@@ -1,0 +1,3 @@
+[submodule "plugin-linear-ascent"]
+	path = plugin-linear-ascent
+	url = https://github.com/huemorgan2/plugin-linear-ascent.git
