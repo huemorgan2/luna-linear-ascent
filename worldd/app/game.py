@@ -1,0 +1,130 @@
+"""World game service — runs the plugin engine against worldd storage.
+
+One row per (tenant, player); scenes computed by the same engine the
+plugin ships. Row-level locking (SELECT ... FOR UPDATE) serializes a
+player's turns; idempotency rows dedupe retried mutations. The world
+frontier is shared across tenants.
+"""
+
+from __future__ import annotations
+
+import json
+
+from .gamepath import ensure_game_importable
+
+ensure_game_importable()
+
+from plugin_linear_ascent.engine import core  # noqa: E402
+from plugin_linear_ascent.engine import state as pstate  # noqa: E402
+from plugin_linear_ascent.engine.scene import Scene  # noqa: E402
+from plugin_linear_ascent.sheet import character_sheet  # noqa: E402
+
+from . import db  # noqa: E402
+
+
+async def _world_frontier(conn) -> int:
+    row = await conn.fetchrow(
+        "SELECT value FROM ascent_world WHERE key='frontier'")
+    return int(json.loads(row["value"])) if row else 1
+
+
+async def _raise_frontier(conn, floor: int) -> None:
+    await conn.execute(
+        "UPDATE ascent_world SET value=$1::jsonb "
+        "WHERE key='frontier' AND (value)::int < $2",
+        json.dumps(floor), floor)
+
+
+async def _load_doc(conn, tenant: str, player: str) -> dict:
+    row = await conn.fetchrow(
+        "SELECT doc FROM ascent_players WHERE tenant=$1 AND player=$2 "
+        "FOR UPDATE", tenant, player)
+    if row:
+        return json.loads(row["doc"])
+    doc = pstate.new_player(f"{tenant}:{player}")
+    await conn.execute(
+        "INSERT INTO ascent_players (tenant, player, doc) "
+        "VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",
+        tenant, player, json.dumps(doc))
+    return doc
+
+
+async def _save_doc(conn, tenant: str, player: str, doc: dict,
+                    ledger: list[dict]) -> None:
+    await conn.execute(
+        "UPDATE ascent_players SET doc=$3, updated_at=now() "
+        "WHERE tenant=$1 AND player=$2",
+        tenant, player, json.dumps(doc))
+    for e in ledger:
+        await conn.execute(
+            "INSERT INTO ascent_ledger (tenant, player, kind, gold, xp, note)"
+            " VALUES ($1,$2,$3,$4,$5,$6)",
+            tenant, player, e.get("kind", ""), int(e.get("gold", 0)),
+            int(e.get("xp", 0)), str(e.get("note", ""))[:256])
+
+
+def _sync_frontier_into_doc(doc: dict, frontier: int) -> None:
+    if frontier > doc.get("unlocked_floor", 1):
+        doc["unlocked_floor"] = frontier
+
+
+async def run_scene(tenant: str, player: str) -> dict:
+    from . import social
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            doc = await _load_doc(conn, tenant, player)
+            await social.inject_world(conn, tenant, player, doc)
+            _sync_frontier_into_doc(doc, doc["_world"]["frontier"])
+            scene: Scene = core.current_scene(doc)
+            ledger = doc.pop("_ledger", [])
+            await social.execute_effects(conn, tenant, player, doc)
+            doc.pop("_world", None)
+            doc["scene"] = scene.to_dict()
+            await _save_doc(conn, tenant, player, doc, ledger)
+            return scene.to_dict()
+
+
+async def run_act(tenant: str, player: str, option: str, text: str,
+                  idem: str) -> dict:
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            if idem:
+                prior = await conn.fetchrow(
+                    "SELECT response FROM ascent_idempotency "
+                    "WHERE tenant=$1 AND idem=$2", tenant, idem)
+                if prior:
+                    return json.loads(prior["response"])
+            from . import social
+            doc = await _load_doc(conn, tenant, player)
+            await social.inject_world(conn, tenant, player, doc)
+            before = doc.get("unlocked_floor", 1)
+            _sync_frontier_into_doc(doc, doc["_world"]["frontier"])
+            scene = core.apply_choice(doc, option, text)
+            ledger = doc.pop("_ledger", [])
+            await social.execute_effects(conn, tenant, player, doc)
+            doc.pop("_world", None)
+            doc["scene"] = scene.to_dict()
+            await _save_doc(conn, tenant, player, doc, ledger)
+            after = doc.get("unlocked_floor", 1)
+            if after > before:
+                await _raise_frontier(conn, after)
+            out = scene.to_dict()
+            if idem:
+                await conn.execute(
+                    "INSERT INTO ascent_idempotency (tenant, idem, response)"
+                    " VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",
+                    tenant, idem, json.dumps(out))
+            return out
+
+
+async def run_character(tenant: str, player: str) -> dict:
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            doc = await _load_doc(conn, tenant, player)
+            if doc["stage"] != "playing":
+                return {"status": "no character yet",
+                        "hint": "Call ascent_scene to start creation."}
+            return character_sheet(doc)

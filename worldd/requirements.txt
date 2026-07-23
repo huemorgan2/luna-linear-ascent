@@ -1,4 +1,4 @@
-fastapi==0.115.*
-uvicorn[standard]==0.34.*
-asyncpg==0.30.*
-pydantic==2.*
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+asyncpg
+pyyaml==0.30.0
