@@ -118,6 +118,70 @@ async def v1_character(body: SceneIn,
     return await game.run_character(tenant, body.player)
 
 
+# ── Self-service enrollment (public, rate-limited) ──────────────────────
+
+ENROLL_PER_HOUR = int(os.environ.get("ASCENT_ENROLL_PER_HOUR", "5"))
+_enroll_hits: dict[str, list[float]] = {}
+
+
+def _enroll_ok(ip: str) -> bool:
+    now = time.monotonic()
+    hits = [t for t in _enroll_hits.get(ip, []) if now - t < 3600]
+    if len(hits) >= ENROLL_PER_HOUR:
+        _enroll_hits[ip] = hits
+        return False
+    hits.append(now)
+    _enroll_hits[ip] = hits
+    return True
+
+
+class EnrollIn(BaseModel):
+    install_id: str = Field(min_length=8, max_length=128)
+    name_hint: str = Field(default="", max_length=32,
+                           pattern=r"^[a-zA-Z0-9\-_ ]*$")
+
+
+@app.post("/v1/enroll")
+async def enroll(body: EnrollIn, request: Request) -> dict:
+    """One-click world signup for a Luna install. Idempotent per install_id.
+
+    No auth by design: the install_id is a client-generated random token,
+    and the response is the tenant's own credentials. Rate limited per IP.
+    """
+    ip = request.client.host if request.client else "?"
+    if not _enroll_ok(ip):
+        raise HTTPException(429, "enrollment rate limited; try again later")
+    pool = await db.get_pool()
+    row = await pool.fetchrow(
+        "SELECT tenant, secret FROM ascent_tenants WHERE install_id = $1",
+        body.install_id)
+    if row:
+        return {"tenant": row["tenant"], "secret": row["secret"],
+                "existing": True}
+    hint = "".join(c for c in body.name_hint.lower()
+                   if c.isalnum() or c == "-")[:20]
+    for _ in range(5):
+        tenant = f"{hint or 'luna'}-{pysecrets.token_hex(4)}"
+        secret = pysecrets.token_hex(32)
+        try:
+            await pool.execute(
+                "INSERT INTO ascent_tenants (tenant, secret, install_id) "
+                "VALUES ($1, $2, $3)", tenant, secret, body.install_id)
+        except Exception:
+            # either a tenant-name collision (reroll) or a concurrent
+            # enroll won the install_id race (return theirs)
+            row = await pool.fetchrow(
+                "SELECT tenant, secret FROM ascent_tenants "
+                "WHERE install_id = $1", body.install_id)
+            if row:
+                return {"tenant": row["tenant"], "secret": row["secret"],
+                        "existing": True}
+            continue
+        log.info("tenant enrolled: %s (ip=%s)", tenant, ip)
+        return {"tenant": tenant, "secret": secret, "existing": False}
+    raise HTTPException(500, "could not allocate tenant")
+
+
 # ── Admin (X-Admin-Key) ──────────────────────────────────────────────────
 
 def _admin(x_admin_key: str = Header(default="")) -> None:
