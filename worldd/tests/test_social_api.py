@@ -19,6 +19,7 @@ async def tenants(client):
 async def create(client, secret, tenant, player, name,
                  race="human", clazz="warrior"):
     await scene(client, secret, tenant, player)
+    await act(client, secret, tenant, player, option="begin")
     await act(client, secret, tenant, player, option=race)
     await act(client, secret, tenant, player, option=clazz)
     return await act(client, secret, tenant, player, text=name)

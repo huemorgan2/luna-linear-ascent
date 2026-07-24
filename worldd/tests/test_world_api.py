@@ -87,6 +87,8 @@ async def test_rejects_stale_timestamp(client, tenant_a):
 async def test_creation_flow_over_http(client, tenant_a):
     player = f"p-{uuid.uuid4().hex[:8]}"
     s = await scene(client, tenant_a, "tenant-a", player)
+    assert "demon king" in s["headline"].lower()   # story intro first
+    s = await act(client, tenant_a, "tenant-a", player, option="begin")
     assert "shard" in s["headline"].lower()
     s = await act(client, tenant_a, "tenant-a", player, option="dwarf")
     assert "how do you fight" in s["headline"]
@@ -103,6 +105,7 @@ async def test_creation_flow_over_http(client, tenant_a):
 async def test_idempotent_act_replays_same_scene(client, tenant_a):
     player = f"p-{uuid.uuid4().hex[:8]}"
     await scene(client, tenant_a, "tenant-a", player)
+    await act(client, tenant_a, "tenant-a", player, option="begin")
     idem = str(uuid.uuid4())
     s1 = await act(client, tenant_a, "tenant-a", player,
                    option="human", idem=idem)
@@ -120,6 +123,7 @@ async def test_frontier_is_shared_across_tenants(client, tenant_a, tenant_b):
         "UPDATE ascent_world SET value='4'::jsonb WHERE key='frontier'")
     player = f"p-{uuid.uuid4().hex[:8]}"
     await scene(client, tenant_b, "tenant-b", player)
+    await act(client, tenant_b, "tenant-b", player, option="begin")
     await act(client, tenant_b, "tenant-b", player, option="elf")
     await act(client, tenant_b, "tenant-b", player, option="archer")
     await act(client, tenant_b, "tenant-b", player, text="Fleet")
@@ -134,6 +138,6 @@ async def test_players_are_tenant_scoped(client, tenant_a, tenant_b):
     player = f"p-{uuid.uuid4().hex[:8]}"
     await scene(client, tenant_a, "tenant-a", player)
     await act(client, tenant_a, "tenant-a", player, option="halfling")
-    # same player name under tenant-b starts fresh at race selection
+    # same player name under tenant-b starts fresh at the story intro
     s = await scene(client, tenant_b, "tenant-b", player)
-    assert "shard" in s["headline"].lower()
+    assert "demon king" in s["headline"].lower()
