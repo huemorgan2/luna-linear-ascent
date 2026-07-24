@@ -62,15 +62,26 @@ model exactly once, via the tool result).
 
 ### W3 — Sidekick voice (plugin instructions; biggest UX win)
 
-Rewrite `_SHARED_RULES`/`_EMBED_RULES` and tool descriptions:
-- never repeat/summarize/re-list anything visible on the card;
-- at most one short in-character sentence, only when it adds information
-  (tactics, warnings, build synergies);
-- if nothing to add: reply with an empty message — silence is correct and
-  expected most of the time;
-- include 3 contrastive calibration examples (good silence / good
-  one-liner / bad narration) — examples steer models better than
-  adjectives.
+Calibration (revised 2026-07-24: the sin is *redundancy*, not speech — the
+sidekick is a character, don't mute it). Rewrite `_SHARED_RULES`/
+`_EMBED_RULES` and tool descriptions:
+- HARD RULE: never repeat, summarize, or re-list anything visible on the
+  card — no re-describing the scene, no reading out the options;
+- at most ONE short in-character sentence (two only for boss/death-level
+  moments);
+- a short line is usually welcome, of one of two kinds:
+  - a tactical read when there's real signal ("Wounded and slow — one
+    strike ends it", "We can't take two hits at 4 HP — lodge first");
+  - a flavor/personality beat when there isn't ("That smell again.
+    Wardens.");
+- go silent (empty reply) during repetitive beats — mid-combat grind,
+  the third fight in a row, routine shop visits — where any comment is
+  noise;
+- always speak on notable beats: new floor, boss, near-death, level-up,
+  rare loot;
+- include ~4 contrastive calibration examples (good tactical line / good
+  flavor line / good silence / bad narration) — examples steer models
+  better than adjectives.
 
 ## Execution order
 
@@ -79,8 +90,9 @@ Rewrite `_SHARED_RULES`/`_EMBED_RULES` and tool descriptions:
    temporarily hide `post_chat_card` to prove the stock-Luna fallback.
 3. W3 → dojo-style multi-turn playtest (real browser, real conversation):
    creation → town → 3 fights → a warden/boss encounter. Assert:
-   - every agent bubble ≤ 1 sentence; ≥ 1 scene gets pure silence;
-   - no bubble re-lists card options;
+   - every agent bubble ≤ 1 short sentence (≤ 2 on boss/death beats);
+   - ≥ 1 repetitive scene gets pure silence; big beats always get a line;
+   - no bubble re-lists card options or re-describes the scene;
    - cards survive page reload;
    - phase-8 regression: settings tab join/disconnect still works after the
      Luna rebuild.
