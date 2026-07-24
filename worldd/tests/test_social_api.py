@@ -154,3 +154,28 @@ async def test_gnarl_quorum_two_players(client, tenants):
     assert any("Gnarl" in r["line"] for r in stone)
     await pool.execute(
         "UPDATE ascent_world SET value='1'::jsonb WHERE key='frontier'")
+
+
+async def test_muster_roll_lists_all_climbers(client, tenants):
+    a, b = tenants
+    pa, pb = f"a-{uuid.uuid4().hex[:6]}", f"b-{uuid.uuid4().hex[:6]}"
+    na, nb = f"Vex{pa[-4:]}", f"Wren{pb[-4:]}"
+    await create(client, a, "tenant-a", pa, na)
+    await create(client, b, "tenant-b", pb, nb, race="elf", clazz="archer")
+
+    docb = await get_doc("tenant-b", pb)
+    docb.update({"level": 12, "unlocked_floor": 14, "bank": 5000})
+    await set_doc("tenant-b", pb, docb)
+
+    s = await act(client, a, "tenant-a", pa, option="muster")
+    assert "climber" in s["headline"]
+    # B out-climbs the fresh chars: on the board with class, floor, wealth
+    rows = [l for l in s["body_lines"] if l.startswith(nb)]
+    assert rows, s["body_lines"]
+    assert "elf archer" in rows[0]
+    assert "floor 14" in rows[0]
+    assert "wealth #" in rows[0]
+    # the board is sorted by frontier floor, strongest first
+    floors = [int(l.split("floor ")[1].split(" ")[0])
+              for l in s["body_lines"] if "floor " in l]
+    assert floors == sorted(floors, reverse=True)

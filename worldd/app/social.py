@@ -50,6 +50,8 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
     w["pvp_targets"] = await _pvp_targets(conn, tenant, player, doc, day)
     w["grant_targets"] = await _grant_targets(conn, doc)
 
+    w["roster"], w["roster_count"] = await _roster(conn)
+
     rows = await conn.fetch(
         "SELECT guild FROM ascent_guilds ORDER BY created_at LIMIT 6")
     w["guilds"] = [r["guild"] for r in rows]
@@ -73,6 +75,34 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
         }
 
     doc["_world"] = w
+
+
+async def _roster(conn) -> tuple[list[dict], int]:
+    """The Muster Roll: every playing climber, strongest floors first.
+    Banked-wealth rank is over the whole roster; the board shows 12."""
+    rows = await conn.fetch(
+        "SELECT doc, updated_at FROM ascent_players "
+        "WHERE doc->>'stage'='playing'")
+    now = pstate.now()
+    entries = []
+    for r in rows:
+        d = json.loads(r["doc"])
+        entries.append({
+            "name": d.get("name") or "a climber",
+            "race": d.get("race") or "?",
+            "clazz": d.get("clazz") or "?",
+            "level": d.get("level", 1),
+            "power": pstate.atk(d) + pstate.dfs(d),
+            "floor": d.get("unlocked_floor", 1),
+            "bank": d.get("bank", 0),
+            "last_seen_days": max(0, (now - r["updated_at"]).days),
+        })
+    by_bank = sorted(entries, key=lambda e: -e["bank"])
+    for rank, e in enumerate(by_bank, 1):
+        e["bank_rank"] = rank
+        del e["bank"]                      # rank is public, balance is not
+    entries.sort(key=lambda e: (-e["floor"], -e["level"]))
+    return entries[:12], len(entries)
 
 
 async def _known_names(conn, doc: dict) -> list[str]:
@@ -140,6 +170,12 @@ async def execute_effects(conn, tenant: str, player: str,
             await conn.execute(
                 "INSERT INTO ascent_guilds (guild, founder) VALUES ($1,$2) "
                 "ON CONFLICT DO NOTHING", e["guild"], doc.get("name") or player)
+        elif kind == "happening":
+            # engine-reported world news: deaths, warden first clears
+            await conn.execute(
+                "INSERT INTO ascent_happenings (world_day, kind, line) "
+                "VALUES ($1,'climb',$2)", pstate.world_day(),
+                str(e.get("line", ""))[:200])
         # guild_join / guild_leave live entirely in the doc
 
 
