@@ -1,0 +1,212 @@
+[
+  {
+    "machine_id": "1855360a733478",
+    "agent_id": "dfed269e-4aba-4aec-9ce5-5a7acb24be0a",
+    "agent_slug": "alonna-my-luna",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "d893275ce55648",
+    "agent_id": "f0def852-1b77-4ad2-8d6c-95adaae95565",
+    "agent_slug": "roy-moshe",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "d8d0500a157358",
+    "agent_id": "86bc8212-616e-4590-bc41-f69c598d0722",
+    "agent_slug": "roy-billmaster",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "859054f4153d58",
+    "agent_id": "09785042-c266-4d1b-934a-6d08005644c4",
+    "agent_slug": "orma-my-luna-1",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "48e06e2b14d048",
+    "agent_id": "d5710769-6ae3-4d8a-8597-0cd6b3550f0b",
+    "agent_slug": "vaselin-test-0-13-016-8-5-pluginsdk-9849753-2",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "843e4ec2472618",
+    "agent_id": "92ef4519-55dd-4127-a1b0-20f56db77609",
+    "agent_slug": "matanla-rico",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "d8d1d27a651758",
+    "agent_id": "e39ae44f-b03e-4789-9b82-0e0eabe6ef37",
+    "agent_slug": "alonna-my-luna-2",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "7847317b052528",
+    "agent_id": "5e959fe6-2249-4712-b8ac-68996d5efc34",
+    "agent_slug": "daniel-b-my-luna",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "2862947a750408",
+    "agent_id": "44b4a51a-db22-46c8-82b6-8ae3dc5a9581",
+    "agent_slug": "oronm-margoluna",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "683e510fd5e2e8",
+    "agent_id": "d22b09be-bc1d-4704-ba48-906d6f1de66b",
+    "agent_slug": "nave-my-luna",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "d8d52e6f152e08",
+    "agent_id": "f909b267-bde9-4399-a6e4-e54bb5e43d6a",
+    "agent_slug": "guyre-arya",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "d8953eefe6d368",
+    "agent_id": "4a40cc11-585d-4c08-b9bd-34c4feaeed90",
+    "agent_slug": "nadavsh-obi",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "8994e3c6e4e118",
+    "agent_id": "c227bf38-9125-4dbd-8c37-e16542418d77",
+    "agent_slug": "avivda-soul",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "827562c7960648",
+    "agent_id": "8facfd61-39c0-460e-ae89-eb12b525fad7",
+    "agent_slug": "tomerkr-neo",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "89605ef6ee9608",
+    "agent_id": "ba2fb622-4d12-4781-8ec2-f24c981c7c78",
+    "agent_slug": "peterse-goldie",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "2872d9dc3d6048",
+    "agent_id": "6a336901-25f3-4f2e-8c07-b60d1ecb36e6",
+    "agent_slug": "vaselin-pa",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "48ee1e3ad1d118",
+    "agent_id": "57a87dba-9928-4321-8dc0-7b0ed2274615",
+    "agent_slug": "yaelma-my-luna",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "811099c97d9238",
+    "agent_id": "0f34e542-4486-4e7f-b81e-d7e390da78ef",
+    "agent_slug": "vaselin-starla",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "8d9e32be225ed8",
+    "agent_id": "67fd8bb0-13d4-4baa-8f89-15e91aba6f7a",
+    "agent_slug": "kerenko-keren-s-assistant",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "185455dc7d4d58",
+    "agent_id": "258e335c-2bf3-44a4-93ba-506c82247761",
+    "agent_slug": "alonna-fde-luna",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "e826025a027ed8",
+    "agent_id": "2347bb65-e668-47e1-ba7f-94da9bdeeb27",
+    "agent_slug": "matanla-messi",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "18511e2a2d4d38",
+    "agent_id": "633b5261-0883-4f1c-8897-d4c41c90ec68",
+    "agent_slug": "darya-robin",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "d89575db236648",
+    "agent_id": "4678bb46-9a0b-4dae-8b4c-5e213dc7bbfd",
+    "agent_slug": "kateni-mellon",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "8d3d0dae9dee38",
+    "agent_id": "58d31507-63b9-48a5-9f9d-77de73756da1",
+    "agent_slug": "roniak-rocky",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "e823500f6d4538",
+    "agent_id": "63cbee42-989d-4a26-b74c-ab9831dfdaf0",
+    "agent_slug": "alexpe-my-luna",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "48e03d4bd900d8",
+    "agent_id": "549df3dd-247a-484f-9d9d-c40b413fc0ab",
+    "agent_slug": "noamac-my-luna",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "68352d2b504058",
+    "agent_id": "23444a1e-5348-4acb-9c41-ddef5770cc6e",
+    "agent_slug": "moshecr-moshe-s-luna",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "781e002a231928",
+    "agent_id": "9631a190-b920-4ef4-bfef-612928194da0",
+    "agent_slug": "oran-my-luna",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "87e125b02ddd68",
+    "agent_id": "ddb4a0fc-c5c7-4af4-b280-cc5f16652457",
+    "agent_slug": "dotanbahat-john-doe",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  },
+  {
+    "machine_id": "2870274f41e1d8",
+    "agent_id": "502d7d55-7ecd-42f0-8be5-d3840ff49604",
+    "agent_slug": "vaselin-gamer",
+    "fly_state": "started",
+    "image_version": "0.48.006"
+  }
+]
