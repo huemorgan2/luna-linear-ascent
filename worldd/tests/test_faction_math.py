@@ -55,3 +55,25 @@ def test_suggest_targets_scale_with_crew():
     assert large["hoard"] == 3 * small["hoard"]
     assert large["cull"] == 3 * small["cull"]
     assert small["hoard"] > 0 and small["climb"] > 0
+
+
+def test_week_kind_walks_the_rotation():
+    # week k posts kind k % 3 — HOARD → CULL → CLIMB, forever
+    assert [factions.week_kind(w) for w in range(6)] == \
+        ["hoard", "cull", "climb", "hoard", "cull", "climb"]
+
+
+def test_entry_cost_is_dues_sized():
+    assert factions.entry_cost(1) == 5
+    assert factions.entry_cost(4) == 20
+    assert factions.entry_cost(0) == 5    # never free
+
+
+def test_take_gold_charges_gold_then_bank():
+    doc = {"gold": 10, "bank": 20}
+    assert factions.take_gold(doc, 15)
+    assert doc["gold"] == 0 and doc["bank"] == 15
+    assert factions.take_gold(doc, 15)
+    assert doc["gold"] == 0 and doc["bank"] == 0
+    assert not factions.take_gold(doc, 1)     # broke stays broke
+    assert doc["gold"] == 0 and doc["bank"] == 0
