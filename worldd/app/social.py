@@ -54,13 +54,20 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
 
     w["roster"], w["roster_count"] = await _roster(conn)
 
+    # 010: factions are authoritative — the doc's guild string follows the
+    # membership table (kicks land on the next load), and the Guildhall
+    # lists factions instead of the legacy guilds table.
+    from . import factions
+    await factions.sync_doc_guild(conn, tenant, player, doc)
     rows = await conn.fetch(
-        "SELECT guild FROM ascent_guilds ORDER BY created_at LIMIT 6")
-    w["guilds"] = [r["guild"] for r in rows]
+        "SELECT name FROM ascent_factions ORDER BY created_at LIMIT 6")
+    w["guilds"] = [r["name"] for r in rows]
     if doc.get("guild"):
         roster = await conn.fetch(
-            "SELECT doc->>'name' AS name FROM ascent_players "
-            "WHERE doc->>'guild' = $1 AND doc->>'stage' = 'playing'",
+            "SELECT p.doc->>'name' AS name FROM ascent_faction_members m "
+            "JOIN ascent_players p ON p.tenant=m.tenant "
+            "  AND p.player=m.player "
+            "WHERE m.faction=$1 AND p.doc->>'stage'='playing'",
             doc["guild"])
         w["guild_roster"] = [r["name"] for r in roster if r["name"]]
 
@@ -223,9 +230,17 @@ async def execute_effects(conn, tenant: str, player: str,
                 "UPDATE ascent_letters SET read=TRUE "
                 "WHERE id = ANY($1::bigint[]) AND gold=0", e.get("ids", []))
         elif kind == "guild_found":
+            # legacy table kept in sync for audit; factions are the system
             await conn.execute(
                 "INSERT INTO ascent_guilds (guild, founder) VALUES ($1,$2) "
                 "ON CONFLICT DO NOTHING", e["guild"], doc.get("name") or player)
+            await _fx_faction_found(conn, tenant, player, doc, e)
+        elif kind == "guild_join":
+            from . import factions
+            await factions.join_faction(conn, tenant, player, e["guild"])
+        elif kind == "guild_leave":
+            from . import factions
+            await factions.leave_faction(conn, tenant, player)
         elif kind == "happening":
             # engine-reported world news: deaths, warden first clears
             await conn.execute(
@@ -233,6 +248,23 @@ async def execute_effects(conn, tenant: str, player: str,
                 " floor) VALUES ($1,'climb',$2,$3)", pstate.world_day(),
                 str(e.get("line", ""))[:200], int(e.get("floor", 0)))
         # guild_join / guild_leave live entirely in the doc
+
+
+async def _fx_faction_found(conn, tenant: str, player: str, doc: dict,
+                            e: dict) -> None:
+    """Engine-side founding (the Guildhall flow) — the fee was already
+    charged in the doc; give the banner a deterministic sigil the steward
+    can keep or change from the Community tab."""
+    from . import factions
+    name = str(e["guild"])[:24]
+    taken = await conn.fetchval(
+        "SELECT 1 FROM ascent_factions WHERE name=$1", name)
+    if taken:
+        return                       # name raced — membership via join path
+    slugs = factions.banner_slugs()
+    banner = slugs[sum(name.encode()) % len(slugs)]
+    await factions.create_faction(conn, tenant, player, name, banner,
+                                  doc.get("name") or player)
 
 
 async def _find_player_by_name(conn, name: str):

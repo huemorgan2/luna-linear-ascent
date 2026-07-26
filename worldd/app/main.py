@@ -133,6 +133,255 @@ async def v1_import(body: ImportIn,
     return await game.run_import(tenant, body.player, body.doc)
 
 
+# ── Score & Community (plan 010) ─────────────────────────────────────────
+
+@app.post("/v1/leaderboard")
+async def v1_leaderboard(body: SceneIn,
+                         tenant: str = Depends(auth.verify_tenant)) -> dict:
+    """Every playing climber — level and gold visible (010 widened this
+    deliberately; Muster kept bank as rank-only, the Score tab shows it)."""
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT p.tenant, p.player, p.doc, p.updated_at, m.faction "
+            "FROM ascent_players p "
+            "LEFT JOIN ascent_faction_members m "
+            "  ON m.tenant=p.tenant AND m.player=p.player "
+            "WHERE p.doc->>'stage'='playing'")
+    import json as _json
+
+    from plugin_linear_ascent.engine import state as pstate
+    now = pstate.now()
+    out = []
+    for r in rows:
+        d = _json.loads(r["doc"])
+        out.append({
+            "name": d.get("name") or "a climber",
+            "race": d.get("race") or "?",
+            "clazz": d.get("clazz") or "?",
+            "level": d.get("level", 1),
+            "gold": d.get("gold", 0),
+            "bank": d.get("bank", 0),
+            "floor": d.get("unlocked_floor", 1),
+            "faction": r["faction"] or "",
+            "you": r["tenant"] == tenant and True or False,
+            "last_seen_days": max(0, (now - r["updated_at"]).days),
+        })
+    out.sort(key=lambda e: (-e["level"], -(e["gold"] + e["bank"])))
+    return {"players": out[:200], "total": len(out)}
+
+
+class FactionCreateIn(BaseModel):
+    player: str = Field(min_length=1, max_length=128)
+    name: str = Field(min_length=3, max_length=24)
+    banner: str = Field(default="wolf_howl", max_length=32)
+
+
+class FactionJoinIn(BaseModel):
+    player: str = Field(min_length=1, max_length=128)
+    faction: str = Field(min_length=3, max_length=24)
+
+
+class FactionKickIn(BaseModel):
+    player: str = Field(min_length=1, max_length=128)
+    target_tenant: str = Field(min_length=1, max_length=64)
+    target_player: str = Field(min_length=1, max_length=128)
+
+
+class FactionGoalIn(BaseModel):
+    player: str = Field(min_length=1, max_length=128)
+    kind: str = Field(min_length=3, max_length=16)
+    target: int = Field(gt=0, le=10_000_000_000)
+
+
+@app.post("/v1/faction/list")
+async def v1_faction_list(body: SceneIn,
+                          tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import factions
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        rows = await conn.fetch(
+            "SELECT f.name, f.banner, f.goal_kind, f.goal_target, "
+            "count(m.player) AS members "
+            "FROM ascent_factions f "
+            "LEFT JOIN ascent_faction_members m ON m.faction=f.name "
+            "GROUP BY f.name, f.banner, f.goal_kind, f.goal_target "
+            "ORDER BY members DESC, f.name")
+    return {"factions": [dict(r) for r in rows],
+            "banners": factions.banner_slugs(),
+            "found_fee": factions.FOUND_FEE}
+
+
+@app.post("/v1/faction/status")
+async def v1_faction_status(body: SceneIn,
+                            tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import factions
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            me = await factions.member_row(conn, tenant, body.player)
+            if me is None:
+                return {"faction": None}
+            fac_name = me["faction"]
+            await factions.maybe_resolve(conn, fac_name)
+            fac = await conn.fetchrow(
+                "SELECT name, banner, goal_kind, goal_target "
+                "FROM ascent_factions WHERE name=$1", fac_name)
+            members = await factions.members_of(conn, fac_name)
+            week = factions.world_week()
+            attend = await factions.week_attendance(conn, fac_name, week)
+            required = sum(factions.required_days(m["joined_day"], week)
+                           for m in members)
+            attended = sum(attend.get((m["tenant"], m["player"]), 0)
+                           for m in members)
+            progress = await factions._progress(
+                conn, fac_name, fac["goal_kind"], week)
+            last = await conn.fetchrow(
+                "SELECT week, goal_kind, goal_target, progress, multiplier,"
+                " prize_note FROM ascent_faction_weeks WHERE faction=$1 "
+                "ORDER BY week DESC LIMIT 1", fac_name)
+            avg_level = round(sum(m["level"] for m in members)
+                              / max(1, len(members)))
+    return {
+        "faction": fac["name"],
+        "banner": fac["banner"],
+        "role": me["role"],
+        "members": [{
+            "tenant": m["tenant"], "player": m["player"],
+            "name": m["name"] or m["player"], "role": m["role"],
+            "level": m["level"],
+            "days": attend.get((m["tenant"], m["player"]), 0),
+            "required": factions.required_days(m["joined_day"], week),
+        } for m in members],
+        "goal": {"kind": fac["goal_kind"], "target": fac["goal_target"],
+                 "progress": progress},
+        "attendance": {"attended": attended, "required": required,
+                       "multiplier": factions.attendance_multiplier(
+                           attended, required)},
+        "base_pct": factions.base_pct(len(members)),
+        "suggested": factions.suggest_targets(len(members), avg_level),
+        "last_week": dict(last) if last else None,
+    }
+
+
+@app.post("/v1/faction/create")
+async def v1_faction_create(body: FactionCreateIn,
+                            tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import factions
+    name = body.name.strip()
+    if not factions.NAME_RE.match(name):
+        raise HTTPException(422, "3–24 letters, numbers, spaces, - or '")
+    if body.banner not in factions.banner_slugs():
+        raise HTTPException(422, "unknown banner")
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            if await factions.member_row(conn, tenant, body.player):
+                raise HTTPException(409, "you already sit at a table — "
+                                         "leave it first")
+            row = await conn.fetchrow(
+                "SELECT doc FROM ascent_players WHERE tenant=$1 AND "
+                "player=$2 FOR UPDATE", tenant, body.player)
+            if row is None:
+                raise HTTPException(404, "no character")
+            import json as _json
+            doc = _json.loads(row["doc"])
+            if doc.get("stage") != "playing":
+                raise HTTPException(409, "finish character creation first")
+            if doc.get("gold", 0) < factions.FOUND_FEE:
+                raise HTTPException(
+                    402, f"founding a banner costs ◈ {factions.FOUND_FEE}")
+            taken = await conn.fetchval(
+                "SELECT 1 FROM ascent_factions WHERE name=$1", name)
+            if taken:
+                raise HTTPException(409, "that banner already flies")
+            doc["gold"] -= factions.FOUND_FEE
+            await conn.execute(
+                "UPDATE ascent_players SET doc=$3, updated_at=now() "
+                "WHERE tenant=$1 AND player=$2",
+                tenant, body.player, _json.dumps(doc))
+            await conn.execute(
+                "INSERT INTO ascent_ledger (tenant, player, kind, gold,"
+                " note) VALUES ($1,$2,'faction_found',$3,$4)",
+                tenant, body.player, -factions.FOUND_FEE, name)
+            await factions.create_faction(
+                conn, tenant, body.player, name, body.banner,
+                doc.get("name") or body.player)
+    return {"ok": True, "faction": name}
+
+
+@app.post("/v1/faction/join")
+async def v1_faction_join(body: FactionJoinIn,
+                          tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import factions
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            if await factions.member_row(conn, tenant, body.player):
+                raise HTTPException(409, "leave your table first")
+            fac = await conn.fetchval(
+                "SELECT 1 FROM ascent_factions WHERE name=$1", body.faction)
+            if not fac:
+                raise HTTPException(404, "no such banner")
+            await factions.join_faction(conn, tenant, body.player,
+                                        body.faction)
+    return {"ok": True, "faction": body.faction}
+
+
+@app.post("/v1/faction/leave")
+async def v1_faction_leave(body: SceneIn,
+                           tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import factions
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            await factions.leave_faction(conn, tenant, body.player)
+    return {"ok": True}
+
+
+@app.post("/v1/faction/kick")
+async def v1_faction_kick(body: FactionKickIn,
+                          tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import factions
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            me = await factions.member_row(conn, tenant, body.player)
+            if me is None or me["role"] != "steward":
+                raise HTTPException(403, "only the steward removes members")
+            target = await factions.member_row(
+                conn, body.target_tenant, body.target_player)
+            if target is None or target["faction"] != me["faction"]:
+                raise HTTPException(404, "not at your table")
+            if (body.target_tenant, body.target_player) == \
+                    (tenant, body.player):
+                raise HTTPException(422, "leave, don't kick yourself")
+            await conn.execute(
+                "DELETE FROM ascent_faction_members "
+                "WHERE tenant=$1 AND player=$2",
+                body.target_tenant, body.target_player)
+    return {"ok": True}
+
+
+@app.post("/v1/faction/goal")
+async def v1_faction_goal(body: FactionGoalIn,
+                          tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import factions
+    if body.kind not in factions.GOAL_KINDS:
+        raise HTTPException(422, f"kind must be one of {factions.GOAL_KINDS}")
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            me = await factions.member_row(conn, tenant, body.player)
+            if me is None or me["role"] != "steward":
+                raise HTTPException(403, "only the steward sets the goal")
+            await factions.maybe_resolve(conn, me["faction"])
+            await conn.execute(
+                "UPDATE ascent_factions SET goal_kind=$2, goal_target=$3 "
+                "WHERE name=$1", me["faction"], body.kind, body.target)
+    return {"ok": True}
+
+
 # ── Self-service enrollment (public, rate-limited) ──────────────────────
 
 ENROLL_PER_HOUR = int(os.environ.get("ASCENT_ENROLL_PER_HOUR", "5"))

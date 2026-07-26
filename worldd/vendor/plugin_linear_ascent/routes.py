@@ -31,11 +31,10 @@ _ctx: PluginContext | None = None
 
 # Which event kinds warrant which agent nudge. A "moment" runs a genuine
 # reaction turn (the sidekick speaks on its own); "awareness" just lands in
-# history for the agent's next natural turn. Ordinary scenes get neither —
-# fast clicking stays silent, exactly like a human watching over your
-# shoulder who only speaks when something happens.
+# history — no model turn — so the agent always knows the state when it DOES
+# speak. 009: every act notifies; moments stay reserved for the big beats so
+# fast grind clicking never spends model turns on silence.
 _MOMENT_KINDS = {"death", "boss"}
-_AWARENESS_KINDS = {"present", "letter", "loot", "news"}
 
 
 class JoinIn(BaseModel):
@@ -46,33 +45,71 @@ class JoinIn(BaseModel):
     name_hint: str = Field(default="", max_length=32)
 
 
+class FactionCreateIn(BaseModel):
+    name: str = Field(min_length=3, max_length=24)
+    banner: str = Field(default="wolf_howl", max_length=32)
+
+
+class FactionJoinIn(BaseModel):
+    faction: str = Field(min_length=3, max_length=24)
+
+
+class FactionKickIn(BaseModel):
+    tenant: str = Field(min_length=1, max_length=64)
+    player: str = Field(min_length=1, max_length=128)
+
+
+class FactionGoalIn(BaseModel):
+    kind: str = Field(min_length=3, max_length=16)
+    target: int = Field(gt=0, le=10_000_000_000)
+
+
 class ActIn(BaseModel):
     option: str = Field(default="", max_length=64)
     text: str = Field(default="", max_length=200)
+    # 009: the game pane acts directly — no chat card gets posted back.
+    mode: str = Field(default="", max_length=16)
+    scene_id: str = Field(default="", max_length=64)
     # Injected by the chat shell's bridge, not by the card itself.
     conversation_id: str | None = Field(default=None, max_length=64)
     message_id: str | None = Field(default=None, max_length=64)
 
 
+def _state_line(scene) -> str:
+    """One compact line of game state for awareness rows — never HTML."""
+    bits = [scene.eyebrow, scene.headline]
+    m = scene.meters
+    if m:
+        bits.append(f"HP {m.hp}/{m.hp_max} · ⚡{m.energy}/{m.energy_max} "
+                    f"· ✦{m.xp}/{m.xp_need} · ◈{m.gold}")
+    if scene.options:
+        bits.append("options: " + ", ".join(o.label for o in scene.options))
+    return " · ".join(b for b in bits if b)
+
+
 def _notify_agent(scene, conversation_id: str | None) -> None:
-    """Fire-and-forget sidekick reaction on notable beats. Never blocks the
-    click response — the card must feel like code, not like a model."""
+    """Fire-and-forget sidekick nudge on EVERY act (009): big beats get a
+    moment (a real reaction turn, silence invited); everything else lands
+    as an awareness row so the agent tracks state without spending turns.
+    Never blocks the click response — the pane must feel like code."""
     kind = scene.event_kind
-    channel = ("moment" if kind in _MOMENT_KINDS
-               else "awareness" if kind in _AWARENESS_KINDS
-               else None)
-    if channel is None:
-        return
+    channel = "moment" if kind in _MOMENT_KINDS else "awareness"
     send = getattr(_ctx, "send_muted_message", None) if _ctx else None
     if send is None:
         return
-    from .plugin import _VOICE_RULES
-    content = (
-        "The player just advanced Linear Ascent by clicking the scene "
-        "card — the scene below is ALREADY on their screen as a card. "
-        "You are their shardmind sidekick, reacting to what just "
-        "happened.\n\n" + scene.to_text() + "\n\n" + _VOICE_RULES)
-    title = f"Linear Ascent — {kind or 'the world moved'}"
+    if channel == "moment":
+        from .plugin import _VOICE_RULES
+        content = (
+            "The player just advanced Linear Ascent from the game pane — "
+            "the scene below is ALREADY on their screen. You are their "
+            "shardmind sidekick, reacting to what just happened.\n\n"
+            + scene.to_text() + "\n\n" + _VOICE_RULES)
+    else:
+        content = (
+            "Linear Ascent state (the player is playing in the game pane; "
+            "this is for your awareness only — do not respond): "
+            + _state_line(scene))
+    title = f"Linear Ascent — {kind or 'the climb continues'}"
 
     async def _fire():
         try:
@@ -163,38 +200,135 @@ def register_routes(app, ctx: PluginContext) -> None:
 
     @router.post("/act")
     async def act(body: ActIn, user=Depends(get_current_user)) -> dict:
-        """The interactive-card game loop: apply the clicked option, post
-        the next scene as a standalone card, nudge the agent on big beats.
+        """The game loop. 009: the pane is the primary caller — it acts
+        directly and swaps the returned fragment in place; nothing is
+        posted to the chat. Clicks on legacy cards still in chat history
+        keep working: they mutate state and the result shows in the pane
+        (their bridge gets ok + no card, and the old card locks its rows).
         Stale/unknown options are handled by the engine itself (it returns
-        the current scene with a steering hint), so a click on an old card
-        still lands somewhere sensible."""
-        from .render import render_scene
+        the current scene with a steering hint)."""
+        from .render import render_scene_fragment
 
         key = runtime.player_key()
         scene = await runtime.act_for(key, body.option.strip(),
                                       body.text.strip())
-        posted = None
-        post_card = getattr(_ctx, "post_chat_card", None) if _ctx else None
-        if post_card is not None:
-            try:
-                posted = await post_card(
-                    render_scene(scene),
-                    conversation_id=body.conversation_id)
-            except Exception:
-                posted = None
-        if not posted:
-            # No card capability / no resolvable conversation: the click
-            # cannot show its result. Tell the bridge so the card can fall
-            # back to "reply with a number".
-            raise HTTPException(503, "host cannot post scene cards")
         _notify_agent(scene, body.conversation_id)
         return {
             "ok": True,
-            "message_id": posted,
             "scene_id": scene.scene_id,
             "event_kind": scene.event_kind,
             "headline": scene.headline,
+            "fragment": render_scene_fragment(scene),
         }
+
+    @router.post("/pane/scene")
+    async def pane_scene(user=Depends(get_current_user)) -> dict:
+        """Current scene for the pane — idempotent read, same fragment
+        grammar as /act."""
+        from .render import render_scene_fragment
+
+        scene = await runtime.scene_for(runtime.player_key())
+        return {
+            "ok": True,
+            "scene_id": scene.scene_id,
+            "event_kind": scene.event_kind,
+            "headline": scene.headline,
+            "fragment": render_scene_fragment(scene),
+        }
+
+    @router.get("/pane/peek")
+    async def pane_peek(user=Depends(get_current_user)) -> dict:
+        """Freshness probe: the last scene id this process produced for the
+        player (chat-driven acts update it too). No world round trip."""
+        return {"scene_id": runtime.last_scene_id(runtime.player_key())}
+
+    # ── 010: score & community (worldd proxies with the host's auth) ────
+
+    def _world():
+        remote = runtime.state["remote"]
+        if remote is None:
+            raise HTTPException(
+                503, "The world signal is gone — score and factions live "
+                     "in the shared world. Try again in a moment.")
+        return remote
+
+    async def _proxy(coro):
+        from .backend.remote import WorldError
+        try:
+            return await coro
+        except WorldError as e:
+            msg = str(e)
+            code = 400
+            for c in (402, 403, 404, 409, 422, 429):
+                if f"worldd {c}" in msg:
+                    code = c
+                    break
+            raise HTTPException(code, msg.split(": ", 1)[-1][:200])
+        except httpx.HTTPError:
+            raise HTTPException(502, "the world isn't answering")
+
+    @router.get("/pane/score")
+    async def pane_score(user=Depends(get_current_user)) -> dict:
+        return await _proxy(_world().leaderboard(runtime.player_key()))
+
+    @router.get("/pane/community")
+    async def pane_community(user=Depends(get_current_user)) -> dict:
+        w = _world()
+        key = runtime.player_key()
+        status = await _proxy(w.faction_status(key))
+        listing = await _proxy(w.faction_list(key))
+        return {"status": status, "list": listing}
+
+    @router.post("/pane/community/create")
+    async def pane_faction_create(body: FactionCreateIn,
+                                  user=Depends(get_current_user)) -> dict:
+        return await _proxy(_world().faction_create(
+            runtime.player_key(), body.name.strip(), body.banner.strip()))
+
+    @router.post("/pane/community/join")
+    async def pane_faction_join(body: FactionJoinIn,
+                                user=Depends(get_current_user)) -> dict:
+        return await _proxy(_world().faction_join(
+            runtime.player_key(), body.faction.strip()))
+
+    @router.post("/pane/community/leave")
+    async def pane_faction_leave(user=Depends(get_current_user)) -> dict:
+        return await _proxy(_world().faction_leave(runtime.player_key()))
+
+    @router.post("/pane/community/kick")
+    async def pane_faction_kick(body: FactionKickIn,
+                                user=Depends(get_current_user)) -> dict:
+        return await _proxy(_world().faction_kick(
+            runtime.player_key(), body.tenant, body.player))
+
+    @router.post("/pane/community/goal")
+    async def pane_faction_goal(body: FactionGoalIn,
+                                user=Depends(get_current_user)) -> dict:
+        return await _proxy(_world().faction_goal(
+            runtime.player_key(), body.kind, body.target))
+
+    @router.get("/art/factions/{slug}.png")
+    async def faction_banner(slug: str):
+        """Faction sigil art for the pane (white-ink 1-bit PNG, tinted
+        client-side via CSS mask). Public like the pane shell itself."""
+        import os as _os
+        import re as _re
+
+        from fastapi.responses import FileResponse
+        if not _re.fullmatch(r"[a-z0-9_]{1,32}", slug):
+            raise HTTPException(404, "no such sigil")
+        path = _os.path.join(
+            _os.path.dirname(_os.path.abspath(__file__)), "content", "art",
+            "banners", "factions", f"{slug}_320x112.png")
+        if not _os.path.exists(path):
+            raise HTTPException(404, "no such sigil")
+        return FileResponse(path, media_type="image/png",
+                            headers={"Cache-Control": "max-age=86400"})
+
+    @router.get("/ui/", response_class=HTMLResponse)
+    async def pane_ui():
+        from .pane import render_pane
+        return HTMLResponse(render_pane())
 
     @router.get("/ui/settings/", response_class=HTMLResponse)
     async def settings_ui():

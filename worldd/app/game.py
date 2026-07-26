@@ -96,7 +96,14 @@ async def run_act(tenant: str, player: str, option: str, text: str,
                     "WHERE tenant=$1 AND idem=$2", tenant, idem)
                 if prior:
                     return json.loads(prior["response"])
-            from . import social
+            from . import factions, social
+            # 010: any act marks today attended; the player's faction
+            # resolves its previous week lazily on the first act of a
+            # new one.
+            await factions.record_attendance(conn, tenant, player)
+            mine = await factions.member_row(conn, tenant, player)
+            if mine:
+                await factions.maybe_resolve(conn, mine["faction"])
             doc = await _load_doc(conn, tenant, player)
             await social.inject_world(conn, tenant, player, doc)
             before = doc.get("unlocked_floor", 1)
