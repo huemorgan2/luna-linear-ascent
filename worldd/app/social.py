@@ -486,7 +486,7 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
         d["gold"] = d.get("gold", 0) + gold_i
         if d.get("unlocked_floor", 1) <= floor:
             d["unlocked_floor"] = floor + 1
-        body = [f"+ {xp_i:,} experience — your share of the kill",
+        body = [f"+ {xp_i:,} XP — your share of the kill",
                 f"+ ◈ {gold_i:,} from the Warden's hoard"]
         if finisher:
             loot = pstate.rng_pick(
