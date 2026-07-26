@@ -185,6 +185,22 @@ def warden_gold(floor: int) -> int:
     return 80 * floor
 
 
+# ── §5b The shared frontier Warden (007 §3) ──────────────────────────────
+# The live Warden at the world frontier is ONE monster for everyone: a
+# world HP pool that any climber strikes for 3⚡. Slow regen makes solo
+# chipping possible but a handful of blades far faster. The reward pool
+# scales with the HP pool and splits by damage dealt, so the payout per
+# energy matches the solo-tuned warden.
+
+WARDEN_WORLD_HP_MULT = 4
+WARDEN_WORLD_REGEN_HOURLY = 0.08    # of max HP, back per hour
+WARDEN_WORLD_REWARD_MULT = WARDEN_WORLD_HP_MULT
+
+
+def world_warden_hp(floor: int) -> int:
+    return warden_stats(floor)[2] * WARDEN_WORLD_HP_MULT
+
+
 @dataclass(frozen=True)
 class MilestoneBoss:
     floor: int

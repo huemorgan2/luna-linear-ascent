@@ -119,6 +119,47 @@ async def run_act(tenant: str, player: str, option: str, text: str,
             return out
 
 
+_IMPORT_STAGES = {"intro", "creation_race", "creation_class",
+                  "creation_name", "playing"}
+
+
+def _sanitize_import(doc: dict) -> dict | None:
+    """A migrated doc is tenant-authenticated but still client-supplied:
+    strip transient keys and clamp the obvious levers."""
+    if not isinstance(doc, dict) or doc.get("stage") not in _IMPORT_STAGES:
+        return None
+    clean = {k: v for k, v in doc.items()
+             if isinstance(k, str) and not k.startswith("_")
+             and k != "scene"}
+    try:
+        clean["level"] = max(1, min(100, int(clean.get("level", 1))))
+        clean["gold"] = max(0, int(clean.get("gold", 0)))
+        clean["bank"] = max(0, int(clean.get("bank", 0)))
+        clean["xp"] = max(0, int(clean.get("xp", 0)))
+        clean["unlocked_floor"] = max(
+            1, min(100, int(clean.get("unlocked_floor", 1))))
+        pstate.ensure_current(clean)
+    except Exception:
+        return None
+    return clean
+
+
+async def run_import(tenant: str, player: str, doc: dict) -> dict:
+    clean = _sanitize_import(doc)
+    if clean is None:
+        return {"imported": False, "reason": "not a valid character doc"}
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            existing = await _load_doc(conn, tenant, player)
+            if existing.get("stage") == "playing":
+                return {"imported": False,
+                        "reason": "a world character already exists"}
+            clean["luna_user"] = f"{tenant}:{player}"
+            await _save_doc(conn, tenant, player, clean, [])
+            return {"imported": True}
+
+
 async def run_character(tenant: str, player: str) -> dict:
     pool = await db.get_pool()
     async with pool.acquire() as conn:

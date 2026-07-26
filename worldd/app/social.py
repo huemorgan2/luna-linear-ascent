@@ -9,9 +9,11 @@ pending_events, delivered on their next scene).
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 
 from plugin_linear_ascent import economy
+from plugin_linear_ascent.content import schema
 from plugin_linear_ascent.engine import state as pstate
 from plugin_linear_ascent.engine.scene import Scene
 
@@ -74,7 +76,59 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
             "quorum": ms.quorum,
         }
 
+    # 007 §3: the ONE live Warden at the world frontier
+    w["warden"] = await _world_warden(conn, w["frontier"])
+
+    # 007 §4: Morning Crier raw material — census + floor gossip
+    w["census"] = await _census(conn)
+    news_floor = doc.get("floor", 0) or w["frontier"]
+    gossip = await conn.fetch(
+        "SELECT line FROM ascent_happenings "
+        "WHERE floor=$1 AND world_day >= $2 ORDER BY id DESC LIMIT 3",
+        news_floor, day - 1)
+    w["gossip"] = [r["line"] for r in gossip]
+
     doc["_world"] = w
+
+
+async def _census(conn) -> dict:
+    """Climbers by current floor (town counts as floor 1 — Roothollow)."""
+    rows = await conn.fetch(
+        "SELECT greatest(coalesce((doc->>'floor')::int, 0), 1) AS fl, "
+        "count(*) AS n FROM ascent_players "
+        "WHERE doc->>'stage'='playing' GROUP BY 1")
+    by_floor = {int(r["fl"]): int(r["n"]) for r in rows}
+    return {"total": sum(by_floor.values()), "by_floor": by_floor}
+
+
+# ── The shared frontier Warden (007 §3) ──────────────────────────────────
+
+def _warden_regen(v: dict, hp_max: int) -> int:
+    """Lazy regen: WARDEN_WORLD_REGEN_HOURLY of max per hour since the
+    last strike. Never persisted on read — only strikes write."""
+    hp = int(v.get("hp", hp_max))
+    try:
+        ts = dt.datetime.fromisoformat(v["ts"])
+        hours = max(0.0, (pstate.now() - ts).total_seconds() / 3600)
+    except Exception:
+        hours = 0.0
+    return min(hp_max, round(
+        hp + hp_max * economy.WARDEN_WORLD_REGEN_HOURLY * hours))
+
+
+async def _world_warden(conn, frontier: int) -> dict | None:
+    if frontier in economy.MILESTONES or \
+            frontier > schema.max_content_floor():
+        return None                    # milestone quorum / end of content
+    hp_max = economy.world_warden_hp(frontier)
+    row = await conn.fetchrow(
+        "SELECT value FROM ascent_world WHERE key=$1", f"warden:{frontier}")
+    if row is None:
+        return {"floor": frontier, "hp": hp_max, "hp_max": hp_max,
+                "strikers": []}
+    v = json.loads(row["value"])
+    return {"floor": frontier, "hp": _warden_regen(v, hp_max),
+            "hp_max": hp_max, "strikers": v.get("strikers", [])}
 
 
 async def _roster(conn) -> tuple[list[dict], int]:
@@ -162,6 +216,8 @@ async def execute_effects(conn, tenant: str, player: str,
             await _fx_pvp(conn, tenant, player, doc, e)
         elif kind == "boss_commit":
             await _fx_boss_commit(conn, tenant, player, doc, e)
+        elif kind == "warden_strike":
+            await _fx_warden_strike(conn, tenant, player, doc, e)
         elif kind == "letters_seen":
             await conn.execute(
                 "UPDATE ascent_letters SET read=TRUE "
@@ -173,9 +229,9 @@ async def execute_effects(conn, tenant: str, player: str,
         elif kind == "happening":
             # engine-reported world news: deaths, warden first clears
             await conn.execute(
-                "INSERT INTO ascent_happenings (world_day, kind, line) "
-                "VALUES ($1,'climb',$2)", pstate.world_day(),
-                str(e.get("line", ""))[:200])
+                "INSERT INTO ascent_happenings (world_day, kind, line,"
+                " floor) VALUES ($1,'climb',$2,$3)", pstate.world_day(),
+                str(e.get("line", ""))[:200], int(e.get("floor", 0)))
         # guild_join / guild_leave live entirely in the doc
 
 
@@ -317,6 +373,122 @@ def _death_report(victim: str, attacker: str, loot: int) -> Scene:
         event_kind="death",
         banner="death",
     )
+
+
+# ── Shared frontier Warden strikes (007 §3) ──────────────────────────────
+
+async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
+                            e: dict) -> None:
+    """Land a strike on the world Warden. HP pool lives in ascent_world
+    under warden:{floor}; the kill raises the frontier for everyone and
+    splits the reward pool by damage dealt."""
+    floor = int(e.get("floor", 0))
+    dmg = max(0, int(e.get("damage", 0)))
+    if dmg <= 0:
+        return
+    row = await conn.fetchrow(
+        "SELECT value FROM ascent_world WHERE key='frontier' FOR UPDATE")
+    frontier = int(json.loads(row["value"])) if row else 1
+    if floor != frontier or floor in economy.MILESTONES:
+        # the world moved on between scene and click — refund the ⚡
+        pstate.gain_energy(doc, economy.COST_WARDEN_ATTEMPT)
+        return
+    key = f"warden:{floor}"
+    row = await conn.fetchrow(
+        "SELECT value FROM ascent_world WHERE key=$1 FOR UPDATE", key)
+    hp_max = economy.world_warden_hp(floor)
+    v = json.loads(row["value"]) if row else {}
+    hp = _warden_regen(v, hp_max) if row else hp_max
+    strikers = list(v.get("strikers", []))
+    name = doc.get("name") or player
+    for s in strikers:
+        if s.get("tenant") == tenant and s.get("player") == player:
+            s["dmg"] = int(s.get("dmg", 0)) + dmg
+            s["name"] = name
+            break
+    else:
+        strikers.append({"tenant": tenant, "player": player,
+                         "name": name, "dmg": dmg})
+    hp -= dmg
+    if hp > 0:
+        await conn.execute(
+            "INSERT INTO ascent_world (key, value) VALUES ($1,$2::jsonb) "
+            "ON CONFLICT (key) DO UPDATE SET value=excluded.value",
+            key, json.dumps({"hp": hp, "ts": pstate.now().isoformat(),
+                             "strikers": strikers[-40:]}))
+        return
+    await _warden_fall(conn, tenant, player, doc, floor, strikers)
+
+
+async def _warden_fall(conn, tenant: str, player: str, doc: dict,
+                       floor: int, strikers: list[dict]) -> None:
+    day = pstate.world_day()
+    warden_name = schema.get_floor(floor).warden_name
+    await conn.execute("DELETE FROM ascent_world WHERE key=$1",
+                       f"warden:{floor}")
+    await conn.execute(
+        "UPDATE ascent_world SET value=$1::jsonb "
+        "WHERE key='frontier' AND (value)::int < $2",
+        json.dumps(floor + 1), floor + 1)
+
+    total = max(1, sum(int(s.get("dmg", 0)) for s in strikers))
+    xp_pool = economy.warden_xp(floor) * economy.WARDEN_WORLD_REWARD_MULT
+    gold_pool = economy.warden_gold(floor) * economy.WARDEN_WORLD_REWARD_MULT
+    names = ", ".join(s.get("name") or "?" for s in strikers)
+
+    for s in strikers:
+        finisher = s.get("tenant") == tenant and s.get("player") == player
+        if finisher:
+            d = doc
+        else:
+            row = await conn.fetchrow(
+                "SELECT doc FROM ascent_players WHERE tenant=$1 AND "
+                "player=$2 FOR UPDATE", s.get("tenant"), s.get("player"))
+            if row is None:
+                continue
+            d = json.loads(row["doc"])
+        share = int(s.get("dmg", 0)) / total
+        xp_i = round(xp_pool * share)
+        gold_i = round(gold_pool * share)
+        d["xp"] = d.get("xp", 0) + xp_i
+        d["gold"] = d.get("gold", 0) + gold_i
+        if d.get("unlocked_floor", 1) <= floor:
+            d["unlocked_floor"] = floor + 1
+        body = [f"+ {xp_i:,} experience — your share of the kill",
+                f"+ ◈ {gold_i:,} from the Warden's hoard"]
+        if finisher:
+            loot = pstate.rng_pick(
+                d, [(60, "trollblood_tonic"), (40, "luck_charm")])
+            inv = d.setdefault("inventory", {})
+            inv[loot] = inv.get(loot, 0) + 1
+            body.append("▪ the killing blow was yours — rare loot: "
+                        f"{economy.APOTHECARY[loot].name}")
+        body.append(f"FLOOR {floor + 1} stands open for everyone.")
+        d.setdefault("pending_events", []).insert(0, Scene(
+            eyebrow=f"FLOOR {floor} · THE KEEP · AFTER",
+            headline=f"{warden_name} has fallen",
+            support=f"Struck down by {names}.",
+            body_lines=body,
+            event_kind="boss",
+        ).to_dict())
+        if not finisher:
+            await conn.execute(
+                "UPDATE ascent_players SET doc=$3, updated_at=now() "
+                "WHERE tenant=$1 AND player=$2",
+                s.get("tenant"), s.get("player"), json.dumps(d))
+        await conn.execute(
+            "INSERT INTO ascent_ledger (tenant, player, kind, gold, xp,"
+            " note) VALUES ($1,$2,'warden_kill',$3,$4,$5)",
+            s.get("tenant"), s.get("player"), gold_i, xp_i, warden_name)
+
+    await conn.execute(
+        "INSERT INTO ascent_happenings (world_day, kind, line, floor) "
+        "VALUES ($1,'boss',$2,$3)", day,
+        f"{warden_name} fell to {names} — floor {floor + 1} is open "
+        "for everyone", floor)
+    await conn.execute(
+        "INSERT INTO ascent_stone (line) VALUES ($1)",
+        f"Floor {floor} — {warden_name} cast down by {names}")
 
 
 async def _fx_boss_commit(conn, tenant: str, player: str, doc: dict,

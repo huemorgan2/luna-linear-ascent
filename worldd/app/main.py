@@ -118,6 +118,21 @@ async def v1_character(body: SceneIn,
     return await game.run_character(tenant, body.player)
 
 
+class ImportIn(BaseModel):
+    player: str = Field(min_length=1, max_length=128)
+    doc: dict
+
+
+@app.post("/v1/import")
+async def v1_import(body: ImportIn,
+                    tenant: str = Depends(auth.verify_tenant)) -> dict:
+    """One-time local→world character migration (007 Phase 1). Only lands
+    when the world has no playing character for this (tenant, player) —
+    the world copy always wins over the local outage shadow."""
+    from . import game
+    return await game.run_import(tenant, body.player, body.doc)
+
+
 # ── Self-service enrollment (public, rate-limited) ──────────────────────
 
 ENROLL_PER_HOUR = int(os.environ.get("ASCENT_ENROLL_PER_HOUR", "5"))
