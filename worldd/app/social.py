@@ -28,6 +28,33 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
         "SELECT value FROM ascent_world WHERE key='frontier'")
     w["frontier"] = int(json.loads(row["value"])) if row else 1
 
+    # 010: factions are authoritative — the doc's guild string follows the
+    # membership table (kicks land on the next load). Runs before the
+    # happenings fetch so week-turn news lands in the same request.
+    from . import factions
+    await factions.sync_doc_guild(conn, tenant, player, doc)
+    await factions.maybe_post_week(conn)
+    if doc.get("guild"):
+        await factions.maybe_resolve(conn, doc["guild"])
+        # resolution may have charged THIS player's dues / paid a prize in
+        # the DB copy; re-sync the money fields or the final doc save
+        # would overwrite them
+        fresh = await conn.fetchrow(
+            "SELECT doc FROM ascent_players WHERE tenant=$1 AND player=$2",
+            tenant, player)
+        if fresh:
+            fd = json.loads(fresh["doc"])
+            for k in ("gold", "bank", "faction_buff"):
+                if k in fd:
+                    doc[k] = fd[k]
+                else:
+                    doc.pop(k, None)
+        w["faction"] = await _faction_panel(conn, tenant, player,
+                                            doc["guild"])
+    else:
+        w["factions"] = await _faction_hall(conn)
+        w["faction_banners"] = factions.banner_slugs()
+
     w["inbox_count"] = await conn.fetchval(
         "SELECT count(*) FROM ascent_letters "
         "WHERE to_tenant=$1 AND to_player=$2 AND NOT read", tenant, player)
@@ -54,23 +81,6 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
 
     w["roster"], w["roster_count"] = await _roster(conn)
 
-    # 010: factions are authoritative — the doc's guild string follows the
-    # membership table (kicks land on the next load), and the Guildhall
-    # lists factions instead of the legacy guilds table.
-    from . import factions
-    await factions.sync_doc_guild(conn, tenant, player, doc)
-    rows = await conn.fetch(
-        "SELECT name FROM ascent_factions ORDER BY created_at LIMIT 6")
-    w["guilds"] = [r["name"] for r in rows]
-    if doc.get("guild"):
-        roster = await conn.fetch(
-            "SELECT p.doc->>'name' AS name FROM ascent_faction_members m "
-            "JOIN ascent_players p ON p.tenant=m.tenant "
-            "  AND p.player=m.player "
-            "WHERE m.faction=$1 AND p.doc->>'stage'='playing'",
-            doc["guild"])
-        w["guild_roster"] = [r["name"] for r in roster if r["name"]]
-
     floor = max(1, doc.get("floor", 1))
     if floor in economy.MILESTONES:
         commits = await conn.fetch(
@@ -96,6 +106,76 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
     w["gossip"] = [r["line"] for r in gossip]
 
     doc["_world"] = w
+
+
+async def _faction_hall(conn) -> list[dict]:
+    """The Guildhall list for the unbannered: fee + dues up front."""
+    rows = await conn.fetch(
+        "SELECT f.name, f.banner, f.join_fee, f.weekly_dues, "
+        "count(m.player) AS members FROM ascent_factions f "
+        "LEFT JOIN ascent_faction_members m ON m.faction=f.name "
+        "GROUP BY f.name, f.banner, f.join_fee, f.weekly_dues "
+        "ORDER BY members DESC, f.name LIMIT 6")
+    return [dict(r) for r in rows]
+
+
+async def _faction_panel(conn, tenant: str, player: str,
+                         name: str) -> dict:
+    """The member's Guildhall panel: store, dues, roster with attendance
+    pips + arrears, this week's world challenge, the store ledger."""
+    from . import factions
+    fac = await conn.fetchrow(
+        "SELECT banner, join_fee, weekly_dues, treasury "
+        "FROM ascent_factions WHERE name=$1", name)
+    if fac is None:
+        return {}
+    members = await factions.members_of(conn, name)
+    week = factions.world_week()
+    attend = await factions.week_attendance(conn, name, week)
+    required = sum(factions.required_days(m["joined_day"], week)
+                   for m in members)
+    attended = sum(attend.get((m["tenant"], m["player"]), 0)
+                   for m in members)
+    kind = factions.week_kind(week)
+    wrow = await factions.current_week_row(conn, name)
+    entered = bool(wrow and wrow["entered"])
+    avg_level = round(sum(m["level"] for m in members)
+                      / max(1, len(members)))
+    target = (int(wrow["goal_target"]) if entered else
+              factions.suggest_targets(len(members), avg_level)[kind])
+    progress = (await factions._progress(conn, name, kind, week)
+                if entered else 0)
+    my_role = next((m["role"] for m in members
+                    if m["tenant"] == tenant and m["player"] == player),
+                   "member")
+    ledger = await conn.fetch(
+        "SELECT kind, amount, note FROM ascent_faction_ledger "
+        "WHERE faction=$1 ORDER BY id DESC LIMIT 8", name)
+    last = await conn.fetchrow(
+        "SELECT prize_note FROM ascent_faction_weeks "
+        "WHERE faction=$1 AND resolved ORDER BY week DESC LIMIT 1", name)
+    return {
+        "name": name, "banner": fac["banner"],
+        "join_fee": int(fac["join_fee"]), "dues": int(fac["weekly_dues"]),
+        "store": int(fac["treasury"]), "role": my_role,
+        "members": [{
+            "name": m["name"] or m["player"], "role": m["role"],
+            "level": m["level"], "arrears": bool(m["arrears"]),
+            "days": attend.get((m["tenant"], m["player"]), 0),
+            "required": factions.required_days(m["joined_day"], week),
+        } for m in members],
+        "week": {
+            "kind": kind, "target": target, "entered": entered,
+            "progress": progress,
+            "entry_cost": factions.entry_cost(len(members)),
+            "attended": attended, "required": required,
+            "multiplier": factions.attendance_multiplier(attended,
+                                                         required),
+            "base_pct": factions.base_pct(len(members)),
+        },
+        "ledger": [dict(r) for r in ledger],
+        "last_week": (last["prize_note"] if last else ""),
+    }
 
 
 async def _census(conn) -> dict:
@@ -237,10 +317,23 @@ async def execute_effects(conn, tenant: str, player: str,
             await _fx_faction_found(conn, tenant, player, doc, e)
         elif kind == "guild_join":
             from . import factions
-            await factions.join_faction(conn, tenant, player, e["guild"])
+            err = await factions.join_faction(conn, tenant, player,
+                                              e["guild"], doc)
+            if err:
+                doc.pop("guild", None)   # optimistic colors come down
         elif kind == "guild_leave":
             from . import factions
             await factions.leave_faction(conn, tenant, player)
+        elif kind == "faction_donate":
+            from . import factions
+            await factions.donate(conn, tenant, player,
+                                  int(e.get("amount", 0)), doc,
+                                  payer_name=doc.get("name") or player)
+        elif kind == "faction_enter":
+            from . import factions
+            await factions.enter_week(conn, tenant, player)
+        elif kind == "faction_kick":
+            await _fx_faction_kick(conn, tenant, player, e)
         elif kind == "happening":
             # engine-reported world news: deaths, warden first clears
             await conn.execute(
@@ -252,9 +345,9 @@ async def execute_effects(conn, tenant: str, player: str,
 
 async def _fx_faction_found(conn, tenant: str, player: str, doc: dict,
                             e: dict) -> None:
-    """Engine-side founding (the Guildhall flow) — the fee was already
-    charged in the doc; give the banner a deterministic sigil the steward
-    can keep or change from the Community tab."""
+    """Engine-side founding (the Guildhall flow) — the ◈500 fee was
+    already charged in the doc. The creation flow supplies banner, join
+    fee and dues; a bare legacy effect gets a deterministic sigil."""
     from . import factions
     name = str(e["guild"])[:24]
     taken = await conn.fetchval(
@@ -262,9 +355,32 @@ async def _fx_faction_found(conn, tenant: str, player: str, doc: dict,
     if taken:
         return                       # name raced — membership via join path
     slugs = factions.banner_slugs()
-    banner = slugs[sum(name.encode()) % len(slugs)]
-    await factions.create_faction(conn, tenant, player, name, banner,
-                                  doc.get("name") or player)
+    banner = str(e.get("banner", "")) or slugs[sum(name.encode())
+                                               % len(slugs)]
+    if banner not in slugs:
+        banner = slugs[sum(name.encode()) % len(slugs)]
+    await factions.create_faction(
+        conn, tenant, player, name, banner, doc.get("name") or player,
+        join_fee=int(e.get("join_fee", 0)),
+        weekly_dues=int(e.get("weekly_dues", 5)))
+
+
+async def _fx_faction_kick(conn, tenant: str, player: str,
+                           e: dict) -> None:
+    """Steward removes a member by character name (the Guildhall list)."""
+    from . import factions
+    me = await factions.member_row(conn, tenant, player)
+    if me is None or me["role"] != "steward":
+        return
+    target = str(e.get("name", ""))
+    members = await factions.members_of(conn, me["faction"])
+    for m in members:
+        if (m["name"] or m["player"]) == target and \
+                (m["tenant"], m["player"]) != (tenant, player):
+            await conn.execute(
+                "DELETE FROM ascent_faction_members "
+                "WHERE tenant=$1 AND player=$2", m["tenant"], m["player"])
+            break
 
 
 async def _find_player_by_name(conn, name: str):

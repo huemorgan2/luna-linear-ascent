@@ -175,6 +175,8 @@ class FactionCreateIn(BaseModel):
     player: str = Field(min_length=1, max_length=128)
     name: str = Field(min_length=3, max_length=24)
     banner: str = Field(default="wolf_howl", max_length=32)
+    join_fee: int = Field(default=0, ge=0, le=500)
+    weekly_dues: int = Field(default=5, ge=1, le=50)
 
 
 class FactionJoinIn(BaseModel):
@@ -188,10 +190,9 @@ class FactionKickIn(BaseModel):
     target_player: str = Field(min_length=1, max_length=128)
 
 
-class FactionGoalIn(BaseModel):
+class FactionDonateIn(BaseModel):
     player: str = Field(min_length=1, max_length=128)
-    kind: str = Field(min_length=3, max_length=16)
-    target: int = Field(gt=0, le=10_000_000_000)
+    amount: int = Field(gt=0, le=1_000_000)
 
 
 @app.post("/v1/faction/list")
@@ -201,12 +202,12 @@ async def v1_faction_list(body: SceneIn,
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         rows = await conn.fetch(
-            "SELECT f.name, f.banner, f.goal_kind, f.goal_target, "
-            "count(m.player) AS members "
+            "SELECT f.name, f.banner, f.join_fee, f.weekly_dues, "
+            "f.treasury, count(m.player) AS members "
             "FROM ascent_factions f "
             "LEFT JOIN ascent_faction_members m ON m.faction=f.name "
-            "GROUP BY f.name, f.banner, f.goal_kind, f.goal_target "
-            "ORDER BY members DESC, f.name")
+            "GROUP BY f.name, f.banner, f.join_fee, f.weekly_dues,"
+            " f.treasury ORDER BY members DESC, f.name")
     return {"factions": [dict(r) for r in rows],
             "banners": factions.banner_slugs(),
             "found_fee": factions.FOUND_FEE}
@@ -215,53 +216,17 @@ async def v1_faction_list(body: SceneIn,
 @app.post("/v1/faction/status")
 async def v1_faction_status(body: SceneIn,
                             tenant: str = Depends(auth.verify_tenant)) -> dict:
-    from . import factions
+    from . import factions, social
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
             me = await factions.member_row(conn, tenant, body.player)
             if me is None:
                 return {"faction": None}
-            fac_name = me["faction"]
-            await factions.maybe_resolve(conn, fac_name)
-            fac = await conn.fetchrow(
-                "SELECT name, banner, goal_kind, goal_target "
-                "FROM ascent_factions WHERE name=$1", fac_name)
-            members = await factions.members_of(conn, fac_name)
-            week = factions.world_week()
-            attend = await factions.week_attendance(conn, fac_name, week)
-            required = sum(factions.required_days(m["joined_day"], week)
-                           for m in members)
-            attended = sum(attend.get((m["tenant"], m["player"]), 0)
-                           for m in members)
-            progress = await factions._progress(
-                conn, fac_name, fac["goal_kind"], week)
-            last = await conn.fetchrow(
-                "SELECT week, goal_kind, goal_target, progress, multiplier,"
-                " prize_note FROM ascent_faction_weeks WHERE faction=$1 "
-                "ORDER BY week DESC LIMIT 1", fac_name)
-            avg_level = round(sum(m["level"] for m in members)
-                              / max(1, len(members)))
-    return {
-        "faction": fac["name"],
-        "banner": fac["banner"],
-        "role": me["role"],
-        "members": [{
-            "tenant": m["tenant"], "player": m["player"],
-            "name": m["name"] or m["player"], "role": m["role"],
-            "level": m["level"],
-            "days": attend.get((m["tenant"], m["player"]), 0),
-            "required": factions.required_days(m["joined_day"], week),
-        } for m in members],
-        "goal": {"kind": fac["goal_kind"], "target": fac["goal_target"],
-                 "progress": progress},
-        "attendance": {"attended": attended, "required": required,
-                       "multiplier": factions.attendance_multiplier(
-                           attended, required)},
-        "base_pct": factions.base_pct(len(members)),
-        "suggested": factions.suggest_targets(len(members), avg_level),
-        "last_week": dict(last) if last else None,
-    }
+            await factions.maybe_resolve(conn, me["faction"])
+            panel = await social._faction_panel(
+                conn, tenant, body.player, me["faction"])
+    return {"faction": me["faction"], **panel}
 
 
 @app.post("/v1/faction/create")
@@ -306,7 +271,8 @@ async def v1_faction_create(body: FactionCreateIn,
                 tenant, body.player, -factions.FOUND_FEE, name)
             await factions.create_faction(
                 conn, tenant, body.player, name, body.banner,
-                doc.get("name") or body.player)
+                doc.get("name") or body.player,
+                join_fee=body.join_fee, weekly_dues=body.weekly_dues)
     return {"ok": True, "faction": name}
 
 
@@ -317,14 +283,10 @@ async def v1_faction_join(body: FactionJoinIn,
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
-            if await factions.member_row(conn, tenant, body.player):
-                raise HTTPException(409, "leave your table first")
-            fac = await conn.fetchval(
-                "SELECT 1 FROM ascent_factions WHERE name=$1", body.faction)
-            if not fac:
-                raise HTTPException(404, "no such banner")
-            await factions.join_faction(conn, tenant, body.player,
-                                        body.faction)
+            err = await factions.join_faction(conn, tenant, body.player,
+                                              body.faction)
+            if err:
+                raise HTTPException(409, err)
     return {"ok": True, "faction": body.faction}
 
 
@@ -363,23 +325,48 @@ async def v1_faction_kick(body: FactionKickIn,
     return {"ok": True}
 
 
-@app.post("/v1/faction/goal")
-async def v1_faction_goal(body: FactionGoalIn,
-                          tenant: str = Depends(auth.verify_tenant)) -> dict:
+@app.post("/v1/faction/donate")
+async def v1_faction_donate(body: FactionDonateIn,
+                            tenant: str = Depends(auth.verify_tenant)) -> dict:
     from . import factions
-    if body.kind not in factions.GOAL_KINDS:
-        raise HTTPException(422, f"kind must be one of {factions.GOAL_KINDS}")
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
-            me = await factions.member_row(conn, tenant, body.player)
-            if me is None or me["role"] != "steward":
-                raise HTTPException(403, "only the steward sets the goal")
-            await factions.maybe_resolve(conn, me["faction"])
-            await conn.execute(
-                "UPDATE ascent_factions SET goal_kind=$2, goal_target=$3 "
-                "WHERE name=$1", me["faction"], body.kind, body.target)
+            err = await factions.donate(conn, tenant, body.player,
+                                        body.amount)
+            if err:
+                raise HTTPException(409, err)
     return {"ok": True}
+
+
+@app.post("/v1/faction/enter")
+async def v1_faction_enter(body: SceneIn,
+                           tenant: str = Depends(auth.verify_tenant)) -> dict:
+    """Steward enters THIS week's world challenge — paid from the store."""
+    from . import factions
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            err = await factions.enter_week(conn, tenant, body.player)
+            if err:
+                raise HTTPException(409, err)
+    return {"ok": True}
+
+
+@app.post("/v1/faction/board")
+async def v1_faction_board(body: SceneIn,
+                           tenant: str = Depends(auth.verify_tenant)) -> dict:
+    """The COMMUNITY news board — read-only, any tenant. Resolves any
+    pending weeks first so 'last week' is always settled."""
+    from . import factions
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            names = await conn.fetch("SELECT name FROM ascent_factions")
+            for r in names:
+                await factions.maybe_resolve(conn, r["name"])
+            await factions.maybe_post_week(conn)
+            return await factions.board(conn)
 
 
 # ── Self-service enrollment (public, rate-limited) ──────────────────────
