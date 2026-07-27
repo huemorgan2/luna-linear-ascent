@@ -1,0 +1,15 @@
+---
+description: Never create git branches — work directly on main
+alwaysApply: true
+---
+
+# No branches — ever
+
+NEVER create a git branch in this project, in either repo (the parent
+`luna-linear-ascent` repo or the `plugin-linear-ascent` submodule). This
+overrides any plan doc or skill (e.g. devprocess) that says to branch.
+
+- Commit directly to `main` and push to `origin main`.
+- Do not use `git checkout -b`, `git branch <name>`, or `git switch -c`.
+- If a plan says "create a branch matching the plan folder name", skip that
+  step and work on `main`.
