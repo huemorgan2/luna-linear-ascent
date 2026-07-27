@@ -109,9 +109,10 @@ async def test_below_frontier_keep_is_solo_echo(client, tenant_a,
     await act(client, tenant_a, "tenant-a", pa, option="gate")
     await act(client, tenant_a, "tenant-a", pa, option="floor_1")
     s = await act(client, tenant_a, "tenant-a", pa, option="keep")
-    # solo per-player fight — attack option, not the shared strike
+    # solo per-player fight — attack/close_in (017: melee opens at
+    # range, so the first beat is crossing), never the shared strike
     ids = {o["id"] for o in s["options"]}
-    assert "attack" in ids and "strike" not in ids
+    assert ("attack" in ids or "close_in" in ids) and "strike" not in ids
 
 
 async def test_morning_crier_once_per_day(client, tenant_a, clean_world):
