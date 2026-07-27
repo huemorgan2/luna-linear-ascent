@@ -13,8 +13,11 @@ import secrets as pysecrets
 import time
 from contextlib import asynccontextmanager
 
+from pathlib import Path
+
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import auth, db
@@ -37,6 +40,12 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="ascent-worldd", version="0.3.0", lifespan=lifespan)
+
+# Static shareables (e.g. /static/intro-movie/ — the 016 intro movie mock)
+app.mount("/static",
+          StaticFiles(directory=Path(__file__).resolve().parent.parent
+                      / "static", html=True),
+          name="static")
 
 
 # ── Per-tenant rate limit (in-process token bucket; numInstances: 1) ─────
