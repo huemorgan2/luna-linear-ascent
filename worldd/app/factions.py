@@ -36,6 +36,7 @@ SMALL_FACTION_MAX = 3      # ≤3 members → 15% base; 4+ → 20%
 BASE_PCT_SMALL = 0.15
 BASE_PCT_FULL = 0.20
 FOUND_FEE = 500            # matches the engine's Guildhall fee
+FOUND_MIN_LEVEL = 4        # 015: founding is a rank privilege
 GOAL_KINDS = ("hoard", "cull", "climb")
 NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 '\-]{2,23}$")
 
@@ -604,6 +605,231 @@ async def board(conn) -> dict:
         "banners": banners,
         "ticker": [r["line"] for r in ticker],
     }
+
+
+# ── The faction desk (plan 015) ──────────────────────────────────────────
+# Joining is a REQUEST an admin (any steward) accepts or rejects. The fee
+# is charged at accept. Admins can rename the banner and promote members;
+# the founder is a permanent badge, not a role.
+
+async def is_admin(conn, tenant: str, player: str) -> str | None:
+    """The caller's faction name if they hold the steward role, else None."""
+    me = await member_row(conn, tenant, player)
+    if me is None or me["role"] != "steward":
+        return None
+    return me["faction"]
+
+
+async def request_join(conn, tenant: str, player: str,
+                       name: str) -> str | None:
+    if await member_row(conn, tenant, player):
+        return "you already sit at a table — leave it first"
+    fac = await conn.fetchrow(
+        "SELECT name FROM ascent_factions WHERE name=$1", name)
+    if fac is None:
+        return "that banner no longer flies"
+    doc = await _load_doc(conn, tenant, player)
+    if doc is None or doc.get("stage") != "playing":
+        return "no character"
+    # one open request per player — asking elsewhere moves the request
+    await conn.execute(
+        "INSERT INTO ascent_faction_requests (tenant, player, faction,"
+        " requested_day) VALUES ($1,$2,$3,$4) "
+        "ON CONFLICT (tenant, player) DO UPDATE "
+        "SET faction=EXCLUDED.faction, requested_day=EXCLUDED.requested_day,"
+        " created_at=now()",
+        tenant, player, name, pstate.world_day())
+    return None
+
+
+async def cancel_request(conn, tenant: str, player: str) -> None:
+    await conn.execute(
+        "DELETE FROM ascent_faction_requests WHERE tenant=$1 AND player=$2",
+        tenant, player)
+
+
+async def my_request(conn, tenant: str, player: str) -> str | None:
+    return await conn.fetchval(
+        "SELECT faction FROM ascent_faction_requests "
+        "WHERE tenant=$1 AND player=$2", tenant, player)
+
+
+async def pending_requests(conn, faction: str) -> list[dict]:
+    rows = await conn.fetch(
+        "SELECT r.tenant, r.player, r.requested_day,"
+        "       p.doc->>'name' AS name,"
+        "       coalesce((p.doc->>'level')::int, 1) AS level "
+        "FROM ascent_faction_requests r "
+        "LEFT JOIN ascent_players p ON p.tenant=r.tenant "
+        "  AND p.player=r.player "
+        "WHERE r.faction=$1 ORDER BY r.created_at", faction)
+    return [dict(r) for r in rows]
+
+
+async def approve_request(conn, tenant: str, player: str,
+                          target_tenant: str,
+                          target_player: str) -> str | None:
+    """Accept a join request: charge the fee, seat the member. If the
+    requester can't cover the fee the request STAYS (they can top up)."""
+    faction = await is_admin(conn, tenant, player)
+    if faction is None:
+        return "only an admin works the desk"
+    req = await conn.fetchrow(
+        "SELECT faction FROM ascent_faction_requests "
+        "WHERE tenant=$1 AND player=$2 AND faction=$3 FOR UPDATE",
+        target_tenant, target_player, faction)
+    if req is None:
+        return "no such request at your desk"
+    err = await join_faction(conn, target_tenant, target_player, faction)
+    if err:
+        return err
+    await conn.execute(
+        "DELETE FROM ascent_faction_requests WHERE tenant=$1 AND player=$2",
+        target_tenant, target_player)
+    return None
+
+
+async def reject_request(conn, tenant: str, player: str,
+                         target_tenant: str,
+                         target_player: str) -> str | None:
+    faction = await is_admin(conn, tenant, player)
+    if faction is None:
+        return "only an admin works the desk"
+    gone = await conn.execute(
+        "DELETE FROM ascent_faction_requests "
+        "WHERE tenant=$1 AND player=$2 AND faction=$3",
+        target_tenant, target_player, faction)
+    return None if gone.endswith("1") else "no such request at your desk"
+
+
+async def rename_faction(conn, tenant: str, player: str,
+                         new_name: str) -> str | None:
+    """Admin renames the banner. Members/requests follow by FK cascade;
+    weeks and the store ledger are plain text and move here, so wins and
+    audit history stay attached."""
+    faction = await is_admin(conn, tenant, player)
+    if faction is None:
+        return "only an admin renames the banner"
+    new_name = new_name.strip()
+    if not NAME_RE.match(new_name):
+        return "3–24 letters, numbers, spaces, - or '"
+    if new_name == faction:
+        return None
+    taken = await conn.fetchval(
+        "SELECT 1 FROM ascent_factions WHERE name=$1", new_name)
+    if taken:
+        return "that banner already flies"
+    await conn.execute(
+        "UPDATE ascent_factions SET name=$2 WHERE name=$1",
+        faction, new_name)
+    await conn.execute(
+        "UPDATE ascent_faction_weeks SET faction=$2 WHERE faction=$1",
+        faction, new_name)
+    await conn.execute(
+        "UPDATE ascent_faction_ledger SET faction=$2 WHERE faction=$1",
+        faction, new_name)
+    await conn.execute(
+        "INSERT INTO ascent_happenings (world_day, kind, line) "
+        "VALUES ($1,'faction',$2)", pstate.world_day(),
+        f"The {faction} banner flies new colors — it is {new_name} now")
+    return None
+
+
+async def promote_member(conn, tenant: str, player: str,
+                         target_tenant: str,
+                         target_player: str) -> str | None:
+    faction = await is_admin(conn, tenant, player)
+    if faction is None:
+        return "only an admin promotes"
+    target = await member_row(conn, target_tenant, target_player)
+    if target is None or target["faction"] != faction:
+        return "not at your table"
+    if target["role"] == "steward":
+        return "already an admin"
+    await conn.execute(
+        "UPDATE ascent_faction_members SET role='steward' "
+        "WHERE tenant=$1 AND player=$2", target_tenant, target_player)
+    return None
+
+
+async def faction_detail(conn, tenant: str, player: str,
+                         name: str) -> dict | None:
+    """The faction page: public roster + stats; the viewer's own flags;
+    the request queue when the viewer is an admin of this faction."""
+    fac = await conn.fetchrow(
+        "SELECT name, banner, founder_tenant, founder_player, join_fee,"
+        " weekly_dues, treasury, created_week FROM ascent_factions "
+        "WHERE name=$1", name)
+    if fac is None:
+        return None
+    members = await members_of(conn, name)
+    week = world_week()
+    attend = await week_attendance(conn, name, week)
+    founder_key = (fac["founder_tenant"], fac["founder_player"])
+    founder_name = ""
+    out_members = []
+    for m in members:
+        is_founder = (m["tenant"], m["player"]) == founder_key
+        if is_founder:
+            founder_name = m["name"] or m["player"]
+        out_members.append({
+            "tenant": m["tenant"], "player": m["player"],
+            "name": m["name"] or m["player"], "level": m["level"],
+            "role": m["role"], "founder": is_founder,
+            "you": (m["tenant"], m["player"]) == (tenant, player),
+            "arrears": bool(m["arrears"]),
+            "days": attend.get((m["tenant"], m["player"]), 0),
+        })
+    if not founder_name:
+        # founder may have left the table — the mark on the page remains
+        row = await conn.fetchrow(
+            "SELECT doc->>'name' AS name FROM ascent_players "
+            "WHERE tenant=$1 AND player=$2", *founder_key)
+        founder_name = (row and row["name"]) or fac["founder_player"] or "?"
+    wins = int(await conn.fetchval(
+        "SELECT count(*) FROM ascent_faction_weeks WHERE faction=$1 "
+        "AND won", name) or 0)
+    wrow = await current_week_row(conn, name)
+    me = await member_row(conn, tenant, player)
+    viewer_role = (me["role"] if me and me["faction"] == name else "")
+    is_admin_here = viewer_role == "steward"
+    kind = week_kind(week)
+    d = {
+        "name": fac["name"], "banner": fac["banner"],
+        "founder": founder_name,
+        "founder_key": {"tenant": founder_key[0], "player": founder_key[1]},
+        "join_fee": int(fac["join_fee"]), "dues": int(fac["weekly_dues"]),
+        "store": int(fac["treasury"]), "wins": wins,
+        "members": out_members,
+        "week": {
+            "kind": kind,
+            "entered": bool(wrow and wrow["entered"]),
+            "entry_cost": entry_cost(len(members)),
+            "target": int(wrow["goal_target"]) if wrow else 0,
+        },
+        "viewer": {
+            "member": bool(me and me["faction"] == name),
+            "in_faction": bool(me),
+            "admin": is_admin_here,
+            "founder": (tenant, player) == founder_key,
+            "requested": (await my_request(conn, tenant, player)) == name,
+        },
+    }
+    if is_admin_here:
+        d["requests"] = await pending_requests(conn, name)
+    return d
+
+
+async def search_factions(conn, q: str = "", limit: int = 10) -> list[dict]:
+    """Top banners by table size; q narrows by name (server-side)."""
+    rows = await conn.fetch(
+        "SELECT f.name, f.banner, f.join_fee, f.weekly_dues, f.treasury, "
+        "count(m.player) AS members FROM ascent_factions f "
+        "LEFT JOIN ascent_faction_members m ON m.faction=f.name "
+        "WHERE ($1 = '' OR f.name ILIKE '%' || $1 || '%') "
+        "GROUP BY f.name, f.banner, f.join_fee, f.weekly_dues, f.treasury "
+        "ORDER BY members DESC, f.name LIMIT $2", q.strip()[:24], limit)
+    return [dict(r) for r in rows]
 
 
 async def leave_faction(conn, tenant: str, player: str) -> None:
