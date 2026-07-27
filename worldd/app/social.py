@@ -54,6 +54,9 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
     else:
         w["factions"] = await _faction_hall(conn)
         w["faction_banners"] = factions.banner_slugs()
+        # 015: the pending request, so the hall shows the asked state
+        w["faction_requested"] = await factions.my_request(
+            conn, tenant, player) or ""
 
     w["inbox_count"] = await conn.fetchval(
         "SELECT count(*) FROM ascent_letters "
@@ -109,13 +112,14 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
 
 
 async def _faction_hall(conn) -> list[dict]:
-    """The Guildhall list for the unbannered: fee + dues up front."""
+    """The Guildhall list for the unbannered: fee + dues up front.
+    015: top 10 by table size (the ledger)."""
     rows = await conn.fetch(
         "SELECT f.name, f.banner, f.join_fee, f.weekly_dues, "
         "count(m.player) AS members FROM ascent_factions f "
         "LEFT JOIN ascent_faction_members m ON m.faction=f.name "
         "GROUP BY f.name, f.banner, f.join_fee, f.weekly_dues "
-        "ORDER BY members DESC, f.name LIMIT 6")
+        "ORDER BY members DESC, f.name LIMIT 10")
     return [dict(r) for r in rows]
 
 
@@ -125,7 +129,8 @@ async def _faction_panel(conn, tenant: str, player: str,
     pips + arrears, this week's world challenge, the store ledger."""
     from . import factions
     fac = await conn.fetchrow(
-        "SELECT banner, join_fee, weekly_dues, treasury "
+        "SELECT banner, join_fee, weekly_dues, treasury,"
+        " founder_tenant, founder_player "
         "FROM ascent_factions WHERE name=$1", name)
     if fac is None:
         return {}
@@ -148,6 +153,13 @@ async def _faction_panel(conn, tenant: str, player: str,
     my_role = next((m["role"] for m in members
                     if m["tenant"] == tenant and m["player"] == player),
                    "member")
+    founder_key = (fac["founder_tenant"], fac["founder_player"])
+    # 015: admins see the request queue size right in the Guildhall
+    pending = 0
+    if my_role == "steward":
+        pending = int(await conn.fetchval(
+            "SELECT count(*) FROM ascent_faction_requests "
+            "WHERE faction=$1", name) or 0)
     ledger = await conn.fetch(
         "SELECT kind, amount, note FROM ascent_faction_ledger "
         "WHERE faction=$1 ORDER BY id DESC LIMIT 8", name)
@@ -158,8 +170,10 @@ async def _faction_panel(conn, tenant: str, player: str,
         "name": name, "banner": fac["banner"],
         "join_fee": int(fac["join_fee"]), "dues": int(fac["weekly_dues"]),
         "store": int(fac["treasury"]), "role": my_role,
+        "pending_requests": pending,
         "members": [{
             "name": m["name"] or m["player"], "role": m["role"],
+            "founder": (m["tenant"], m["player"]) == founder_key,
             "level": m["level"], "arrears": bool(m["arrears"]),
             "days": attend.get((m["tenant"], m["player"]), 0),
             "required": factions.required_days(m["joined_day"], week),
@@ -321,6 +335,10 @@ async def execute_effects(conn, tenant: str, player: str,
                                               e["guild"], doc)
             if err:
                 doc.pop("guild", None)   # optimistic colors come down
+        elif kind == "faction_request":
+            # 015: joining is a request an admin accepts at the desk
+            from . import factions
+            await factions.request_join(conn, tenant, player, e["guild"])
         elif kind == "guild_leave":
             from . import factions
             await factions.leave_faction(conn, tenant, player)

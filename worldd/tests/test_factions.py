@@ -36,6 +36,7 @@ async def clean_factions(client):
     pool = await db.get_pool()
 
     async def wipe():
+        await pool.execute("DELETE FROM ascent_faction_requests")
         await pool.execute("DELETE FROM ascent_faction_members")
         await pool.execute("DELETE FROM ascent_faction_weeks")
         await pool.execute("DELETE FROM ascent_faction_ledger")
@@ -54,11 +55,13 @@ def _name():
     return f"Banner {uuid.uuid4().hex[:6]}"
 
 
-async def _set_money(pool, tenant, player, gold, bank=0):
+async def _set_money(pool, tenant, player, gold, bank=0, level=5):
+    """Fund a character (and rank them past the 015 founding gate)."""
     await pool.execute(
         "UPDATE ascent_players SET doc = doc "
-        "|| jsonb_build_object('gold', $3::bigint, 'bank', $4::bigint) "
-        "WHERE tenant=$1 AND player=$2", tenant, player, gold, bank)
+        "|| jsonb_build_object('gold', $3::bigint, 'bank', $4::bigint,"
+        " 'level', $5::int) "
+        "WHERE tenant=$1 AND player=$2", tenant, player, gold, bank, level)
 
 
 async def _money(pool, tenant, player):
