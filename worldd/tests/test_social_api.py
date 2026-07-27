@@ -163,8 +163,10 @@ async def test_muster_roll_lists_all_climbers(client, tenants):
     await create(client, a, "tenant-a", pa, na)
     await create(client, b, "tenant-b", pb, nb, race="elf", clazz="archer")
 
+    # the board caps at 12, floor-sorted — put B near the tower's top so
+    # leftover climbers from other sessions in the dev DB can't push it off
     docb = await get_doc("tenant-b", pb)
-    docb.update({"level": 12, "unlocked_floor": 14, "bank": 5000})
+    docb.update({"level": 97, "unlocked_floor": 97, "bank": 5000})
     await set_doc("tenant-b", pb, docb)
 
     s = await act(client, a, "tenant-a", pa, option="muster")
@@ -173,7 +175,7 @@ async def test_muster_roll_lists_all_climbers(client, tenants):
     rows = [l for l in s["body_lines"] if l.startswith(nb)]
     assert rows, s["body_lines"]
     assert "elf archer" in rows[0]
-    assert "floor 14" in rows[0]
+    assert "floor 97" in rows[0]
     assert "wealth #" in rows[0]
     # the board is sorted by frontier floor, strongest first
     floors = [int(l.split("floor ")[1].split(" ")[0])
