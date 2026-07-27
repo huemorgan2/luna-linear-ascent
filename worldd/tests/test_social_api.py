@@ -19,6 +19,8 @@ async def tenants(client):
 async def create(client, secret, tenant, player, name,
                  race="human", clazz="warrior"):
     await scene(client, secret, tenant, player)
+    for _ in range(9):                                # 016: through the movie
+        await act(client, secret, tenant, player, option="next")
     await act(client, secret, tenant, player, option="begin")
     await act(client, secret, tenant, player, option=race)
     await act(client, secret, tenant, player, option=clazz)

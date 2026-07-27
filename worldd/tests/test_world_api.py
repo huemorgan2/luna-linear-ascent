@@ -87,7 +87,10 @@ async def test_rejects_stale_timestamp(client, tenant_a):
 async def test_creation_flow_over_http(client, tenant_a):
     player = f"p-{uuid.uuid4().hex[:8]}"
     s = await scene(client, tenant_a, "tenant-a", player)
-    assert "demon king" in s["headline"].lower()   # story intro first
+    assert "world that was" in s["headline"].lower()  # 016: movie scene I
+    for _ in range(9):                                # Next through the movie
+        s = await act(client, tenant_a, "tenant-a", player, option="next")
+    assert "demon king" in s["headline"].lower()      # the title card
     s = await act(client, tenant_a, "tenant-a", player, option="begin")
     assert "shard" in s["headline"].lower()
     s = await act(client, tenant_a, "tenant-a", player, option="dwarf")
@@ -105,6 +108,8 @@ async def test_creation_flow_over_http(client, tenant_a):
 async def test_idempotent_act_replays_same_scene(client, tenant_a):
     player = f"p-{uuid.uuid4().hex[:8]}"
     await scene(client, tenant_a, "tenant-a", player)
+    for _ in range(9):                                # 016: through the movie
+        await act(client, tenant_a, "tenant-a", player, option="next")
     await act(client, tenant_a, "tenant-a", player, option="begin")
     idem = str(uuid.uuid4())
     s1 = await act(client, tenant_a, "tenant-a", player,
@@ -123,6 +128,8 @@ async def test_frontier_is_shared_across_tenants(client, tenant_a, tenant_b):
         "UPDATE ascent_world SET value='4'::jsonb WHERE key='frontier'")
     player = f"p-{uuid.uuid4().hex[:8]}"
     await scene(client, tenant_b, "tenant-b", player)
+    for _ in range(9):                                # 016: through the movie
+        await act(client, tenant_b, "tenant-b", player, option="next")
     await act(client, tenant_b, "tenant-b", player, option="begin")
     await act(client, tenant_b, "tenant-b", player, option="elf")
     await act(client, tenant_b, "tenant-b", player, option="archer")
@@ -138,6 +145,6 @@ async def test_players_are_tenant_scoped(client, tenant_a, tenant_b):
     player = f"p-{uuid.uuid4().hex[:8]}"
     await scene(client, tenant_a, "tenant-a", player)
     await act(client, tenant_a, "tenant-a", player, option="halfling")
-    # same player name under tenant-b starts fresh at the story intro
+    # same player name under tenant-b starts fresh at the story movie
     s = await scene(client, tenant_b, "tenant-b", player)
-    assert "demon king" in s["headline"].lower()
+    assert "world that was" in s["headline"].lower()

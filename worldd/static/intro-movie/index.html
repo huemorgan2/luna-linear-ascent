@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>LINEAR ASCENT — intro movie (016 prototype)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LINEAR ASCENT — The Story So Far</title>
 <style>
   :root {
     --ink: #0b0e14;
@@ -12,23 +13,25 @@
     --cyan: #5eaefc;
   }
   html, body {
-    margin: 0; height: 100%;
+    margin: 0; min-height: 100%;
     background: var(--ink);
     color: var(--dim);
     font-family: "SF Mono", Menlo, Consolas, monospace;
-    display: flex; align-items: center; justify-content: center;
   }
-  #stage { width: 660px; }
+  body {
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px 0;
+  }
+  #stage { width: min(660px, 94vw); }
   #frame {
-    width: 640px; height: 400px;
+    width: 100%; aspect-ratio: 640 / 400;
     background: var(--panel);
     border: 1px solid #1d2433;
     position: relative;
-    display: flex; align-items: center; justify-content: center;
     overflow: hidden;
   }
   #frame img {
-    width: 640px; height: 400px;
+    width: 100%; height: 100%;
     image-rendering: pixelated;
     position: absolute; inset: 0;
   }
@@ -82,8 +85,8 @@
 const ART = "./";
 const FPS = 12;
 
-// split scenes: intro gif plays once (introFrames/FPS seconds), then the
-// pane swaps in the loop gif — same swap the game will do.
+// split scenes: the intro gif plays once (split/FPS seconds), then the
+// frame swaps in the loop gif — the same swap the game does in-pane.
 const SCENES = [
   { slug: "intro_aldervale", eyebrow: "THE STORY SO FAR · I",
     text: "Aldervale was whole once — and it was never primitive.\n\nHuman river-ports under blinking signal towers. Elven woods lit from within. Dwarven forges splitting atoms beneath the mountains.\n\nMagic and machine were one craft there. They called it aether." },
@@ -106,7 +109,7 @@ const SCENES = [
   { slug: "ascent_title", title: true, eyebrow: "LINEAR ASCENT",
     headline: "Climb the Ascent. Cast down the Demon King.",
     text: "One hundred floors between Roothollow and the throne.",
-    button: "Walk to the tower gate \u25B8" },
+    button: "\u27f2 Watch again" },
 ];
 
 const art = document.getElementById("art");
@@ -168,7 +171,7 @@ function finishTypingOrNext() {
   } else if (idx < SCENES.length - 1) {
     show(idx + 1);
   } else {
-    show(0);              // prototype: the gate button restarts the movie
+    show(0);              // the title card offers a replay
   }
 }
 

@@ -35,6 +35,8 @@ async def clean_world(client):
 async def create_player(client, secret, tenant, name):
     player = f"p-{uuid.uuid4().hex[:8]}"
     await scene(client, secret, tenant, player)
+    for _ in range(9):                                # 016: through the movie
+        await act(client, secret, tenant, player, option="next")
     await act(client, secret, tenant, player, option="begin")
     await act(client, secret, tenant, player, option="human")
     await act(client, secret, tenant, player, option="warrior")
