@@ -218,9 +218,10 @@ async def _census(conn) -> dict:
 
 # ── The shared frontier Warden (007 §3) ──────────────────────────────────
 
-def _warden_regen(v: dict, hp_max: int) -> int:
-    """Lazy regen: WARDEN_WORLD_REGEN_HOURLY of max per hour since the
-    last strike. Never persisted on read — only strikes write."""
+def _warden_regen(v: dict, hp_max: int, floor: int) -> int:
+    """Lazy regen: world_warden_regen_hourly(floor) of max per hour since
+    the last strike (022/001: slow inside the solo band so one blade can
+    finish the job). Never persisted on read — only strikes write."""
     hp = int(v.get("hp", hp_max))
     try:
         ts = dt.datetime.fromisoformat(v["ts"])
@@ -228,7 +229,7 @@ def _warden_regen(v: dict, hp_max: int) -> int:
     except Exception:
         hours = 0.0
     return min(hp_max, round(
-        hp + hp_max * economy.WARDEN_WORLD_REGEN_HOURLY * hours))
+        hp + hp_max * economy.world_warden_regen_hourly(floor) * hours))
 
 
 async def _world_warden(conn, frontier: int) -> dict | None:
@@ -242,7 +243,7 @@ async def _world_warden(conn, frontier: int) -> dict | None:
         return {"floor": frontier, "hp": hp_max, "hp_max": hp_max,
                 "strikers": []}
     v = json.loads(row["value"])
-    return {"floor": frontier, "hp": _warden_regen(v, hp_max),
+    return {"floor": frontier, "hp": _warden_regen(v, hp_max, frontier),
             "hp_max": hp_max, "strikers": v.get("strikers", [])}
 
 
@@ -611,7 +612,7 @@ async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
         "SELECT value FROM ascent_world WHERE key=$1 FOR UPDATE", key)
     hp_max = economy.world_warden_hp(floor)
     v = json.loads(row["value"]) if row else {}
-    hp = _warden_regen(v, hp_max) if row else hp_max
+    hp = _warden_regen(v, hp_max, floor) if row else hp_max
     strikers = list(v.get("strikers", []))
     name = doc.get("name") or player
     for s in strikers:
@@ -645,8 +646,9 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
         json.dumps(floor + 1), floor + 1)
 
     total = max(1, sum(int(s.get("dmg", 0)) for s in strikers))
-    xp_pool = economy.warden_xp(floor) * economy.WARDEN_WORLD_REWARD_MULT
-    gold_pool = economy.warden_gold(floor) * economy.WARDEN_WORLD_REWARD_MULT
+    mult = economy.world_warden_reward_mult(floor)
+    xp_pool = round(economy.warden_xp(floor) * mult)
+    gold_pool = round(economy.warden_gold(floor) * mult)
     names = ", ".join(s.get("name") or "?" for s in strikers)
 
     for s in strikers:

@@ -57,11 +57,26 @@ async def test_shared_warden_one_hp_pool_kill_opens_for_all(
     assert "whole world" in s["support"]
     assert any(o["id"] == "strike" for o in s["options"])
 
+    # 022/001: the strike opens a REAL fight against the world's body
     s = await act(client, tenant_a, "tenant-a", pa, option="strike")
-    assert "your blow lands" in " ".join(s["body_lines"])
-    row = await pool.fetchrow(
-        "SELECT value FROM ascent_world WHERE key='warden:1'")
-    v = json.loads(row["value"])
+    ids = {o["id"] for o in s["options"]}
+    assert "attack" in ids or "close_in" in ids
+    if "close_in" in ids:
+        await act(client, tenant_a, "tenant-a", pa, option="close_in")
+    await act(client, tenant_a, "tenant-a", pa, option="attack")
+    # break away — the fight's total lands as ONE effect when A gets out
+    v = None
+    for _ in range(20):
+        await pool.execute(
+            "UPDATE ascent_players SET doc = jsonb_set(doc, '{hp}',"
+            " '999'::jsonb) WHERE tenant='tenant-a' AND player=$1", pa)
+        s = await act(client, tenant_a, "tenant-a", pa, option="run")
+        row = await pool.fetchrow(
+            "SELECT value FROM ascent_world WHERE key='warden:1'")
+        if row and json.loads(row["value"]).get("strikers"):
+            v = json.loads(row["value"])
+            break
+    assert v, "fleeing must persist the wounds to the world pool"
     assert v["strikers"][0]["name"] == "Aldo" and v["strikers"][0]["dmg"] > 0
 
     # B sees the SAME wounded warden, with A's name on it
@@ -71,12 +86,16 @@ async def test_shared_warden_one_hp_pool_kill_opens_for_all(
     assert "Aldo" in " ".join(s["body_lines"])
     assert f"{v['hp']:,}" in s["headline"]
 
-    # test lever: leave it at 1 HP — B lands the killing blow
+    # test lever: leave it at 1 HP — B lands the killing blow in a fight
     v["hp"] = 1
     await pool.execute(
         "UPDATE ascent_world SET value=$1::jsonb WHERE key='warden:1'",
         json.dumps(v))
-    await act(client, tenant_b, "tenant-b", pb, option="strike")
+    s = await act(client, tenant_b, "tenant-b", pb, option="strike")
+    if any(o["id"] == "close_in" for o in s["options"]):
+        await act(client, tenant_b, "tenant-b", pb, option="close_in")
+    s = await act(client, tenant_b, "tenant-b", pb, option="attack")
+    assert "collapses" in s["headline"]
 
     row = await pool.fetchrow(
         "SELECT value FROM ascent_world WHERE key='frontier'")
