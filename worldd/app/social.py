@@ -103,6 +103,11 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
     active = int(w["census"].get("total", 0))
 
     floor = max(1, doc.get("floor", 1))
+
+    # 022/003: presence — who is on which floor RIGHT NOW. Counts and
+    # torches for every floor: injection runs BEFORE the act, so the
+    # player may be about to move — the engine picks its own floor.
+    w["presence"] = await _presence(conn)
     if floor in economy.MILESTONES:
         commits = await conn.fetch(
             "SELECT name FROM ascent_boss_commits "
@@ -216,6 +221,75 @@ async def _census(conn) -> dict:
         "WHERE doc->>'stage'='playing' GROUP BY 1")
     by_floor = {int(r["fl"]): int(r["n"]) for r in rows}
     return {"total": sum(by_floor.values()), "by_floor": by_floor}
+
+
+# ── Presence (022 §003) ──────────────────────────────────────────────────
+# Roy's rule: HOT = acted on this floor within 3 minutes — the only tier
+# that counts as "with you"; CAMPED = within the hour — texture, never
+# company. A stale count is worse than a small one, so the cache TTL
+# must stay strictly under the hot window (gated in tests).
+
+PRESENCE_HOT_MIN = 3
+PRESENCE_CAMP_MIN = 60
+PRESENCE_TTL_S = 30.0
+_TORCH_LIMIT = 6
+# only these locations put a body ON a floor — a climber idling in
+# Roothollow keeps a floor number in the doc but is not "with you"
+_FIELD_LOCATIONS = ("gate_town", "warden_keep", "boss_keep")
+
+_presence_cache: dict = {"at": None, "data": None}
+
+
+def _torch_status(d: dict) -> str:
+    """One word, derived — never asked for."""
+    try:
+        hurt = d.get("hp", 0) < 0.4 * pstate.max_hp(d)
+    except Exception:
+        hurt = False
+    if hurt:
+        return "hurt"
+    if d.get("location") in ("warden_keep", "boss_keep") or \
+            (d.get("encounter") or {}).get("kind") == "warden":
+        return "at the keep"
+    if d.get("encounter"):
+        return "hunting"
+    return "at the fire"
+
+
+async def _presence(conn) -> dict:
+    """{"by_floor": {floor: {"hot": n, "camped": n}},
+        "torches": {floor: [{"name", "status"}, ...]}} — cached 30s."""
+    now = pstate.now()
+    cached_at = _presence_cache["at"]
+    if _presence_cache["data"] is not None and cached_at is not None \
+            and (now - cached_at).total_seconds() < PRESENCE_TTL_S:
+        return _presence_cache["data"]
+    rows = await conn.fetch(
+        "SELECT doc, updated_at FROM ascent_players "
+        "WHERE doc->>'stage'='playing' "
+        "AND updated_at > now() - make_interval(mins => $1)",
+        PRESENCE_CAMP_MIN)
+    by_floor: dict[int, dict] = {}
+    torches: dict[int, list] = {}
+    for r in rows:
+        d = json.loads(r["doc"])
+        if d.get("location") not in _FIELD_LOCATIONS \
+                and not d.get("encounter"):
+            continue
+        fl = max(1, int(d.get("floor") or 1))
+        age_min = (now - r["updated_at"]).total_seconds() / 60
+        slot = by_floor.setdefault(fl, {"hot": 0, "camped": 0})
+        if age_min <= PRESENCE_HOT_MIN:
+            slot["hot"] += 1
+            t = torches.setdefault(fl, [])
+            if len(t) < _TORCH_LIMIT:
+                t.append({"name": d.get("name") or "a climber",
+                          "status": _torch_status(d)})
+        else:
+            slot["camped"] += 1
+    data = {"by_floor": by_floor, "torches": torches}
+    _presence_cache.update(at=now, data=data)
+    return data
 
 
 # ── The shared frontier Warden (007 §3, curves by 022 §002) ──────────────

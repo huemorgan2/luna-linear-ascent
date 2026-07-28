@@ -142,6 +142,30 @@ async def v1_import(body: ImportIn,
     return await game.run_import(tenant, body.player, body.doc)
 
 
+# ── Presence (022 §003) ──────────────────────────────────────────────────
+
+@app.post("/v1/presence")
+async def v1_presence(body: SceneIn,
+                      tenant: str = Depends(auth.verify_tenant)) -> dict:
+    """Grade-2 liveness for the pane peek: the caller's floor and its
+    hot/camped counts, straight from the 30s presence cache — cheap by
+    construction."""
+    from . import social
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT doc FROM ascent_players WHERE tenant=$1 AND player=$2",
+            tenant, body.player)
+        floor = 1
+        if row:
+            import json as _json
+            floor = max(1, int(_json.loads(row["doc"]).get("floor") or 1))
+        pres = await social._presence(conn)
+    slot = pres["by_floor"].get(floor) or {}
+    return {"floor": floor, "hot": int(slot.get("hot", 0)),
+            "camped": int(slot.get("camped", 0))}
+
+
 # ── Score & Community (plan 010) ─────────────────────────────────────────
 
 @app.post("/v1/leaderboard")
