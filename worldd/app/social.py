@@ -63,6 +63,10 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
                                       and int(prior) >= day)
     else:
         w["factions"] = await _faction_hall(conn)
+        # 019: the hall's "Join a banner" row carries the true count,
+        # not the top-10 window
+        w["factions_total"] = await conn.fetchval(
+            "SELECT count(*) FROM ascent_factions")
         w["faction_banners"] = factions.banner_slugs()
         # 015: the pending request, so the hall shows the asked state
         w["faction_requested"] = await factions.my_request(

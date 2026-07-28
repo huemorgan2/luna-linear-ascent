@@ -232,9 +232,13 @@ async def v1_faction_list(body: FactionListIn,
         total = int(await conn.fetchval(
             "SELECT count(*) FROM ascent_factions") or 0)
         requested = await factions.my_request(conn, tenant, body.player)
+        # 019: the board's call-to-action needs to know the viewer sits
+        # at no table (members get no join buttons, no pitch)
+        mine = await factions.member_row(conn, tenant, body.player)
     return {"factions": rows,
             "total": total,
             "requested": requested or "",
+            "in_faction": (mine or {}).get("faction") or "",
             "banners": factions.banner_slugs(),
             "found_fee": factions.FOUND_FEE,
             "found_min_level": factions.FOUND_MIN_LEVEL}
