@@ -98,23 +98,25 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
 
     w["roster"], w["roster_count"] = await _roster(conn)
 
+    # 007 §4 / 022: the census also sizes the warden pool and quorums
+    w["census"] = await _census(conn)
+    active = int(w["census"].get("total", 0))
+
     floor = max(1, doc.get("floor", 1))
     if floor in economy.MILESTONES:
         commits = await conn.fetch(
             "SELECT name FROM ascent_boss_commits "
             "WHERE floor=$1 AND world_day >= $2 ORDER BY created_at",
             floor, day - 2)
-        ms = economy.MILESTONES[floor]
         w["boss"] = {
             "committed": [r["name"] for r in commits],
-            "quorum": ms.quorum,
+            # 022/002: the war party rides the N(F) curve, never below
+            # the hand-set table
+            "quorum": economy.milestone_quorum(floor, active),
         }
 
     # 007 §3: the ONE live Warden at the world frontier
-    w["warden"] = await _world_warden(conn, w["frontier"])
-
-    # 007 §4: Morning Crier raw material — census + floor gossip
-    w["census"] = await _census(conn)
+    w["warden"] = await _world_warden(conn, w["frontier"], active)
     news_floor = doc.get("floor", 0) or w["frontier"]
     gossip = await conn.fetch(
         "SELECT line FROM ascent_happenings "
@@ -216,35 +218,61 @@ async def _census(conn) -> dict:
     return {"total": sum(by_floor.values()), "by_floor": by_floor}
 
 
-# ── The shared frontier Warden (007 §3) ──────────────────────────────────
+# ── The shared frontier Warden (007 §3, curves by 022 §002) ──────────────
 
-def _warden_regen(v: dict, hp_max: int, floor: int) -> int:
-    """Lazy regen: world_warden_regen_hourly(floor) of max per hour since
-    the last strike (022/001: slow inside the solo band so one blade can
-    finish the job). Never persisted on read — only strikes write."""
+def _warden_now(v: dict, floor: int, active: int | None) -> dict:
+    """The warden's TRUE current state from a stored row: lazy regen,
+    the silence window (F > 30: quiet for W hours closes the wound
+    fully), and the pity ramp (each fully-closed wound takes 3% off the
+    max, forever). Pure — never persisted on read; only strikes write.
+
+    Returns {hp, hp_max, pity, strikers, closed} where closed means the
+    wound fully closed since the last write (the next write must record
+    the pity and reset the siege)."""
+    pity = int(v.get("pity", 0))
+
+    def _max(k: int) -> int:
+        base = int(v.get("hp_max", 0)) or economy.world_warden_hp(
+            floor, active)
+        return max(1, round(base * (1 - economy.WARDEN_PITY_PCT) ** k))
+
+    hp_max = _max(pity)
     hp = int(v.get("hp", hp_max))
     try:
         ts = dt.datetime.fromisoformat(v["ts"])
         hours = max(0.0, (pstate.now() - ts).total_seconds() / 3600)
     except Exception:
         hours = 0.0
-    return min(hp_max, round(
+    w = economy.warden_silence_hours(floor)
+    closed = hp < hp_max and (
+        (w is not None and hours >= w)
+        or hp + hp_max * economy.world_warden_regen_hourly(floor) * hours
+        >= hp_max)
+    if closed:
+        pity += 1
+        hp_max = _max(pity)
+        return {"hp": hp_max, "hp_max": hp_max, "pity": pity,
+                "strikers": [], "closed": True}
+    hp = min(hp_max, round(
         hp + hp_max * economy.world_warden_regen_hourly(floor) * hours))
+    return {"hp": hp, "hp_max": hp_max, "pity": pity,
+            "strikers": v.get("strikers", []), "closed": False}
 
 
-async def _world_warden(conn, frontier: int) -> dict | None:
+async def _world_warden(conn, frontier: int,
+                        active: int = 0) -> dict | None:
     if frontier in economy.MILESTONES or \
             frontier > schema.max_content_floor():
         return None                    # milestone quorum / end of content
-    hp_max = economy.world_warden_hp(frontier)
     row = await conn.fetchrow(
         "SELECT value FROM ascent_world WHERE key=$1", f"warden:{frontier}")
     if row is None:
+        hp_max = economy.world_warden_hp(frontier, active or None)
         return {"floor": frontier, "hp": hp_max, "hp_max": hp_max,
                 "strikers": []}
-    v = json.loads(row["value"])
-    return {"floor": frontier, "hp": _warden_regen(v, hp_max, frontier),
-            "hp_max": hp_max, "strikers": v.get("strikers", [])}
+    st = _warden_now(json.loads(row["value"]), frontier, active or None)
+    return {"floor": frontier, "hp": st["hp"], "hp_max": st["hp_max"],
+            "strikers": st["strikers"]}
 
 
 async def _roster(conn) -> tuple[list[dict], int]:
@@ -610,10 +638,20 @@ async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
     key = f"warden:{floor}"
     row = await conn.fetchrow(
         "SELECT value FROM ascent_world WHERE key=$1 FOR UPDATE", key)
-    hp_max = economy.world_warden_hp(floor)
-    v = json.loads(row["value"]) if row else {}
-    hp = _warden_regen(v, hp_max, floor) if row else hp_max
-    strikers = list(v.get("strikers", []))
+    active = await conn.fetchval(
+        "SELECT count(*) FROM ascent_players WHERE doc->>'stage'='playing'")
+    active = int(active or 0)
+    if row is None:
+        # first blood materialises the row — the pool is sized to the
+        # world it faces and FROZEN there (022/002)
+        base = economy.world_warden_hp(floor, active or None)
+        st = {"hp": base, "hp_max": base, "pity": 0, "strikers": []}
+    else:
+        v = json.loads(row["value"])
+        st = _warden_now(v, floor, active or None)
+        st["hp_max"] = int(v.get("hp_max", 0)) or economy.world_warden_hp(
+            floor, active or None)          # the PRE-pity base, frozen
+    strikers = list(st["strikers"])
     name = doc.get("name") or player
     for s in strikers:
         if s.get("tenant") == tenant and s.get("player") == player:
@@ -623,19 +661,23 @@ async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
     else:
         strikers.append({"tenant": tenant, "player": player,
                          "name": name, "dmg": dmg})
-    hp -= dmg
+    hp = st["hp"] - dmg
     if hp > 0:
         await conn.execute(
             "INSERT INTO ascent_world (key, value) VALUES ($1,$2::jsonb) "
             "ON CONFLICT (key) DO UPDATE SET value=excluded.value",
-            key, json.dumps({"hp": hp, "ts": pstate.now().isoformat(),
+            key, json.dumps({"hp": hp, "hp_max": st["hp_max"],
+                             "pity": st["pity"],
+                             "ts": pstate.now().isoformat(),
                              "strikers": strikers[-40:]}))
         return
-    await _warden_fall(conn, tenant, player, doc, floor, strikers)
+    await _warden_fall(conn, tenant, player, doc, floor, strikers,
+                       active or None)
 
 
 async def _warden_fall(conn, tenant: str, player: str, doc: dict,
-                       floor: int, strikers: list[dict]) -> None:
+                       floor: int, strikers: list[dict],
+                       active: int | None = None) -> None:
     day = pstate.world_day()
     warden_name = schema.get_floor(floor).warden_name
     await conn.execute("DELETE FROM ascent_world WHERE key=$1",
@@ -646,7 +688,7 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
         json.dumps(floor + 1), floor + 1)
 
     total = max(1, sum(int(s.get("dmg", 0)) for s in strikers))
-    mult = economy.world_warden_reward_mult(floor)
+    mult = economy.world_warden_reward_mult(floor, active)
     xp_pool = round(economy.warden_xp(floor) * mult)
     gold_pool = round(economy.warden_gold(floor) * mult)
     names = ", ".join(s.get("name") or "?" for s in strikers)
@@ -721,7 +763,10 @@ async def _fx_boss_commit(conn, tenant: str, player: str, doc: dict,
     commits = await conn.fetch(
         "SELECT tenant, player, name FROM ascent_boss_commits "
         "WHERE floor=$1 AND world_day >= $2", floor, day - 2)
-    if len(commits) < ms.quorum:
+    active = await conn.fetchval(
+        "SELECT count(*) FROM ascent_players WHERE doc->>'stage'='playing'")
+    if len(commits) < economy.milestone_quorum(floor, int(active or 0)
+                                               or None):
         return
     await _resolve_boss(conn, tenant, player, doc, ms, commits)
 
