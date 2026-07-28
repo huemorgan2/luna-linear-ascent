@@ -51,6 +51,16 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
                     doc.pop(k, None)
         w["faction"] = await _faction_panel(conn, tenant, player,
                                             doc["guild"])
+        # 007: the shared rack rides in for members — the desk lists
+        # it, the pawn scene offers the donate.
+        from . import armory
+        w["armory"] = await armory.shelf(conn, doc["guild"])
+        w["armory_cap"] = armory.ARMORY_CAP
+        prior = await conn.fetchval(
+            "SELECT take_day FROM ascent_armory_takes "
+            "WHERE tenant=$1 AND player=$2", tenant, player)
+        w["armory_took_today"] = bool(prior is not None
+                                      and int(prior) >= day)
     else:
         w["factions"] = await _faction_hall(conn)
         w["faction_banners"] = factions.banner_slugs()
@@ -358,6 +368,39 @@ async def execute_effects(conn, tenant: str, player: str,
                 "INSERT INTO ascent_happenings (world_day, kind, line,"
                 " floor) VALUES ($1,'climb',$2,$3)", pstate.world_day(),
                 str(e.get("line", ""))[:200], int(e.get("floor", 0)))
+        elif kind == "armory_deposit":
+            # 007: the engine already lifted the piece (and its wear
+            # stash) out of the doc; a refusal hands it straight back
+            # and says so by letter — never a silent vanish (003 law).
+            from . import armory
+            uses = e.get("uses_left")
+            err = await armory.deposit(
+                conn, tenant, player, doc, str(e.get("slug", "")),
+                int(uses) if uses is not None else None)
+            if err:
+                slug = str(e.get("slug", ""))
+                inv = doc.setdefault("inventory", {})
+                inv[slug] = int(inv.get(slug, 0)) + 1
+                if uses is not None:
+                    doc.setdefault("durability_pack", {})[slug] = int(uses)
+                await conn.execute(
+                    "INSERT INTO ascent_letters (to_tenant, to_player,"
+                    " from_name, body) VALUES ($1,$2,$3,$4)",
+                    tenant, player, "the armory keeper",
+                    f"Your donation came back — {err}.")
+        elif kind == "armory_take":
+            # 007: the engine already validated against the injected
+            # shelf; a race (row gone, cooldown) gets a letter, never
+            # a silent vanish.
+            from . import armory
+            err = await armory.take(conn, tenant, player, doc,
+                                    int(e.get("item_id", 0)))
+            if err:
+                await conn.execute(
+                    "INSERT INTO ascent_letters (to_tenant, to_player,"
+                    " from_name, body) VALUES ($1,$2,$3,$4)",
+                    tenant, player, "the armory keeper",
+                    f"The piece never left the rack — {err}.")
         # guild_join / guild_leave live entirely in the doc
 
 

@@ -160,6 +160,12 @@ async def test_gnarl_quorum_two_players(client, tenants):
 
 async def test_muster_roll_lists_all_climbers(client, tenants):
     a, b = tenants
+    # sweep this test's own leftovers from prior runs — a dozen stale
+    # level-97 Wrens fill the 12-row board and push the fresh one off
+    pool = await db.get_pool()
+    await pool.execute(
+        "DELETE FROM ascent_players WHERE player LIKE 'b-%' "
+        "AND doc->>'name' LIKE 'Wren%'")
     pa, pb = f"a-{uuid.uuid4().hex[:6]}", f"b-{uuid.uuid4().hex[:6]}"
     na, nb = f"Vex{pa[-4:]}", f"Wren{pb[-4:]}"
     await create(client, a, "tenant-a", pa, na)
