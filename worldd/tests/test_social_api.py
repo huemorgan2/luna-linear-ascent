@@ -158,7 +158,11 @@ async def test_gnarl_quorum_two_players(client, tenants):
         "UPDATE ascent_world SET value='1'::jsonb WHERE key='frontier'")
 
 
-async def test_muster_roll_lists_all_climbers(client, tenants):
+async def test_roster_payload_lists_all_climbers(client, tenants):
+    # The in-game Muster Roll scene is retired, but the roster still ships
+    # in the world payload for installs on older plugin versions, so the
+    # data itself is asserted here rather than through a scene.
+    from app import social      # needs the game path the app sets up on boot
     a, b = tenants
     # sweep this test's own leftovers from prior runs — a dozen stale
     # level-97 Wrens fill the 12-row board and push the fresh one off
@@ -177,15 +181,15 @@ async def test_muster_roll_lists_all_climbers(client, tenants):
     docb.update({"level": 97, "unlocked_floor": 97, "bank": 5000})
     await set_doc("tenant-b", pb, docb)
 
-    s = await act(client, a, "tenant-a", pa, option="muster")
-    assert "climber" in s["headline"]
+    entries, total = await social._roster(pool)
+    assert total >= 2
     # B out-climbs the fresh chars: on the board with class, floor, wealth
-    rows = [l for l in s["body_lines"] if l.startswith(nb)]
-    assert rows, s["body_lines"]
-    assert "elf archer" in rows[0]
-    assert "floor 97" in rows[0]
-    assert "wealth #" in rows[0]
+    mine = [e for e in entries if e["name"] == nb]
+    assert mine, entries
+    assert mine[0]["race"] == "elf" and mine[0]["clazz"] == "archer"
+    assert mine[0]["floor"] == 97
+    assert mine[0]["bank_rank"] >= 1
+    assert "bank" not in mine[0]          # rank is public, balance is not
     # the board is sorted by frontier floor, strongest first
-    floors = [int(l.split("floor ")[1].split(" ")[0])
-              for l in s["body_lines"] if "floor " in l]
+    floors = [e["floor"] for e in entries]
     assert floors == sorted(floors, reverse=True)
