@@ -82,10 +82,6 @@ _TIPS: dict[str, str] = {
              "hunt it — gold and XP scale with the floor, so work the "
              "highest one you survive. A Warden holds every lift up; "
              "when one falls, the next floor opens for EVERYONE."),
-    "muster": ("The roll of every climber on the Ascent: level, floor, "
-               "carried and banked gold, faction. See who is ahead, who "
-               "climbs beside you — and who carries enough to be worth "
-               "meeting in the fields."),
 
     # ── gate towns ──
     "hunt": ("Fight a wild creature of this floor — 1 energy. The bread and "
@@ -235,7 +231,7 @@ for _c, _t in _CLASS_ANGLE.items():
 def _buy_tip(slug: str) -> str:
     g = economy.FORGE.get(slug)
     if g:
-        req = economy.rung_level_req(g)
+        req = economy.rung_player_level_req(g)
         if g.slot == "shoes":
             return (f"{g.name} — footwear, +{g.speed} speed (wants "
                     f"level {req}). {g.flavor.capitalize()}. Speed "
