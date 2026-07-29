@@ -130,6 +130,12 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
 
     # 007 §3: the ONE live Warden at the world frontier
     w["warden"] = await _world_warden(conn, w["frontier"], active)
+
+    # 022/008: the floor's open flare, the assist kill-log, and the
+    # lodge's long fire — all world rows, all reads.
+    w["flare"] = await _floor_flare(conn, tenant, player, floor)
+    w["recent_kills"] = await _floor_kills(conn, floor)
+    w["fire"] = await _long_fire(conn)
     news_floor = doc.get("floor", 0) or w["frontier"]
     gossip = await conn.fetch(
         "SELECT line FROM ascent_happenings "
@@ -463,6 +469,16 @@ async def execute_effects(conn, tenant: str, player: str,
             await _fx_warden_strike(conn, tenant, player, doc, e)
         elif kind == "horn":
             await _fx_horn(conn, tenant, player, doc, e)
+        elif kind == "flare":
+            await _fx_flare(conn, tenant, player, doc, e)
+        elif kind == "flare_answer":
+            await _fx_flare_answer(conn, tenant, player, doc, e)
+        elif kind == "kill_note":
+            await _fx_kill_note(conn, doc, e)
+        elif kind == "fire_word":
+            await _fx_fire_word(conn, doc, e)
+        elif kind == "fire_stew":
+            await _fx_fire_stew(conn, doc, e)
         elif kind == "letters_seen":
             await conn.execute(
                 "UPDATE ascent_letters SET read=TRUE "
@@ -856,6 +872,167 @@ async def _fx_horn(conn, tenant: str, player: str, doc: dict,
             "INSERT INTO ascent_letters (to_tenant, to_player, from_name,"
             " body) VALUES ($1,$2,$3,$4)",
             r["tenant"], r["player"], sounder, body)
+
+
+# ── 022/008: the flare, the assist kill-log, the long fire ───────────────
+# All three live on ascent_world rows — never inside another player's
+# doc (the 007 fan-out race ruling): the flared player is BY DEFINITION
+# mid-fight, so everything both sides need rides a side row both read.
+
+def _flare_fresh(v: dict) -> bool:
+    age = (pstate.now() - dt.datetime.fromisoformat(v["ts"])).total_seconds()
+    return age < economy.FLARE_TTL_MIN * 60
+
+
+async def _fx_flare(conn, tenant: str, player: str, doc: dict,
+                    e: dict) -> None:
+    """One live flare per floor — the first fresh cry holds the sky
+    until it is answered or gutters out."""
+    floor = int(e.get("floor") or 0)
+    if floor < 1:
+        return
+    key = f"flare:{floor}"
+    row = await conn.fetchrow(
+        "SELECT value FROM ascent_world WHERE key=$1 FOR UPDATE", key)
+    if row is not None:
+        v = json.loads(row["value"])
+        own = v.get("tenant") == tenant and v.get("player") == player
+        if _flare_fresh(v) and not v.get("answered_by") and not own:
+            return                     # someone else's live flare holds
+    v = {"tenant": tenant, "player": player,
+         "name": doc.get("name") or "a climber",
+         "monster": e.get("monster") or "something",
+         "slug": e.get("slug") or "", "ts": pstate.now().isoformat(),
+         "answered_by": None}
+    await conn.execute(
+        "INSERT INTO ascent_world (key, value) VALUES ($1,$2::jsonb) "
+        "ON CONFLICT (key) DO UPDATE SET value=$2::jsonb",
+        key, json.dumps(v))
+
+
+async def _fx_flare_answer(conn, tenant: str, player: str, doc: dict,
+                           e: dict) -> None:
+    """First tap wins: the pay, the ledger, the Stone line — exactly
+    once per flare. Late answerers still fought a real fight; they just
+    don't get the plaque."""
+    floor = int(e.get("floor") or 0)
+    row = await conn.fetchrow(
+        "SELECT value FROM ascent_world WHERE key=$1 FOR UPDATE",
+        f"flare:{floor}")
+    if row is None:
+        return
+    v = json.loads(row["value"])
+    own = v.get("tenant") == tenant and v.get("player") == player
+    if own or v.get("answered_by") or not _flare_fresh(v):
+        return
+    name = doc.get("name") or "a climber"
+    v["answered_by"] = name
+    await conn.execute(
+        "UPDATE ascent_world SET value=$1::jsonb WHERE key=$2",
+        json.dumps(v), f"flare:{floor}")
+    gold = economy.flare_answer_gold(floor)
+    doc["gold"] = doc.get("gold", 0) + gold
+    doc["xp"] = doc.get("xp", 0) + economy.FLARE_ANSWER_AETHER
+    await conn.execute(
+        "INSERT INTO ascent_ledger (tenant, player, kind, gold, xp, note)"
+        " VALUES ($1,$2,'flare_answer',$3,$4,$5)",
+        tenant, player, gold, economy.FLARE_ANSWER_AETHER,
+        f"floor {floor}, for {v.get('name', '?')}")
+    await conn.execute(
+        "INSERT INTO ascent_stone (line) VALUES ($1)",
+        f"{name} answered a flare on floor {floor} — "
+        f"{v.get('name', 'a climber')} lives to tell it")
+
+
+async def _fx_kill_note(conn, doc: dict, e: dict) -> None:
+    """The floor's rolling kill-log — what the assist window reads."""
+    floor = int(e.get("floor") or 0)
+    slug = e.get("slug") or ""
+    if floor < 1 or not slug:
+        return
+    key = f"kills:{floor}"
+    row = await conn.fetchrow(
+        "SELECT value FROM ascent_world WHERE key=$1 FOR UPDATE", key)
+    now = pstate.now()
+    cutoff = economy.ASSIST_WINDOW_MIN * 60
+    ring = json.loads(row["value"]) if row else []
+    ring = [k for k in ring
+            if (now - dt.datetime.fromisoformat(k["ts"])).total_seconds()
+            <= cutoff]
+    ring.append({"slug": slug, "by": doc.get("name") or "",
+                 "ts": now.isoformat()})
+    await conn.execute(
+        "INSERT INTO ascent_world (key, value) VALUES ($1,$2::jsonb) "
+        "ON CONFLICT (key) DO UPDATE SET value=$2::jsonb",
+        key, json.dumps(ring[-12:]))
+
+
+_FIRE_SEATS = 5
+
+
+async def _fx_fire_word(conn, doc: dict, e: dict) -> None:
+    """The long fire keeps five seats; saying a word takes yours back."""
+    word = str(e.get("word") or "")[:80]
+    if not word:
+        return
+    row = await conn.fetchrow(
+        "SELECT value FROM ascent_world WHERE key='fire' FOR UPDATE")
+    name = doc.get("name") or "a climber"
+    ring = json.loads(row["value"]) if row else []
+    ring = [f for f in ring if f.get("name") != name]
+    ring.append({"name": name, "word": word,
+                 "ts": pstate.now().isoformat()})
+    await conn.execute(
+        "INSERT INTO ascent_world (key, value) VALUES ('fire',$1::jsonb) "
+        "ON CONFLICT (key) DO UPDATE SET value=$1::jsonb",
+        json.dumps(ring[-_FIRE_SEATS:]))
+
+
+async def _fx_fire_stew(conn, doc: dict, e: dict) -> None:
+    row = await _find_player_by_name(conn, e.get("to_name") or "")
+    if row is None:
+        return
+    frm = doc.get("name") or "a climber"
+    await conn.execute(
+        "INSERT INTO ascent_letters (to_tenant, to_player, from_name,"
+        " body) VALUES ($1,$2,$3,$4)",
+        row["tenant"], row["player"], frm,
+        f"{frm} stood you a stew at the long fire. It was hot, and "
+        "nobody asked anything of you.")
+
+
+async def _floor_flare(conn, tenant: str, player: str,
+                       floor: int) -> dict | None:
+    row = await conn.fetchrow(
+        "SELECT value FROM ascent_world WHERE key=$1", f"flare:{floor}")
+    if row is None:
+        return None
+    v = json.loads(row["value"])
+    if not _flare_fresh(v):
+        return None
+    return {"name": v.get("name"), "monster": v.get("monster"),
+            "slug": v.get("slug"), "answered_by": v.get("answered_by"),
+            "own": v.get("tenant") == tenant and v.get("player") == player}
+
+
+async def _floor_kills(conn, floor: int) -> list[dict]:
+    row = await conn.fetchrow(
+        "SELECT value FROM ascent_world WHERE key=$1", f"kills:{floor}")
+    if row is None:
+        return []
+    now = pstate.now()
+    cutoff = economy.ASSIST_WINDOW_MIN * 60
+    return [k for k in json.loads(row["value"])
+            if (now - dt.datetime.fromisoformat(k["ts"])).total_seconds()
+            <= cutoff]
+
+
+async def _long_fire(conn) -> list[dict]:
+    row = await conn.fetchrow(
+        "SELECT value FROM ascent_world WHERE key='fire'")
+    if row is None:
+        return []
+    return list(reversed(json.loads(row["value"])))[:_FIRE_SEATS]
 
 
 async def _warden_fall(conn, tenant: str, player: str, doc: dict,
