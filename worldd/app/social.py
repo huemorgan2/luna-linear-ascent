@@ -84,6 +84,14 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
     stone = await conn.fetch(
         "SELECT line FROM ascent_stone ORDER BY id DESC LIMIT 8")
     w["stone"] = [r["line"] for r in stone]
+    # 022/007: the Stone of Eras — permanent, readable in every era.
+    eras = await conn.fetch(
+        "SELECT era, data FROM ascent_eras ORDER BY era DESC LIMIT 5")
+    w["eras"] = [
+        (lambda d: f"ERA {r['era']} — fell on day {d.get('world_day', '?')}"
+                   f" to {d.get('finisher', '?')} and "
+                   f"{max(0, len(d.get('war_party', [])) - 1)} blades")
+        (json.loads(r["data"])) for r in eras]
 
     # loaded unconditionally: the upcoming action may move the player into
     # any social scene, and injection happens before the engine runs.
@@ -373,8 +381,11 @@ async def _roster(conn) -> tuple[list[dict], int]:
     entries = []
     for r in rows:
         d = json.loads(r["doc"])
+        # 022/007: reincarnation glyphs ride every social surface
+        pts = int((d.get("prestige") or {}).get("points", 0))
+        glyph = " " + "✦" * min(pts, 3) if pts else ""
         entries.append({
-            "name": d.get("name") or "a climber",
+            "name": (d.get("name") or "a climber") + glyph,
             "race": d.get("race") or "?",
             "clazz": d.get("clazz") or "?",
             "level": d.get("level", 1),
@@ -859,6 +870,11 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
         "WHERE key='frontier' AND (value)::int < $2",
         json.dumps(floor + 1), floor + 1)
 
+    if floor + 1 == 100:
+        # 022/007: the last floor just opened — the siege is DECLARED,
+        # not stumbled into.
+        from . import era
+        await era.declare_last_siege(conn, active)
     total = max(1, sum(int(s.get("dmg", 0)) for s in strikers))
     mult = economy.world_warden_reward_mult(floor, active)
     xp_pool = round(economy.warden_xp(floor) * mult)
@@ -1027,6 +1043,10 @@ async def _resolve_boss(conn, tenant: str, player: str, doc: dict,
         await conn.execute(
             "INSERT INTO ascent_stone (line) VALUES ($1)",
             f"Floor {ms.floor} — {ms.name} cast down by {names}")
+        if ms.floor == 100:
+            # 022/007: the era ends, together, on purpose.
+            from . import era
+            await era.close_era(conn, tenant, player, doc, commits)
     else:
         await conn.execute(
             "INSERT INTO ascent_happenings (world_day, kind, line) "

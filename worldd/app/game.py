@@ -42,6 +42,10 @@ async def _load_doc(conn, tenant: str, player: str) -> dict:
     if row:
         return json.loads(row["doc"])
     doc = pstate.new_player(f"{tenant}:{player}")
+    # 022/007: a name the reincarnation ledger knows boots with the
+    # glyph and the time-perks (never power).
+    from . import era
+    await era.prestige_boot(conn, tenant, player, doc)
     await conn.execute(
         "INSERT INTO ascent_players (tenant, player, doc) "
         "VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",
