@@ -314,14 +314,25 @@ def _warden_now(v: dict, floor: int, active: int | None) -> dict:
     fully), and the pity ramp (each fully-closed wound takes 3% off the
     max, forever). Pure — never persisted on read; only strikes write.
 
-    Returns {hp, hp_max, pity, strikers, closed} where closed means the
-    wound fully closed since the last write (the next write must record
-    the pity and reset the siege)."""
+    Returns {hp, hp_max, base, pity, strikers, closed} where closed means
+    the wound fully closed since the last write (the next write must
+    record the pity and reset the siege) and base is the frozen pre-pity
+    max the next write must store."""
     pity = int(v.get("pity", 0))
+    stored = int(v.get("hp_max", 0))
+    sized = economy.world_warden_hp(floor, active)
+    # 024: a pool is frozen at first blood, but a RETUNE has to reach the
+    # sieges already standing — production's floor-1 Warden would keep a
+    # pool from the old curve forever. Resize on read, keeping the
+    # wound's DEPTH as a fraction: nobody's strikes are erased, they just
+    # cut a smaller body. The tune stamp rides the row; writes renew it.
+    if stored > 0 and int(v.get("tune", 1)) != economy.WARDEN_POOL_TUNE:
+        frac = min(1.0, max(0.0, int(v.get("hp", stored)) / stored))
+        v = dict(v, hp_max=sized, hp=max(0, round(sized * frac)))
+        stored = sized
+    base = stored or sized
 
     def _max(k: int) -> int:
-        base = int(v.get("hp_max", 0)) or economy.world_warden_hp(
-            floor, active)
         return max(1, round(base * (1 - economy.WARDEN_PITY_PCT) ** k))
 
     hp_max = _max(pity)
@@ -339,7 +350,7 @@ def _warden_now(v: dict, floor: int, active: int | None) -> dict:
     if closed:
         pity += 1
         hp_max = _max(pity)
-        return {"hp": hp_max, "hp_max": hp_max, "pity": pity,
+        return {"hp": hp_max, "hp_max": hp_max, "base": base, "pity": pity,
                 "strikers": [], "closed": True, "closes_in_s": None}
     rate = hp_max * economy.world_warden_regen_hourly(floor)
     hp = min(hp_max, round(hp + rate * hours))
@@ -355,7 +366,7 @@ def _warden_now(v: dict, floor: int, active: int | None) -> dict:
             cands.append((hp_max - hp) / rate)
         if cands:
             closes_in_s = max(0, round(min(cands) * 3600))
-    return {"hp": hp, "hp_max": hp_max, "pity": pity,
+    return {"hp": hp, "hp_max": hp_max, "base": base, "pity": pity,
             "strikers": v.get("strikers", []), "closed": False,
             "closes_in_s": closes_in_s}
 
@@ -780,8 +791,8 @@ async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
             # a NEW wound resets the once-per-wound slates
             called = [int(t) for t in v.get("called", [])]
             horns = list(v.get("horns", []))
-        st["hp_max"] = int(v.get("hp_max", 0)) or economy.world_warden_hp(
-            floor, active or None)          # the PRE-pity base, frozen
+        # the PRE-pity base, frozen — post-024 resize, never the raw row
+        st["hp_max"] = int(st["base"])
     strikers = list(st["strikers"])
     for s in strikers:
         if s.get("tenant") == tenant and s.get("player") == player:
@@ -814,6 +825,7 @@ async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
             "ON CONFLICT (key) DO UPDATE SET value=excluded.value",
             key, json.dumps({"hp": hp, "hp_max": st["hp_max"],
                              "pity": st["pity"],
+                             "tune": economy.WARDEN_POOL_TUNE,
                              "ts": pstate.now().isoformat(),
                              "called": called, "horns": horns,
                              "strikers": strikers[-40:]}))
