@@ -326,11 +326,24 @@ def _warden_now(v: dict, floor: int, active: int | None) -> dict:
         pity += 1
         hp_max = _max(pity)
         return {"hp": hp_max, "hp_max": hp_max, "pity": pity,
-                "strikers": [], "closed": True}
-    hp = min(hp_max, round(
-        hp + hp_max * economy.world_warden_regen_hourly(floor) * hours))
+                "strikers": [], "closed": True, "closes_in_s": None}
+    rate = hp_max * economy.world_warden_regen_hourly(floor)
+    hp = min(hp_max, round(hp + rate * hours))
+    # 022/006: the countdown the card shows — the wound closes at the
+    # silence deadline or at full regen, whichever lands first. Zero
+    # extra state; pure arithmetic off the same ts the close law reads.
+    closes_in_s = None
+    if hp < hp_max:
+        cands = []
+        if w is not None:
+            cands.append(max(0.0, w - hours))
+        if rate > 0:
+            cands.append((hp_max - hp) / rate)
+        if cands:
+            closes_in_s = max(0, round(min(cands) * 3600))
     return {"hp": hp, "hp_max": hp_max, "pity": pity,
-            "strikers": v.get("strikers", []), "closed": False}
+            "strikers": v.get("strikers", []), "closed": False,
+            "closes_in_s": closes_in_s}
 
 
 async def _world_warden(conn, frontier: int,
@@ -343,10 +356,11 @@ async def _world_warden(conn, frontier: int,
     if row is None:
         hp_max = economy.world_warden_hp(frontier, active or None)
         return {"floor": frontier, "hp": hp_max, "hp_max": hp_max,
-                "strikers": []}
+                "strikers": [], "pity": 0, "closes_in_s": None}
     st = _warden_now(json.loads(row["value"]), frontier, active or None)
     return {"floor": frontier, "hp": st["hp"], "hp_max": st["hp_max"],
-            "strikers": st["strikers"]}
+            "strikers": st["strikers"], "pity": st["pity"],
+            "closes_in_s": st["closes_in_s"]}
 
 
 async def _roster(conn) -> tuple[list[dict], int]:
@@ -436,6 +450,8 @@ async def execute_effects(conn, tenant: str, player: str,
             await _fx_boss_commit(conn, tenant, player, doc, e)
         elif kind == "warden_strike":
             await _fx_warden_strike(conn, tenant, player, doc, e)
+        elif kind == "horn":
+            await _fx_horn(conn, tenant, player, doc, e)
         elif kind == "letters_seen":
             await conn.execute(
                 "UPDATE ascent_letters SET read=TRUE "
@@ -715,38 +731,120 @@ async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
     active = await conn.fetchval(
         "SELECT count(*) FROM ascent_players WHERE doc->>'stage'='playing'")
     active = int(active or 0)
+    warden_name = schema.get_floor(floor).warden_name
+    name = doc.get("name") or player
+    called: list[int] = []
+    horns: list[str] = []
     if row is None:
         # first blood materialises the row — the pool is sized to the
-        # world it faces and FROZEN there (022/002)
+        # world it faces and FROZEN there (022/002). 006: the Stone
+        # remembers who cut first.
         base = economy.world_warden_hp(floor, active or None)
         st = {"hp": base, "hp_max": base, "pity": 0, "strikers": []}
+        eff_max = base
+        await conn.execute(
+            "INSERT INTO ascent_stone (line) VALUES ($1)",
+            f"Floor {floor} — {name} drew first blood on {warden_name}")
     else:
         v = json.loads(row["value"])
         st = _warden_now(v, floor, active or None)
+        eff_max = st["hp_max"]              # post-pity, what fights see
+        if not st["closed"]:
+            # a NEW wound resets the once-per-wound slates
+            called = [int(t) for t in v.get("called", [])]
+            horns = list(v.get("horns", []))
         st["hp_max"] = int(v.get("hp_max", 0)) or economy.world_warden_hp(
             floor, active or None)          # the PRE-pity base, frozen
     strikers = list(st["strikers"])
-    name = doc.get("name") or player
     for s in strikers:
         if s.get("tenant") == tenant and s.get("player") == player:
             s["dmg"] = int(s.get("dmg", 0)) + dmg
             s["name"] = name
+            s["ts"] = pstate.now().isoformat()      # 006: the hour roll
+            s["guild"] = doc.get("guild") or ""     # 006: standings
             break
     else:
         strikers.append({"tenant": tenant, "player": player,
-                         "name": name, "dmg": dmg})
+                         "name": name, "dmg": dmg,
+                         "ts": pstate.now().isoformat(),
+                         "guild": doc.get("guild") or ""})
     hp = st["hp"] - dmg
     if hp > 0:
+        # 022/006: the Crier calls the wound at 75/50/25% — once per
+        # wound, tower-wide (the `called` slate rides the row).
+        before = 100 * st["hp"] / max(1, eff_max)
+        after = 100 * hp / max(1, eff_max)
+        for t in (75, 50, 25):
+            if t not in called and before > t >= after:
+                called.append(t)
+                await conn.execute(
+                    "INSERT INTO ascent_happenings (world_day, kind, line,"
+                    " floor) VALUES ($1,'war',$2,$3)", pstate.world_day(),
+                    f"{warden_name} is cut to {t}% on floor {floor} — "
+                    "the wound is open, every blade counts", floor)
         await conn.execute(
             "INSERT INTO ascent_world (key, value) VALUES ($1,$2::jsonb) "
             "ON CONFLICT (key) DO UPDATE SET value=excluded.value",
             key, json.dumps({"hp": hp, "hp_max": st["hp_max"],
                              "pity": st["pity"],
                              "ts": pstate.now().isoformat(),
+                             "called": called, "horns": horns,
                              "strikers": strikers[-40:]}))
         return
     await _warden_fall(conn, tenant, player, doc, floor, strikers,
                        active or None)
+
+
+def _fmt_countdown(seconds: int | None) -> str:
+    if seconds is None:
+        return "when the tower forgets"
+    h, m = int(seconds) // 3600, (int(seconds) % 3600) // 60
+    return f"{h}h {m:02d}m" if h else f"{m}m"
+
+
+async def _fx_horn(conn, tenant: str, player: str, doc: dict,
+                   e: dict) -> None:
+    """022/006: Sound the horn — one tap letters every guildmate with
+    the floor and the countdown. Once per BANNER per wound (the horns
+    slate rides the warden row and resets when the wound does); the
+    write never touches ts — a horn must not feed the silence clock."""
+    floor = int(e.get("floor", 0))
+    guild = doc.get("guild")
+    if not guild:
+        return
+    row = await conn.fetchrow(
+        "SELECT value FROM ascent_world WHERE key=$1 FOR UPDATE",
+        f"warden:{floor}")
+    if row is None:
+        return                              # no wound — nothing to call
+    v = json.loads(row["value"])
+    st = _warden_now(v, floor, None)
+    if st["closed"] or st["hp"] >= st["hp_max"]:
+        return
+    horns = list(v.get("horns", []))
+    if guild in horns:
+        return
+    horns.append(guild)
+    v["horns"] = horns
+    await conn.execute(
+        "UPDATE ascent_world SET value=$1::jsonb WHERE key=$2",
+        json.dumps(v), f"warden:{floor}")
+    warden_name = schema.get_floor(floor).warden_name
+    pct = max(0, round(100 * st["hp"] / max(1, st["hp_max"])))
+    body = (f"The horn: {warden_name} stands at {pct}% on floor {floor}. "
+            f"The wound closes in {_fmt_countdown(st['closes_in_s'])} — "
+            "come cut.")
+    rows = await conn.fetch(
+        "SELECT tenant, player FROM ascent_players "
+        "WHERE doc->>'guild' = $1 AND doc->>'stage' = 'playing'", guild)
+    sounder = doc.get("name") or player
+    for r in rows:
+        if r["tenant"] == tenant and r["player"] == player:
+            continue
+        await conn.execute(
+            "INSERT INTO ascent_letters (to_tenant, to_player, from_name,"
+            " body) VALUES ($1,$2,$3,$4)",
+            r["tenant"], r["player"], sounder, body)
 
 
 async def _warden_fall(conn, tenant: str, player: str, doc: dict,
@@ -765,7 +863,14 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
     mult = economy.world_warden_reward_mult(floor, active)
     xp_pool = round(economy.warden_xp(floor) * mult)
     gold_pool = round(economy.warden_gold(floor) * mult)
-    names = ", ".join(s.get("name") or "?" for s in strikers)
+    # 022/006: the finisher is named FIRST — the clearing-group fame
+    # line — then everyone else by damage dealt.
+    def _is_finisher(s):
+        return s.get("tenant") == tenant and s.get("player") == player
+    roll = sorted(strikers,
+                  key=lambda s: (not _is_finisher(s),
+                                 -int(s.get("dmg", 0))))
+    names = ", ".join(s.get("name") or "?" for s in roll)
 
     for s in strikers:
         finisher = s.get("tenant") == tenant and s.get("player") == player
@@ -817,6 +922,11 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
         "VALUES ($1,'boss',$2,$3)", day,
         f"{warden_name} fell to {names} — floor {floor + 1} is open "
         "for everyone", floor)
+    top = max(strikers, key=lambda s: int(s.get("dmg", 0)))
+    await conn.execute(
+        "INSERT INTO ascent_stone (line) VALUES ($1)",
+        f"Floor {floor} — the deepest cut in {warden_name} was "
+        f"{top.get('name') or '?'}'s ({int(top.get('dmg', 0)):,})")
     await conn.execute(
         "INSERT INTO ascent_stone (line) VALUES ($1)",
         f"Floor {floor} — {warden_name} cast down by {names}")
