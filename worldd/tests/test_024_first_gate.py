@@ -38,7 +38,10 @@ async def _seed_legacy_row(pool, hp, hp_max=OLD_POOL, floor=1, **extra):
 
 
 def test_the_old_pool_really_was_the_thing_that_shrank():
-    assert economy.world_warden_hp(1) < OLD_POOL / 3
+    # 025 put 60% back on (the wound never closes on the siege floors
+    # now), so the gate is no longer a third of what it was — but it is
+    # still less than half the pool that drew the "impossible" complaint.
+    assert economy.world_warden_hp(1) < OLD_POOL / 2
 
 
 async def test_a_legacy_pool_resizes_and_keeps_the_wound_depth(
@@ -84,17 +87,21 @@ async def test_the_next_strike_stamps_the_tune_and_the_new_pool(
     assert st["hp_max"] == economy.world_warden_hp(1)
 
 
-async def test_two_strikes_close_the_first_gate(client, tenant_a,
-                                               clean_world):
-    """The complaint, answered end to end: one player, two full fights."""
+async def test_one_player_closes_the_first_gate_over_several_fights(
+        client, tenant_a, clean_world):
+    """The complaint, answered end to end: one player, a handful of full
+    fights, and — 025 — no clock running against him between them."""
     pool = await db.get_pool()
     unit = economy.strike_fight_damage(1)
+    need = -(-economy.world_warden_hp(1) // unit)
+    assert need <= 4
     # the fall rolls loot on the doc — a real one, not a name-only stub
     doc = {"name": "Kettle", "luna_user": "t:solo", "rng_counter": 0,
            "gold": 0, "xp": 0, "inventory": {}, "unlocked_floor": 1}
-    await _strike("tenant-a", "p-solo", doc, 1, unit)
-    v = await _warden_row(pool)
-    assert v is not None and v["hp"] > 0          # still standing, wounded
+    for _ in range(need - 1):
+        await _strike("tenant-a", "p-solo", doc, 1, unit)
+        v = await _warden_row(pool)
+        assert v is not None and v["hp"] > 0      # still standing, wounded
     await _strike("tenant-a", "p-solo", doc, 1, unit)
     frontier = await pool.fetchval(
         "SELECT value FROM ascent_world WHERE key='frontier'")

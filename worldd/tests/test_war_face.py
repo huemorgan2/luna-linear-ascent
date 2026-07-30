@@ -155,5 +155,9 @@ async def test_keep_card_reads_the_countdown(client, tenant_a, clean_world):
     await act(client, tenant_a, "tenant-a", pa, option="floor_1")
     s = await act(client, tenant_a, "tenant-a", pa, option="keep")
     body = "\n".join(s["body_lines"])
-    assert "the wound closes in" in body and "keep striking" in body
+    # 025 §3: floor 1 is a siege floor — there IS no countdown to read,
+    # and the card has to say so instead of leaving the player waiting on
+    # a clock that will never run.
+    assert "does not heal" in body
+    assert "the wound is exactly as you left it" in body
     assert "Cutter" in body
