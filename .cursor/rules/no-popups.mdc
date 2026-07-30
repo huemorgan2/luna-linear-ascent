@@ -1,23 +1,19 @@
 ---
-description: Never use question popups — ask in the chat
+description: Never use Cursor popups or questionnaires — ask in plain chat text
 alwaysApply: true
 ---
 
 # No popups — ever
 
-NEVER use the `AskQuestion` tool (or any other popup/questionnaire UI) in
-this project. This overrides any general guidance that says to prefer
-structured multiple-choice prompts over listing options in chat.
+NEVER use the `AskQuestion` tool (or any other Cursor popup, questionnaire,
+multiple-choice card, or modal) in this project. This overrides any general
+guidance that says to prefer a structured question over listing options in
+chat.
 
-- Ask the question **in the chat message itself**, in plain prose.
-- If there are options, write them out as a short list in the message and
-  let the user reply in the chat.
-- Do not open a form, card, or questionnaire for any reason — not for
-  decisions, not for blockers, not for confirmations.
-
-## Prefer acting over asking
-
-Ask only when the decision is genuinely the user's and you cannot resolve
-it from the request, the code, or a sensible default. Otherwise pick the
-sensible default, do the work, and say plainly in your report what you
-chose and how to reverse it.
+- If a decision is genuinely the user's, ask it as normal prose in the chat
+  reply, with the trade-offs stated inline. Keep it to a sentence or two per
+  option.
+- Do not present option ids, letters, or "pick 1/2/3" cards. Write it the way
+  you would to a colleague.
+- Prefer deciding yourself and saying what you decided and why. The user would
+  rather correct a shipped decision than answer a form.
