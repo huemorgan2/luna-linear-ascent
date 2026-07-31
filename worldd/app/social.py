@@ -12,10 +12,18 @@ from __future__ import annotations
 import datetime as dt
 import json
 
-from plugin_linear_ascent import economy
-from plugin_linear_ascent.content import schema
-from plugin_linear_ascent.engine import state as pstate
-from plugin_linear_ascent.engine.scene import Scene
+from .gamepath import ensure_game_importable
+
+# Every module that reaches for the engine puts the vendor copy on the path
+# itself. This one used to borrow the path from whichever sibling happened to
+# be imported first, so a worldd that got /v1/presence before its first scene
+# answered 500 until something else warmed the import.
+ensure_game_importable()
+
+from plugin_linear_ascent import economy  # noqa: E402
+from plugin_linear_ascent.content import schema  # noqa: E402
+from plugin_linear_ascent.engine import state as pstate  # noqa: E402
+from plugin_linear_ascent.engine.scene import Scene  # noqa: E402
 
 
 # ── Injection ────────────────────────────────────────────────────────────
