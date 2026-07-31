@@ -869,8 +869,8 @@ async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
                 await conn.execute(
                     "INSERT INTO ascent_happenings (world_day, kind, line,"
                     " floor) VALUES ($1,'war',$2,$3)", pstate.world_day(),
-                    f"{warden_name} is cut to {t}% on floor {floor} — "
-                    "the wound is open, every blade counts", floor)
+                    f"{warden_name} — cut to {t}% · floor {floor}",
+                    floor)
         await conn.execute(
             "INSERT INTO ascent_world (key, value) VALUES ($1,$2::jsonb) "
             "ON CONFLICT (key) DO UPDATE SET value=excluded.value",
@@ -1183,8 +1183,8 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
     await conn.execute(
         "INSERT INTO ascent_happenings (world_day, kind, line, floor) "
         "VALUES ($1,'boss',$2,$3)", day,
-        f"{warden_name} fell to {names} — floor {floor + 1} is open "
-        "for everyone", floor)
+        f"{warden_name} slain by {names} · floor {floor + 1} open",
+        floor)
     top = max(strikers, key=lambda s: int(s.get("dmg", 0)))
     await conn.execute(
         "INSERT INTO ascent_stone (line) VALUES ($1)",
