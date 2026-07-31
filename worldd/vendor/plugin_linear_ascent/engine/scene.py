@@ -47,6 +47,10 @@ class Meters:
     xp_need: int        # xp_need(level) — full bar = licensed to train
     gold: int
     level: int = 1      # 012: shown next to the gold
+    atk: int = 0        # 030: total ATK/DEF ride the wire so the renderer
+    dfs: int = 0        # can draw pip rows without reading the player doc.
+                        # Defaults 0 = "not sent" (older engine): the
+                        # profile block simply omits the rows.
 
 
 @dataclass
@@ -96,6 +100,17 @@ class Scene:
                                     # 027: clickable picture tiles —
                                     # {opt, slug, label, sub}. Faction
                                     # sigils are art, not filenames.
+    paper: dict | None = None       # 030 Phase 5: the Morning Crier —
+                                    # {headline, items[], closable}. Drawn
+                                    # as a broadsheet over paper art; ✕
+                                    # posts news_close. Top-level and
+                                    # optional — older clients drop it.
+    strip: dict | None = None       # 030: a thin art band with one big
+                                    # number — {art, text}. The vault's
+                                    # strongbox shelf: 320×50 art, the
+                                    # text drawn large and centered over
+                                    # it. Top-level and optional: older
+                                    # clients drop it, text keeps parity.
     enemy: dict | None = None       # 017/003: the fight dossier payload —
                                     # {name, hp, hp_max, atk, def, profile,
                                     #  range, lore, specimen, pspd, dtype,
@@ -112,6 +127,12 @@ class Scene:
         # draws it, the agent says it.
         for nt in self.notices:
             lines.append(f"! {nt.get('text', '')}")
+        # 030 Phase 5: the agent reads the same paper the card draws.
+        if self.paper and self.paper.get("items"):
+            lines.append("— THE MORNING CRIER —")
+            if self.paper.get("headline"):
+                lines.append(self.paper["headline"])
+            lines += [f"· {it}" for it in self.paper["items"]]
         if self.awaits_text:
             lines.append(f"⌨ waiting for a typed chat reply: "
                          f"{self.awaits_text}")
@@ -120,12 +141,21 @@ class Scene:
             lines.append(f"{en['name']} HP {en['hp']}/{en['hp_max']}")
             if en.get("tiers"):
                 lines.append("◈ " + " · ".join(en["tiers"]))
+            # 030 Phase 7: the odds ride the text card too
+            drops = en.get("drops") or {}
+            if drops.get("gold"):
+                lines.append(f"· coins ◈ {drops['gold'][0]}–"
+                             f"{drops['gold'][1]}")
+            if drops.get("xp"):
+                lines.append(f"· XP ✦ {drops['xp'][0]}–{drops['xp'][1]}")
             if en.get("range") == "at_range":
                 lines.append("◇ at range — it hasn't reached you yet")
             elif en.get("range") == "close":
                 lines.append("◇ close quarters — it is on top of you")
         if self.shard_note:
             lines.append(f"◆ {self.shard_note}")
+        if self.strip and self.strip.get("text"):
+            lines.append(self.strip["text"])
         for b in self.body_lines:
             # 007 fold markers degrade to a plain divider in text
             if b == "▣.":
@@ -139,9 +169,12 @@ class Scene:
                 lines.append(f" {i}) {o.label}{badge}{hint}")
         if self.meters:
             m = self.meters
+            stats = (f"   ATK {m.atk}   DEF {m.dfs}"
+                     if getattr(m, "atk", 0) else "")
             lines.append(
                 f"HP {m.hp}/{m.hp_max}   ⚡ {m.energy}/{m.energy_max}   "
-                f"XP {m.xp}/{m.xp_need}   LV {m.level}   gold {m.gold}")
+                f"XP {m.xp}/{m.xp_need}   LV {m.level}   gold {m.gold}"
+                f"{stats}")
         # 010.1: ⚡/🔒 are one-character markers for the HTML renderer's
         # 1-bit glyphs; the text surface (the agent reads this) speaks in
         # words so no emoji ever leaks into a chat reply.
@@ -176,6 +209,8 @@ class Scene:
             "notices": self.notices,
             "ask": self.ask,
             "gallery": self.gallery,
+            "paper": self.paper,
+            "strip": self.strip,
             "enemy": self.enemy,
         }
 
@@ -214,5 +249,7 @@ class Scene:
             notices=list(d.get("notices", [])),
             ask=(dict(d["ask"]) if d.get("ask") else None),
             gallery=list(d.get("gallery", [])),
+            paper=(dict(d["paper"]) if d.get("paper") else None),
+            strip=(dict(d["strip"]) if d.get("strip") else None),
             enemy=(dict(d["enemy"]) if d.get("enemy") else None),
         )

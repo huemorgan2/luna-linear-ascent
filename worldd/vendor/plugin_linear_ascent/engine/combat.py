@@ -79,7 +79,9 @@ def meters(p: dict) -> Meters:
         xp=p["xp"],
         xp_need=economy.xp_need(p["level"]),
         gold=p["gold"],
-        level=p["level"])
+        level=p["level"],
+        atk=state.atk(p),
+        dfs=state.dfs(p))
 
 
 def _eyebrow(p: dict, floor) -> str:
@@ -282,6 +284,26 @@ def _lore(e: dict, floor) -> str:
     return ""
 
 
+def _drop_ranges(p: dict, floor) -> dict:
+    """030 Phase 7: the dossier says the odds — coin and XP ranges from
+    the SAME math _victory rolls (jitter band × fade × specimen ×
+    profile × threat), so the promise and the payout can't drift."""
+    e = p["encounter"]
+    fade = economy.fade_multiplier(p["unlocked_floor"], floor.floor)
+    threat = economy.kill_reward_mult(e.get("traits") or ())
+    g_mult = (economy.SPECIMENS[e.get("specimen", "common")]["gold"]
+              * economy.profile_gold_mult(_profile(p)) * threat * fade)
+    g = economy.gold_per_kill(floor.floor)
+    x = economy.xp_per_kill(floor.floor)
+    x_mult = threat * fade
+    return {
+        "gold": [max(1, round(g * 0.5 * g_mult)),
+                 max(1, round(g * 1.5 * g_mult))],
+        "xp": [max(1, round(x * 0.75 * x_mult)),
+               max(1, round(x * 1.25 * x_mult))],
+    }
+
+
 def _enemy_payload(p: dict, floor) -> dict:
     """003: everything the [i] card and the fight header need, in one
     dict on the Scene — the renderer never reads the player doc."""
@@ -289,6 +311,9 @@ def _enemy_payload(p: dict, floor) -> dict:
     prof = _profile(p)
     pspd = economy.player_speed(p)
     return {
+        # 030 Phase 7: additive keys — old renderers drop them (wire law)
+        "story": _lore(e, floor),
+        "drops": _drop_ranges(p, floor) if e["kind"] == "wilds" else None,
         "name": e["name"],
         "hp": max(0, e["hp"]), "hp_max": e["hp_max"],
         "atk": e["atk"], "def": e["def"],
@@ -376,12 +401,15 @@ def fight_scene(p: dict, floor, opener: bool = False, note: str = "") -> Scene:
     e = p["encounter"]
     clazz = p.get("clazz")
     at_range = _range_state(p) == "at_range"
+    # every swing at a Warden costs energy — priced on the row.
+    strike_hint = (f"{economy.COST_WARDEN_STRIKE} ⚡"
+                   if e["kind"] == "warden" else "")
     # 017 §2.4: at range steel cannot attack — Close in replaces it.
     # In close quarters anyone may try to Open distance.
     if at_range and _damage_type(p) == "melee":
         opts = [Option("close_in", "Close in", "cross the ground")]
     else:
-        opts = [Option("attack", "Attack")]
+        opts = [Option("attack", "Attack", strike_hint)]
     if not at_range:
         opts.append(Option("open_distance", "Open distance"))
     opts += [
@@ -398,7 +426,10 @@ def fight_scene(p: dict, floor, opener: bool = False, note: str = "") -> Scene:
             and _damage_type(p) == "ranged":
         # 004: the long shot needs a bow in hand — an archer swinging
         # off-class steel has no string to draw.
-        opts.append(Option("treeline_shot", "Treeline shot", "class", aether=True))
+        opts.append(Option(
+            "treeline_shot", "Treeline shot",
+            f"class · {strike_hint}" if strike_hint else "class",
+            aether=True))
     if p["inventory"].get("trollblood_tonic"):
         opts.append(Option("drink_tonic", "Drink trollblood tonic", "full heal"))
     # 022/008: below a quarter bar, a dying climber can call the floor —
@@ -1184,6 +1215,8 @@ def resolve_fight_action(p: dict, floor, option_id: str) -> Scene:
     keep = spends and e.get("shared") and e.get("kind") == "warden"
     s = _resolve_round(p, floor, option_id)
     e = p.get("encounter")
+    if e and e.pop("_no_round", None):
+        return s              # a refused swing spends nothing
     if not (keep and e):
         return s
     e["rounds"] = int(e.get("rounds", 0)) + 1
@@ -1197,6 +1230,20 @@ def resolve_fight_action(p: dict, floor, option_id: str) -> Scene:
 def _resolve_round(p: dict, floor, option_id: str) -> Scene:
     e = p["encounter"]
     notes: list[str] = []
+
+    # Every swing at a Warden costs energy — refused BEFORE the round is
+    # spent, so a dry bar costs nothing (no venom tick, no counter, no
+    # round against the exchange budget). A melee "attack" from range
+    # resolves as the crossing, not a swing, and stays free.
+    if e["kind"] == "warden" and option_id in ("attack", "treeline_shot") \
+            and not (_damage_type(p) == "melee"
+                     and _range_state(p) == "at_range"):
+        if not state.spend_energy(p, economy.COST_WARDEN_STRIKE):
+            e["_no_round"] = True
+            return fight_scene(p, floor, note=(
+                f"A swing at a Warden takes {economy.COST_WARDEN_STRIKE} ⚡ "
+                "you don't have. Stand your ground, run, or let the clock "
+                "refill you."))
 
     # 006: round upkeep — the venom ticks and the golden shell rots on
     # every round-spending action, before the action itself resolves.

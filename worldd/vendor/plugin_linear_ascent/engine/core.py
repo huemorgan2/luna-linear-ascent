@@ -224,6 +224,20 @@ def apply_choice(p: dict, option_id: str, text: str = "") -> Scene:
     if used is not None:
         return _stamp(p, used)
 
+    # 030 Phase 5: the paper's ✕ — closing the Crier stamps the same
+    # news_day guard the delivery keys on, so closed stays closed until
+    # dawn. Valid wherever the paper shows, hence outside the row list.
+    if option_id == "news_close":
+        p["news_day"] = state.world_day()
+        return _stamp(p, _build_scene(p))
+
+    # 030 Phase 8: mid-reel every click is the next beat, exactly like the
+    # intro. A stray id ("hunt" sent before the arrival card) advances the
+    # frame instead of erroring — the reel only runs one direction and
+    # nothing can wedge against it.
+    if p.get("movie_floor"):
+        return _stamp(p, _floor_movie_advance(p))
+
     scene = _build_scene(p)
     if p.get("location") in _NOTICE_ROOMS and not scene.enemy:
         doors = {nt["opt"] for nt in notices.pending(p)}
@@ -258,9 +272,6 @@ def apply_choice(p: dict, option_id: str, text: str = "") -> Scene:
 def _pop_pending_event(p: dict) -> Scene | None:
     if p.get("encounter"):
         return None                      # never interrupt a fight
-    ev = _maybe_news(p)
-    if ev:
-        return ev
     ev = _maybe_present(p)
     if ev:
         return ev
@@ -274,9 +285,11 @@ def _pop_pending_event(p: dict) -> Scene | None:
 
 # ── World news — the Morning Crier (007 §4) ──────────────────────────────
 
-def _maybe_news(p: dict) -> Scene | None:
-    """Once per world day, in world mode only: what happened while you
-    were gone. Data comes from worldd's injection — never invented."""
+def _news_paper(p: dict) -> dict | None:
+    """030 Phase 5: the Morning Crier is a PAPER pinned to the square,
+    not an interstitial — it rides the town card until its ✕
+    (news_close) stamps news_day. Data comes from worldd's injection —
+    never invented."""
     if p["stage"] != "playing":
         return None
     w = p.get("_world") or {}
@@ -285,32 +298,31 @@ def _maybe_news(p: dict) -> Scene | None:
     day = state.world_day()
     if p.get("news_day", -1) >= day:
         return None
-    p["news_day"] = day
-    return _news_scene(p, w, day)
+    return _paper_payload(p, w, day)
 
 
-def _news_scene(p: dict, w: dict, day: int) -> Scene:
+def _paper_payload(p: dict, w: dict, day: int) -> dict:
     frontier = int(w.get("frontier", 1))
     census = w.get("census") or {}
     by_floor = {int(k): int(v)
                 for k, v in (census.get("by_floor") or {}).items()}
     total = int(census.get("total", 0))
     my_floor = p["floor"] if p["floor"] > 0 else frontier
-    lines = []
+    items = []
     # 022/004: noticed, never taught — the heal already happened in
     # touch_daily; the Crier only says what the body already knows.
     if p.get("daily", {}).get("dawn_healed"):
-        lines.append("· dawn — your wounds have closed.")
+        items.append("dawn — your wounds have closed.")
     # 022/005: the night slot settled at the same boundary.
     ny = p.get("daily", {}).get("night_yield")
     if ny and ny.get("kind") == "work":
-        lines.append(f"· the night shift paid ◈ {ny['gold']} while "
+        items.append(f"the night shift paid ◈ {ny['gold']} while "
                      "you slept.")
     elif ny and ny.get("kind") == "rest":
-        lines.append(f"· you wake rested — ✦ {ny['aether']} banked "
+        items.append(f"you wake rested — ✦ {ny['aether']} banked "
                      "toward your next kills.")
-    lines.append(
-        f"· {total} climber{'s' if total != 1 else ''} on the "
+    items.append(
+        f"{total} climber{'s' if total != 1 else ''} on the "
         f"Ascent — {by_floor.get(frontier, 0)} at the frontier "
         f"(floor {frontier}), {by_floor.get(1, 0)} down at floor 1, "
         f"{by_floor.get(my_floor, 0)} on floor {my_floor} with you.")
@@ -320,7 +332,7 @@ def _news_scene(p: dict, w: dict, day: int) -> Scene:
         fl = schema.get_floor(int(wd["floor"]))
         blades = len(wd.get("strikers") or [])
         line = (
-            f"· {fl.warden_name} holds floor {wd['floor']} at {pct}% — "
+            f"{fl.warden_name} holds floor {wd['floor']} at {pct}% — "
             + (f"{blades} blade{'s' if blades != 1 else ''} against it."
                if blades else "no blade against it yet."))
         # 022/006: the clock rides the news when a wound is open
@@ -328,26 +340,19 @@ def _news_scene(p: dict, w: dict, day: int) -> Scene:
             from . import social as _social
             line += (" The wound closes in "
                      f"{_social._fmt_countdown(wd['closes_in_s'])}.")
-        lines.append(line)
+        items.append(line)
     gossip = w.get("gossip") or []
     if gossip:
-        lines.append(f"heard around floor {my_floor}:")
-        lines += [f"· {g}" for g in gossip[:3]]
+        items += [g for g in gossip[:3]]
     else:
-        lines.append(f"· floor {my_floor} was quiet — no news is its "
+        items.append(f"floor {my_floor} was quiet — no news is its "
                      "own kind of news.")
-    return Scene(
-        eyebrow="ROOTHOLLOW · THE MORNING CRIER",
-        headline=f"Day {day} on the Ascent — the frontier stands at "
-                 f"floor {frontier}",
-        support="What moved while you were away.",
-        shard_note=_news_advice(p, w, frontier, wd),
-        body_lines=lines,
-        options=[Option("town", "Into the square")],
-        meters=combat.meters(p),
-        event_kind="news",
-        banner="roothollow",
-    )
+    return {
+        "headline": f"Day {day} on the Ascent — the frontier stands at "
+                    f"floor {frontier}",
+        "items": items,
+        "closable": True,
+    }
 
 
 def _quorum(p: dict, floor: int) -> int:
@@ -484,6 +489,10 @@ def _build_scene(p: dict) -> Scene:
         return _creation_class_scene(p)
     if p["stage"] == "creation_name":
         return _creation_name_scene(p)
+    # 030 Phase 8: mid-movie a refresh replays the current beat — the
+    # movie has no skip, exactly like the intro.
+    if p.get("movie_floor"):
+        return _floor_movie_scene(p)
     if p.get("encounter"):
         fl = schema.get_floor(p["encounter"]["floor"])
         return combat.fight_scene(p, fl)
@@ -535,6 +544,8 @@ def _dispatch(p: dict, oid: str) -> Scene:
         return _creation_pick_class(p, oid)
     if p["stage"] == "creation_name":
         return _creation_name_scene(p)     # name comes as text
+    if p.get("movie_floor"):
+        return _floor_movie_advance(p)
     if p.get("encounter"):
         fl = schema.get_floor(p["encounter"]["floor"])
         return combat.resolve_fight_action(p, fl, oid)
@@ -729,8 +740,9 @@ def _town_waiting(p: dict, w: dict) -> dict[str, int]:
 def _town_scene(p: dict) -> Scene:
     w = p.get("_world") or {}
     lines = []
-    for h in (w.get("happenings") or [])[:5]:
-        lines.append(f"· {h}")
+    # 030 Phase 5: the raw happenings dump is gone — the same news arrives
+    # once, typeset, on the Crier's paper below.
+    paper = _news_paper(p)
     # 020: the nearest unlock — and any protection that dies with it —
     # always readable from the square. The full ladder is at the Stone.
     nxt = unlocks.next_line(p)
@@ -787,10 +799,15 @@ def _town_scene(p: dict) -> Scene:
         headline=f"Roothollow — floor {max(1, p['unlocked_floor'])} is the "
                  "frontier",
         support="The last free settlement. Everything starts and restarts here.",
+        # the sidekick still reads the day's paper and says where the
+        # climb is — advice belongs to the shard, news to the Crier.
+        shard_note=(_news_advice(p, w, int(w.get("frontier", 1)),
+                                 w.get("warden")) if paper else ""),
         body_lines=lines,
         options=opts,
         meters=combat.meters(p),
         banner="roothollow",
+        paper=paper,
     )
 
 
@@ -1549,6 +1566,8 @@ def _lodge_scene(p: dict) -> Scene:
             opts.append(Option(
                 "fire_stew", "Stand a stranger a stew",
                 f"◈ {economy.FIRE_STEW_GOLD} · a letter with it"))
+    # 030 Phase 6: the keeper has a mouth — how coin moves under this roof.
+    opts.append(Option("talk", "Talk to the keeper", "free"))
     opts.append(Option("back", "Back to the square"))
     return Scene(
         eyebrow="ROOTHOLLOW · THE LODGE",
@@ -1563,7 +1582,56 @@ def _lodge_scene(p: dict) -> Scene:
     )
 
 
+def _keeper_scene(p: dict) -> Scene:
+    """030 Phase 6: the keeper talks money. Every number is read off
+    economy.py at build time; the prose rotates so a second ask is not
+    a replay. This is the keeper's room — no shard chatter in it."""
+    day = state.world_day()
+    shift = _night_shift(day)
+    work = economy.night_work_gold(max(1, p["unlocked_floor"]))
+    rest = economy.night_rest_aether(p["level"])
+    tellings = (
+        [f"“Coin under this roof? The night slot. One action a "
+         f"night: take {shift} and there's ◈ {work} on the board at "
+         "dawn, or rest by the fire and bank the pool instead. I plan "
+         "nights, not lives.”"],
+        [f"“Rest is pay too. A night by my fire banks ✦ {rest} — "
+         f"it rides out at +{round(economy.RESTED_XP_BONUS_PCT * 100)}% "
+         "a kill till the pool runs dry. The pool holds "
+         f"{economy.RESTED_POOL_CAP_NIGHTS} nights' worth, no more — "
+         "sleep doesn't stack forever.”"],
+        [f"“The Vault pays {round(economy.BANK_INTEREST_RATE * 100)}% "
+         "a day on what you leave, stubs at dawn, regular as bells. "
+         "Banked coin is safe coin — but mind, it can't buy my bunk. "
+         "The palisade takes carried coin only.”"],
+        [f"“Spoils? The pawn broker across the square pays "
+         f"{round(economy.pawn_rate(day) * 100)}% of forge price today. "
+         "The rate is his mood and his mood is the day — patient "
+         "climbers sell on the good days.”"],
+    )
+    n = int(p["flags"].get("keeper_told", 0))
+    p["flags"]["keeper_told"] = n + 1
+    body = list(tellings[n % len(tellings)])
+    if not p["flags"].get("met_keeper"):
+        p["flags"]["met_keeper"] = True
+        body.insert(0, "The keeper sets down the ledger and looks you "
+                       "over once — a new name for the book.")
+    return Scene(
+        eyebrow="ROOTHOLLOW · THE LODGE",
+        headline="The keeper leans on the counter",
+        support="Ask again — there is always another way coin moves "
+                "through this room.",
+        body_lines=body,
+        options=[Option("talk", "Ask for another telling", "free"),
+                 Option("back", "Back to the square")],
+        meters=combat.meters(p),
+        banner="lodge",
+    )
+
+
 def _lodge_action(p: dict, oid: str) -> Scene:
+    if oid == "talk":
+        return _keeper_scene(p)
     if oid == "stew":
         return _eat_stew(p, _lodge_scene)
     if oid == "fire_word":
@@ -1696,7 +1764,7 @@ def _vault_scene(p: dict) -> Scene:
     # credit — the pile is the reason to come back.
     stubs = state.interest_sync(p)
     lines = []
-    lines.append(f"banked ◈ {p['bank']:,} · carried ◈ {p['gold']:,}")
+    lines.append(f"carried ◈ {p['gold']:,}")
     opts = []
     if stubs:
         if len(stubs) > 5:
@@ -1754,6 +1822,11 @@ def _vault_scene(p: dict) -> Scene:
         options=opts,
         meters=combat.meters(p),
         banner="vault",
+        # 030 Phase 4: the deposit is a SHELF, not a sentence — one big
+        # number over the strongbox art. The ◈ paints into the coin glyph
+        # card-side; the text surface reads the line as written.
+        strip={"art": "vault_interior",
+               "text": f"DEPOSITED: ◈ {p['bank']:,}"},
     )
 
 
@@ -2030,6 +2103,73 @@ def _gate_scene(p: dict) -> Scene:
     )
 
 
+# ── 030 Phase 8: the floor movie ─────────────────────────────────────────
+# A 2-3 beat scripted entry on the 016 intro pattern (fx + headline +
+# body + Next), exactly once per floor per character. Floors with loop
+# GIFs (1-10, law 1) animate; everywhere else the fx slug misses and the
+# still banner carries the beat — one code path, only the motion differs.
+
+def _floor_movie_scene(p: dict) -> Scene:
+    n = int(p["movie_floor"])
+    fl = schema.get_floor(n)
+    beat = int(p.get("movie_beat", 0))
+    if beat == 0:
+        body = [fl.arrival]
+        npc = getattr(fl, "npc", None)
+        if npc is not None:
+            body.append(npc.lore)
+        return Scene(
+            eyebrow=f"FLOOR {n} · {fl.zone.upper()} · I",
+            headline=f"{fl.biome} — {fl.zone}",
+            body_lines=body,
+            options=[Option("next", "Next")],
+            fx=f"floor{n}_world",
+            banner=fl.banner,
+        )
+    w = p.get("_world") or {}
+    frontier = int(w.get("frontier", p["unlocked_floor"]))
+    if frontier > n:
+        # the warden fell — same art under the shared demise treatment,
+        # and the text names WHO, when the world remembers.
+        names = ((w.get("warden") or {}).get("fallen_by")
+                 or {}).get(str(n), "")
+        by = (f"Broken by {names}." if names
+              else "Broken by a war party of climbers.")
+        return Scene(
+            eyebrow=f"FLOOR {n} · THE KEEP · II",
+            headline=f"{fl.warden_name} has already fallen",
+            body_lines=[f"{fl.warden_name} held this lift once. {by}",
+                        "The lift above runs free. The floor is yours "
+                        "to hunt."],
+            options=[Option("next", "Next")],
+            fx="warden_fall",
+            banner=f"warden_{n:03d}",
+        )
+    return Scene(
+        eyebrow=f"FLOOR {n} · THE KEEP · II",
+        headline=f"{fl.warden_name} holds the lift",
+        body_lines=[fl.warden_prose,
+                    f"{fl.warden_name} — ATK {fl.warden_atk} · DEF "
+                    f"{fl.warden_def} · {fl.warden_hp:,} HP. The stair "
+                    "stays shut while it stands."],
+        options=[Option("next", "Next")],
+        fx=f"floor{n}_warden",
+        banner=f"warden_{n:03d}",
+    )
+
+
+def _floor_movie_advance(p: dict) -> Scene:
+    n = int(p["movie_floor"])
+    beat = int(p.get("movie_beat", 0))
+    if beat < 1:
+        p["movie_beat"] = beat + 1
+        return _floor_movie_scene(p)
+    p["flags"][f"floor_seen_{n}"] = True
+    p.pop("movie_floor", None)
+    p.pop("movie_beat", None)
+    return _floor_arrival_scene(p, n)
+
+
 def _gate_pick(p: dict, oid: str) -> Scene:
     if not oid.startswith("floor_"):
         return _gate_scene(p)
@@ -2047,6 +2187,15 @@ def _gate_pick(p: dict, oid: str) -> Scene:
         return s
     p["floor"] = n
     p["location"] = "gate_town"
+    # 030 Phase 8: the first time a character sets foot on a floor, the
+    # floor introduces itself — a short movie, no skip, like the intro.
+    if not p["flags"].get(f"floor_seen_{n}"):
+        p["movie_floor"], p["movie_beat"] = n, 0
+        return _floor_movie_scene(p)
+    return _floor_arrival_scene(p, n)
+
+
+def _floor_arrival_scene(p: dict, n: int) -> Scene:
     fl = schema.get_floor(n)
     lines = [fl.arrival]
     lines += _presence_floor_lines(p, n)
@@ -2099,8 +2248,49 @@ def _gate_town_options(p: dict, fl) -> list[Option]:
                 opts.append(Option(f"use_{slug}", f"Use a {item.name}",
                                    f"+{amount} HP · {have} left"))
     opts.append(Option("keep", f"The Warden's keep — {fl.warden_name}", "3 ⚡"))
+    # 030 Phase 6: the floor's one voice — floors without an npc block
+    # (11-100, until their art pass) simply have no talk row.
+    npc = getattr(fl, "npc", None)
+    if npc is not None:
+        opts.append(Option("talk", f"Talk — {npc.name}", npc.role))
     opts.append(Option("town", "Return to Roothollow"))
     return opts
+
+
+def _npc_scene(p: dict, fl) -> Scene:
+    """030 Phase 6: the gate town's local speaks. YAML prose is
+    numberless; the warden's strength is said in derived numbers
+    (economy.warden_stats via the Floor row) and the tone is keyed to
+    whether that warden still stands."""
+    npc = fl.npc
+    flag = f"met_npc_{fl.floor}"
+    body = []
+    if not p["flags"].get(flag):
+        p["flags"][flag] = True
+        body.append(npc.greet)
+    body.append(npc.lore)
+    body.append("Out past the wire: "
+                + ", ".join(e.name for e in fl.encounters) + ".")
+    w = p.get("_world") or {}
+    frontier = int(w.get("frontier", p["unlocked_floor"]))
+    if frontier > fl.floor:
+        body.append(f"“{fl.warden_name} fell — the lift above runs free, "
+                    "and this floor breathes easier for it. Thank you "
+                    "for every blade that helped.”")
+    else:
+        body.append(npc.warn)
+        body.append(f"{fl.warden_name} — ATK {fl.warden_atk} · "
+                    f"DEF {fl.warden_def} · {fl.warden_hp:,} HP. "
+                    "That's the shape of it. Walk in knowing.")
+    return Scene(
+        eyebrow=f"FLOOR {fl.floor} · {fl.gate_town.upper()}",
+        headline=f"{npc.name} — {npc.role}",
+        support="Talking is free. Listening is what saves you.",
+        body_lines=body,
+        options=_gate_town_options(p, fl),
+        meters=combat.meters(p),
+        banner=fl.banner,
+    )
 
 
 def _gate_town_scene(p: dict) -> Scene:
@@ -2123,6 +2313,8 @@ def _gate_town_scene(p: dict) -> Scene:
 
 def _gate_town_action(p: dict, oid: str) -> Scene:
     fl = schema.get_floor(max(1, p["floor"]))
+    if oid == "talk" and getattr(fl, "npc", None) is not None:
+        return _npc_scene(p, fl)
     if oid == "answer_flare":
         fw = _live_flare(p)
         if fw is None:

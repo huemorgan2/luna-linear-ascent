@@ -57,6 +57,8 @@ _EVENTS = os.path.join(_ART_ROOT, "events")
 # a picture everywhere now — cards included — so the same 1-bit art resolves
 # through the ordinary banner lookup.
 _SIGILS = os.path.join(_ART, "factions")
+# 030: full-body player portraits, 100×200 — one per armour forge tier.
+_PORTRAITS = os.path.join(_ART_ROOT, "portraits")
 
 # 011 event animations tint by their moment, not the floor mood.
 _FX_TINT = {"ascent_open": VIOLET, "ascent_title": VIOLET_SOFT,
@@ -101,9 +103,11 @@ def _banner_data_url(slug: str) -> tuple[str, int, int] | None:
 
     Creature art (encounters/wardens, plan 005) wins over the banner dir
     so milestone bosses pick up their taller 320x200 art when it exists.
+    030: rooms prefer their tall 320x200 art too — a place is a picture,
+    not a letterhead; the 320x112 strip stays as the fallback.
     """
     for art_dir, sizes in ((_CREATURES, ("320x200", "320x112")),
-                           (_ART, ("320x112", "160x56", "320x200")),
+                           (_ART, ("320x200", "320x112", "160x56")),
                            (_SIGILS, ("320x112",))):
         for size in sizes:
             path = os.path.join(art_dir, f"{slug}_{size}.png")
@@ -221,6 +225,141 @@ def _et(s: str) -> str:
     return _sub_glyphs(_e(s))
 
 
+# ── 030 Phase 1: one coin, one colour ───────────────────────────────────
+# An amount wears its colour everywhere: gold in GOLD behind the 16×16
+# coin mask (the win-card coin is THE coin now), XP in VIOLET_SOFT behind
+# the aether shard, energy amounts in AETHER with the bolt. ◈/✦ survive
+# only in Scene.to_text() — the text surface stays text.
+def _coin(n) -> str:
+    text = n if isinstance(n, str) else f"{int(n):,}"
+    return (f'<span class="amt" style="color:{GOLD}">'
+            f"{_eglyph('coin')} {text}</span>")
+
+
+def _xp(n) -> str:
+    text = n if isinstance(n, str) else f"{int(n):,}"
+    return (f'<span class="amt" style="color:{VIOLET_SOFT}">'
+            f"{_eglyph('aether')} {text} XP</span>")
+
+
+_PAINT_GOLD = re.compile(r"◈\s?(?P<n>[+\-−]?[\d,]+)")
+_PAINT_AE = re.compile(r"✦\s?(?P<n>[+\-−]?[\d,]+)")
+_PAINT_XP = re.compile(r"(?P<n>[+\-−]?\d[\d,]*)\s?XP\b")
+_PAINT_EN_A = re.compile(r"(?P<n>\d+)\s?⚡")
+_PAINT_EN_B = re.compile(r"⚡\s?(?P<n>[+\-−]?\d+)")
+
+
+def _paint_amounts(s: str) -> str:
+    """Runs on ESCAPED text, before _sub_glyphs — a painted ⚡ still
+    becomes the 1-bit bolt, tinted by the span it now sits inside. Runs
+    after the +/− gain-loss tint upstream, so a green line keeps a
+    gold-coloured amount inside it."""
+    s = _PAINT_GOLD.sub(lambda m: _coin(m.group("n")), s)
+    s = _PAINT_AE.sub(
+        lambda m: f'<span class="amt" style="color:{VIOLET_SOFT}">'
+                  f"{_eglyph('aether')} {m.group('n')}</span>", s)
+    s = _PAINT_XP.sub(
+        lambda m: f'<span class="amt" style="color:{VIOLET_SOFT}">'
+                  f"{_eglyph('aether')} {m.group('n')} XP</span>", s)
+    s = _PAINT_EN_A.sub(
+        lambda m: f'<span class="amt" style="color:{AETHER}">'
+                  f"{m.group('n')} ⚡</span>", s)
+    s = _PAINT_EN_B.sub(
+        lambda m: f'<span class="amt" style="color:{AETHER}">'
+                  f"⚡ {m.group('n')}</span>", s)
+    return s
+
+
+def _ep(s: str) -> str:
+    """Escape + paint amounts + glyph swap — hints, body lines, notices."""
+    return _sub_glyphs(_paint_amounts(_e(s)))
+
+
+@lru_cache(maxsize=None)
+def _paper_tex_url() -> str | None:
+    """The broadsheet's own grain — banners/paper_320x150.png. Its odd
+    size stays out of `_banner_data_url` so no room ever resolves it."""
+    path = os.path.join(_ART, "paper_320x150.png")
+    if os.path.exists(path):
+        b64 = base64.b64encode(open(path, "rb").read()).decode()
+        return f"data:image/png;base64,{b64}"
+    return None
+
+
+def _paper_html(paper: dict) -> str:
+    """030 Phase 5: the Morning Crier as a broadsheet — paper texture
+    (banners/paper_320x150.png) as a light mask over the panel, the
+    day's items typeset in dark ink on top, ✕ top-right closes it for
+    the day (posts news_close). No texture on disk → a plain dark
+    noticeboard, same words."""
+    items = [i for i in (paper.get("items") or []) if i]
+    if not items:
+        return ""
+    url = _paper_tex_url()
+    tex = ""
+    cls = " noart"
+    if url:
+        tex = (f'<span class="ptex" aria-hidden="true" '
+               f'style="background-color:{DIM};'
+               f"-webkit-mask-image:url('{url}');"
+               f"mask-image:url('{url}');\"></span>")
+        cls = ""
+    close = ""
+    if paper.get("closable"):
+        close = ('<button type="button" class="pclose" data-opt="news_close" '
+                 'aria-label="close the paper for the day">✕</button>')
+    hl = paper.get("headline", "")
+    head = f'<div class="phl">{_e(hl)}</div>' if hl else ""
+    rows = "".join(
+        f'<div class="pit">{_ep(i if len(i) <= 76 else i[:75] + "…")}</div>'
+        for i in items)
+    return (f'<div class="paper{cls} later">{tex}{close}'
+            f'<div class="pbody"><div class="pmast">THE MORNING CRIER</div>'
+            f"{head}{rows}</div></div>")
+
+
+@lru_cache(maxsize=None)
+def _strip_art_url(slug: str) -> str | None:
+    """030 Phase 4: thin band art — {slug}_320x50.png in banners/."""
+    path = os.path.join(_ART, f"{slug}_320x50.png")
+    if os.path.exists(path):
+        b64 = base64.b64encode(open(path, "rb").read()).decode()
+        return f"data:image/png;base64,{b64}"
+    return None
+
+
+def _strip_band_html(strip: dict) -> str:
+    """The strongbox shelf: one big number over a 320×50 art band on ink.
+    The art is a dim backdrop; the text is the point and paints its own
+    amounts (Phase 1). Missing art → the band is just the dark shelf."""
+    text = strip.get("text", "")
+    if not text:
+        return ""
+    art = ""
+    url = _strip_art_url(strip.get("art", ""))
+    if url:
+        art = (f'<span class="bart" aria-hidden="true" '
+               f'style="background-color:{PANEL2};'
+               f"-webkit-mask-image:url('{url}');"
+               f"mask-image:url('{url}');\"></span>")
+    return (f'<div class="stripband later">{art}'
+            f'<span class="btx">{_ep(text)}</span></div>')
+
+
+def _shard_html(note: str) -> str:
+    """030 Phase 3: the shardmind has a face — the 16×16 `shard` grid at
+    32px, aether-lit, where it writes. to_text() keeps ◆."""
+    if "shard" in icons.ICON_KEYS:
+        url = icons.icon_data_url("shard")
+        glyph = (f'<span class="glyph savatar" aria-hidden="true" '
+                 f"style=\"-webkit-mask-image:url('{url}');"
+                 f"mask-image:url('{url}')\"></span>")
+    else:
+        glyph = '<span class="glyph">◆</span>'
+    return (f'<div class="shard type">{glyph}'
+            f"<span>{_ep(note)}</span></div>")
+
+
 # Combat numbers, colored in place: damage the player deals reads orange,
 # HP the player loses reads red. Scene content stays plain text (the
 # renderer contract) — these match the battle-text phrasings from
@@ -238,7 +377,7 @@ def _combat_html(line: str) -> str:
         lambda m: f'<span style="color:{RED}">{m.group(0)}</span>', s)
     s = _HIT_DMG.sub(
         lambda m: f'<span style="color:{ORANGE}">{m.group(0)}</span>', s)
-    return _sub_glyphs(s)
+    return _sub_glyphs(_paint_amounts(s))
 
 
 # ── 025 §6: the haul, drawn ─────────────────────────────────────────────
@@ -251,7 +390,9 @@ def _combat_html(line: str) -> str:
 # apart before the number is read. At the cap the heap would stop scaling
 # and start costing DOM, so the numeral takes over.
 TALLY_CAP = 100
-_TALLY_MARK = {"gold": ("coin", GOLD), "aether": ("aether", AETHER)}
+# 030: XP wears VIOLET_SOFT everywhere now (law 3) — blue stays the
+# notification ink plus energy amounts, nothing else.
+_TALLY_MARK = {"gold": ("coin", GOLD), "aether": ("aether", VIOLET_SOFT)}
 _TALLY_WORD = {"gold": "gold", "aether": "XP"}
 
 
@@ -294,7 +435,7 @@ def _notices_html(notices: list[dict]) -> str:
         rows.append(
             f'<button type="button" class="nrow" data-opt="{_e(opt)}">'
             f'<span class="nk">{word}</span>{chip}'
-            f'<span class="ntx">{_et(str(nt.get("text", "")))}</span>'
+            f'<span class="ntx">{_ep(str(nt.get("text", "")))}</span>'
             f'<span class="ngo">→</span></button>')
     if not rows:
         return ""
@@ -373,7 +514,7 @@ _TIP_XP = ("XP — experience. Fills as you fight and banks past the cap. "
            "XP — spending delays training, never lowers a level.")
 _TIP_LV = ("LV — your level. Levels are bought at the Guildhall: a full "
            "XP bar plus the training fee in gold.")
-_TIP_GOLD = ("◈ Carried gold — spendable anywhere but lost when you die. "
+_TIP_GOLD = ("Carried gold — spendable anywhere but lost when you die. "
              "The Vault banks it safely at 5%/day interest.")
 
 
@@ -405,8 +546,88 @@ def _meters_html(m: Meters) -> str:
         f"{_blocks(m.xp, m.xp_need)}</span></span>"
         f'<span class="gold">'
         f'<span class="lvl" data-tip="{_e(_TIP_LV)}">LV {m.level}</span>'
-        f'<span data-tip="{_e(_TIP_GOLD)}">◈ {val("gold", m.gold)}</span>'
+        f'<span data-tip="{_e(_TIP_GOLD)}">{_eglyph("coin")} '
+        f'{val("gold", m.gold)}</span>'
         f"</span></div>")
+
+
+# ── 030: the player profile — who is climbing ───────────────────────────
+# The rail grows into a profile block: a 100×200 full-body portrait that
+# suits up with the armour tier, and total ATK/DEF drawn as rows of ten
+# 16×16 glyphs — every 3 points fills half an icon (worn sword / armour
+# in the icon house style), the numeral always beside them. Missing art
+# or an older engine (no atk on the wire) degrades to the bare rail.
+
+_PORTRAIT_TIERS = ((9, "aegis"), (7, "plate"), (5, "scale"),
+                   (3, "chain"), (1, "leather"))
+
+_TIP_ATK = ("ATK — your total attack: class base plus weapon and honing. "
+            "Every 3 points fills half a sword.")
+_TIP_DEF = ("DEF — your total defense: shield, armor and honing. "
+            "Every 3 points fills half an icon.")
+
+
+def _portrait_slug(scene: Scene) -> str:
+    """rags → leather → chain → scale → plate → aegis, resolved from the
+    equipped armour on the pack strip — the renderer never opens the
+    player doc, it reads the scene it was handed."""
+    tier = 0
+    for cell in scene.inventory or []:
+        if cell.get("kind") == "armor" and cell.get("equipped"):
+            g = economy.FORGE.get(cell.get("slug", ""))
+            tier = g.tier if g else 0
+            break
+    for floor_t, slug in _PORTRAIT_TIERS:
+        if tier >= floor_t:
+            return slug
+    return "rags"
+
+
+@lru_cache(maxsize=None)
+def _portrait_data_url(slug: str) -> str | None:
+    path = os.path.join(_PORTRAITS, f"portrait_{slug}_100x200.png")
+    if os.path.exists(path):
+        b64 = base64.b64encode(open(path, "rb").read()).decode()
+        return f"data:image/png;base64,{b64}"
+    return None
+
+
+def _pip_row(key: str, label: str, stat: int, tint: str, tip: str) -> str:
+    halves = max(0, min(20, round(stat / 3)))
+    pips = []
+    for i in range(10):
+        left = halves - 2 * i
+        if left >= 2:
+            mode, col = "full", tint
+        elif left == 1:
+            mode, col = "half", tint
+        else:
+            mode, col = "outline", FAINT
+        url = icons.icon_data_url(key, mode)
+        pips.append(f'<span class="pip" style="background-color:{col};'
+                    f"-webkit-mask-image:url('{url}');"
+                    f"mask-image:url('{url}');\"></span>")
+    return (f'<div class="piprow" data-tip="{_e(tip)}">'
+            f'<span class="plab" style="color:{tint}">{label} {stat}</span>'
+            f'<span class="pips">{"".join(pips)}</span></div>')
+
+
+def _profile_html(scene: Scene) -> str:
+    m = scene.meters
+    right = _meters_html(m)
+    if getattr(m, "atk", 0):
+        right += ('<div class="piprows later">'
+                  + _pip_row("sword", "ATK", m.atk, ORANGE, _TIP_ATK)
+                  + _pip_row("armor", "DEF", getattr(m, "dfs", 0), DIM,
+                             _TIP_DEF)
+                  + "</div>")
+    url = _portrait_data_url(_portrait_slug(scene))
+    if not url:
+        return right
+    return (f'<div class="profile">'
+            f'<div class="portrait later" style="background-color:{TEXT};'
+            f"-webkit-mask-image:url('{url}');mask-image:url('{url}');\">"
+            f'</div><div class="pcol">{right}</div></div>')
 
 
 # ── 017/003: the enemy header + the [i] dossier ─────────────────────────
@@ -460,6 +681,12 @@ def _active_mods(en: dict) -> list[str]:
     return mods
 
 
+_TIP_EATK = ("Its attack — the same scale as your sword row: every 3 "
+             "points fills half a blade. Read the matchup at a glance.")
+_TIP_EDEF = ("Its defense — the same scale as your armour row: every 3 "
+             "points fills half an icon.")
+
+
 def _enemy_head_html(en: dict) -> str:
     hp, cap = int(en.get("hp", 0)), max(1, int(en.get("hp_max", 1)))
     low = " low" if hp * 10 <= cap * 3 else ""
@@ -471,7 +698,16 @@ def _enemy_head_html(en: dict) -> str:
         chip = '<span class="rchip">◇ close quarters</span>'
     mods = _active_mods(en)
     mod = (f'<span class="mchip">{_e(mods[0])}</span>' if mods else "")
-    return (f'<div class="ehead later">'
+    # 030 Phase 7: the monster wears its numbers — ATK and DEF in the
+    # player's own pip language, each chip on a solid INK plate so the
+    # white pips read over any art (the black-background rule).
+    pips = ('<span class="echip">'
+            + _pip_row("sword", "ATK", int(en.get("atk", 0)), ORANGE,
+                       _TIP_EATK)
+            + _pip_row("armor", "DEF", int(en.get("def", 0)), DIM,
+                       _TIP_EDEF)
+            + "</span>")
+    return (f'<div class="ehead later">{pips}'
             f'<span class="meter foe{low}" data-tip="The enemy\'s health — '
             f'visible from the first breath. Kill it before it kills you.">'
             f"<span>HP {hp}/{cap}</span>"
@@ -488,6 +724,11 @@ def _dossier_html(en: dict) -> str:
         rows.append(f'<div class="drw">{_ticon(icon, tint)}'
                     f'<span><b>{_e(head)}</b> {_e(text)}</span></div>')
 
+    # 030 Phase 7: the story leads — who this thing is, before what it
+    # does. "story" is the payload key; "lore" the pre-030 fallback.
+    story = en.get("story") or en.get("lore")
+    if story:
+        rows.append(f'<div class="dlore">{_e(story)}</div>')
     if prof.get("armor", "none") != "none":
         row("t_armor", f"plate — {economy.TIER_LABEL[prof['armor']]}.",
             "Turns part of every blow of steel or shot. Spellwork "
@@ -515,8 +756,17 @@ def _dossier_html(en: dict) -> str:
     for m in _active_mods(en):
         rows.append(f'<div class="drw"><span class="dmark">◇</span>'
                     f"<span>{_e(m)}</span></div>")
-    if en.get("lore"):
-        rows.append(f'<div class="dlore">{_e(en["lore"])}</div>')
+    # 030 Phase 7: the odds — coin and XP ranges from the kill math,
+    # painted per the one-coin-one-colour law.
+    drops = en.get("drops") or {}
+    if drops.get("gold"):
+        lo, hi = drops["gold"]
+        rows.append(f'<div class="drw"><span class="dmark">·</span>'
+                    f"<span>{_ep(f'coins ◈ {lo}–{hi}')}</span></div>")
+    if drops.get("xp"):
+        lo, hi = drops["xp"]
+        rows.append(f'<div class="drw"><span class="dmark">·</span>'
+                    f"<span>{_ep(f'XP ✦ {lo}–{hi}')}</span></div>")
     return (f'<details class="dx"><summary role="note" aria-label="enemy '
             f'dossier">i</summary><div class="dossier">'
             f'<div class="dhead">{_e(en.get("name", ""))} — the shard\'s '
@@ -543,6 +793,39 @@ def _opt_gear_icon(oid: str) -> str:
     return (f'<span class="gicon" aria-hidden="true" '
             f"style=\"-webkit-mask-image:url('{url}');"
             f"mask-image:url('{url}')\"></span>")
+
+
+# ── 030 Phase 3: the gate ledger becomes a hall of doors ────────────────
+# A floor_{n} option row grows to ~3× height and shows where you are going:
+# the floor's fields art beside its warden. Resolved entirely render-side
+# from the option id — zero wire change, floors without art degrade to the
+# plain text row.
+_FLOOR_OPT = re.compile(r"^floor_(\d+)$")
+
+
+def _floor_tile_art(oid: str, locked: bool) -> str:
+    m = _FLOOR_OPT.match(oid)
+    if not m:
+        return ""
+    n = int(m.group(1))
+    field_slug = ""
+    try:
+        from .content import schema
+        field_slug = schema.get_floor(n).banner
+    except Exception:  # noqa: BLE001 — art is decoration, never a crash
+        pass
+    cells = []
+    for slug, tint in ((field_slug, DIM), (f"warden_{n:03d}", VIOLET)):
+        art = _banner_data_url(slug) if slug else None
+        if not art:
+            continue
+        url, _w, _h = art
+        cells.append(
+            f'<span class="fart" aria-hidden="true" '
+            f'style="background-color:{FAINT if locked else tint};'
+            f"-webkit-mask-image:url('{url}');"
+            f"mask-image:url('{url}');\"></span>")
+    return f'<span class="farts">{"".join(cells)}</span>' if cells else ""
 
 
 def _inventory_html(scene: Scene) -> str:
@@ -851,7 +1134,7 @@ let d=0;for(const el of later){setTimeout(()=>el.classList.add('shown'),d);d+=90
    input all act through the same one door (window.__laAct). */
 (function () {
   var btns = Array.prototype.slice.call(document.querySelectorAll(
-    'button.opt, button.nrow, button.gtile'));
+    'button.opt, button.nrow, button.gtile, button.pclose'));
   var acted = false;
   var hint = document.querySelector('.reply');
   function setHint(t) { if (hint) hint.textContent = t; }
@@ -920,17 +1203,29 @@ def render_scene_fragment(scene: Scene) -> str:
     elif banner:
         url, w, h = banner
         tint = _banner_tint(scene.banner, scene.banner_variant)
+    plate_on_art = False
     if fx or split or banner:
-        parts.append(
+        banner_html = (
             f'<div class="banner" style="background-color:{tint};'
             f"aspect-ratio:{w}/{h};"
             f"-webkit-mask-image:url('{url}');"
             f"mask-image:url('{url}');\"{swap_attr}></div>")
+        # 030 Phase 7: the stat plate sits top-right ON the art whenever
+        # there is art to sit on — one visual language with the player's
+        # pip rows, so a matchup reads at a glance.
+        if scene.enemy:
+            banner_html = (f'<div class="bwrap">{banner_html}'
+                           f"{_enemy_head_html(scene.enemy)}</div>")
+            plate_on_art = True
+        parts.append(banner_html)
 
     # 027: the notice board owns the top of the card — above the location,
     # above the headline. It is not a menu row and must never look like one.
     if getattr(scene, "notices", None):
         parts.append(_notices_html(scene.notices))
+    # 030 Phase 5: the day's paper — above the location, below the board.
+    if getattr(scene, "paper", None):
+        parts.append(_paper_html(scene.paper))
 
     parts.append(f'<div class="eyebrow type">{_e(scene.eyebrow)}</div>')
     hl_col = _HEADLINE.get(scene.event_kind, TEXT)
@@ -939,13 +1234,17 @@ def render_scene_fragment(scene: Scene) -> str:
     if scene.enemy:
         # 003: the always-on enemy bar + range chip, and the [i] badge
         # (top-right of the card — over the banner when there is one).
-        parts.append(_enemy_head_html(scene.enemy))
+        if not plate_on_art:
+            parts.append(_enemy_head_html(scene.enemy))
         parts.append(_dossier_html(scene.enemy))
     if scene.support:
-        parts.append(f'<div class="support type">{_et(scene.support)}</div>')
+        parts.append(f'<div class="support type">{_ep(scene.support)}</div>')
+    # 030 Phase 4: the art band with one big number (the vault shelf).
+    # getattr: a strip-less Scene from an older engine must render fine.
+    if getattr(scene, "strip", None):
+        parts.append(_strip_band_html(scene.strip))
     if scene.shard_note:
-        parts.append(f'<div class="shard type"><span class="glyph">◆</span>'
-                     f"<span>{_et(scene.shard_note)}</span></div>")
+        parts.append(_shard_html(scene.shard_note))
     in_fold = False
     for line in scene.body_lines:
         # 007: ▣ fold markers — long shop shelves collapse into a
@@ -962,10 +1261,10 @@ def render_scene_fragment(scene: Scene) -> str:
             continue
         if line.startswith("+"):
             parts.append(f'<div class="body type" style="color:{OK}">'
-                         f"{_et(line)}</div>")
+                         f"{_ep(line)}</div>")
         elif line.startswith("−") or line.startswith("-"):
             parts.append(f'<div class="body type" style="color:{RED}">'
-                         f"{_et(line)}</div>")
+                         f"{_ep(line)}</div>")
         else:
             parts.append(f'<div class="body type">{_combat_html(line)}</div>')
     if in_fold:
@@ -984,16 +1283,20 @@ def render_scene_fragment(scene: Scene) -> str:
             # 019: a locked row is dimmed but stays a button — clicking
             # it is how the player asks why the gate is shut.
             opt_cls = " locked" if getattr(o, "locked", False) else ""
-            hint = (f'<span class="hint">{_et(o.hint)}</span>'
+            hint = (f'<span class="hint">{_ep(o.hint)}</span>'
                     if o.hint else "")
             gicon = _opt_gear_icon(o.id)
+            # 030: gate floor rows carry their fields + warden art
+            tile = _floor_tile_art(o.id, bool(getattr(o, "locked", False)))
+            if tile:
+                opt_cls += " ftile"
             # 027: the count leaves the label and becomes a blue chip —
             # a notification reads as a notification, at a glance.
             bn = int(getattr(o, "badge", 0) or 0)
             badge = f'<span class="badge">{bn}</span>' if bn else ""
             btn = (f'<button type="button" class="opt{opt_cls}" '
                    f'data-opt="{_e(o.id)}">'
-                   f'<span class="key{key_cls}">{i}</span>{gicon}'
+                   f'<span class="key{key_cls}">{i}</span>{tile}{gicon}'
                    f'<span class="lbl">{_et(o.label)}</span>{badge}'
                    f"{hint}</button>")
             # 014: the whisper glyph — [i] OUTSIDE the button, so tapping
@@ -1007,7 +1310,7 @@ def render_scene_fragment(scene: Scene) -> str:
                      f"with a number</div></div>")
 
     if scene.meters:
-        parts.append(_meters_html(scene.meters))
+        parts.append(_profile_html(scene))
     parts.append(_inventory_html(scene))
 
     stripe = _STRIPE.get(scene.event_kind)
@@ -1026,6 +1329,18 @@ SCENE_CSS = f"""
 /* ── 017/003: enemy header + [i] dossier ── */
 .ehead{{display:flex;flex-wrap:wrap;align-items:center;gap:1ch 2ch;
  margin-top:6px;color:{DIM};}}
+/* 030 Phase 7: the stat plate over the fight art. Ink art under white
+   pips needs solid plates to read; the [i] badge keeps the very corner,
+   so the plate starts a badge-height lower. */
+.bwrap{{position:relative;}}
+.bwrap .ehead{{position:absolute;top:34px;right:8px;margin:0;
+ flex-direction:column;align-items:flex-end;gap:4px;z-index:2;}}
+.echip{{display:flex;flex-direction:column;gap:2px;background:{INK};
+ border:1px solid {BORDER};padding:3px 6px;}}
+.bwrap .ehead .meter,.bwrap .ehead .rchip,.bwrap .ehead .mchip{{
+ background:{INK};border:1px solid {BORDER};padding:2px 6px;}}
+.echip .piprow{{margin-top:0;}}
+.echip .piprow .plab{{min-width:6.5ch;text-align:right;font-size:12px;}}
 .meter.foe .blocks{{color:{VIOLET_SOFT};}}
 .meter.foe.low .blocks{{color:{RED};}}
 .rchip{{color:{VIOLET_SOFT};letter-spacing:.04em;}}
@@ -1097,6 +1412,27 @@ SCENE_CSS = f"""
  font-variant-numeric:tabular-nums;}}
 .badge{{margin-left:1ch;}}
 .opt:hover .badge{{background:{TEXT};}}
+/* ── 030 Phase 5: the Morning Crier's broadsheet ── */
+.paper{{position:relative;margin:0 0 10px;background:{PANEL};
+ border:1px solid {BORDER};overflow:hidden;min-height:60px;}}
+.paper .ptex{{position:absolute;inset:0;mask-size:cover;
+ -webkit-mask-size:cover;mask-position:center;-webkit-mask-position:center;
+ mask-repeat:no-repeat;-webkit-mask-repeat:no-repeat;
+ image-rendering:pixelated;}}
+.paper .pbody{{position:relative;z-index:1;padding:9px 1.5ch 10px;
+ color:{INK};}}
+.paper.noart .pbody{{color:{TEXT};}}
+.paper .pmast{{font-weight:700;letter-spacing:.18em;font-size:11px;
+ text-transform:uppercase;border-bottom:1px solid currentColor;
+ padding-bottom:3px;margin-bottom:5px;}}
+.paper .phl{{font-weight:700;margin-bottom:4px;text-wrap:balance;}}
+.paper .pit{{display:-webkit-box;-webkit-line-clamp:2;
+ -webkit-box-orient:vertical;overflow:hidden;margin-top:2px;}}
+.paper .pit::before{{content:"· ";}}
+.paper .pclose{{position:absolute;top:6px;right:6px;z-index:2;
+ background:{INK};border:1px solid {BORDER};color:{DIM};font:inherit;
+ line-height:1.2;cursor:pointer;padding:1px .6ch;border-radius:0;}}
+.paper .pclose:hover{{color:{TEXT};border-color:{TEXT};}}
 /* ── 027: the card's own input ── */
 .ask{{margin:10px 0 0;padding:10px 0 0;border-top:1px dashed {BORDER};
  display:block;}}
@@ -1154,6 +1490,17 @@ SCENE_CSS = f"""
  padding:8px 1.5ch;margin-top:8px;color:{DIM};}}
 .shard .glyph{{color:{AETHER};flex:none;}}
 .body{{margin:6px 0 0;white-space:pre-wrap;}}
+/* ── 030: the art band — one big number on a dark shelf ── */
+.stripband{{position:relative;display:flex;align-items:center;
+ justify-content:center;margin:8px 0 0;background:{INK};
+ border:1px solid {BORDER};aspect-ratio:320/50;overflow:hidden;}}
+.stripband .bart{{position:absolute;inset:0;mask-size:cover;
+ -webkit-mask-size:cover;mask-position:center;-webkit-mask-position:center;
+ mask-repeat:no-repeat;-webkit-mask-repeat:no-repeat;
+ image-rendering:pixelated;}}
+.stripband .btx{{position:relative;z-index:1;font-size:18px;
+ font-weight:700;letter-spacing:.06em;font-variant-numeric:tabular-nums;}}
+.stripband .btx .eg{{width:18px;height:18px;vertical-align:-3px;}}
 /* ── 007: folded shop shelves (▣ markers) ── */
 .fold{{margin:6px 0 0;}}
 .fold summary{{list-style:none;cursor:pointer;user-select:none;
@@ -1187,6 +1534,15 @@ SCENE_CSS = f"""
  background-color:{DIM};mask-size:100% 100%;-webkit-mask-size:100% 100%;
  mask-repeat:no-repeat;-webkit-mask-repeat:no-repeat;
  image-rendering:pixelated;}}
+/* ── 030: gate floor rows — a door you can see through ── */
+.opt.ftile{{min-height:96px;}}
+.farts{{flex:none;display:flex;gap:4px;align-items:center;}}
+.fart{{display:inline-block;width:120px;max-width:24vw;height:84px;
+ mask-size:cover;-webkit-mask-size:cover;mask-position:center;
+ -webkit-mask-position:center;mask-repeat:no-repeat;
+ -webkit-mask-repeat:no-repeat;image-rendering:pixelated;}}
+.opt.ftile:hover .fart{{background-color:{TEXT};}}
+.opt.ftile.locked:hover .fart{{background-color:{FAINT};}}
 .opt:hover .gicon{{background-color:{TEXT};}}
 .opt.locked .gicon,.opt.locked:hover .gicon{{background-color:{FAINT};}}
 .orow{{display:flex;align-items:stretch;gap:5px;}}
@@ -1209,10 +1565,34 @@ SCENE_CSS = f"""
 .meter .mv{{font-variant-numeric:tabular-nums;transition:color .2s ease;}}
 .meter.up .mv{{color:{OK};}}
 .meter.down .mv{{color:{RED};}}
+/* 030 law 3: a number wears its colour — the meter labels match their
+   bars, not just the blocks. Blue stays energy + notifications only. */
+.meter.hp{{color:{OK};}}
 .meter.hp .blocks{{color:{OK};}}
+.meter.hp.low{{color:{RED};}}
 .meter.hp.low .blocks{{color:{RED};}}
+.meter.en{{color:{AETHER};}}
 .meter.en .blocks{{color:{AETHER};}}
+.meter.ae{{color:{VIOLET_SOFT};}}
 .meter.ae .blocks{{color:{VIOLET_SOFT};}}
+.amt{{white-space:nowrap;}}
+/* ── 030: the profile block — portrait beside the rail + pip rows ── */
+.profile{{display:flex;gap:2ch;align-items:flex-start;margin-top:10px;
+ padding-top:8px;border-top:1px dashed {BORDER};}}
+.profile .portrait{{flex:none;width:100px;aspect-ratio:100/200;
+ mask-size:100% 100%;-webkit-mask-size:100% 100%;mask-repeat:no-repeat;
+ -webkit-mask-repeat:no-repeat;image-rendering:pixelated;}}
+.profile .pcol{{flex:1;min-width:0;}}
+.profile .rail{{margin-top:0;padding-top:0;border-top:0;}}
+.piprows{{margin-top:8px;color:{DIM};}}
+.piprow{{display:flex;align-items:center;gap:1ch;margin-top:4px;
+ cursor:help;}}
+.piprow .plab{{flex:none;min-width:8ch;font-variant-numeric:tabular-nums;}}
+.piprow .pips{{display:inline-grid;grid-template-columns:repeat(10,18px);
+ gap:1px;}}
+.pip{{width:16px;height:16px;display:inline-block;
+ mask-size:100% 100%;-webkit-mask-size:100% 100%;mask-repeat:no-repeat;
+ -webkit-mask-repeat:no-repeat;image-rendering:pixelated;}}
 .rail .gold{{color:{GOLD};margin-left:auto;display:inline-flex;gap:1.5ch;}}
 .rail .gold [data-tip]{{cursor:help;}}
 .rail .lvl{{color:{TEXT};}}

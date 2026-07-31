@@ -24,6 +24,9 @@ ENERGY_BASE_CAP = 24
 
 COST_WILDS_FIGHT = 1
 COST_WARDEN_ATTEMPT = 3
+# every swing at a Warden — flat across floors, on top of the join cost,
+# so the keep drains the energy bar instead of being a free grind.
+COST_WARDEN_STRIKE = 3
 COST_BOSS_COMMIT = 5
 COST_PVP_ATTACK = 3
 
@@ -31,6 +34,13 @@ COST_PVP_ATTACK = 3
 # climb. Everything priced "per level" beyond 30 is priced per gear band
 # or per floor instead.
 LEVEL_CAP = 30
+
+# 030 Phase 9: how deep the tuning work has actually gone. Slow sim
+# suites cover floors ≤ this cap on every run; the full tower runs only
+# under ASCENT_FULL_SIMS=1 (the pre-ship ritual, not the inner loop).
+# Whole-tower arithmetic gates (smoothness, pace, art coverage) ignore
+# this — they are quick and always on.
+TUNED_FLOOR_CAP = 10
 
 
 def energy_cap(gear_tier: int, race: str = "") -> int:
