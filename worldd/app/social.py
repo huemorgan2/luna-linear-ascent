@@ -422,14 +422,21 @@ async def _world_warden(conn, frontier: int,
         return None                    # milestone quorum / end of content
     row = await conn.fetchrow(
         "SELECT value FROM ascent_world WHERE key=$1", f"warden:{frontier}")
+    # 030 Phase 8: who broke each keep below the frontier — the arrival
+    # reel credits the war party by name instead of a nameless "fallen".
+    frows = await conn.fetch(
+        "SELECT key, value FROM ascent_world WHERE key LIKE 'fallen:%'")
+    fallen_by = {r["key"].split(":", 1)[1]: json.loads(r["value"])
+                 for r in frows}
     if row is None:
         hp_max = economy.world_warden_hp(frontier, active or None)
         return {"floor": frontier, "hp": hp_max, "hp_max": hp_max,
-                "strikers": [], "pity": 0, "closes_in_s": None}
+                "strikers": [], "pity": 0, "closes_in_s": None,
+                "fallen_by": fallen_by}
     st = _warden_now(json.loads(row["value"]), frontier, active or None)
     return {"floor": frontier, "hp": st["hp"], "hp_max": st["hp_max"],
             "strikers": st["strikers"], "pity": st["pity"],
-            "closes_in_s": st["closes_in_s"]}
+            "closes_in_s": st["closes_in_s"], "fallen_by": fallen_by}
 
 
 async def _roster(conn) -> tuple[list[dict], int]:
@@ -1120,6 +1127,13 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
                   key=lambda s: (not _is_finisher(s),
                                  -int(s.get("dmg", 0))))
     names = ", ".join(s.get("name") or "?" for s in roll)
+    # 030 Phase 8: the arrival reel on a fallen floor names its slayers.
+    # The roll is written once, at the fall — the payload reads it back
+    # forever after, finisher first.
+    await conn.execute(
+        "INSERT INTO ascent_world (key, value) VALUES ($1,$2::jsonb) "
+        "ON CONFLICT (key) DO UPDATE SET value=$2::jsonb",
+        f"fallen:{floor}", json.dumps(names))
 
     for s in strikers:
         finisher = s.get("tenant") == tenant and s.get("player") == player
