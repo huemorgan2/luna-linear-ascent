@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import re
 
 from .gamepath import ensure_game_importable
 
@@ -24,6 +25,41 @@ from plugin_linear_ascent import economy  # noqa: E402
 from plugin_linear_ascent.content import schema  # noqa: E402
 from plugin_linear_ascent.engine import state as pstate  # noqa: E402
 from plugin_linear_ascent.engine.scene import Scene  # noqa: E402
+
+
+# 030 Phase 5: one warden, one line — always the latest chapter. The
+# Crier called every 75/50/25 threshold AND the fall as separate lines;
+# a busy war filled the whole paper with one keep's arithmetic.
+_WAR_PCT = re.compile(r"cut to (\d+)%")
+
+
+def _condense_war(rows: list[dict]) -> list[str]:
+    """Rows arrive newest-first. A 'boss' (fell) line for a floor
+    silences every 'war' threshold line for that floor in the window;
+    otherwise only the lowest threshold — the freshest wound — survives."""
+    fallen = {r["floor"] for r in rows if r["kind"] == "boss"}
+    lowest: dict = {}
+    for r in rows:
+        if r["kind"] != "war":
+            continue
+        m = _WAR_PCT.search(r["line"] or "")
+        pct = int(m.group(1)) if m else 0
+        fl = r["floor"]
+        if fl not in lowest or pct < lowest[fl]:
+            lowest[fl] = pct
+    out = []
+    for r in rows:
+        if r["kind"] == "war":
+            fl = r["floor"]
+            if fl in fallen:
+                continue
+            m = _WAR_PCT.search(r["line"] or "")
+            pct = int(m.group(1)) if m else 0
+            if lowest.get(fl) != pct:
+                continue
+            lowest.pop(fl)          # first (newest) at that threshold only
+        out.append(r["line"])
+    return out
 
 
 # ── Injection ────────────────────────────────────────────────────────────
@@ -85,9 +121,9 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
         "WHERE to_tenant=$1 AND to_player=$2 AND NOT read", tenant, player)
 
     happ = await conn.fetch(
-        "SELECT line FROM ascent_happenings WHERE world_day >= $1 "
-        "ORDER BY id DESC LIMIT 5", day - 1)
-    w["happenings"] = [r["line"] for r in happ]
+        "SELECT kind, line, floor FROM ascent_happenings "
+        "WHERE world_day >= $1 ORDER BY id DESC LIMIT 20", day - 1)
+    w["happenings"] = _condense_war([dict(r) for r in happ])[:5]
 
     stone = await conn.fetch(
         "SELECT line FROM ascent_stone ORDER BY id DESC LIMIT 8")
@@ -146,10 +182,10 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
     w["fire"] = await _long_fire(conn)
     news_floor = doc.get("floor", 0) or w["frontier"]
     gossip = await conn.fetch(
-        "SELECT line FROM ascent_happenings "
-        "WHERE floor=$1 AND world_day >= $2 ORDER BY id DESC LIMIT 3",
+        "SELECT kind, line, floor FROM ascent_happenings "
+        "WHERE floor=$1 AND world_day >= $2 ORDER BY id DESC LIMIT 12",
         news_floor, day - 1)
-    w["gossip"] = [r["line"] for r in gossip]
+    w["gossip"] = _condense_war([dict(r) for r in gossip])[:3]
 
     doc["_world"] = w
 
