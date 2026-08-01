@@ -85,9 +85,20 @@ async def health() -> dict:
     return {
         "ok": True,
         "api": API_VERSION,
+        "game": _game_version(),
         "server_time": dt.datetime.now(dt.timezone.utc).isoformat(),
         "db": db.ready(),
     }
+
+
+def _game_version() -> str:
+    try:
+        from .gamepath import ensure_game_importable
+        ensure_game_importable()
+        from plugin_linear_ascent.version import VERSION
+        return VERSION
+    except Exception:
+        return "unknown"
 
 
 # ── Game API (tenant HMAC) ───────────────────────────────────────────────
