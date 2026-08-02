@@ -20,7 +20,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import auth, db
+from . import auth, db, site
 from .config import get_config
 
 API_VERSION = 1
@@ -46,6 +46,10 @@ app.mount("/static",
           StaticFiles(directory=Path(__file__).resolve().parent.parent
                       / "static", html=True),
           name="static")
+
+# linearascent.net rides the same service (plan 003): the homepage, the
+# public world feed, and old-days accounts.
+app.include_router(site.router)
 
 
 # ── Per-tenant rate limit (in-process token bucket; numInstances: 1) ─────

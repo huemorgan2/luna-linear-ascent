@@ -29,7 +29,8 @@ TRANSIENT_TABLES = (
     "ascent_faction_weeks", "ascent_faction_ledger",
     "ascent_faction_requests", "ascent_armory", "ascent_armory_takes",
 )
-PERMANENT_TABLES = ("ascent_eras", "ascent_reincarnation")
+PERMANENT_TABLES = ("ascent_eras", "ascent_reincarnation",
+                    "ascent_accounts")
 
 # The mark is earned, not given: a level-5 climber has cleared mercy's
 # floors and paid the first training fees — tourists don't reincarnate.

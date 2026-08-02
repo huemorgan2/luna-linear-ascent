@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LINEAR ASCENT — one tower, one world, free</title>
+<meta name="description" content="A shared-world RPG that plays in a chat window. One tower of a hundred floors, one world, everyone climbs the same one. Free — a username and a password, like the old days.">
+<meta property="og:title" content="LINEAR ASCENT">
+<meta property="og:description" content="One tower. One world. Everyone climbs the same one. Free — like the old days.">
+<meta property="og:image" content="https://linearascent.net/static/intro-movie/ascent_title_320x200.gif">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23060606'/%3E%3Crect x='6' y='2' width='4' height='12' fill='%23f2b632'/%3E%3Crect x='4' y='12' width='8' height='2' fill='%23f2b632'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/site/site.css">
+</head>
+<body>
+
+<header id="bar" aria-hidden="true">
+  <span id="bar-left">FLOOR 0 · THE GATE</span>
+  <span id="bar-right" data-live="bar">LINEAR ASCENT</span>
+</header>
+
+<main>
+
+<!-- ═══ FLOOR 0 · THE GATE ═══════════════════════════════════════════ -->
+<section id="gate" data-floor="FLOOR 0 · THE GATE">
+  <div class="hero">
+    <img class="px hero-reel" src="/static/intro-movie/ascent_title_320x200.gif"
+         alt="LINEAR ASCENT — the tower title reel" width="320" height="200">
+    <p class="tagline">ONE TOWER. ONE WORLD.<br>EVERYONE CLIMBS THE SAME ONE.</p>
+    <p class="free-line"><span class="gold">FREE</span> — like the old days.
+       No price. No ads. No launcher. No email.</p>
+    <nav class="options">
+      <a class="opt" href="#door">[ CLIMB — free, no email ]</a>
+      <a class="opt dim2" href="#lore">[ Watch from the gate ]</a>
+    </nav>
+    <p class="dim live-line" data-live="hero">… the gate lamps are lit; the world is climbing …</p>
+  </div>
+  <div id="ticker" aria-hidden="true"><span id="ticker-inner">
+    <span class="dim">THE WORLD IS ALIVE ······ turn toward the tower ······</span>
+  </span></div>
+</section>
+
+<!-- ═══ FLOOR 1 · THE WORLD THAT WAS ═════════════════════════════════ -->
+<section id="lore" data-floor="FLOOR 1 · THE WORLD THAT WAS">
+  <div class="card">
+    <div class="eyebrow">THE STORY SO FAR · I</div>
+    <h2>The world that was</h2>
+    <img class="px" loading="lazy" src="/static/intro-movie/intro_aldervale_320x200.gif" alt="Aldervale before the theft" width="320" height="200">
+    <p class="t">Aldervale was whole once — and it was never primitive.</p>
+    <p class="t">Human river-ports under blinking signal towers. Elven woods lit from within. Dwarven forges splitting atoms beneath the mountains.</p>
+    <p class="t">Magic and machine were one craft there. They called it aether.</p>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">THE STORY SO FAR · II</div>
+    <h2>The theft</h2>
+    <img class="px" loading="lazy" src="/static/intro-movie/intro_theft_loop_320x200.gif" alt="The theft of the realms" width="320" height="200">
+    <p class="t">Then Vharuk, the Demon King, rose from below.</p>
+    <p class="t">He did not burn the world. He stole it — realm by realm, torn out of the ground with everyone still on it.</p>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">THE STORY SO FAR · III</div>
+    <h2>The Ascent</h2>
+    <img class="px" loading="lazy" src="/static/intro-movie/intro_tower_320x200.gif" alt="The tower of a hundred floors" width="320" height="200">
+    <p class="t">He welded what he took into a tower of a hundred floors — black iron, grav-engines, chains of aether.</p>
+    <p class="t">Every floor is a captured realm. The people below gave it the only name that fits: the Ascent.</p>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">THE STORY SO FAR · IV</div>
+    <h2>The Wardens</h2>
+    <img class="px" loading="lazy" src="/static/intro-movie/intro_warden_320x200.gif" alt="A Warden holds the lift" width="320" height="200">
+    <p class="t">On every floor, a Warden holds the lift to the next — half beast, half war-machine.</p>
+    <p class="t">And on the hundredth floor, in a citadel half throne room, half reactor core, the Demon King sits with the whole world stacked beneath him.</p>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">THE STORY SO FAR · V</div>
+    <h2>You</h2>
+    <img class="px" loading="lazy" src="/static/intro-movie/intro_refugee_loop_320x200.gif" alt="A refugee at the tower's foot" width="320" height="200">
+    <p class="t">You were on one of those floors.</p>
+    <p class="t">Your home is up there now — locked behind a hundred Wardens. You walked out of the wreckage with a rusted shiv and fifty coins.</p>
+    <p class="t">That makes you what everyone here is: a refugee. And a climber.</p>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">THE STORY SO FAR · VI</div>
+    <h2>Roothollow</h2>
+    <img class="px" loading="lazy" src="/static/intro-movie/intro_roothollow_320x200.gif" alt="Roothollow, the last free settlement" width="320" height="200">
+    <p class="t">At the tower's foot stands the last free settlement: Roothollow.</p>
+    <p class="t">Tarps over titanium. A plasma forge next to a horse trough. Refugees of every stolen realm, all of them climbers now.</p>
+    <p class="t">Every climb starts here — and every dead climber wakes here. The tower does not get to keep you.</p>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">THE STORY SO FAR · VII</div>
+    <h2>No one climbs alone</h2>
+    <img class="px" loading="lazy" src="/static/intro-movie/intro_stone_loop_320x200.gif" alt="The Stone of the Climb" width="320" height="200">
+    <p class="t">When a Warden falls, the lift opens for everyone — every climber, everywhere.</p>
+    <p class="t">And the names of those who did it are cut into the Stone of the Climb, lit from within by aether.</p>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">THE STORY SO FAR · VIII</div>
+    <h2>The shardmind</h2>
+    <img class="px" loading="lazy" src="/static/intro-movie/intro_shard_loop_320x200.gif" alt="A shard of old Aldervale" width="320" height="200">
+    <p class="t">At the gate, a shard of old Aldervale will choose you — a machine spirit that remembers the world as it was.</p>
+    <p class="t">It will scout ahead of you, carry what you cannot lose, and drag you back from death.</p>
+    <p class="t">It is speaking to you right now.</p>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">THE STORY SO FAR · IX</div>
+    <h2>The muster</h2>
+    <img class="px" loading="lazy" src="/static/intro-movie/intro_muster_320x200.gif" alt="Climbers muster at the keep" width="320" height="200">
+    <p class="t">The great Wardens do not fall to one blade.</p>
+    <p class="t">Climbers pledge at the keep, and when enough have gathered, they break it — together. Floor by floor. Warden by Warden. All the way to the throne.</p>
+    <p class="closer">The tower does not care whose name is on the blade.<br>The Stone does.</p>
+  </div>
+</section>
+
+<!-- ═══ FLOOR 2 · ONE WORLD ══════════════════════════════════════════ -->
+<section id="oneworld" data-floor="FLOOR 2 · ONE WORLD">
+  <div class="card wide">
+    <div class="eyebrow">ONE WORLD — THIS IS THE WHOLE TRICK</div>
+    <h2>Every blade cuts the same body</h2>
+    <p>There is no server list. There are no shards, no instances, no
+       parallel copies of the tower. The Warden holding the frontier has
+       <span class="bright">one</span> pool of blood, and every climber
+       alive is cutting it.</p>
+    <p>Strike it and flee — your damage <span class="bright">stays</span>.
+       Sleep, and someone across the world deepens your wound. When it
+       falls, the lift opens for <span class="gold">everyone</span>, and
+       every blade that cut gets its share of the kill, by name, on the
+       card.</p>
+    <div class="wound" data-live="warden">
+      <p class="dim">— the frontier, right now —</p>
+      <p><span id="warden-name" class="bright">THE FRONTIER WARDEN</span></p>
+      <p class="meter"><span id="warden-bar">░░░░░░░░░░░░░░░░░░░░░░░░</span> <span id="warden-pct">··%</span></p>
+      <p class="dim" id="warden-blades">scripts off — but the wound is real, and it is open now</p>
+    </div>
+    <img class="px" loading="lazy" src="/static/site/art/warden_fall_320x200.gif" alt="A Warden falls" width="320" height="200">
+    <p class="closer">When it falls, it falls for everyone.</p>
+  </div>
+</section>
+
+<!-- ═══ FLOOR 3 · YOUR CLIMB ═════════════════════════════════════════ -->
+<section id="climb" data-floor="FLOOR 3 · YOUR CLIMB">
+  <div class="card wide">
+    <div class="eyebrow">HOW IT PLAYS</div>
+    <h2>A whole MMO in a chat window</h2>
+    <p>No client. No install. Linear Ascent plays as
+       <span class="bright">scene cards</span> — every turn is a card
+       like the ones on this page: art, a headline, the world's news,
+       and your options. It runs in chat via
+       <span class="bright">Luna</span>, and the browser door is being
+       cut into this very page.</p>
+    <div class="trio">
+      <figure>
+        <img class="px" loading="lazy" src="/static/site/art/portrait_plate_100x200.png" alt="Warrior" width="100" height="200">
+        <figcaption><span class="bright">WARRIOR</span><br><span class="dim">walks in swinging. Pays for it. Keeps walking.</span></figcaption>
+      </figure>
+      <figure>
+        <img class="px" loading="lazy" src="/static/site/art/portrait_elf_leather_100x200.png" alt="Archer" width="100" height="200">
+        <figcaption><span class="bright">ARCHER</span><br><span class="dim">opens at range and means to stay there.</span></figcaption>
+      </figure>
+      <figure>
+        <img class="px" loading="lazy" src="/static/site/art/portrait_wick_100x200.png" alt="Sorcerer" width="100" height="200">
+        <figcaption><span class="bright">SORCERER</span><br><span class="dim">spends sleep, fire and memory of the old world.</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="card" id="demo-card">
+    <div class="eyebrow"><span id="demo-eyebrow">FLOOR 1 · THE FENCEROWS</span></div>
+    <h2 id="demo-headline">A grey wolf circles</h2>
+    <img class="px" id="demo-art" loading="lazy" src="/static/site/art/grey_wolf_320x112.png" alt="A fight, playing itself" width="320" height="112">
+    <p class="meter" id="demo-meters">YOU  ████████░░ 24/30 · WOLF ██████████ 14/14</p>
+    <div id="demo-lines"><p class="dim">— a real fight, playing itself —</p></div>
+    <nav class="options demo-opts">
+      <span class="opt" id="demo-opt-attack">[ Attack ]</span>
+      <span class="opt" id="demo-opt-brace">[ Brace ]</span>
+      <span class="opt" id="demo-opt-run">[ Run ]</span>
+    </nav>
+  </div>
+</section>
+
+<!-- ═══ FLOOR 4 · THE FLOORS ═════════════════════════════════════════ -->
+<section id="floors" data-floor="FLOOR 4 · THE CLIMB AHEAD">
+  <div class="card wide">
+    <div class="eyebrow">THE CLIMB AHEAD</div>
+    <h2>A hundred floors. Every one a stolen realm.</h2>
+    <p>Greenreach first — the stolen meadowlands. Ten floors are filmed;
+       the frontier decides how fast the rest matter. Past the meadows:
+       the mine-realms, the silk floors, the cinder belt. The tower is
+       <span class="bright">longer than anyone has lived</span>.</p>
+  </div>
+  <div class="strip">
+    <figure><img class="px" loading="lazy" src="/static/site/art/floor1_world_320x200.gif" alt="Floor 1" width="320" height="200"><figcaption>F1 · THE FENCEROWS<br><span class="dim">Lamplit Steading · Warden Brackjaw</span></figcaption></figure>
+    <figure><img class="px" loading="lazy" src="/static/site/art/floor2_world_320x200.gif" alt="Floor 2" width="320" height="200"><figcaption>F2 · THE DROWNED PASTURE<br><span class="dim">Weirsend · Warden Sedgeback</span></figcaption></figure>
+    <figure><img class="px" loading="lazy" src="/static/site/art/floor3_world_320x200.gif" alt="Floor 3" width="320" height="200"><figcaption>F3 · THE ORCHARD ROWS<br><span class="dim">Cider Cross · Warden Applewrath</span></figcaption></figure>
+    <figure><img class="px" loading="lazy" src="/static/site/art/floor4_world_320x200.gif" alt="Floor 4" width="320" height="200"><figcaption>F4 · THE BEACON FIELD<br><span class="dim">Pylon Rest · Warden Glarefang</span></figcaption></figure>
+    <figure><img class="px" loading="lazy" src="/static/site/art/floor5_world_320x200.gif" alt="Floor 5" width="320" height="200"><figcaption>F5 · THE SHEARING DOWNS<br><span class="dim">Woolgate · Warden Ramsteel</span></figcaption></figure>
+    <figure><img class="px" loading="lazy" src="/static/site/art/floor6_world_320x200.gif" alt="Floor 6" width="320" height="200"><figcaption>F6 · THE HOLLOW LANES<br><span class="dim">Hedgeharbor · Warden Thornhide</span></figcaption></figure>
+    <figure><img class="px" loading="lazy" src="/static/site/art/floor7_world_320x200.gif" alt="Floor 7" width="320" height="200"><figcaption>F7 · THE MILLRACE<br><span class="dim">Wheelhouse · Warden Milldrown</span></figcaption></figure>
+    <figure><img class="px" loading="lazy" src="/static/site/art/floor8_world_320x200.gif" alt="Floor 8" width="320" height="200"><figcaption>F8 · THE BURNT COMMON<br><span class="dim">Ashfold · Warden Greycinder</span></figcaption></figure>
+    <figure><img class="px" loading="lazy" src="/static/site/art/floor9_world_320x200.gif" alt="Floor 9" width="320" height="200"><figcaption>F9 · THE GALLOWS FAIR<br><span class="dim">Fairstead · Warden Hookmaster</span></figcaption></figure>
+    <figure><img class="px" loading="lazy" src="/static/site/art/floor10_world_320x200.gif" alt="Floor 10" width="320" height="200"><figcaption>F10 · THE KINGSFIELD<br><span class="dim">Bannerline · GNARL, THE GOBLIN KING</span></figcaption></figure>
+  </div>
+</section>
+
+<!-- ═══ FLOOR 5 · THE SOCIETY ════════════════════════════════════════ -->
+<section id="society" data-floor="FLOOR 5 · THE SOCIETY">
+  <div class="card wide">
+    <div class="eyebrow">THE SOCIETY OF THE CLIMB</div>
+    <h2>The tower is full of people. Not all of them are nice.</h2>
+    <div class="quad">
+      <div class="mini">
+        <div class="eyebrow dim2">THE GUILDHALL</div>
+        <p>Found a banner, fly it, tax your members, enter the weekly
+           world challenge. Admin is a job; dues are real.</p>
+      </div>
+      <div class="mini">
+        <div class="eyebrow dim2">THE RELAY</div>
+        <p>Letters carried floor to floor by relay. Gold rides with
+           them — minus the carrier's cut. Write to allies. Or victims.</p>
+      </div>
+      <div class="mini">
+        <div class="eyebrow dim2">THE FIELDS</div>
+        <p>Sleep unlodged above the mercy floors and yes — you can be
+           robbed in your sleep. The Crier prints who did it.</p>
+      </div>
+      <div class="mini">
+        <div class="eyebrow dim2">THE MORNING CRIER</div>
+        <p>The world's newspaper, at your door at dawn: who fell, who
+           struck, whose banner rose. Your name can be in it.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FLOOR 6 · THE STONE OF ERAS ══════════════════════════════════ -->
+<section id="stone" data-floor="FLOOR 6 · THE STONE OF ERAS">
+  <div class="card wide stonecard">
+    <div class="eyebrow">THE STONE OF ERAS</div>
+    <h2>Your deeds outlive the world</h2>
+    <p>When the hundredth floor breaks and Vharuk is cast down, the era
+       <span class="bright">ends</span>. The world resets to the first
+       gate — and the era's whole ledger is frozen into the Stone,
+       readable in every era to come. Forever.</p>
+    <pre class="stonepre" id="stone-lines" data-live="stone">
+   ═══ THE STONE ═══
+   scripts off — the Stone still stands;
+   its freshest lines show here when they can be read
+    </pre>
+    <p class="dim" id="era-lines"></p>
+    <p class="closer">This page will outlive the current world.<br>So could you.</p>
+  </div>
+</section>
+
+<!-- ═══ FLOOR 7 · THE CRIER ══════════════════════════════════════════ -->
+<section id="crier" data-floor="FLOOR 7 · THE MORNING CRIER">
+  <div class="card papercard">
+    <div class="eyebrow">☰ THE MORNING CRIER — <span id="crier-day">at the frontier</span></div>
+    <div id="crier-lines">
+      <p class="dim">The paper prints at dawn. Scripts show you today's edition.</p>
+    </div>
+    <p class="dim">— real lines from today's paper. This is not a mockup;
+       these things happened to real climbers, recently.</p>
+  </div>
+</section>
+
+<!-- ═══ FLOOR 8 · THE DOOR ═══════════════════════════════════════════ -->
+<section id="door" data-floor="FLOOR 8 · THE DOOR">
+  <div class="card doorcard">
+    <div class="eyebrow">THE DOOR</div>
+    <h2>Take a name. Climb.</h2>
+    <p><span class="gold">FREE.</span> A username and a password —
+       <span class="bright">like the old days</span>. No email. No
+       verification chain. No launcher. Nothing to buy, ever, because
+       there is nothing for sale.</p>
+    <p class="dim">Your name is your legend — it will be spoken by the
+       Crier, written in letters, and one day, maybe, cut into the
+       Stone. Choose it well.</p>
+    <form id="door-form" method="post" action="/signup">
+      <label>USERNAME <input name="username" maxlength="24" minlength="2"
+             autocomplete="username" required pattern="[A-Za-z0-9][A-Za-z0-9 '\-_]{1,23}"></label>
+      <label>PASSWORD <input name="password" type="password" minlength="4"
+             maxlength="128" autocomplete="new-password" required></label>
+      <div class="options">
+        <button class="opt gold-opt" type="submit">[ ENTER THE TOWER ]</button>
+        <button class="opt dim2" type="submit" formaction="/login" id="door-login">[ I have a name already ]</button>
+      </div>
+    </form>
+    <p id="door-note" class="dim">The name is reserved the moment the door
+       opens — it is yours in the world, and the browser climb lands on
+       this page next.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p><span class="dim">LINEAR ASCENT · worldd</span> <span id="foot-version" class="dim">·</span></p>
+  <p class="dim">Plays in chat via Luna — plugin <span class="bright">linear-ascent</span> on the official marketplace. Browser climb: soon, on this page.</p>
+  <p class="dim">Typeface: “Web Plus IBM VGA 8x16” — <a href="https://int10h.org/oldschool-pc-fonts/">The Ultimate Oldschool PC Font Pack</a> (CC BY-SA 4.0). All art is the game's own 1-bit hand.</p>
+  <p class="dim" id="foot-era">ERA · — the tower stands.</p>
+</footer>
+
+<script src="/static/site/site.js" defer></script>
+</body>
+</html>

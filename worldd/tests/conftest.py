@@ -16,6 +16,7 @@ os.environ.setdefault("ASCENT_ADMIN_KEY", "test-admin-key")
 # tests hammer a single tenant; don't trip the production rate limits
 os.environ.setdefault("ASCENT_RATE_CAPACITY", "100000")
 os.environ.setdefault("ASCENT_ENROLL_PER_HOUR", "100000")
+os.environ.setdefault("ASCENT_SIGNUP_PER_HOUR", "100000")
 
 
 @pytest_asyncio.fixture
