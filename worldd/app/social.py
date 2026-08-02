@@ -181,9 +181,12 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
     w["recent_kills"] = await _floor_kills(conn, floor)
     w["fire"] = await _long_fire(conn)
     news_floor = doc.get("floor", 0) or w["frontier"]
+    # rows written without a floor (pvp, faction lines) are world-wide
+    # news — they read on every floor's paper, not just the frontier's.
     gossip = await conn.fetch(
         "SELECT kind, line, floor FROM ascent_happenings "
-        "WHERE floor=$1 AND world_day >= $2 ORDER BY id DESC LIMIT 12",
+        "WHERE COALESCE(floor, 0) IN (0, $1) AND world_day >= $2 "
+        "ORDER BY id DESC LIMIT 12",
         news_floor, day - 1)
     w["gossip"] = _condense_war([dict(r) for r in gossip])[:3]
 
@@ -1153,24 +1156,30 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
         d["gold"] = d.get("gold", 0) + gold_i
         if d.get("unlocked_floor", 1) <= floor:
             d["unlocked_floor"] = floor + 1
-        body = [f"+ {xp_i:,} XP — your share of the kill",
-                f"+ ◈ {gold_i:,} from the Warden's hoard"]
         if finisher:
+            # 033: the finisher is standing in the card — the receipt
+            # lands on the outgoing scene (game.run_act patches it in)
+            # and rides the doc through the fall reel so a refresh
+            # keeps the numbers. No letter: they watched it happen.
             loot = pstate.rng_pick(
                 d, [(60, "trollblood_tonic"), (40, "luck_charm")])
             inv = d.setdefault("inventory", {})
             inv[loot] = inv.get(loot, 0) + 1
-            body.append("▪ the killing blow was yours — rare loot: "
-                        f"{economy.APOTHECARY[loot].name}")
-        body.append(f"FLOOR {floor + 1} stands open for everyone.")
-        d.setdefault("pending_events", []).insert(0, Scene(
-            eyebrow=f"FLOOR {floor} · THE KEEP · AFTER",
-            headline=f"{warden_name} has fallen",
-            support=f"Struck down by {names}.",
-            body_lines=body,
-            event_kind="boss",
-        ).to_dict())
-        if not finisher:
+            r = d.setdefault("kill_receipt", {})
+            r.update({"xp": xp_i, "gold": gold_i, "names": names,
+                      "loot": economy.APOTHECARY[loot].name,
+                      "shared": True, "_new": True})
+        else:
+            body = [f"+ {xp_i:,} XP — your share of the kill",
+                    f"+ ◈ {gold_i:,} from the Warden's hoard",
+                    f"FLOOR {floor + 1} stands open for everyone."]
+            d.setdefault("pending_events", []).insert(0, Scene(
+                eyebrow=f"FLOOR {floor} · THE KEEP · AFTER",
+                headline=f"{warden_name} has fallen",
+                support=f"Struck down by {names}.",
+                body_lines=body,
+                event_kind="boss",
+            ).to_dict())
             await conn.execute(
                 "UPDATE ascent_players SET doc=$3, updated_at=now() "
                 "WHERE tenant=$1 AND player=$2",

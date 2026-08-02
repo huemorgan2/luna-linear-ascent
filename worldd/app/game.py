@@ -14,6 +14,7 @@ from .gamepath import ensure_game_importable
 
 ensure_game_importable()
 
+from plugin_linear_ascent.engine import combat  # noqa: E402
 from plugin_linear_ascent.engine import core  # noqa: E402
 from plugin_linear_ascent.engine import state as pstate  # noqa: E402
 from plugin_linear_ascent.engine.scene import Scene  # noqa: E402
@@ -72,6 +73,30 @@ def _sync_frontier_into_doc(doc: dict, frontier: int) -> None:
         doc["unlocked_floor"] = frontier
 
 
+def _patch_kill_receipt(doc: dict, scene) -> None:
+    """033: the Warden fell in THIS request — `_warden_fall` settled the
+    finisher's share after the engine had already drawn the card, so
+    the settled numbers land on the outgoing scene here. The receipt
+    (minus the one-shot `_new` flag) stays on the doc for the rest of
+    the fall reel; the reel's exit pops it."""
+    receipt = doc.get("kill_receipt") or {}
+    if not receipt.pop("_new", False):
+        return
+    new = combat.kill_receipt_lines(
+        {k: receipt[k] for k in ("xp", "gold", "loot", "shared")
+         if k in receipt})
+    lines = list(scene.body_lines)
+    if lines and lines[-1].startswith("FLOOR"):
+        lines[-1:-1] = new          # the open-floor line stays last
+    else:
+        lines += new
+    scene.body_lines = lines
+    if receipt.get("names"):
+        scene.support = f"Struck down by {receipt['names']}."
+    scene.tally = [{"kind": "gold", "n": int(receipt.get("gold", 0))},
+                   {"kind": "aether", "n": int(receipt.get("xp", 0))}]
+
+
 async def run_scene(tenant: str, player: str) -> dict:
     from . import social
     pool = await db.get_pool()
@@ -115,6 +140,7 @@ async def run_act(tenant: str, player: str, option: str, text: str,
             scene = core.apply_choice(doc, option, text)
             ledger = doc.pop("_ledger", [])
             await social.execute_effects(conn, tenant, player, doc)
+            _patch_kill_receipt(doc, scene)
             doc.pop("_world", None)
             doc["scene"] = scene.to_dict()
             await _save_doc(conn, tenant, player, doc, ledger)

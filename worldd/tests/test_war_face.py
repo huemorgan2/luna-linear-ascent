@@ -16,7 +16,7 @@ gamepath.ensure_game_importable()
 
 from app import db, social  # noqa: E402
 from tests.test_multiplayer import create_player  # noqa: E402
-from tests.test_world_api import act, make_tenant  # noqa: E402
+from tests.test_world_api import act, enter_floor, make_tenant  # noqa: E402
 
 
 @pytest.fixture
@@ -151,8 +151,7 @@ async def test_keep_card_reads_the_countdown(client, tenant_a, clean_world):
     pool = await db.get_pool()
     pa = await create_player(client, tenant_a, "tenant-a", "Reader")
     await _strike("tenant-a", "p-x", {"name": "Cutter"}, 1, 10)
-    await act(client, tenant_a, "tenant-a", pa, option="gate")
-    await act(client, tenant_a, "tenant-a", pa, option="floor_1")
+    await enter_floor(client, tenant_a, "tenant-a", pa, 1)
     s = await act(client, tenant_a, "tenant-a", pa, option="keep")
     body = "\n".join(s["body_lines"])
     # 025 §3: floor 1 is a siege floor — there IS no countdown to read,

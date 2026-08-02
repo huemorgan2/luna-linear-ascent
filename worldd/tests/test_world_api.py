@@ -52,6 +52,16 @@ async def scene(client, secret, tenant, player):
     return r.json()["scene"]
 
 
+async def enter_floor(client, secret, tenant, player, n):
+    """030 Phase 8: a character's first step onto a floor plays a reel —
+    click through it the way a player would and return the arrival card."""
+    await act(client, secret, tenant, player, option="gate")
+    s = await act(client, secret, tenant, player, option=f"floor_{n}")
+    while {o["id"] for o in s.get("options", [])} == {"next", "skip"}:
+        s = await act(client, secret, tenant, player, option="next")
+    return s
+
+
 @pytest.fixture
 async def tenant_a(client):
     return await make_tenant(client, "tenant-a")

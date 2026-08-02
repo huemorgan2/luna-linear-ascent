@@ -6,7 +6,7 @@ import uuid
 import pytest
 
 from app import db
-from tests.test_world_api import act, make_tenant, scene, signed
+from tests.test_world_api import act, enter_floor, make_tenant, scene, signed
 
 
 @pytest.fixture
@@ -51,8 +51,7 @@ async def test_shared_warden_one_hp_pool_kill_opens_for_all(
     pb = await create_player(client, tenant_b, "tenant-b", "Brai")
 
     # A walks to the floor-1 keep: the SHARED warden, one pool for all
-    await act(client, tenant_a, "tenant-a", pa, option="gate")
-    await act(client, tenant_a, "tenant-a", pa, option="floor_1")
+    await enter_floor(client, tenant_a, "tenant-a", pa, 1)
     s = await act(client, tenant_a, "tenant-a", pa, option="keep")
     assert "whole world" in s["support"]
     assert any(o["id"] == "strike" for o in s["options"])
@@ -80,8 +79,7 @@ async def test_shared_warden_one_hp_pool_kill_opens_for_all(
     assert v["strikers"][0]["name"] == "Aldo" and v["strikers"][0]["dmg"] > 0
 
     # B sees the SAME wounded warden, with A's name on it
-    await act(client, tenant_b, "tenant-b", pb, option="gate")
-    await act(client, tenant_b, "tenant-b", pb, option="floor_1")
+    await enter_floor(client, tenant_b, "tenant-b", pb, 1)
     s = await act(client, tenant_b, "tenant-b", pb, option="keep")
     assert "Aldo" in " ".join(s["body_lines"])
     assert f"{v['hp']:,}" in s["headline"]
@@ -95,15 +93,21 @@ async def test_shared_warden_one_hp_pool_kill_opens_for_all(
     if any(o["id"] == "close_in" for o in s["options"]):
         await act(client, tenant_b, "tenant-b", pb, option="close_in")
     s = await act(client, tenant_b, "tenant-b", pb, option="attack")
-    assert "collapses" in s["headline"]
+    # 033: the kill card IS the fall reel, and it pays on the spot —
+    # worldd lands the settled split on the outgoing card.
+    assert "falls" in s["headline"]
+    assert any("killing blow" in l for l in s["body_lines"])
+    assert any("share of the kill" in l for l in s["body_lines"])
+    assert "Struck down by" in s["support"]
+    assert "Brai" in s["support"]
 
     row = await pool.fetchrow(
         "SELECT value FROM ascent_world WHERE key='frontier'")
     assert int(json.loads(row["value"])) == 2
 
-    # B's next scene: the fall report, with the finisher's loot
+    # B's next scene: a refresh mid-reel replays the fall, receipt intact
     s = await scene(client, tenant_b, "tenant-b", pb)
-    assert "has fallen" in s["headline"]
+    assert "falls" in s["headline"]
     assert any("killing blow" in l for l in s["body_lines"])
     # A gets the report too — pushed into their doc, no action needed
     s = await scene(client, tenant_a, "tenant-a", pa)
@@ -125,8 +129,7 @@ async def test_below_frontier_keep_is_solo_echo(client, tenant_a,
     await pool.execute(
         "UPDATE ascent_world SET value='3'::jsonb WHERE key='frontier'")
     pa = await create_player(client, tenant_a, "tenant-a", "Echo")
-    await act(client, tenant_a, "tenant-a", pa, option="gate")
-    await act(client, tenant_a, "tenant-a", pa, option="floor_1")
+    await enter_floor(client, tenant_a, "tenant-a", pa, 1)
     s = await act(client, tenant_a, "tenant-a", pa, option="keep")
     # solo per-player fight — attack/close_in (017: melee opens at
     # range, so the first beat is crossing), never the shared strike
@@ -140,13 +143,15 @@ async def test_morning_crier_once_per_day(client, tenant_a, clean_world):
     await pool.execute(
         "UPDATE ascent_players SET doc = jsonb_set(doc, '{news_day}',"
         " '-1'::jsonb) WHERE tenant='tenant-a' AND player=$1", pa)
+    # 030 Phase 5: the Crier is a PAPER riding the town card, not an
+    # interstitial — it stays pinned until its ✕ stamps news_day.
     s = await scene(client, tenant_a, "tenant-a", pa)
-    assert "MORNING CRIER" in s["eyebrow"]
-    assert s["event_kind"] == "news"
-    assert any("at the frontier" in l for l in s["body_lines"])
-    assert s["shard_note"]                     # the advice line
+    assert s["paper"]
+    assert any("at the frontier" in l for l in s["paper"]["items"])
     s = await scene(client, tenant_a, "tenant-a", pa)
-    assert "MORNING CRIER" not in s["eyebrow"]
+    assert s["paper"]                          # unread stays pinned
+    s = await act(client, tenant_a, "tenant-a", pa, option="news_close")
+    assert not s.get("paper")                  # closed stays closed
 
 
 async def test_import_lands_once_and_world_wins(client, tenant_a):

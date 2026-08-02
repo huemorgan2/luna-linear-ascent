@@ -6,7 +6,8 @@ import uuid
 import pytest
 
 from app import db
-from tests.test_world_api import act, make_tenant, scene, signed
+from tests.test_world_api import (act, enter_floor, make_tenant, scene,
+                                  signed)
 
 
 @pytest.fixture
@@ -75,10 +76,15 @@ async def test_full_drama_loop(client, tenants):
     s = await scene(client, b, "tenant-b", pb)
     assert na in s["headline"] or "fields" in s["support"]
 
-    # happenings carry the news
+    # happenings carry the news — typeset on the Crier's paper (030 §5).
+    # A fresh climber skips creation-day's paper, so reopen it first.
+    docb = await get_doc("tenant-b", pb)
+    docb["news_day"] = -1
+    await set_doc("tenant-b", pb, docb)
     s = await act(client, b, "tenant-b", pb, option="town")
     s = await scene(client, b, "tenant-b", pb)
-    assert any(na in l for l in s["body_lines"])
+    news = s["body_lines"] + ((s.get("paper") or {}).get("items") or [])
+    assert any(na in l for l in news), news
 
 
 async def test_letter_and_grant_flow(client, tenants):
@@ -134,8 +140,7 @@ async def test_gnarl_quorum_two_players(client, tenants):
 
     # both walk to the floor-10 keep; A pledges first
     for secret, t, p in ((a, "tenant-a", pa), (b, "tenant-b", pb)):
-        await act(client, secret, t, p, option="gate")
-        await act(client, secret, t, p, option="floor_10")
+        await enter_floor(client, secret, t, p, 10)
         s = await act(client, secret, t, p, option="keep")
         assert "war party" in " ".join(s["body_lines"])
         await act(client, secret, t, p, option="boss_commit")

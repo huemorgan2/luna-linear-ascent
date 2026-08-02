@@ -13,7 +13,7 @@ gamepath.ensure_game_importable()
 
 from app import db, social  # noqa: E402
 from tests.test_multiplayer import create_player  # noqa: E402
-from tests.test_world_api import act, make_tenant, signed  # noqa: E402
+from tests.test_world_api import act, enter_floor, make_tenant, signed  # noqa: E402
 
 
 @pytest.fixture
@@ -77,8 +77,7 @@ async def test_presence_tiers_hot_camped_gone(client, tenant_a, tenant_b):
 async def test_town_idlers_hold_no_floor(client, tenant_a):
     pool = await db.get_pool()
     pa = await create_player(client, tenant_a, "tenant-a", "Towny")
-    await act(client, tenant_a, "tenant-a", pa, option="gate")
-    await act(client, tenant_a, "tenant-a", pa, option="floor_1")
+    await enter_floor(client, tenant_a, "tenant-a", pa, 1)
     pres = await _fresh_presence()
     on_floor = pres["by_floor"].get(1, {}).get("hot", 0)
     # walk back to Roothollow: the doc keeps floor=1 but the body left
