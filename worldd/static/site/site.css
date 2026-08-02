@@ -179,6 +179,10 @@ img.px { image-rendering: pixelated; width: min(640px, 100%); height: auto; }
 /* ── the door ──────────────────────────────────────────────────────── */
 .doorcard { border-color: var(--gold); }
 .doorcard .eyebrow { background: var(--gold); color: var(--bg); }
+/* two doors, one card: the tab says which one the form is */
+.dtabs { justify-content: flex-start; margin-top: 1rem; }
+.dtab.on { background: var(--gold); color: var(--bg);
+           border-color: var(--gold); }
 #door-form { margin: 1rem 0 .75rem; }
 #door-form label { display: block; margin-bottom: .75rem;
                    color: var(--bright); }

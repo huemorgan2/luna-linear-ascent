@@ -26,6 +26,16 @@ async def client():
     from app.main import app
 
     async with app.router.lifespan_context(app):
+        # 004: a name is unique in a world, and this test database is one
+        # world that every run walks back into. The suite founds Stew and
+        # Fleet over and over — in a real world that is a stranger taking
+        # your name; here it is the same fixture on its second call. Climber
+        # reservations are cleared per test; that names are unique at all is
+        # proven inside tests/test_names.py, within one test.
+        from app import db as _db
+        if _db.ready():
+            await (await _db.get_pool()).execute(
+                "DELETE FROM ascent_names WHERE kind = 'climber'")
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as c:
             yield c

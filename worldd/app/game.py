@@ -97,6 +97,27 @@ def _patch_kill_receipt(doc: dict, scene) -> None:
                    {"kind": "aether", "n": int(receipt.get("xp", 0))}]
 
 
+async def _claim_name(conn, tenant: str, player: str, doc: dict,
+                      option: str, text: str) -> str:
+    """004: the registrar, before the engine writes anything.
+
+    A name is unique across the whole world, and only worldd can know that.
+    The claim happens inside this turn's transaction — two climbers racing
+    for `Fleet` in the same instant cannot both win — and the verdict rides
+    into the engine on `_world`, which decides what the card says. Returns
+    the name it newly reserved (so a refusal can give it back), or "".
+    """
+    if doc.get("stage") != "creation_name" or option or not text:
+        return ""
+    from . import names
+    want = names.canonical(text)
+    if not names.is_legal(want):
+        return ""                      # the engine refuses it on its own
+    verdict = await names.claim(conn, want, names.CLIMBER, tenant, player)
+    doc["_world"]["name_claim"] = verdict
+    return want if verdict == names.CREATED else ""
+
+
 async def run_scene(tenant: str, player: str) -> dict:
     from . import social
     pool = await db.get_pool()
@@ -137,7 +158,12 @@ async def run_act(tenant: str, player: str, option: str, text: str,
             await social.inject_world(conn, tenant, player, doc)
             before = doc.get("unlocked_floor", 1)
             _sync_frontier_into_doc(doc, doc["_world"]["frontier"])
+            reserved = await _claim_name(conn, tenant, player, doc,
+                                         option, text)
             scene = core.apply_choice(doc, option, text)
+            if reserved and doc.get("name") != reserved:
+                from . import names
+                await names.release(conn, reserved, tenant, player)
             ledger = doc.pop("_ledger", [])
             await social.execute_effects(conn, tenant, player, doc)
             _patch_kill_receipt(doc, scene)
@@ -193,8 +219,19 @@ async def run_import(tenant: str, player: str, doc: dict) -> dict:
                 return {"imported": False,
                         "reason": "a world character already exists"}
             clean["luna_user"] = f"{tenant}:{player}"
+            out = {"imported": True}
+            # 004: an offline name lands in a world where names are unique.
+            # It cannot be sent back to the gate to pick again, so it takes
+            # the nearest free name and is told which.
+            if clean.get("name"):
+                from . import names
+                held = await names.claim_free(conn, clean["name"],
+                                              tenant, player)
+                if held != clean["name"]:
+                    out["renamed"] = held
+                    clean["name"] = held
             await _save_doc(conn, tenant, player, clean, [])
-            return {"imported": True}
+            return out
 
 
 async def run_character(tenant: str, player: str) -> dict:

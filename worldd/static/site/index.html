@@ -30,7 +30,7 @@
     <p class="free-line"><span class="gold">FREE</span> — like the old days.
        No price. No ads. No launcher. No email.</p>
     <nav class="options">
-      <a class="opt" href="#door">[ CLIMB — free, no email ]</a>
+      <a class="opt" href="#door">[ SIGN-UP — free, no email ]</a>
       <a class="opt dim2" href="#lore">[ Watch from the gate ]</a>
     </nav>
     <p class="dim live-line" data-live="hero">… the gate lamps are lit; the world is climbing …</p>
@@ -280,17 +280,27 @@
        <span class="bright">like the old days</span>. No email. No
        verification chain. No launcher. Nothing to buy, ever, because
        there is nothing for sale.</p>
-    <p class="dim">Your name is your legend — it will be spoken by the
-       Crier, written in letters, and one day, maybe, cut into the
-       Stone. Choose it well.</p>
+    <p class="dim">Your username <span class="bright">is</span> your
+       climber's name — one word, yours alone in the whole world. It will be
+       spoken by the Crier, written in letters, and one day, maybe, cut into
+       the Stone. Choose it well.</p>
+    <nav class="options dtabs" id="door-tabs">
+      <button class="opt dtab on" type="button" id="tab-signup">[ SIGN-UP ]</button>
+      <button class="opt dtab dim2" type="button" id="tab-signin">[ SIGN-IN ]</button>
+    </nav>
     <form id="door-form" method="post" action="/signup">
       <label>USERNAME <input name="username" maxlength="24" minlength="2"
-             autocomplete="username" required pattern="[A-Za-z0-9][A-Za-z0-9 '\-_]{1,23}"></label>
-      <label>PASSWORD <input name="password" type="password" minlength="4"
+             autocomplete="username" required
+             placeholder="one word — every script welcome"></label>
+      <label id="row-pw"><span id="label-pw">NEW PASSWORD</span>
+             <input name="password" type="password" minlength="4"
              maxlength="128" autocomplete="new-password" required></label>
+      <label id="row-pw2">RETYPE PASSWORD
+             <input name="password2" type="password" minlength="4"
+             maxlength="128" autocomplete="new-password"></label>
       <div class="options">
-        <button class="opt gold-opt" type="submit">[ ENTER THE TOWER ]</button>
-        <button class="opt dim2" type="submit" formaction="/login" id="door-login">[ I have a name already ]</button>
+        <button class="opt gold-opt" type="submit" id="door-signup">[ SIGN-UP — free, no email ]</button>
+        <button class="opt dim2" type="submit" formaction="/login" id="door-login">[ SIGN-IN ]</button>
       </div>
     </form>
     <p id="door-note" class="dim">The name is reserved the moment the door

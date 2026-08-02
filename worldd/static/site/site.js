@@ -223,11 +223,42 @@
     .catch(function () {});
 
   if (form) {
+    /* Two doors, one form: sign-up asks for the password twice, sign-in
+       once. With scripts off both submit buttons are in the markup with
+       their own formaction, so the page still opens either door. */
+    var setMode = function (m) {
+      var up = m === "signup";
+      form.setAttribute("action", up ? "/signup" : "/login");
+      $("label-pw").textContent = up ? "NEW PASSWORD" : "PASSWORD";
+      $("row-pw2").style.display = up ? "" : "none";
+      form.elements.password2.required = up;
+      form.elements.password.setAttribute(
+        "autocomplete", up ? "new-password" : "current-password");
+      $("door-signup").style.display = up ? "" : "none";
+      $("door-login").style.display = up ? "none" : "";
+      $("door-login").classList.toggle("gold-opt", !up);
+      $("door-login").classList.toggle("dim2", up);
+      $("tab-signup").classList.toggle("on", up);
+      $("tab-signup").classList.toggle("dim2", !up);
+      $("tab-signin").classList.toggle("on", !up);
+      $("tab-signin").classList.toggle("dim2", up);
+    };
+    $("tab-signup").addEventListener("click", function () {
+      setMode("signup");
+    });
+    $("tab-signin").addEventListener("click", function () {
+      setMode("signin");
+    });
+    setMode("signup");
+
     var doorPost = function (path) {
       var body = {
         username: form.elements.username.value,
         password: form.elements.password.value
       };
+      if (path === "/signup") {
+        body.password2 = form.elements.password2.value;
+      }
       fetch(path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -245,7 +276,14 @@
     };
     form.addEventListener("submit", function (ev) {
       ev.preventDefault();
-      doorPost("/signup");
+      var path = form.getAttribute("action");
+      if (path === "/signup"
+          && form.elements.password2.value !== form.elements.password.value) {
+        note.classList.add("err");
+        note.textContent = "▮ the two passwords differ";
+        return;
+      }
+      doorPost(path);
     });
     $("door-login").addEventListener("click", function (ev) {
       ev.preventDefault();

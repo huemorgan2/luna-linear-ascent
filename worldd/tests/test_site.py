@@ -25,6 +25,10 @@ async def test_homepage_serves_the_terminal(client):
     assert "LINEAR ASCENT" in body
     assert "FREE" in body                      # ours is free — play on that
     assert 'action="/signup"' in body          # the door posts without JS
+    # 004: two doors, named the way everyone names them
+    assert "SIGN-UP" in body and "SIGN-IN" in body
+    assert "NEW PASSWORD" in body and "RETYPE PASSWORD" in body
+    assert 'formaction="/login"' in body       # sign-in works scripts off too
     # the terminal law: the one vendored font, no external requests
     assert "WebPlus_IBM_VGA_8x16.woff" in (await client.get(
         "/static/site/site.css")).text
@@ -78,7 +82,8 @@ async def test_public_world_is_cached(client):
 async def test_signup_login_logout_json(client):
     name = _name()
     r = await client.post("/signup", json={"username": name,
-                                           "password": "hunter2"})
+                                           "password": "hunter2",
+                                           "password2": "hunter2"})
     assert r.status_code == 200
     assert r.json()["username"] == name
     assert site.SESSION_COOKIE in r.cookies
@@ -113,12 +118,34 @@ async def test_signup_rules(client):
     r = await client.post("/signup", json={"username": "x",
                                            "password": "hunter2"})
     assert r.status_code == 422                   # one stroke is no name
-    r = await client.post("/signup", json={"username": "Two|Pipes",
+    r = await client.post("/signup", json={"username": "«»",
                                            "password": "hunter2"})
-    assert r.status_code == 422                   # | is not mason's alphabet
+    assert r.status_code == 422                   # nothing granite can hold
     r = await client.post("/signup", json={"username": _name(),
                                            "password": "abc"})
     assert r.status_code == 422                   # password too short
+    # 004: sign-up asks twice, and a mismatch is refused with the reason
+    r = await client.post("/signup", json={"username": _name(),
+                                           "password": "hunter2",
+                                           "password2": "hunter3"})
+    assert r.status_code == 422
+    assert "differ" in r.json()["detail"]
+
+
+async def test_the_username_is_the_climber_name_one_word(client):
+    """"Master Chief" is MasterChief: the space is joined, not refused —
+    the same law the gate's registrar follows."""
+    stem = _name()
+    r = await client.post("/signup", json={"username": f"{stem} Chief",
+                                           "password": "hunter2",
+                                           "password2": "hunter2"})
+    assert r.status_code == 200
+    assert r.json()["username"] == f"{stem}Chief"
+    # and it is the name the world now holds
+    from app import db as _db
+    assert await (await _db.get_pool()).fetchval(
+        "SELECT kind FROM ascent_names WHERE name_lower = lower($1)",
+        f"{stem}Chief") == "account"
 
 
 # ── the door: scripts off (plain form POST → redirect) ───────────────────
