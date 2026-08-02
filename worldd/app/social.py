@@ -99,7 +99,10 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
         # it, the pawn scene offers the donate.
         from . import armory
         w["armory"] = await armory.shelf(conn, doc["guild"])
-        w["armory_cap"] = armory.ARMORY_CAP
+        # 032: the flat 50-row roof became bought chest slots
+        w["armory_cap"] = ((w["faction"].get("hall") or {})
+                           .get("chest", {})
+                           .get("cap", factions.CHEST_SLOTS[1]))
         prior = await conn.fetchval(
             "SELECT take_day FROM ascent_armory_takes "
             "WHERE tenant=$1 AND player=$2", tenant, player)
@@ -115,6 +118,10 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
         # 015: the pending request, so the hall shows the asked state
         w["faction_requested"] = await factions.my_request(
             conn, tenant, player) or ""
+
+    # 032: the Guildhall's civic wall — this week's standings and the
+    # hall of banners — hangs for everyone, member or not.
+    w["hall_board"] = await factions.hall_board(conn)
 
     w["inbox_count"] = await conn.fetchval(
         "SELECT count(*) FROM ascent_letters "
@@ -271,6 +278,8 @@ async def _faction_panel(conn, tenant: str, player: str,
         },
         "ledger": [dict(r) for r in ledger],
         "last_week": (last["prize_note"] if last else ""),
+        # 032: the hall — room, coffer, chest, bunks, board, the works
+        "hall": await factions.hall_state(conn, name),
     }
 
 
@@ -575,8 +584,56 @@ async def execute_effects(conn, tenant: str, player: str,
         elif kind == "faction_enter":
             from . import factions
             await factions.enter_week(conn, tenant, player)
+        elif kind == "hall_room_buy":
+            # 032: the works — steward-only, coffer-paid, one tier at a
+            # time. The engine validates against the injected hall
+            # payload; a race here just no-ops, treasury untouched.
+            from . import factions
+            await factions.buy_room(conn, tenant, player,
+                                    tier=e.get("tier"))
+        elif kind == "hall_coffer_up":
+            from . import factions
+            await factions.buy_coffer(conn, tenant, player,
+                                      tier=e.get("tier"))
+        elif kind == "hall_chest_up":
+            from . import factions
+            await factions.buy_chest(conn, tenant, player,
+                                     tier=e.get("tier"))
+        elif kind == "hall_bed_buy":
+            from . import factions
+            await factions.buy_bed(conn, tenant, player)
+        elif kind == "hall_bed_claim":
+            # free safe night: sets doc["lodged_until_day"] the same way
+            # the Lodge does — the caller saves the doc
+            from . import factions
+            await factions.claim_bed(conn, tenant, player, doc)
+        elif kind == "hall_note":
+            from . import factions
+            await factions.write_note(conn, tenant, player,
+                                      str(e.get("line", "")))
         elif kind == "faction_kick":
             await _fx_faction_kick(conn, tenant, player, e)
+        elif kind == "faction_approve":
+            # 032: the desk moved into the hall — same admin checks as
+            # the HTTP path; a raced/failed accept leaves the request.
+            from . import factions
+            await factions.approve_request(
+                conn, tenant, player,
+                str(e.get("tenant", "")), str(e.get("player", "")))
+        elif kind == "faction_reject":
+            from . import factions
+            await factions.reject_request(
+                conn, tenant, player,
+                str(e.get("tenant", "")), str(e.get("player", "")))
+        elif kind == "faction_promote":
+            await _fx_faction_promote(conn, tenant, player, e)
+        elif kind == "faction_rename":
+            from . import factions
+            await factions.rename_faction(conn, tenant, player,
+                                          str(e.get("name", "")))
+        elif kind == "faction_request_cancel":
+            from . import factions
+            await factions.cancel_request(conn, tenant, player)
         elif kind == "happening":
             # engine-reported world news: deaths, warden first clears
             await conn.execute(
@@ -656,6 +713,21 @@ async def _fx_faction_kick(conn, tenant: str, player: str,
             await conn.execute(
                 "DELETE FROM ascent_faction_members "
                 "WHERE tenant=$1 AND player=$2", m["tenant"], m["player"])
+            break
+
+
+async def _fx_faction_promote(conn, tenant: str, player: str,
+                              e: dict) -> None:
+    """Admin promotes a member by character name (the hall roster)."""
+    from . import factions
+    me = await factions.member_row(conn, tenant, player)
+    if me is None or me["role"] != "steward":
+        return
+    target = str(e.get("name", ""))
+    for m in await factions.members_of(conn, me["faction"]):
+        if (m["name"] or m["player"]) == target:
+            await factions.promote_member(conn, tenant, player,
+                                          m["tenant"], m["player"])
             break
 
 

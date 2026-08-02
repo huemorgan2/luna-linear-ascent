@@ -45,6 +45,38 @@ JOIN_FEE_MAX = 500         # set at founding, immutable
 DUES_MIN, DUES_MAX = 1, 50  # per member per world-week
 ENTRY_PER_MEMBER = 5       # the weekly challenge entry, paid from the store
 
+# ── The banner hall (plan 032) — every price and cap in ONE place ────────
+# All hall prices are coffer-paid and world-bound (burned): the 010 law
+# that no player can ever draw faction gold back out stands untouched.
+ROOM_NAMES = {1: "the back room", 2: "a hall of your own",
+              3: "the long hall", 4: "the high hall"}
+ROOM_PRICES = {2: 500, 3: 2000, 4: 6000}     # tier bought, one at a time
+COFFER_CAPS = {1: 200, 2: 600, 3: 2500, 4: 8000}
+COFFER_PRICES = {2: 120, 3: 400, 4: 1200}
+CHEST_SLOTS = {1: 4, 2: 8, 3: 16, 4: 32}
+CHEST_PRICES = {2: 150, 3: 400, 4: 1000}
+BED_PRICE = 250
+BEDS_BY_ROOM = {1: 0, 2: 2, 3: 6, 4: 10}     # beds fit from room 2 up
+NOTE_MAX_CHARS = 64        # one bulletin line, plain text
+NOTES_KEPT = 20            # the board shows the last 20, newest first
+
+
+def tier_to_fit(value: int, caps: dict[int, int]) -> int:
+    """The smallest tier whose cap covers `value` — the migration 011
+    grandfathering rule (existing balances/racks are never truncated,
+    so anything over the top cap still lands on the top tier)."""
+    for tier in sorted(caps):
+        if value <= caps[tier]:
+            return tier
+    return max(caps)
+
+
+def coffer_take(treasury: int, coffer_tier: int, amount: int) -> int:
+    """Clip a coffer inflow to the space left under the cap — nothing is
+    ever burned out of a member's pocket by a full coffer."""
+    cap = COFFER_CAPS.get(int(coffer_tier), COFFER_CAPS[1])
+    return max(0, min(int(amount), cap - int(treasury)))
+
 _BANNER_DIR = os.path.join(
     os.path.dirname(os.path.abspath(__file__)), "..", "vendor",
     "plugin_linear_ascent", "content", "art", "banners", "factions")
@@ -210,7 +242,7 @@ async def maybe_post_week(conn) -> None:
             "VALUES ($1,'faction',$2)", pstate.world_day(),
             f"This week the Ascent demands a {kind.upper()} — banners "
             f"enter at the Guildhall (◈ {ENTRY_PER_MEMBER} a head, from "
-            "the store)")
+            "the coffer)")
 
 
 async def maybe_resolve(conn, faction: str) -> None:
@@ -221,8 +253,9 @@ async def maybe_resolve(conn, faction: str) -> None:
     if week < 0:
         return
     fac = await conn.fetchrow(
-        "SELECT name, banner, created_week, join_fee, weekly_dues, treasury "
-        "FROM ascent_factions WHERE name=$1 FOR UPDATE", faction)
+        "SELECT name, banner, created_week, join_fee, weekly_dues, treasury,"
+        " coffer_tier FROM ascent_factions WHERE name=$1 FOR UPDATE",
+        faction)
     if fac is None or fac["created_week"] > week:
         return
     # claim the week exactly once (the faction row lock serializes us)
@@ -261,8 +294,12 @@ async def _collect_dues(conn, fac: dict, members: list[dict],
     """Weekly dues, gold first then bank. Can't pay → arrears: stays at
     the table, skipped from that week's prize split. Clears the first
     week they can pay again. Members who joined after the week owe
-    nothing for it."""
+    nothing for it. 032: every inflow clips to the coffer's cap — dues
+    that don't fit are simply not charged (a full coffer is never the
+    member's debt, so no arrears either)."""
     dues, name = int(fac["weekly_dues"]), fac["name"]
+    room_left = coffer_take(int(fac["treasury"]),
+                            int(fac.get("coffer_tier", 1)), 10 ** 9)
     collected = 0
     for m in members:
         if m["joined_day"] >= (week + 1) * WEEK_DAYS:
@@ -270,15 +307,18 @@ async def _collect_dues(conn, fac: dict, members: list[dict],
         doc = await _load_doc(conn, m["tenant"], m["player"])
         if doc is None:
             continue
-        if take_gold(doc, dues):
+        charge = min(dues, room_left - collected)
+        if charge <= 0:
+            m["arrears"] = False
+        elif take_gold(doc, charge):
             await _save_doc(conn, m["tenant"], m["player"], doc)
-            collected += dues
+            collected += charge
             m["arrears"] = False
             await conn.execute(
                 "INSERT INTO ascent_ledger (tenant, player, kind, gold,"
                 " note) VALUES ($1,$2,'faction_dues',$3,$4)",
-                m["tenant"], m["player"], -dues, f"{name} · week {week}")
-            await store_ledger(conn, name, week, "dues", dues,
+                m["tenant"], m["player"], -charge, f"{name} · week {week}")
+            await store_ledger(conn, name, week, "dues", charge,
                                m["tenant"], m["player"],
                                m.get("name") or m["player"])
         else:
@@ -434,40 +474,54 @@ async def join_faction(conn, tenant: str, player: str, name: str,
     Effect path (doc passed): the engine already charged the doc — this
     only lands the world-side half; a failure refunds the doc, which the
     caller saves. HTTP path (doc=None): load, charge, save here.
+    032: the fee clips to the coffer's cap — the joiner is only ever
+    charged what fits (nothing is burned by a full coffer).
     Returns an error string or None."""
     fac = await conn.fetchrow(
-        "SELECT name, join_fee FROM ascent_factions WHERE name=$1 "
-        "FOR UPDATE", name)
+        "SELECT name, join_fee, treasury, coffer_tier FROM ascent_factions "
+        "WHERE name=$1 FOR UPDATE", name)
     fee = int(fac["join_fee"]) if fac else 0
+    take = (coffer_take(fac["treasury"], fac["coffer_tier"], fee)
+            if fac else 0)
     engine_paid = doc is not None
 
-    def refund() -> None:
-        if engine_paid and fee:
-            doc["gold"] = int(doc.get("gold", 0)) + fee
+    def refund(n: int) -> None:
+        if engine_paid and n > 0:
+            doc["gold"] = int(doc.get("gold", 0)) + n
     if fac is None:
-        refund()
+        refund(fee)
         return "that banner no longer flies"
     if await member_row(conn, tenant, player):
-        refund()
+        refund(fee)
         return "you already sit at a table — leave it first"
+    if engine_paid and take < fee:
+        # the engine charged the posted fee; the brim hands the rest back
+        refund(fee - take)
+        await conn.execute(
+            "INSERT INTO ascent_ledger (tenant, player, kind, gold, note)"
+            " VALUES ($1,$2,'faction_join',$3,$4)",
+            tenant, player, fee - take,
+            f"{name} — the coffer was full, part returned")
     if not engine_paid:
         doc = await _load_doc(conn, tenant, player)
         if doc is None:
             return "no character"
-        if fee and not take_gold(doc, fee):
+        if fee and int(doc.get("gold", 0)) + int(doc.get("bank", 0)) < fee:
             return f"the join fee is ◈ {fee} — you can't cover it"
+        if take:
+            take_gold(doc, take)
         await _save_doc(conn, tenant, player, doc)
-        if fee:
+        if take:
             # engine path audits via doc["_ledger"]; HTTP path does it here
             await conn.execute(
                 "INSERT INTO ascent_ledger (tenant, player, kind, gold,"
                 " note) VALUES ($1,$2,'faction_join',$3,$4)",
-                tenant, player, -fee, name)
-    if fee:
+                tenant, player, -take, name)
+    if take:
         await conn.execute(
             "UPDATE ascent_factions SET treasury = treasury + $2 "
-            "WHERE name=$1", name, fee)
-        await store_ledger(conn, name, world_week(), "join_fee", fee,
+            "WHERE name=$1", name, take)
+        await store_ledger(conn, name, world_week(), "join_fee", take,
                            tenant, player, doc.get("name") or player)
     await conn.execute(
         "INSERT INTO ascent_faction_members (tenant, player, faction,"
@@ -483,16 +537,31 @@ async def donate(conn, tenant: str, player: str, amount: int,
     """Any member, any time, carried gold only (the bank is the safe
     place — donating is a deliberate act). Effect path (doc passed): the
     engine already charged the doc; failure refunds it. HTTP path
-    (doc=None): load, charge, save here."""
+    (doc=None): load, charge, save here. 032: the donation clips to the
+    coffer's cap — only what fits leaves the donor's pocket."""
     amount = int(amount)
     engine_paid = doc is not None
     me = await member_row(conn, tenant, player)
+
+    def refund(n: int) -> None:
+        if engine_paid and n > 0:
+            doc["gold"] = int(doc.get("gold", 0)) + n
     if me is None:
-        if engine_paid and amount > 0:
-            doc["gold"] = int(doc.get("gold", 0)) + amount
+        refund(amount)
         return "you have no banner"
     if amount <= 0:
         return "a donation needs a number above zero"
+    fac = await conn.fetchrow(
+        "SELECT treasury, coffer_tier FROM ascent_factions WHERE name=$1 "
+        "FOR UPDATE", me["faction"])
+    if fac is None:
+        refund(amount)
+        return "that banner no longer flies"
+    take = coffer_take(fac["treasury"], fac["coffer_tier"], amount)
+    if take <= 0:
+        refund(amount)
+        cap = COFFER_CAPS.get(int(fac["coffer_tier"]), COFFER_CAPS[1])
+        return f"the coffer is full — ◈ {cap:,} is its brim"
     if not engine_paid:
         doc = await _load_doc(conn, tenant, player)
         if doc is None:
@@ -500,18 +569,26 @@ async def donate(conn, tenant: str, player: str, amount: int,
         if int(doc.get("gold", 0)) < amount:
             return (f"you carry ◈ {doc.get('gold', 0):,} — "
                     f"not ◈ {amount:,}")
-        doc["gold"] = int(doc["gold"]) - amount
+        doc["gold"] = int(doc["gold"]) - take
         await _save_doc(conn, tenant, player, doc)
         # engine path audits via doc["_ledger"]; HTTP path does it here
         await conn.execute(
             "INSERT INTO ascent_ledger (tenant, player, kind, gold, note) "
             "VALUES ($1,$2,'faction_donation',$3,$4)",
-            tenant, player, -amount, me["faction"])
+            tenant, player, -take, me["faction"])
+    elif take < amount:
+        # the engine charged the full ask; the brim hands the rest back
+        refund(amount - take)
+        await conn.execute(
+            "INSERT INTO ascent_ledger (tenant, player, kind, gold, note) "
+            "VALUES ($1,$2,'faction_donation',$3,$4)",
+            tenant, player, amount - take,
+            f"{me['faction']} — the coffer took ◈ {take:,}, rest returned")
     await conn.execute(
         "UPDATE ascent_factions SET treasury = treasury + $2 WHERE name=$1",
-        me["faction"], amount)
+        me["faction"], take)
     await store_ledger(conn, me["faction"], world_week(), "donation",
-                       amount, tenant, player,
+                       take, tenant, player,
                        payer_name or (doc or {}).get("name") or player)
     return None
 
@@ -534,7 +611,7 @@ async def enter_week(conn, tenant: str, player: str) -> str | None:
         name))
     if treasury < cost:
         short = cost - treasury
-        return (f"the entry is ◈ {cost} and the store holds ◈ {treasury} "
+        return (f"the entry is ◈ {cost} and the coffer holds ◈ {treasury} "
                 f"— ◈ {short} short. Dues land at week's turn, or pass "
                 "the hat")
     kind = week_kind(week)
@@ -564,6 +641,297 @@ async def current_week_row(conn, faction: str):
         faction, world_week())
 
 
+# ── The banner hall (plan 032) — the works, the bunks, the board ─────────
+# Buying up is a steward action, paid from the coffer, one tier at a
+# time, never automatic, never downgraded. Every purchase is burned out
+# of the world (ledger kinds works_*) — nobody pockets the coffer.
+
+async def _works_faction(conn, tenant: str,
+                         player: str) -> tuple[dict | None, str | None]:
+    """Steward gate + the locked faction row a works purchase needs."""
+    faction = await is_admin(conn, tenant, player)
+    if faction is None:
+        return None, "only the steward orders the works"
+    fac = await conn.fetchrow(
+        "SELECT name, room_tier, coffer_tier, chest_tier, beds, treasury "
+        "FROM ascent_factions WHERE name=$1 FOR UPDATE", faction)
+    if fac is None:
+        return None, "that banner no longer flies"
+    return dict(fac), None
+
+
+async def _pay_works(conn, fac: dict, tenant: str, player: str,
+                     price: int, kind: str, note: str) -> str | None:
+    treasury = int(fac["treasury"])
+    if treasury < price:
+        short = price - treasury
+        return (f"the works want ◈ {price:,} and the coffer holds "
+                f"◈ {treasury:,} — ◈ {short:,} short")
+    await conn.execute(
+        "UPDATE ascent_factions SET treasury = treasury - $2 WHERE name=$1",
+        fac["name"], price)
+    await store_ledger(conn, fac["name"], world_week(), kind, -price,
+                       tenant, player, note)
+    return None
+
+
+async def buy_room(conn, tenant: str, player: str,
+                   tier: int | None = None) -> str | None:
+    """Steward buys the hall up one room tier, from the coffer."""
+    fac, err = await _works_faction(conn, tenant, player)
+    if err:
+        return err
+    nxt = int(fac["room_tier"]) + 1
+    if tier is not None and int(tier) != nxt:
+        return "one tier at a time — the hall is built, not conjured"
+    if nxt not in ROOM_PRICES:
+        return "the high hall is already yours — nothing grander is sold"
+    err = await _pay_works(conn, fac, tenant, player, ROOM_PRICES[nxt],
+                           "works_room", ROOM_NAMES[nxt])
+    if err:
+        return err
+    await conn.execute(
+        "UPDATE ascent_factions SET room_tier=$2 WHERE name=$1",
+        fac["name"], nxt)
+    return None
+
+
+async def buy_coffer(conn, tenant: str, player: str,
+                     tier: int | None = None) -> str | None:
+    fac, err = await _works_faction(conn, tenant, player)
+    if err:
+        return err
+    nxt = int(fac["coffer_tier"]) + 1
+    if tier is not None and int(tier) != nxt:
+        return "one tier at a time — the hall is built, not conjured"
+    if nxt not in COFFER_PRICES:
+        return "the coffer is as deep as they are made"
+    err = await _pay_works(conn, fac, tenant, player, COFFER_PRICES[nxt],
+                           "works_coffer",
+                           f"a deeper coffer — holds ◈ {COFFER_CAPS[nxt]:,}")
+    if err:
+        return err
+    await conn.execute(
+        "UPDATE ascent_factions SET coffer_tier=$2 WHERE name=$1",
+        fac["name"], nxt)
+    return None
+
+
+async def buy_chest(conn, tenant: str, player: str,
+                    tier: int | None = None) -> str | None:
+    fac, err = await _works_faction(conn, tenant, player)
+    if err:
+        return err
+    nxt = int(fac["chest_tier"]) + 1
+    if tier is not None and int(tier) != nxt:
+        return "one tier at a time — the hall is built, not conjured"
+    if nxt not in CHEST_PRICES:
+        return "the chest is as big as they are made"
+    err = await _pay_works(conn, fac, tenant, player, CHEST_PRICES[nxt],
+                           "works_chest",
+                           f"a bigger chest — {CHEST_SLOTS[nxt]} slots")
+    if err:
+        return err
+    await conn.execute(
+        "UPDATE ascent_factions SET chest_tier=$2 WHERE name=$1",
+        fac["name"], nxt)
+    return None
+
+
+async def buy_bed(conn, tenant: str, player: str) -> str | None:
+    """Steward buys one bed, ◈250 from the coffer, capped by room tier."""
+    fac, err = await _works_faction(conn, tenant, player)
+    if err:
+        return err
+    room, beds = int(fac["room_tier"]), int(fac["beds"])
+    cap = BEDS_BY_ROOM.get(room, 0)
+    if beds >= cap:
+        if cap == 0:
+            return "the back room fits no beds — buy up the hall first"
+        return (f"{ROOM_NAMES[room]} fits {cap} beds — "
+                "buy up the hall for more")
+    err = await _pay_works(conn, fac, tenant, player, BED_PRICE,
+                           "works_bed", f"bed {beds + 1} for the bunks")
+    if err:
+        return err
+    await conn.execute(
+        "UPDATE ascent_factions SET beds = beds + 1 WHERE name=$1",
+        fac["name"])
+    return None
+
+
+async def claim_bed(conn, tenant: str, player: str,
+                    doc: dict) -> str | None:
+    """Any member, free, while claims remain — first come, first bunked.
+    A claim sets the SAME lodged_until_day flag the Lodge sells, so PvP
+    target selection honors it untouched. Safety only: no night job, no
+    rested-XP — dawn heals everyone regardless."""
+    me = await member_row(conn, tenant, player)
+    if me is None:
+        return "you have no banner"
+    beds = int(await conn.fetchval(
+        "SELECT beds FROM ascent_factions WHERE name=$1 FOR UPDATE",
+        me["faction"]) or 0)
+    if beds <= 0:
+        return "no bunks stand in your hall yet"
+    day = pstate.world_day()
+    mine = await conn.fetchval(
+        "SELECT 1 FROM ascent_faction_bed_claims "
+        "WHERE tenant=$1 AND player=$2 AND world_day=$3",
+        tenant, player, day)
+    if mine:
+        return "you already have a bunk tonight"
+    claimed = int(await conn.fetchval(
+        "SELECT count(*) FROM ascent_faction_bed_claims "
+        "WHERE faction=$1 AND world_day=$2", me["faction"], day) or 0)
+    if claimed >= beds:
+        return "every bunk is claimed tonight — first come, first bunked"
+    row = await conn.fetchrow(
+        "INSERT INTO ascent_faction_bed_claims (tenant, player, faction,"
+        " world_day) VALUES ($1,$2,$3,$4) "
+        "ON CONFLICT DO NOTHING RETURNING world_day",
+        tenant, player, me["faction"], day)
+    if row is None:
+        return "you already have a bunk tonight"
+    doc["lodged_until_day"] = day + 1     # the Lodge's flag, set free
+    return None
+
+
+async def write_note(conn, tenant: str, player: str,
+                     line: str) -> str | None:
+    """One line on the bulletin board, any member, free. One note per
+    member per world-day — writing again the same day replaces it."""
+    me = await member_row(conn, tenant, player)
+    if me is None:
+        return "you have no banner"
+    line = " ".join(str(line).split())[:NOTE_MAX_CHARS]
+    if not line:
+        return "the board takes one line — write something first"
+    await conn.execute(
+        "INSERT INTO ascent_faction_notes (faction, tenant, player,"
+        " world_day, line) VALUES ($1,$2,$3,$4,$5) "
+        "ON CONFLICT (faction, tenant, player, world_day) "
+        "DO UPDATE SET line=EXCLUDED.line, created_at=now()",
+        me["faction"], tenant, player, pstate.world_day(), line)
+    return None
+
+
+async def hall_state(conn, faction: str) -> dict | None:
+    """The hall as one payload: room, coffer, chest, bunks, the board,
+    and the works rows a steward can buy. Rides the scene injection
+    (social._faction_panel) and /v1/faction/detail."""
+    fac = await conn.fetchrow(
+        "SELECT room_tier, coffer_tier, chest_tier, beds, treasury "
+        "FROM ascent_factions WHERE name=$1", faction)
+    if fac is None:
+        return None
+    day = pstate.world_day()
+    used = int(await conn.fetchval(
+        "SELECT count(*) FROM ascent_armory WHERE faction=$1",
+        faction) or 0)
+    tonight = await conn.fetch(
+        "SELECT coalesce(p.doc->>'name', c.player) AS name "
+        "FROM ascent_faction_bed_claims c "
+        "LEFT JOIN ascent_players p ON p.tenant=c.tenant "
+        "  AND p.player=c.player "
+        "WHERE c.faction=$1 AND c.world_day=$2 ORDER BY name",
+        faction, day)
+    notes = await conn.fetch(
+        "SELECT n.world_day, coalesce(p.doc->>'name', n.player) AS player,"
+        " n.line FROM ascent_faction_notes n "
+        "LEFT JOIN ascent_players p ON p.tenant=n.tenant "
+        "  AND p.player=n.player "
+        "WHERE n.faction=$1 ORDER BY n.id DESC LIMIT $2",
+        faction, NOTES_KEPT)
+    room, coffer, chest = (int(fac["room_tier"]), int(fac["coffer_tier"]),
+                           int(fac["chest_tier"]))
+    treasury, beds = int(fac["treasury"]), int(fac["beds"])
+    works = []
+    if room + 1 in ROOM_PRICES:
+        price = ROOM_PRICES[room + 1]
+        works.append({"kind": "room", "tier": room + 1, "price": price,
+                      "label": f"buy up the hall — {ROOM_NAMES[room + 1]}",
+                      "affordable": treasury >= price})
+    if coffer + 1 in COFFER_PRICES:
+        price = COFFER_PRICES[coffer + 1]
+        works.append({
+            "kind": "coffer", "tier": coffer + 1, "price": price,
+            "label": f"a deeper coffer — holds ◈ {COFFER_CAPS[coffer + 1]:,}",
+            "affordable": treasury >= price})
+    if chest + 1 in CHEST_PRICES:
+        price = CHEST_PRICES[chest + 1]
+        works.append({
+            "kind": "chest", "tier": chest + 1, "price": price,
+            "label": f"a bigger chest — {CHEST_SLOTS[chest + 1]} slots",
+            "affordable": treasury >= price})
+    if beds < BEDS_BY_ROOM.get(room, 0):
+        works.append({
+            "kind": "bed", "tier": beds + 1, "price": BED_PRICE,
+            "label": (f"a bed for the bunks — "
+                      f"{beds + 1} of {BEDS_BY_ROOM[room]}"),
+            "affordable": treasury >= BED_PRICE})
+    return {
+        "room_tier": room, "room_name": ROOM_NAMES.get(room, "?"),
+        "coffer": {"bal": treasury,
+                   "cap": COFFER_CAPS.get(coffer, COFFER_CAPS[1]),
+                   "tier": coffer},
+        "chest": {"used": used,
+                  "cap": CHEST_SLOTS.get(chest, CHEST_SLOTS[1]),
+                  "tier": chest},
+        "beds": {"count": beds, "tonight": [r["name"] for r in tonight]},
+        "notes": [{"day": int(r["world_day"]), "player": r["player"],
+                   "line": r["line"]} for r in notes],
+        "works": works,
+    }
+
+
+async def week_standings(conn, week: int | None = None) -> list[dict]:
+    """Entered banners this week with live progress, best first — the
+    Guildhall's standings wall (032 §3)."""
+    week = world_week() if week is None else week
+    rows = await conn.fetch(
+        "SELECT w.faction, f.banner, w.goal_kind, w.goal_target "
+        "FROM ascent_faction_weeks w "
+        "JOIN ascent_factions f ON f.name=w.faction "
+        "WHERE w.week=$1 AND w.entered ORDER BY w.faction", week)
+    out = []
+    for r in rows:
+        progress = await _progress(conn, r["faction"], r["goal_kind"], week)
+        out.append({"name": r["faction"], "banner": r["banner"],
+                    "progress": progress,
+                    "target": int(r["goal_target"])})
+    out.sort(key=lambda s: (-(s["progress"] / max(1, s["target"])),
+                            s["name"]))
+    return out
+
+
+async def banner_scores(conn) -> list[dict]:
+    """Every banner with its all-time score line — wins, members, room
+    tier — sorted by wins (the hall-of-banners tiles)."""
+    rows = await conn.fetch(
+        "SELECT f.name, f.banner, f.room_tier,"
+        "  count(m.player) AS members, coalesce(w.wins, 0) AS wins "
+        "FROM ascent_factions f "
+        "LEFT JOIN ascent_faction_members m ON m.faction=f.name "
+        "LEFT JOIN (SELECT faction, count(*) AS wins "
+        "           FROM ascent_faction_weeks WHERE won "
+        "           GROUP BY faction) w ON w.faction=f.name "
+        "GROUP BY f.name, f.banner, f.room_tier, w.wins "
+        "ORDER BY wins DESC, f.name")
+    return [{"name": r["name"], "banner": r["banner"],
+             "wins": int(r["wins"]), "members": int(r["members"]),
+             "room_tier": int(r["room_tier"])} for r in rows]
+
+
+async def hall_board(conn) -> dict:
+    """The trimmed board every scene injection carries — this week's
+    standings and the hall of banners (032 §3)."""
+    week = world_week()
+    return {"week": week, "kind": week_kind(week),
+            "standings": await week_standings(conn, week),
+            "banners": await banner_scores(conn)}
+
+
 # ── The news board (COMMUNITY tab — read-only, any tenant) ───────────────
 
 async def board(conn) -> dict:
@@ -572,18 +940,21 @@ async def board(conn) -> dict:
         "SELECT faction, goal_kind, goal_target, progress, won, prize_note "
         "FROM ascent_faction_weeks WHERE week=$1 AND entered "
         "ORDER BY won DESC, progress DESC LIMIT 8", week - 1)
-    wins = await conn.fetch(
-        "SELECT faction, count(*) AS wins FROM ascent_faction_weeks "
-        "WHERE won GROUP BY faction ORDER BY wins DESC, faction LIMIT 8")
+    # 032: the wins column is the hall-of-banners score line — shared
+    # with the scene injection's hall_board, computed once
+    scores = await banner_scores(conn)
+    wins = [{"faction": s["name"], "wins": s["wins"]}
+            for s in scores if s["wins"]][:8]
     stats = await conn.fetch(
-        "SELECT f.name, f.banner, f.treasury, count(m.player) AS members, "
+        "SELECT f.name, f.banner, f.treasury, f.room_tier, "
+        "  count(m.player) AS members, "
         "  round(coalesce(avg(coalesce((p.doc->>'level')::int,1)),0)) "
         "    AS avg_level "
         "FROM ascent_factions f "
         "LEFT JOIN ascent_faction_members m ON m.faction=f.name "
         "LEFT JOIN ascent_players p ON p.tenant=m.tenant "
         "  AND p.player=m.player "
-        "GROUP BY f.name, f.banner, f.treasury")
+        "GROUP BY f.name, f.banner, f.treasury, f.room_tier")
     ticker = await conn.fetch(
         "SELECT line FROM ascent_happenings WHERE kind='faction' "
         "ORDER BY id DESC LIMIT 8")
@@ -595,7 +966,7 @@ async def board(conn) -> dict:
         "challenge": {"kind": week_kind(week),
                       "entry_per_member": ENTRY_PER_MEMBER},
         "last_week": [dict(r) for r in last],
-        "wins": [dict(r) for r in wins],
+        "wins": wins,
         "most_members": sorted(peopled, key=lambda r: (-r["members"],
                                                        r["name"]))[:5],
         "richest": sorted(rows, key=lambda r: (-r["treasury"],
@@ -815,6 +1186,15 @@ async def faction_detail(conn, tenant: str, player: str,
             "requested": (await my_request(conn, tenant, player)) == name,
         },
     }
+    # 032: the hall on the faction page — members get the whole house,
+    # outsiders see the room tier and nothing private
+    hall = await hall_state(conn, name)
+    if hall:
+        d["room_tier"] = hall["room_tier"]
+        d["room_name"] = hall["room_name"]
+        d["hall"] = (hall if d["viewer"]["member"] else
+                     {"room_tier": hall["room_tier"],
+                      "room_name": hall["room_name"]})
     if is_admin_here:
         d["requests"] = await pending_requests(conn, name)
     return d

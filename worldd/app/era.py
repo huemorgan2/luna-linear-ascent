@@ -28,6 +28,7 @@ TRANSIENT_TABLES = (
     "ascent_factions", "ascent_faction_members", "ascent_attendance",
     "ascent_faction_weeks", "ascent_faction_ledger",
     "ascent_faction_requests", "ascent_armory", "ascent_armory_takes",
+    "ascent_faction_notes", "ascent_faction_bed_claims",
 )
 PERMANENT_TABLES = ("ascent_eras", "ascent_reincarnation",
                     "ascent_accounts")

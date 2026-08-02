@@ -11,7 +11,7 @@ import uuid
 
 import pytest
 
-from app import armory, db
+from app import armory, db, factions
 from plugin_linear_ascent import economy
 from tests.test_factions import _set_money, clean_factions, post  # noqa: F401
 from tests.test_factions import tenant_a, tenant_b  # noqa: F401
@@ -97,15 +97,17 @@ async def test_donate_take_round_trip_moves_no_gold(
     assert "pigsticker" not in (da.get("durability_pack") or {})
     assert da["gold"] == gold_a0                       # EV law, donor side
 
-    # the desk lists it for the other member, take moves it over
+    # the hall's chest lists it for the other member, take moves it over
     gold_b0 = (await _doc(pool, "tenant-b", pb))["gold"]
-    s = await act(client, tenant_b, "tenant-b", pb, option="guildhall")
-    joined = " ".join(s["body_lines"])
-    assert "ARMORY 1/" in joined and "Pigsticker" in joined
+    await act(client, tenant_b, "tenant-b", pb, option="hall")
+    s = await act(client, tenant_b, "tenant-b", pb, option="hall_chest")
+    assert "1 of" in s["headline"]
     take = next(o["id"] for o in s["options"]
                 if o["id"].startswith("take_arm_"))
+    assert any("Pigsticker" in o["label"] for o in s["options"]
+               if o["id"] == take)
     s = await act(client, tenant_b, "tenant-b", pb, option=take)
-    assert "comes off the rack" in " ".join(s["body_lines"])
+    assert "comes out of the chest" in " ".join(s["body_lines"])
     db_doc = await _doc(pool, "tenant-b", pb)
     assert db_doc["inventory"].get("pigsticker") == 1
     assert db_doc["durability_pack"]["pigsticker"] == worn_left  # no launder
@@ -119,14 +121,21 @@ async def test_one_take_a_day(client, tenant_a, tenant_b,
     pa, pb, name = await _crew(client, pool, tenant_a, tenant_b)
     for slug in ("pigsticker", "wolfbite"):
         await armory_seed(pool, name, slug)
-    s = await act(client, tenant_b, "tenant-b", pb, option="guildhall")
+    await act(client, tenant_b, "tenant-b", pb, option="hall")
+    s = await act(client, tenant_b, "tenant-b", pb, option="hall_chest")
     takes = [o["id"] for o in s["options"] if o["id"].startswith("take_arm_")]
     assert len(takes) == 2
     await act(client, tenant_b, "tenant-b", pb, option=takes[0])
-    # the second take the same day: no options offered, refusal on click
-    s = await act(client, tenant_b, "tenant-b", pb, option="guildhall")
-    assert not any(o["id"].startswith("take_arm_") for o in s["options"])
+    # the second take the same day: the row stays visible (019 — every
+    # state a proper row) but the day cap refuses the click
+    s = await act(client, tenant_b, "tenant-b", pb, option="hall_chest")
     assert "already took" in " ".join(s["body_lines"])
+    left = next(o["id"] for o in s["options"]
+                if o["id"].startswith("take_arm_"))
+    s = await act(client, tenant_b, "tenant-b", pb, option=left)
+    assert "One piece a day" in " ".join(s["body_lines"])
+    assert await pool.fetchval(
+        "SELECT count(*) FROM ascent_armory") == 1     # nothing moved
 
 
 async def armory_seed(pool, faction, slug, uses=None, tenant="tenant-x",
@@ -139,25 +148,28 @@ async def armory_seed(pool, faction, slug, uses=None, tenant="tenant-x",
 
 async def test_cap_bounces_the_deposit_with_a_letter(
         client, tenant_a, tenant_b, clean_armory):  # noqa: F811
+    """032: the flat 50-row roof became bought chest slots — a tier-1
+    chest holds 4 pieces and refuses the 5th."""
     pool = await db.get_pool()
     pa, pb, name = await _crew(client, pool, tenant_a, tenant_b)
-    for _ in range(armory.ARMORY_CAP):
+    cap = factions.CHEST_SLOTS[1]
+    for _ in range(cap):
         await armory_seed(pool, name, "pigsticker")
     await _patch_doc(pool, "tenant-a", pa, inventory={"wolfbite": 1})
     await act(client, tenant_a, "tenant-a", pa, option="pawn")
     s = await act(client, tenant_a, "tenant-a", pa, option="donate_wolfbite")
-    # the engine sees the full rack in the injection and refuses on the
+    # the engine sees the full chest in the injection and refuses on the
     # spot — the piece never moves, no effect fires
     assert "full" in s["shard_note"]
     da = await _doc(pool, "tenant-a", pa)
     assert da["inventory"].get("wolfbite") == 1
     assert await pool.fetchval(
-        "SELECT count(*) FROM ascent_armory") == armory.ARMORY_CAP
+        "SELECT count(*) FROM ascent_armory") == cap
     # the worldd guard holds on its own too (the race path → letter)
     async with pool.acquire() as conn:
         err = await armory.deposit(conn, "tenant-a", pa, da,
                                    "wolfbite", None)
-    assert err and "racks are full" in err
+    assert err and "chest is full" in err
 
 
 async def test_members_only_both_ways(client, tenant_a, tenant_b,
@@ -191,7 +203,8 @@ async def test_take_keeps_the_worse_wear_never_launders(
     await _patch_doc(pool, "tenant-b", pb,
                      inventory={"pigsticker": 1},
                      durability_pack={"pigsticker": 10})
-    s = await act(client, tenant_b, "tenant-b", pb, option="guildhall")
+    await act(client, tenant_b, "tenant-b", pb, option="hall")
+    s = await act(client, tenant_b, "tenant-b", pb, option="hall_chest")
     take = next(o["id"] for o in s["options"]
                 if o["id"].startswith("take_arm_"))
     await act(client, tenant_b, "tenant-b", pb, option=take)

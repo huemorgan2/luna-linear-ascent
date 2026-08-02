@@ -4,7 +4,8 @@ The EV law (plan 007 §1): no gold ever enters or leaves through the
 armory. A deposit moves (slug, wear-stash) out of the donor's doc into
 a row; a take moves the SAME pair back into the taker's pack — a
 round-trip is worth exactly zero, whatever the pawn broker pays today.
-Caps guard the two remaining abuses: 50 rows per faction (storage) and
+Caps guard the two remaining abuses: bought chest slots per faction
+(storage — 032 turned the flat 50-row roof into CHEST_SLOTS tiers) and
 one take per player per world day (vacuuming). Member-only both ways.
 """
 
@@ -19,7 +20,13 @@ from plugin_linear_ascent.engine import state as pstate  # noqa: E402
 
 from . import factions  # noqa: E402
 
-ARMORY_CAP = 50
+
+async def slot_cap(conn, faction: str) -> int:
+    """The chest's bought capacity (032) — CHEST_SLOTS by chest tier."""
+    tier = await conn.fetchval(
+        "SELECT chest_tier FROM ascent_factions WHERE name=$1", faction)
+    return factions.CHEST_SLOTS.get(int(tier or 1),
+                                    factions.CHEST_SLOTS[1])
 
 
 def _gear(slug: str):
@@ -57,11 +64,13 @@ async def deposit(conn, tenant: str, player: str, doc: dict,
     mine = await factions.member_row(conn, tenant, player)
     if not mine:
         return "only members reach the armory racks"
+    cap = await slot_cap(conn, mine["faction"])
     count = await conn.fetchval(
         "SELECT count(*) FROM ascent_armory WHERE faction=$1",
         mine["faction"])
-    if count >= ARMORY_CAP:
-        return f"the racks are full — {ARMORY_CAP} pieces is the roof"
+    if count >= cap:
+        return (f"the chest is full — {cap} slots, every one filled. "
+                "The works sell a bigger one")
     await conn.execute(
         "INSERT INTO ascent_armory "
         "(faction, tenant, player, donor_name, slug, uses_left) "
