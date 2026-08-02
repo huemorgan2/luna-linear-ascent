@@ -7,7 +7,7 @@
 <meta name="description" content="A shared-world RPG that plays in a chat window. One tower of a hundred floors, one world, everyone climbs the same one. Free — a username and a password, like the old days.">
 <meta property="og:title" content="LINEAR ASCENT">
 <meta property="og:description" content="One tower. One world. Everyone climbs the same one. Free — like the old days.">
-<meta property="og:image" content="https://linearascent.net/static/intro-movie/ascent_title_320x200.gif">
+<meta property="og:image" content="https://linearascent.net/static/intro-movie/ascent_title_640x480.gif">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23060606'/%3E%3Crect x='6' y='2' width='4' height='12' fill='%23f2b632'/%3E%3Crect x='4' y='12' width='8' height='2' fill='%23f2b632'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="/static/site/site.css">
@@ -19,18 +19,20 @@
   <span id="bar-right" data-live="bar">LINEAR ASCENT</span>
 </header>
 
-<main>
-
-<!-- ═══ FLOOR 0 · THE GATE ═══════════════════════════════════════════ -->
+<!-- ═══ FLOOR 0 · THE GATE — full-fold title reel + CTA card ═════════ -->
 <section id="gate" data-floor="FLOOR 0 · THE GATE">
-  <div class="hero">
-    <img class="px hero-reel" src="/static/intro-movie/ascent_title_320x200.gif"
-         alt="LINEAR ASCENT — the tower title reel" width="320" height="200">
-    <p class="tagline">ONE TOWER. ONE WORLD.<br>EVERYONE CLIMBS THE SAME ONE.</p>
+  <div class="gate-bg" aria-hidden="true">
+    <img class="px" src="/static/intro-movie/ascent_title_640x480.gif"
+         alt="" width="640" height="480">
+  </div>
+  <div class="card gatecard">
+    <div class="eyebrow">FLOOR 0 · THE GATE</div>
+    <h2>One tower. One world.</h2>
+    <p class="tagline">Everyone climbs the same one.</p>
     <p class="free-line"><span class="gold">FREE</span> — like the old days.
        No price. No ads. No launcher. No email.</p>
     <nav class="options">
-      <a class="opt" href="#door">[ SIGN-UP — free, no email ]</a>
+      <a class="opt gold-opt" href="#door">[ SIGN-UP — free, no email ]</a>
       <a class="opt dim2" href="#lore">[ Watch from the gate ]</a>
     </nav>
     <p class="dim live-line" data-live="hero">… the gate lamps are lit; the world is climbing …</p>
@@ -39,6 +41,8 @@
     <span class="dim">THE WORLD IS ALIVE ······ turn toward the tower ······</span>
   </span></div>
 </section>
+
+<main>
 
 <!-- ═══ FLOOR 1 · THE WORLD THAT WAS ═════════════════════════════════ -->
 <section id="lore" data-floor="FLOOR 1 · THE WORLD THAT WAS">

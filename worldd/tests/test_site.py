@@ -29,6 +29,8 @@ async def test_homepage_serves_the_terminal(client):
     assert "SIGN-UP" in body and "SIGN-IN" in body
     assert "NEW PASSWORD" in body and "RETYPE PASSWORD" in body
     assert 'formaction="/login"' in body       # sign-in works scripts off too
+    # top fold: title reel fills the viewport; CTA sits in a card
+    assert "ascent_title_640x480.gif" in body and "gatecard" in body
     # the terminal law: the one vendored font, no external requests
     assert "WebPlus_IBM_VGA_8x16.woff" in (await client.get(
         "/static/site/site.css")).text

@@ -60,18 +60,49 @@ a:hover { background: var(--gold); color: var(--bg); }
 }
 #bar-right { text-align: right; overflow: hidden; text-overflow: ellipsis; }
 
-main { max-width: 84ch; margin: 0 auto; padding: 3rem 1ch 0; }
+main { max-width: 84ch; margin: 0 auto; padding: 2rem 1ch 0; }
 
 section { padding: 2rem 0; }
 
-/* ── the hero ──────────────────────────────────────────────────────── */
-#gate { min-height: 92vh; display: flex; flex-direction: column;
-        justify-content: center; }
-.hero { text-align: center; }
-.hero-reel { width: min(640px, 100%); height: auto; }
-.tagline { margin-top: 1rem; color: var(--bright); }
-.free-line { margin-top: .5rem; }
-.live-line { margin-top: 1rem; }
+/* ── the gate: full-fold title reel, CTA card bottom-right ─────────── */
+#gate {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 480px;
+  padding: 0;
+  overflow: hidden;
+  /* sit under the fixed gold bar, not under the fold */
+  box-sizing: border-box;
+}
+.gate-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background: var(--bg);
+}
+.gate-bg img {
+  display: block; width: 100%; height: 100%;
+  /* sit just under the fixed gold bar so LINEAR ASCENT isn't cropped */
+  object-fit: cover; object-position: center 8%;
+  image-rendering: pixelated;
+}
+/* same card grammar as the rest of the page — parked bottom-right with
+   room for the ticker, never clipped by the fold */
+.gatecard {
+  position: absolute;
+  right: 2rem; bottom: 3.25rem;
+  z-index: 2;
+  margin: 0;
+  max-width: min(44ch, calc(100vw - 3rem));
+  max-height: calc(100dvh - 5.5rem);
+  overflow: auto;
+  background: rgba(9, 9, 9, .92);
+  text-align: left;
+}
+.gatecard .tagline { color: var(--bright); margin-bottom: .5rem; }
+.gatecard .free-line { margin-bottom: .25rem; }
+.gatecard .live-line { margin: 1rem 0 0; }
+.gatecard .options { justify-content: flex-start; margin-top: .75rem; }
 
 .options { display: flex; flex-wrap: wrap; gap: 1ch; justify-content: center;
            margin-top: 1rem; }
@@ -85,15 +116,25 @@ section { padding: 2rem 0; }
 .opt.dim2 { color: var(--dim); }
 .gold-opt { border-color: var(--gold); }
 
-/* ── the ticker ────────────────────────────────────────────────────── */
+/* ── the ticker — pinned to the fold's bottom edge ─────────────────── */
 #ticker {
-  margin-top: 2rem; border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2;
+  margin: 0;
+  border-top: 1px solid var(--line);
+  border-bottom: none;
+  background: rgba(6, 6, 6, .88);
   overflow: hidden; white-space: nowrap;
 }
 #ticker-inner { display: inline-block; padding-left: 100%;
                 animation: tick 40s linear infinite; }
 @keyframes tick { to { transform: translateX(-100%); } }
+
+@media (max-width: 52ch) {
+  .gatecard {
+    right: 1ch; left: 1ch; bottom: 2.75rem;
+    max-width: none;
+  }
+}
 
 /* ── scene cards ───────────────────────────────────────────────────── */
 .card {
