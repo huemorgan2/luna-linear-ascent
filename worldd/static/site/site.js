@@ -203,11 +203,10 @@
   function doorKnown(name) {
     form.style.display = "none";
     note.classList.remove("err");
-    note.innerHTML = "The door knows you, <span class='bright'>" + name
-      + "</span>. Your name is held in the world — the browser climb "
-      + "lands on this page next. ";
+    note.innerHTML = "You're in, <span class='bright'>" + name
+      + "</span>. ";
     var out = document.createElement("a");
-    out.textContent = "[ leave by the door ]";
+    out.textContent = "[ sign out ]";
     out.href = "#";
     out.onclick = function (ev) {
       ev.preventDefault();
