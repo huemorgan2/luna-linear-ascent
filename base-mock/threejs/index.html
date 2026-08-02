@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Linear Ascent — base hub mock (3D · 1-bit)</title>
+<style>
+  :root {
+    --ink: #0b0e14; --panel: #11151f; --border: #232a3a;
+    --dim: #8b93a7; --faint: #5b6275; --text: #e6e9f2;
+    --gold: #f5a524; --aether: #5eaefc; --ok: #3ad29f;
+    --hp: #ef6a6a; --en: #f5d76e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; background: var(--ink); overflow: hidden;
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; }
+  #stage { position: fixed; inset: 0; display: grid; place-items: center; }
+  #col { display: flex; flex-direction: column; gap: 0;
+    border: 1px solid var(--border); }
+
+  /* meters rail above the scene — same discipline as the chat cards */
+  #hud { display: flex; justify-content: space-between; align-items: center;
+    gap: 18px; padding: 8px 12px; background: var(--panel);
+    font-size: 12px; color: var(--dim); letter-spacing: .04em; }
+  #hud .meter { display: inline-flex; gap: 8px; align-items: baseline; }
+  #hud .meter b { color: var(--text); font-weight: 600; }
+  #hud .blocks { font-size: 10px; letter-spacing: 0; }
+  #hud .hp .blocks { color: var(--hp); }
+  #hud .en .blocks { color: var(--en); }
+  #hud .ae .blocks { color: var(--aether); }
+  #hud .gold { color: var(--gold); }
+
+  #wrap { position: relative; }
+  canvas.game { display: block; image-rendering: pixelated; cursor: crosshair;
+    touch-action: none; }
+  #labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .tag { position: absolute; transform: translate(-50%, -100%);
+    font-size: 10px; letter-spacing: .12em; color: var(--faint);
+    text-transform: uppercase; white-space: nowrap; text-shadow: 0 1px 0 var(--ink); }
+  .tag.player { color: var(--dim); }
+  .bubble { position: absolute; transform: translate(-50%, -130%);
+    font-size: 11px; color: var(--text); background: var(--panel);
+    border: 1px solid var(--border); padding: 4px 8px; max-width: 220px;
+    white-space: normal; line-height: 1.35; }
+  .bubble::after { content: ""; position: absolute; left: 50%; bottom: -5px;
+    width: 8px; height: 8px; background: var(--panel);
+    border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    transform: translateX(-50%) rotate(45deg); }
+  #toast { position: absolute; left: 50%; top: 14%; transform: translateX(-50%);
+    font-size: 12px; color: var(--text); background: var(--panel);
+    border: 1px solid var(--border); border-left: 2px solid var(--aether);
+    padding: 6px 12px; opacity: 0; transition: opacity .25s; max-width: 80%;
+    text-align: center; line-height: 1.4; }
+
+  /* options under the scene — [1] [2] like the chat cards */
+  #prompt { min-height: 34px; display: flex; flex-direction: column;
+    background: var(--panel); }
+  #prompt .opt { display: flex; gap: 10px; align-items: center; width: 100%;
+    padding: 9px 12px; font: inherit; font-size: 12px; letter-spacing: .05em;
+    color: var(--dim); background: none; border: none; text-align: left;
+    cursor: pointer; }
+  #prompt .opt + .opt { border-top: 1px solid var(--border); }
+  #prompt .opt:hover { color: var(--text); background: rgba(94,174,252,.06); }
+  #prompt .opt .key { color: var(--aether); }
+  #prompt .hint { padding: 10px 12px; font-size: 11px; color: var(--faint);
+    letter-spacing: .08em; }
+
+  /* destination list — mobile only: full-width numbered rows */
+  #dest { display: none; flex-direction: column; background: var(--panel); }
+  #dest .chip { display: flex; gap: 10px; align-items: center; width: 100%;
+    font: inherit; font-size: 12px; letter-spacing: .05em; text-align: left;
+    color: var(--dim); background: none; border: none; cursor: pointer;
+    border-top: 1px solid var(--border); padding: 10px 12px; }
+  #dest .chip .key { color: var(--aether); }
+  #dest .chip.near { color: var(--text); background: rgba(94,174,252,.14); }
+
+  #foot { position: fixed; bottom: 4px; width: 100%; text-align: center;
+    font-size: 10px; color: var(--faint); letter-spacing: .1em; }
+
+  @media (max-width: 700px) {
+    #stage { place-items: start center; padding-top: 6px; }
+    #hud { font-size: 10px; padding: 6px 8px; gap: 8px; }
+    #hud .blocks { font-size: 8px; }
+    #prompt .opt { font-size: 11px; padding: 8px 10px; }
+    #dest { display: flex; }
+    #foot { display: none; }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="col">
+    <div id="hud">
+      <span class="m">
+        <span class="meter hp"><b>HP 33/52</b> <span class="blocks">██████░░░░</span></span>
+        &nbsp;&nbsp;<span class="meter en"><b>⚡ 9/24</b> <span class="blocks">████░░░░░░</span></span>
+        &nbsp;&nbsp;<span class="meter ae"><b>✦ 17/60</b> <span class="blocks">███░░░░░░░</span></span>
+      </span>
+      <span class="gold">◈ 77</span>
+    </div>
+    <div id="wrap">
+      <canvas class="game" id="game"></canvas>
+      <div id="labels"></div>
+      <div id="toast"></div>
+    </div>
+    <div id="prompt"><span class="hint">walk close to things to act</span></div>
+    <div id="dest"></div>
+  </div>
+</div>
+<div id="foot">base-mock · roothollow · 640×400 · WASD/arrows or click to walk</div>
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js" } }</script>
+<script type="module" src="./main.js"></script>
+</body>
+</html>
