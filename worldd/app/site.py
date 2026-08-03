@@ -260,16 +260,16 @@ async def signup(request: Request):
     username, password, retyped, wants_json = await _credentials(request)
     ip = request.client.host if request.client else "?"
     if not _signup_ok(ip):
-        return _door_error(429, "too many doors opened — try later",
+        return _door_error(429, "too many sign-ups — try later",
                            wants_json)
     if not names.is_legal(username):
         return _door_error(
-            422, "2 to 24 strokes — letters, numbers, - or _", wants_json)
+            422, "username: 2–24 letters, numbers, - or _", wants_json)
     if not (PASSWORD_MIN <= len(password) <= PASSWORD_MAX):
         return _door_error(
-            422, f"a password of {PASSWORD_MIN}+ strokes", wants_json)
+            422, f"password must be {PASSWORD_MIN}+ characters", wants_json)
     if retyped and retyped != password:
-        return _door_error(422, "the two passwords differ", wants_json)
+        return _door_error(422, "passwords do not match", wants_json)
     pool = await db.get_pool()
     try:
         async with pool.acquire() as conn, conn.transaction():
@@ -284,11 +284,9 @@ async def signup(request: Request):
                 "INSERT INTO ascent_accounts (username, pw_hash) "
                 "VALUES ($1, $2)", username, _hash_pw(password))
     except (_NameTaken, asyncpg.UniqueViolationError):
-        return _door_error(409, "that name is already climbing",
-                           wants_json)
+        return _door_error(409, "username already taken", wants_json)
     log.info("account created: %s (ip=%s)", username, ip)
-    return _door_response(request, username, wants_json,
-                          "the name is yours — the tower knows it now")
+    return _door_response(request, username, wants_json, "signed up")
 
 
 @router.post("/login")
@@ -299,10 +297,9 @@ async def login(request: Request):
         "SELECT username, pw_hash FROM ascent_accounts "
         "WHERE lower(username) = lower($1)", username)
     if row is None or not _check_pw(password, row["pw_hash"]):
-        return _door_error(401, "the door does not know that knock",
-                           wants_json)
+        return _door_error(401, "wrong username or password", wants_json)
     return _door_response(request, row["username"], wants_json,
-                          "welcome back")
+                          "signed in")
 
 
 @router.post("/logout")

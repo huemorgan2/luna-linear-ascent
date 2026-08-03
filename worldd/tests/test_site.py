@@ -30,7 +30,7 @@ async def test_homepage_serves_the_terminal(client):
     assert "NEW PASSWORD" in body and "RETYPE PASSWORD" in body
     assert 'formaction="/login"' in body       # sign-in works scripts off too
     # top fold: title reel fills the viewport; CTA sits in a card
-    assert "ascent_title_640x480.gif" in body and "gatecard" in body
+    assert "ascent_title_640x400.gif" in body and "gatecard" in body
     # the terminal law: the one vendored font, no external requests
     assert "WebPlus_IBM_VGA_8x16.woff" in (await client.get(
         "/static/site/site.css")).text
@@ -131,7 +131,7 @@ async def test_signup_rules(client):
                                            "password": "hunter2",
                                            "password2": "hunter3"})
     assert r.status_code == 422
-    assert "differ" in r.json()["detail"]
+    assert "match" in r.json()["detail"]
 
 
 async def test_the_username_is_the_climber_name_one_word(client):

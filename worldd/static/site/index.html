@@ -7,7 +7,7 @@
 <meta name="description" content="A shared-world RPG that plays in a chat window. One tower of a hundred floors, one world, everyone climbs the same one. Free — a username and a password, like the old days.">
 <meta property="og:title" content="LINEAR ASCENT">
 <meta property="og:description" content="One tower. One world. Everyone climbs the same one. Free — like the old days.">
-<meta property="og:image" content="https://linearascent.net/static/intro-movie/ascent_title_640x480.gif">
+<meta property="og:image" content="https://linearascent.net/static/intro-movie/ascent_title_640x400.gif">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23060606'/%3E%3Crect x='6' y='2' width='4' height='12' fill='%23f2b632'/%3E%3Crect x='4' y='12' width='8' height='2' fill='%23f2b632'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="/static/site/site.css">
@@ -22,17 +22,17 @@
 <!-- ═══ FLOOR 0 · THE GATE — full-fold title reel + CTA card ═════════ -->
 <section id="gate" data-floor="FLOOR 0 · THE GATE">
   <div class="gate-bg" aria-hidden="true">
-    <img class="px" src="/static/intro-movie/ascent_title_640x480.gif"
-         alt="" width="640" height="480">
+    <img class="px" src="/static/intro-movie/ascent_title_640x400.gif"
+         alt="" width="640" height="400">
   </div>
   <div class="card gatecard">
     <div class="eyebrow">FLOOR 0 · THE GATE</div>
     <h2>One tower. One world.</h2>
     <p class="tagline">Everyone climbs the same one.</p>
     <p class="free-line"><span class="gold">FREE</span> — like the old days.
-       No price. No ads. No launcher. No email.</p>
+       No price. No ads. No launcher.</p>
     <nav class="options">
-      <a class="opt gold-opt" href="#door">[ SIGN-UP — free, no email ]</a>
+      <a class="opt gold-opt" href="#door">[ SIGN-UP ]</a>
       <a class="opt dim2" href="#lore">[ Watch from the gate ]</a>
     </nav>
     <p class="dim live-line" data-live="hero">… the gate lamps are lit; the world is climbing …</p>
@@ -279,15 +279,7 @@
 <section id="door" data-floor="FLOOR 8 · THE DOOR">
   <div class="card doorcard">
     <div class="eyebrow">THE DOOR</div>
-    <h2>Take a name. Climb.</h2>
-    <p><span class="gold">FREE.</span> A username and a password —
-       <span class="bright">like the old days</span>. No email. No
-       verification chain. No launcher. Nothing to buy, ever, because
-       there is nothing for sale.</p>
-    <p class="dim">Your username <span class="bright">is</span> your
-       climber's name — one word, yours alone in the whole world. It will be
-       spoken by the Crier, written in letters, and one day, maybe, cut into
-       the Stone. Choose it well.</p>
+    <h2>Sign up</h2>
     <nav class="options dtabs" id="door-tabs">
       <button class="opt dtab on" type="button" id="tab-signup">[ SIGN-UP ]</button>
       <button class="opt dtab dim2" type="button" id="tab-signin">[ SIGN-IN ]</button>
@@ -295,7 +287,7 @@
     <form id="door-form" method="post" action="/signup">
       <label>USERNAME <input name="username" maxlength="24" minlength="2"
              autocomplete="username" required
-             placeholder="one word — every script welcome"></label>
+             placeholder="one word"></label>
       <label id="row-pw"><span id="label-pw">NEW PASSWORD</span>
              <input name="password" type="password" minlength="4"
              maxlength="128" autocomplete="new-password" required></label>
@@ -303,11 +295,11 @@
              <input name="password2" type="password" minlength="4"
              maxlength="128" autocomplete="new-password"></label>
       <div class="options">
-        <button class="opt gold-opt" type="submit" id="door-signup">[ SIGN-UP — free, no email ]</button>
+        <button class="opt gold-opt" type="submit" id="door-signup">[ SIGN-UP ]</button>
         <button class="opt dim2" type="submit" formaction="/login" id="door-login">[ SIGN-IN ]</button>
       </div>
     </form>
-    <p id="door-note" class="dim">Username + password. That’s it.</p>
+    <p id="door-note" class="dim"></p>
   </div>
 </section>
 

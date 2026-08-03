@@ -86,9 +86,14 @@ section { padding: 2rem 0; }
   position: absolute; inset: 0; z-index: 0;
   background: var(--bg);
 }
-.gate-bg img {
+.gate-bg img,
+.gate-bg img.px {
+  /* beat the global img.px 640px cap. Asset is 640×400 (16:10) —
+     contain keeps LINEAR ASCENT fully in frame on tall viewports
+     (cover was slicing the title to EAR ASCEN). */
   display: block; width: 100%; height: 100%;
-  object-fit: cover; object-position: center top;
+  max-width: none;
+  object-fit: contain; object-position: center center;
   image-rendering: pixelated;
 }
 /* same card grammar as the rest of the page — parked bottom-right with

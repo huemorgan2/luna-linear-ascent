@@ -228,6 +228,11 @@
     var setMode = function (m) {
       var up = m === "signup";
       form.setAttribute("action", up ? "/signup" : "/login");
+      var title = form.closest(".doorcard");
+      if (title) {
+        var h2 = title.querySelector("h2");
+        if (h2) h2.textContent = up ? "Sign up" : "Sign in";
+      }
       $("label-pw").textContent = up ? "NEW PASSWORD" : "PASSWORD";
       $("row-pw2").style.display = up ? "" : "none";
       form.elements.password2.required = up;
@@ -267,10 +272,10 @@
       }).then(function (res) {
         if (res.ok) return doorKnown(res.j.username);
         note.classList.add("err");
-        note.textContent = "▮ " + (res.j.detail || "the door stays shut");
+        note.textContent = "▮ " + (res.j.detail || "sign-up failed");
       }).catch(function () {
         note.classList.add("err");
-        note.textContent = "▮ the relay dropped the letter — try again";
+        note.textContent = "▮ network error — try again";
       });
     };
     form.addEventListener("submit", function (ev) {
