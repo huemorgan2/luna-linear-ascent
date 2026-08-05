@@ -181,6 +181,10 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
 
     # 007 §3: the ONE live Warden at the world frontier
     w["warden"] = await _world_warden(conn, w["frontier"], active)
+    # 034 §3: every keep already broken, and when. The memorial standing
+    # in each of them reads this; it sits at the top of the payload
+    # because `warden` is None at a milestone frontier.
+    w["fallen"] = await _fallen_map(conn)
 
     # 022/008: the floor's open flare, the assist kill-log, and the
     # lodge's long fire — all world rows, all reads.
@@ -427,6 +431,27 @@ def _warden_now(v: dict, floor: int, active: int | None) -> dict:
             "closes_in_s": closes_in_s}
 
 
+def fallen_record(raw) -> dict:
+    """034 §3: `fallen:{floor}` was a bare names string until this plan
+    gave the roll a date. Both shapes are read forever — a legacy row
+    keeps its names and simply has no day, and the memorial says so
+    rather than inventing one."""
+    if isinstance(raw, dict):
+        return raw
+    return {"names": str(raw or "")}
+
+
+async def _fallen_map(conn) -> dict:
+    """Every keep that has already been broken, floor → the fall record.
+    Lives at the top of the world payload (not under `warden`, which is
+    None at a milestone frontier and at the end of content) because the
+    memorial has to stand on every cleared floor."""
+    rows = await conn.fetch(
+        "SELECT key, value FROM ascent_world WHERE key LIKE 'fallen:%'")
+    return {r["key"].split(":", 1)[1]: fallen_record(json.loads(r["value"]))
+            for r in rows}
+
+
 async def _world_warden(conn, frontier: int,
                         active: int = 0) -> dict | None:
     if frontier in economy.MILESTONES or \
@@ -436,19 +461,21 @@ async def _world_warden(conn, frontier: int,
         "SELECT value FROM ascent_world WHERE key=$1", f"warden:{frontier}")
     # 030 Phase 8: who broke each keep below the frontier — the arrival
     # reel credits the war party by name instead of a nameless "fallen".
-    frows = await conn.fetch(
-        "SELECT key, value FROM ascent_world WHERE key LIKE 'fallen:%'")
-    fallen_by = {r["key"].split(":", 1)[1]: json.loads(r["value"])
-                 for r in frows}
+    # 034 §3: and the memorial standing in that keep needs the date too,
+    # so the full record rides beside the names. `fallen_by` keeps its
+    # names-only shape — old clients read it unchanged.
+    fallen = await _fallen_map(conn)
+    fallen_by = {k: v.get("names", "") for k, v in fallen.items()}
     if row is None:
         hp_max = economy.world_warden_hp(frontier, active or None)
         return {"floor": frontier, "hp": hp_max, "hp_max": hp_max,
                 "strikers": [], "pity": 0, "closes_in_s": None,
-                "fallen_by": fallen_by}
+                "fallen_by": fallen_by, "fallen": fallen}
     st = _warden_now(json.loads(row["value"]), frontier, active or None)
     return {"floor": frontier, "hp": st["hp"], "hp_max": st["hp_max"],
             "strikers": st["strikers"], "pity": st["pity"],
-            "closes_in_s": st["closes_in_s"], "fallen_by": fallen_by}
+            "closes_in_s": st["closes_in_s"],
+            "fallen_by": fallen_by, "fallen": fallen}
 
 
 async def _roster(conn) -> tuple[list[dict], int]:
@@ -809,9 +836,10 @@ async def _fx_pvp(conn, tenant: str, player: str, doc: dict,
         victim["gold"] = 0
         victim["hp"] = max(1, pstate.max_hp(victim) // 4)
         doc["gold"] += loot
-        bounty = int(economy.xp_need(victim.get("level", 1))
-                     * economy.PVP_XP_BOUNTY_PCT)
-        doc["xp"] += bounty
+        # 034 §2: the bar is hard — pay what fits and ledger what landed.
+        bounty = pstate.gain_xp(doc, int(
+            economy.xp_need(victim.get("level", 1))
+            * economy.PVP_XP_BOUNTY_PCT))
         victim.setdefault("pending_events", []).append(_death_report(
             v_name, a_name, loot).to_dict())
         line = f"{a_name} ambushed {v_name} in the fields (◈ {loot:,} taken)"
@@ -1070,11 +1098,12 @@ async def _fx_flare_answer(conn, tenant: str, player: str, doc: dict,
         json.dumps(v), f"flare:{floor}")
     gold = economy.flare_answer_gold(floor)
     doc["gold"] = doc.get("gold", 0) + gold
-    doc["xp"] = doc.get("xp", 0) + economy.FLARE_ANSWER_AETHER
+    # 034 §2: the bar is hard — pay what fits and ledger what landed.
+    aether = pstate.gain_xp(doc, economy.FLARE_ANSWER_AETHER)
     await conn.execute(
         "INSERT INTO ascent_ledger (tenant, player, kind, gold, xp, note)"
         " VALUES ($1,$2,'flare_answer',$3,$4,$5)",
-        tenant, player, gold, economy.FLARE_ANSWER_AETHER,
+        tenant, player, gold, aether,
         f"floor {floor}, for {v.get('name', '?')}")
     await conn.execute(
         "INSERT INTO ascent_stone (line) VALUES ($1)",
@@ -1202,13 +1231,21 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
                   key=lambda s: (not _is_finisher(s),
                                  -int(s.get("dmg", 0))))
     names = ", ".join(s.get("name") or "?" for s in roll)
+    top = max(strikers, key=lambda s: int(s.get("dmg", 0)))
     # 030 Phase 8: the arrival reel on a fallen floor names its slayers.
     # The roll is written once, at the fall — the payload reads it back
     # forever after, finisher first.
+    # 034 §3: with the date and the deepest cut, because the keep is a
+    # memorial now and a memorial without a date is a rumour.
     await conn.execute(
         "INSERT INTO ascent_world (key, value) VALUES ($1,$2::jsonb) "
         "ON CONFLICT (key) DO UPDATE SET value=$2::jsonb",
-        f"fallen:{floor}", json.dumps(names))
+        f"fallen:{floor}", json.dumps({
+            "names": names, "day": day,
+            "ts": pstate.now().isoformat(),
+            "warden": warden_name,
+            "top": top.get("name") or "?",
+            "top_dmg": int(top.get("dmg", 0))}))
 
     for s in strikers:
         finisher = s.get("tenant") == tenant and s.get("player") == player
@@ -1222,9 +1259,13 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
                 continue
             d = json.loads(row["doc"])
         share = int(s.get("dmg", 0)) / total
-        xp_i = round(xp_pool * share)
+        # 034 §2: the bar is hard — a share bigger than the bar is clipped
+        # to what fits, and the receipt says the landed number so the
+        # ledger never records a payout the player did not get.
+        offered = round(xp_pool * share)
+        xp_i = pstate.gain_xp(d, offered)
+        clipped = offered - xp_i
         gold_i = round(gold_pool * share)
-        d["xp"] = d.get("xp", 0) + xp_i
         d["gold"] = d.get("gold", 0) + gold_i
         if d.get("unlocked_floor", 1) <= floor:
             d["unlocked_floor"] = floor + 1
@@ -1240,9 +1281,11 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
             r = d.setdefault("kill_receipt", {})
             r.update({"xp": xp_i, "gold": gold_i, "names": names,
                       "loot": economy.APOTHECARY[loot].name,
+                      "xp_clipped": clipped,
                       "shared": True, "_new": True})
         else:
-            body = [f"+ {xp_i:,} XP — your share of the kill",
+            body = [f"+ {xp_i:,} XP — your share of the kill"
+                    + (" (your bar took all it holds)" if clipped else ""),
                     f"+ ◈ {gold_i:,} from the Warden's hoard",
                     f"FLOOR {floor + 1} stands open for everyone."]
             d.setdefault("pending_events", []).insert(0, Scene(
@@ -1266,7 +1309,6 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
         "VALUES ($1,'boss',$2,$3)", day,
         f"{warden_name} slain by {names} · floor {floor + 1} open",
         floor)
-    top = max(strikers, key=lambda s: int(s.get("dmg", 0)))
     await conn.execute(
         "INSERT INTO ascent_stone (line) VALUES ($1)",
         f"Floor {floor} — the deepest cut in {warden_name} was "
@@ -1324,7 +1366,10 @@ async def _resolve_boss(conn, tenant: str, player: str, doc: dict,
     names = ", ".join(c["name"] for c in commits)
     for t, pl, d in docs:
         if victory:
-            d["xp"] = d.get("xp", 0) + ms.xp
+            # 034 §2: the bar is hard, and a milestone pays more than any
+            # bar holds (floor 10 pays 1,500 into a bar of 758). Pay what
+            # fits, say so, and ledger the landed number.
+            xp_i = pstate.gain_xp(d, ms.xp)
             d["gold"] = d.get("gold", 0) + ms.gold
             if d.get("unlocked_floor", 1) <= ms.floor:
                 d["unlocked_floor"] = ms.floor + 1
@@ -1332,7 +1377,10 @@ async def _resolve_boss(conn, tenant: str, player: str, doc: dict,
                 eyebrow=f"FLOOR {ms.floor} · THE KEEP · AFTER",
                 headline=f"{ms.name} has fallen",
                 support=f"The war party held: {names}.",
-                body_lines=[f"+ {ms.xp:,} experience",
+                body_lines=[f"+ {xp_i:,} experience"
+                            + (" — your bar took all it holds; train at "
+                               "the Guildhall before the next one"
+                               if xp_i < ms.xp else ""),
                             f"+ ◈ {ms.gold:,} from the hoard",
                             f"FLOOR {ms.floor + 1} stands open for everyone."],
                 event_kind="boss",
@@ -1346,6 +1394,7 @@ async def _resolve_boss(conn, tenant: str, player: str, doc: dict,
                 event_kind="boss",
             )
             pstate.gain_energy(d, economy.COST_BOSS_COMMIT)
+            xp_i = 0
         d.setdefault("pending_events", []).append(ev.to_dict())
         if not (t == tenant and pl == player):
             await conn.execute(
@@ -1355,7 +1404,7 @@ async def _resolve_boss(conn, tenant: str, player: str, doc: dict,
             "INSERT INTO ascent_ledger (tenant, player, kind, gold, xp,"
             " note) VALUES ($1,$2,$3,$4,$5,$6)",
             t, pl, "boss_win" if victory else "boss_loss",
-            ms.gold if victory else 0, ms.xp if victory else 0, ms.name)
+            ms.gold if victory else 0, xp_i, ms.name)
 
     await conn.execute(
         "DELETE FROM ascent_boss_commits WHERE floor=$1", ms.floor)

@@ -123,18 +123,20 @@ async def test_shared_warden_one_hp_pool_kill_opens_for_all(
     assert "Aldo" in row["line"] and "Brai" in row["line"]
 
 
-async def test_below_frontier_keep_is_solo_echo(client, tenant_a,
-                                                clean_world):
+async def test_below_frontier_keep_is_a_memorial(client, tenant_a,
+                                                 clean_world):
+    """034 §3: the echo bout is retired end to end — through the real
+    HTTP act, a keep below the frontier opens a monument with no fight
+    in it and no shared strike either."""
     pool = await db.get_pool()
     await pool.execute(
         "UPDATE ascent_world SET value='3'::jsonb WHERE key='frontier'")
     pa = await create_player(client, tenant_a, "tenant-a", "Echo")
     await enter_floor(client, tenant_a, "tenant-a", pa, 1)
     s = await act(client, tenant_a, "tenant-a", pa, option="keep")
-    # solo per-player fight — attack/close_in (017: melee opens at
-    # range, so the first beat is crossing), never the shared strike
     ids = {o["id"] for o in s["options"]}
-    assert ("attack" in ids or "close_in" in ids) and "strike" not in ids
+    assert ids == {"back"}
+    assert "fell here" in s["headline"]
 
 
 async def test_morning_crier_once_per_day(client, tenant_a, clean_world):
