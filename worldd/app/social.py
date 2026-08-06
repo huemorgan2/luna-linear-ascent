@@ -544,9 +544,9 @@ async def _grant_targets(conn, doc: dict) -> list[str]:
         "FROM ascent_players WHERE doc->>'stage'='playing' "
         "ORDER BY updated_at DESC LIMIT 20")
     me = doc.get("name")
+    # 036: any level can receive — the burn and daily cap do the policing.
     return [r["name"] for r in rows
-            if r["name"] and r["name"] != me
-            and r["level"] >= economy.GRANT_MIN_RECEIVER_LEVEL][:6]
+            if r["name"] and r["name"] != me][:6]
 
 
 # ── Effects ──────────────────────────────────────────────────────────────
