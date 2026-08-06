@@ -95,18 +95,32 @@ If `ASCENT_SHARED_SECRET` is rotated, every Luna install's
 
 ## Deploying
 
-`ascent-worldd` deploys from this repo via the Render blueprint. To deploy:
+**A push does NOT deploy.** The service reads `autoDeploy: yes`, but GitHub
+has never notified Render for this repo — there is no webhook on
+`huemorgan2/luna-linear-ascent` and the Render GitHub App has no access, so
+every deploy in the service's history is `trigger: api`. Between Aug 2 and
+Aug 5 2026 this silently left two released versions unshipped while players
+kept running old code. Always deploy explicitly:
 
 ```bash
-git push origin main
+worldd/tools/deploy.sh            # deploy, poll to live, verify /health
+worldd/tools/deploy.sh --check    # live version + last deploy, no deploy
 ```
 
-Check deploy status and logs via the `user-render` MCP or the dashboard
-(service → Events / Logs). After every deploy, verify:
+The script refuses to run if `worldd/vendor/` is behind the plugin submodule
+(a stale vendor ships old game code under a new version number), waits out
+the instance swap — `/health` answers from the OLD build for a few seconds
+after Render says "live" — and fails loudly if the version never turns over.
+Auth comes from `RENDER_API_KEY` or the render CLI's `~/.render/cli.yaml`.
 
-```bash
-curl -s https://ascent-worldd.onrender.com/health
-```
+Service `srv-d9ha3csvikkc73ff5rg0`. This matches the house pattern in the
+other Luna repos (`luna/plans/056-.../deploy.py` drives Render the same way);
+none of them use push-to-deploy either.
+
+**The durable fix** is one browser action nobody has done yet: reconnect the
+repo on the service in the Render dashboard, or grant the Render GitHub App
+access to this repo under GitHub → Settings → Applications. Neither is
+scriptable — an OAuth token cannot modify GitHub App installations.
 
 ### Manual deploy via browser
 
