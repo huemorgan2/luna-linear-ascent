@@ -88,19 +88,21 @@ section { padding: 2rem 0; }
 }
 .gate-bg img,
 .gate-bg img.px {
-  /* beat the global img.px 640px cap. Asset is 640×400 (16:10) —
-     contain keeps LINEAR ASCENT fully in frame on tall viewports
-     (cover was slicing the title to EAR ASCEN). */
+  /* beat the global img.px 640px cap. Asset is 640×400 with top headroom
+     so cover can crop the sky without eating the title. Tower lives on
+     the right; left stays open for the signup card. */
   display: block; width: 100%; height: 100%;
   max-width: none;
-  object-fit: contain; object-position: center center;
+  object-fit: cover;
+  /* favor a little sky above the title; sides may crop on tall phones —
+     the tower + sun stay in the safe center-right */
+  object-position: center 28%;
   image-rendering: pixelated;
 }
-/* same card grammar as the rest of the page — parked bottom-right with
-   room for the ticker, never clipped by the fold */
+/* signup card sits in the open left of the hero */
 .gatecard {
   position: absolute;
-  right: 2rem; bottom: 3.25rem;
+  left: 2rem; bottom: 3.25rem;
   z-index: 2;
   margin: 0;
   max-width: min(44ch, calc(100vw - 3rem));
@@ -141,8 +143,12 @@ section { padding: 2rem 0; }
 
 @media (max-width: 52ch) {
   .gatecard {
-    right: 1ch; left: 1ch; bottom: 2.75rem;
+    left: 1ch; right: 1ch; bottom: 2.75rem;
     max-width: none;
+  }
+  .gate-bg img,
+  .gate-bg img.px {
+    object-position: center 22%;
   }
 }
 
