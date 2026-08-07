@@ -1235,6 +1235,75 @@ async def leave_faction(conn, tenant: str, player: str) -> None:
                 "DELETE FROM ascent_factions WHERE name=$1", row["faction"])
 
 
+# ── Shared desk bodies (005: /v1/* and /play/api/* call the same code) ───
+
+def desk_code(err: str) -> int:
+    """HTTP code for a desk refusal — one mapping for both auth flavors."""
+    if "not at your table" in err:
+        return 404
+    if "kick yourself" in err:
+        return 422
+    if "only" in err:
+        return 403
+    return 409
+
+
+async def kick_member(conn, tenant: str, player: str, target_tenant: str,
+                      target_player: str) -> str | None:
+    me = await member_row(conn, tenant, player)
+    if me is None or me["role"] != "steward":
+        return "only the steward removes members"
+    target = await member_row(conn, target_tenant, target_player)
+    if target is None or target["faction"] != me["faction"]:
+        return "not at your table"
+    if (target_tenant, target_player) == (tenant, player):
+        return "leave, don't kick yourself"
+    if target["role"] == "steward":
+        # 015: admins don't kick admins — the founder can
+        founder = await conn.fetchrow(
+            "SELECT founder_tenant, founder_player "
+            "FROM ascent_factions WHERE name=$1", me["faction"])
+        if (founder["founder_tenant"],
+                founder["founder_player"]) != (tenant, player):
+            return "only the founder unseats an admin"
+    await conn.execute(
+        "DELETE FROM ascent_faction_members "
+        "WHERE tenant=$1 AND player=$2",
+        target_tenant, target_player)
+    return None
+
+
+# ── Shared read bodies (005: /v1/* and /play/api/* call the same code) ───
+
+async def settled_board(conn) -> dict:
+    """The COMMUNITY news board — read-only, any caller. Resolves any
+    pending weeks first so 'last week' is always settled."""
+    names = await conn.fetch("SELECT name FROM ascent_factions")
+    for r in names:
+        await maybe_resolve(conn, r["name"])
+    await maybe_post_week(conn)
+    return await board(conn)
+
+
+async def browse(conn, tenant: str, player: str, q: str) -> dict:
+    """The ledger: top 10 banners by table size; q searches server-side.
+    Includes the caller's open request so the UI shows the pending state."""
+    rows = await search_factions(conn, q)
+    total = int(await conn.fetchval(
+        "SELECT count(*) FROM ascent_factions") or 0)
+    requested = await my_request(conn, tenant, player)
+    # 019: the board's call-to-action needs to know the viewer sits
+    # at no table (members get no join buttons, no pitch)
+    mine = await member_row(conn, tenant, player)
+    return {"factions": rows,
+            "total": total,
+            "requested": requested or "",
+            "in_faction": (mine or {}).get("faction") or "",
+            "banners": banner_slugs(),
+            "found_fee": FOUND_FEE,
+            "found_min_level": FOUND_MIN_LEVEL}
+
+
 async def sync_doc_guild(conn, tenant: str, player: str, doc: dict) -> None:
     """Membership table is authoritative — the doc's guild string follows
     it (a kicked player sees their colors gone on the next load)."""

@@ -14,9 +14,10 @@
 </head>
 <body>
 
-<header id="bar" aria-hidden="true">
-  <span id="bar-left">FLOOR 0 · THE GATE</span>
-  <span id="bar-right" data-live="bar">LINEAR ASCENT</span>
+<header id="bar">
+  <span id="bar-left" aria-hidden="true">FLOOR 0 · THE GATE</span>
+  <span id="bar-right" aria-hidden="true" data-live="bar">LINEAR ASCENT</span>
+  <a id="bar-cta" href="#door-signin">[ SIGN IN ]</a>
 </header>
 
 <!-- ═══ FLOOR 0 · THE GATE — full-fold title reel + CTA card ═════════ -->
@@ -33,6 +34,7 @@
        No price. No ads. No launcher.</p>
     <nav class="options">
       <a class="opt gold-opt" href="#door">[ SIGN-UP ]</a>
+      <a class="opt dim2" href="#door-signin">[ SIGN-IN ]</a>
       <a class="opt dim2" href="#lore">[ Watch from the gate ]</a>
     </nav>
     <p class="dim live-line" data-live="hero">… the gate lamps are lit; the world is climbing …</p>
@@ -157,9 +159,9 @@
     <p>No client. No install. Linear Ascent plays as
        <span class="bright">scene cards</span> — every turn is a card
        like the ones on this page: art, a headline, the world's news,
-       and your options. It runs in chat via
-       <span class="bright">Luna</span>, and the browser door is being
-       cut into this very page.</p>
+       and your options. It plays <span class="bright">right here in
+       your browser</span> — nothing to install — and in chat via
+       <span class="bright">Luna</span>. Same world either way.</p>
     <div class="trio">
       <figure>
         <img class="px" loading="lazy" src="/static/site/art/portrait_plate_100x200.png" alt="Warrior" width="100" height="200">
@@ -280,7 +282,10 @@
   <div class="card doorcard">
     <div class="eyebrow">THE DOOR</div>
     <h2>Sign up</h2>
+    <p class="dim">A username and a password and you're on the tower —
+       plays right in this browser, nothing to install.</p>
     <nav class="options dtabs" id="door-tabs">
+      <span id="door-signin"></span>
       <button class="opt dtab on" type="button" id="tab-signup">[ SIGN-UP ]</button>
       <button class="opt dtab dim2" type="button" id="tab-signin">[ SIGN-IN ]</button>
     </nav>
@@ -294,6 +299,10 @@
       <label id="row-pw2">RETYPE PASSWORD
              <input name="password2" type="password" minlength="4"
              maxlength="128" autocomplete="new-password"></label>
+      <label id="row-email">EMAIL <span class="dim">— optional, for
+             resurrection if you lose the password</span>
+             <input name="email" type="text" maxlength="254"
+             autocomplete="email" placeholder="optional"></label>
       <div class="options">
         <button class="opt gold-opt" type="submit" id="door-signup">[ SIGN-UP ]</button>
         <button class="opt dim2" type="submit" formaction="/login" id="door-login">[ SIGN-IN ]</button>
@@ -307,7 +316,7 @@
 
 <footer>
   <p><span class="dim">LINEAR ASCENT · worldd</span> <span id="foot-version" class="dim">·</span></p>
-  <p class="dim">Plays in chat via <a href="https://luna.com.ai">luna.com.ai</a> — plugin <span class="bright">linear-ascent</span> on the official marketplace. Browser climb: soon, on this page.</p>
+  <p class="dim">Browser climb: <a href="/play">linearascent.net/play</a>. Also plays in chat via <a href="https://luna.com.ai">luna.com.ai</a> — plugin <span class="bright">linear-ascent</span> on the official marketplace.</p>
   <p class="dim">Typeface: “Web Plus IBM VGA 8x16” — <a href="https://int10h.org/oldschool-pc-fonts/">The Ultimate Oldschool PC Font Pack</a> (CC BY-SA 4.0). All art is the game's own 1-bit hand.</p>
   <p class="dim" id="foot-era">ERA · — the tower stands.</p>
 </footer>

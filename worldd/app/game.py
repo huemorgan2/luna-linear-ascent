@@ -36,13 +36,19 @@ async def _raise_frontier(conn, floor: int) -> None:
         json.dumps(floor), floor)
 
 
-async def _load_doc(conn, tenant: str, player: str) -> dict:
+async def _load_doc(conn, tenant: str, player: str,
+                    display_name: str = "") -> dict:
     row = await conn.fetchrow(
         "SELECT doc FROM ascent_players WHERE tenant=$1 AND player=$2 "
         "FOR UPDATE", tenant, player)
     if row:
         return json.loads(row["doc"])
     doc = pstate.new_player(f"{tenant}:{player}")
+    if display_name:
+        # 005 web play: the door already carved this name at signup
+        # (names.ACCOUNT) — the doc boots named and the engine skips the
+        # registrar's name ask.
+        doc["name"] = display_name
     # 022/007: a name the reincarnation ledger knows boots with the
     # glyph and the time-perks (never power).
     from . import era
@@ -118,12 +124,13 @@ async def _claim_name(conn, tenant: str, player: str, doc: dict,
     return want if verdict == names.CREATED else ""
 
 
-async def run_scene(tenant: str, player: str) -> dict:
+async def run_scene(tenant: str, player: str,
+                    display_name: str = "") -> dict:
     from . import social
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
-            doc = await _load_doc(conn, tenant, player)
+            doc = await _load_doc(conn, tenant, player, display_name)
             await social.inject_world(conn, tenant, player, doc)
             _sync_frontier_into_doc(doc, doc["_world"]["frontier"])
             scene: Scene = core.current_scene(doc)
@@ -136,7 +143,7 @@ async def run_scene(tenant: str, player: str) -> dict:
 
 
 async def run_act(tenant: str, player: str, option: str, text: str,
-                  idem: str) -> dict:
+                  idem: str, display_name: str = "") -> dict:
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
@@ -154,7 +161,7 @@ async def run_act(tenant: str, player: str, option: str, text: str,
             mine = await factions.member_row(conn, tenant, player)
             if mine:
                 await factions.maybe_resolve(conn, mine["faction"])
-            doc = await _load_doc(conn, tenant, player)
+            doc = await _load_doc(conn, tenant, player, display_name)
             await social.inject_world(conn, tenant, player, doc)
             before = doc.get("unlocked_floor", 1)
             _sync_frontier_into_doc(doc, doc["_world"]["frontier"])

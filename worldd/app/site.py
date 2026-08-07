@@ -212,12 +212,14 @@ def session_user(request: Request) -> str | None:
     return parts[0]
 
 
-async def _credentials(request: Request) -> tuple[str, str, str, bool]:
-    """(username, password, retyped, wants_json) from a JSON fetch or a
-    plain urlencoded form POST — the page must work with scripts off.
+async def _credentials(request: Request) -> tuple[str, str, str, str, bool]:
+    """(username, password, retyped, email, wants_json) from a JSON fetch
+    or a plain urlencoded form POST — the page must work with scripts off.
 
     The username arrives as the world will hold it: 004 joins the words
-    here, once, so every path down the door agrees on the name.
+    here, once, so every path down the door agrees on the name. The email
+    is optional and unvalidated on purpose (005): trimmed, capped, stored
+    — it exists so a lost password can be resurrected by hand later.
     """
     from . import names
     ctype = request.headers.get("content-type", "")
@@ -225,11 +227,13 @@ async def _credentials(request: Request) -> tuple[str, str, str, bool]:
         body = await request.json()
         return (names.canonical(body.get("username", "")),
                 str(body.get("password", "")),
-                str(body.get("password2", "")), True)
+                str(body.get("password2", "")),
+                str(body.get("email", "")).strip()[:254], True)
     form = await request.form()
     return (names.canonical(form.get("username", "")),
             str(form.get("password", "")),
-            str(form.get("password2", "")), False)
+            str(form.get("password2", "")),
+            str(form.get("email", "")).strip()[:254], False)
 
 
 def _door_response(request: Request, username: str, wants_json: bool,
@@ -238,7 +242,8 @@ def _door_response(request: Request, username: str, wants_json: bool,
         resp = JSONResponse({"ok": True, "username": username,
                              "note": note})
     else:
-        resp = RedirectResponse("/#door", status_code=303)
+        # 005: the door opens INTO the game — scripts-off included
+        resp = RedirectResponse("/play", status_code=303)
     proto = request.headers.get("x-forwarded-proto",
                                 request.url.scheme)
     resp.set_cookie(SESSION_COOKIE, _session_token(username),
@@ -257,7 +262,8 @@ def _door_error(status: int, msg: str, wants_json: bool):
 @router.post("/signup")
 async def signup(request: Request):
     from . import names
-    username, password, retyped, wants_json = await _credentials(request)
+    username, password, retyped, email, wants_json = \
+        await _credentials(request)
     ip = request.client.host if request.client else "?"
     if not _signup_ok(ip):
         return _door_error(429, "too many sign-ups — try later",
@@ -281,8 +287,9 @@ async def signup(request: Request):
                                  names.ACCOUNT) == names.TAKEN:
                 raise _NameTaken
             await conn.execute(
-                "INSERT INTO ascent_accounts (username, pw_hash) "
-                "VALUES ($1, $2)", username, _hash_pw(password))
+                "INSERT INTO ascent_accounts (username, pw_hash, email) "
+                "VALUES ($1, $2, $3)", username, _hash_pw(password),
+                email or None)
     except (_NameTaken, asyncpg.UniqueViolationError):
         return _door_error(409, "username already taken", wants_json)
     log.info("account created: %s (ip=%s)", username, ip)
@@ -291,7 +298,8 @@ async def signup(request: Request):
 
 @router.post("/login")
 async def login(request: Request):
-    username, password, _retyped, wants_json = await _credentials(request)
+    username, password, _retyped, _email, wants_json = \
+        await _credentials(request)
     pool = await db.get_pool()
     row = await pool.fetchrow(
         "SELECT username, pw_hash FROM ascent_accounts "

@@ -157,7 +157,8 @@ async def test_signup_form_post_redirects_and_sets_cookie(client):
     r = await client.post("/signup", data={"username": name,
                                            "password": "hunter2"})
     assert r.status_code == 303
-    assert r.headers["location"] == "/#door"
+    # 005: the door opens INTO the game
+    assert r.headers["location"] == "/play"
     assert site.SESSION_COOKIE in r.cookies
     assert (await client.get("/me")).json()["username"] == name
 

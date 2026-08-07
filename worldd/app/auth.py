@@ -15,6 +15,7 @@ from fastapi import HTTPException, Request
 from . import db
 
 SKEW_SECONDS = 300
+WEB_TENANT = "web"     # 005: reachable only via webplay.py's cookie routes
 _cache: dict[str, tuple[str, float]] = {}
 _CACHE_TTL = 60.0
 
@@ -42,6 +43,10 @@ async def verify_tenant(request: Request) -> str:
         raise HTTPException(426, "unsupported api version; expected 1")
     if not tenant or not ts or not sig:
         raise HTTPException(401, "missing auth headers")
+    if tenant == WEB_TENANT:
+        # 005: the web tenant's secret is never disclosed, so a signature
+        # claiming it is a leak being replayed — same answer as no tenant.
+        raise HTTPException(401, "unknown tenant")
     try:
         ts_i = int(ts)
     except ValueError:

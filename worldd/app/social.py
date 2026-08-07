@@ -1429,3 +1429,52 @@ async def _resolve_boss(conn, tenant: str, player: str, doc: dict,
             "INSERT INTO ascent_happenings (world_day, kind, line) "
             "VALUES ($1,'boss',$2)", day,
             f"{ms.name} broke a war party at the keep ({names})")
+
+
+# ── Shared read bodies (005: /v1/* and /play/api/* call the same code) ───
+
+async def leaderboard(conn, tenant: str, player: str) -> dict:
+    """Every playing climber — level and gold visible (010 widened this
+    deliberately; Muster kept bank as rank-only, the Score tab shows it)."""
+    rows = await conn.fetch(
+        "SELECT p.tenant, p.player, p.doc, p.updated_at, m.faction "
+        "FROM ascent_players p "
+        "LEFT JOIN ascent_faction_members m "
+        "  ON m.tenant=p.tenant AND m.player=p.player "
+        "WHERE p.doc->>'stage'='playing'")
+    now = pstate.now()
+    out = []
+    for r in rows:
+        d = json.loads(r["doc"])
+        out.append({
+            "name": d.get("name") or "a climber",
+            "race": d.get("race") or "?",
+            "clazz": d.get("clazz") or "?",
+            "level": d.get("level", 1),
+            "gold": d.get("gold", 0),
+            "bank": d.get("bank", 0),
+            "floor": d.get("unlocked_floor", 1),
+            "faction": r["faction"] or "",
+            # 005: (tenant, player), not tenant alone — the shared web
+            # tenant holds every browser climber and they are not all you
+            "you": r["tenant"] == tenant and r["player"] == player,
+            "last_seen_days": max(0, (now - r["updated_at"]).days),
+        })
+    out.sort(key=lambda e: (-e["level"], -(e["gold"] + e["bank"])))
+    return {"players": out[:200], "total": len(out)}
+
+
+async def floor_presence(conn, tenant: str, player: str) -> dict:
+    """Grade-2 liveness for the pane peek: the caller's floor and its
+    hot/camped counts, straight from the 30s presence cache — cheap by
+    construction."""
+    row = await conn.fetchrow(
+        "SELECT doc FROM ascent_players WHERE tenant=$1 AND player=$2",
+        tenant, player)
+    floor = 1
+    if row:
+        floor = max(1, int(json.loads(row["doc"]).get("floor") or 1))
+    pres = await _presence(conn)
+    slot = pres["by_floor"].get(floor) or {}
+    return {"floor": floor, "hot": int(slot.get("hot", 0)),
+            "camped": int(slot.get("camped", 0))}

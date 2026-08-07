@@ -205,6 +205,12 @@
     note.classList.remove("err");
     note.innerHTML = "You're in, <span class='bright'>" + name
       + "</span>. ";
+    var go = document.createElement("a");
+    go.className = "opt gold-opt";
+    go.textContent = "[ ▶ ENTER THE TOWER ]";
+    go.href = "/play";
+    note.appendChild(go);
+    note.appendChild(document.createTextNode(" "));
     var out = document.createElement("a");
     out.textContent = "[ sign out ]";
     out.href = "#";
@@ -218,7 +224,13 @@
   }
 
   fetch("/me").then(function (r) { return r.json(); })
-    .then(function (m) { if (m.username) doorKnown(m.username); })
+    .then(function (m) {
+      if (m.username) {
+        doorKnown(m.username);
+        var cta = $("bar-cta");
+        if (cta) { cta.textContent = "[ ▶ PLAY ]"; cta.href = "/play"; }
+      }
+    })
     .catch(function () {});
 
   if (form) {
@@ -235,6 +247,7 @@
       }
       $("label-pw").textContent = up ? "NEW PASSWORD" : "PASSWORD";
       $("row-pw2").style.display = up ? "" : "none";
+      $("row-email").style.display = up ? "" : "none";
       form.elements.password2.required = up;
       form.elements.password.setAttribute(
         "autocomplete", up ? "new-password" : "current-password");
@@ -255,6 +268,15 @@
     });
     setMode("signup");
 
+    /* #door-signin (top bar, gate card, /play's bounce) opens the door
+       with the SIGN-IN tab already up — scripts off it still anchors */
+    var hashMode = function () {
+      if (location.hash === "#door-signin") setMode("signin");
+      else if (location.hash === "#door") setMode("signup");
+    };
+    hashMode();
+    addEventListener("hashchange", hashMode);
+
     var doorPost = function (path) {
       var body = {
         username: form.elements.username.value,
@@ -262,6 +284,7 @@
       };
       if (path === "/signup") {
         body.password2 = form.elements.password2.value;
+        body.email = form.elements.email.value;
       }
       fetch(path, {
         method: "POST",
@@ -270,7 +293,8 @@
       }).then(function (r) {
         return r.json().then(function (j) { return { ok: r.ok, j: j }; });
       }).then(function (res) {
-        if (res.ok) return doorKnown(res.j.username);
+        /* 005: the door opens INTO the game */
+        if (res.ok) { location.href = "/play"; return; }
         note.classList.add("err");
         note.textContent = "▮ " + (res.j.detail || "sign-up failed");
       }).catch(function () {

@@ -20,7 +20,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import auth, db, site
+from . import auth, db, ratelimit, site, webplay
 from .config import get_config
 
 API_VERSION = 1
@@ -51,30 +51,15 @@ app.mount("/static",
 # public world feed, and old-days accounts.
 app.include_router(site.router)
 
-
-# ── Per-tenant rate limit (in-process token bucket; numInstances: 1) ─────
-
-RATE_CAPACITY = int(os.environ.get("ASCENT_RATE_CAPACITY", "30"))
-RATE_REFILL_PER_S = float(os.environ.get("ASCENT_RATE_REFILL", "5"))
-_buckets: dict[str, list[float]] = {}  # tenant -> [tokens, last_ts]
-
-
-def _rate_ok(tenant: str) -> bool:
-    now = time.monotonic()
-    tokens, last = _buckets.get(tenant, (float(RATE_CAPACITY), now))
-    tokens = min(RATE_CAPACITY, tokens + (now - last) * RATE_REFILL_PER_S)
-    if tokens < 1.0:
-        _buckets[tenant] = [tokens, now]
-        return False
-    _buckets[tenant] = [tokens - 1.0, now]
-    return True
+# 005: the game itself, session-cookie-authed, at /play + /play/api/*.
+app.include_router(webplay.router)
 
 
 @app.middleware("http")
 async def request_log(request: Request, call_next):
     start = time.monotonic()
     tenant = request.headers.get("x-ascent-tenant", "-")
-    if request.url.path.startswith("/v1/") and not _rate_ok(tenant):
+    if request.url.path.startswith("/v1/") and not ratelimit.allow(tenant):
         return JSONResponse({"detail": "rate limited"}, status_code=429)
     response = await call_next(request)
     ms = (time.monotonic() - start) * 1000
@@ -162,23 +147,11 @@ async def v1_import(body: ImportIn,
 @app.post("/v1/presence")
 async def v1_presence(body: SceneIn,
                       tenant: str = Depends(auth.verify_tenant)) -> dict:
-    """Grade-2 liveness for the pane peek: the caller's floor and its
-    hot/camped counts, straight from the 30s presence cache — cheap by
-    construction."""
+    """Grade-2 liveness for the pane peek — body shared with /play/api."""
     from . import social
     pool = await db.get_pool()
     async with pool.acquire() as conn:
-        row = await conn.fetchrow(
-            "SELECT doc FROM ascent_players WHERE tenant=$1 AND player=$2",
-            tenant, body.player)
-        floor = 1
-        if row:
-            import json as _json
-            floor = max(1, int(_json.loads(row["doc"]).get("floor") or 1))
-        pres = await social._presence(conn)
-    slot = pres["by_floor"].get(floor) or {}
-    return {"floor": floor, "hot": int(slot.get("hot", 0)),
-            "camped": int(slot.get("camped", 0))}
+        return await social.floor_presence(conn, tenant, body.player)
 
 
 # ── Score & Community (plan 010) ─────────────────────────────────────────
@@ -186,37 +159,11 @@ async def v1_presence(body: SceneIn,
 @app.post("/v1/leaderboard")
 async def v1_leaderboard(body: SceneIn,
                          tenant: str = Depends(auth.verify_tenant)) -> dict:
-    """Every playing climber — level and gold visible (010 widened this
-    deliberately; Muster kept bank as rank-only, the Score tab shows it)."""
+    """Every playing climber — body shared with /play/api's Score tab."""
+    from . import social
     pool = await db.get_pool()
     async with pool.acquire() as conn:
-        rows = await conn.fetch(
-            "SELECT p.tenant, p.player, p.doc, p.updated_at, m.faction "
-            "FROM ascent_players p "
-            "LEFT JOIN ascent_faction_members m "
-            "  ON m.tenant=p.tenant AND m.player=p.player "
-            "WHERE p.doc->>'stage'='playing'")
-    import json as _json
-
-    from plugin_linear_ascent.engine import state as pstate
-    now = pstate.now()
-    out = []
-    for r in rows:
-        d = _json.loads(r["doc"])
-        out.append({
-            "name": d.get("name") or "a climber",
-            "race": d.get("race") or "?",
-            "clazz": d.get("clazz") or "?",
-            "level": d.get("level", 1),
-            "gold": d.get("gold", 0),
-            "bank": d.get("bank", 0),
-            "floor": d.get("unlocked_floor", 1),
-            "faction": r["faction"] or "",
-            "you": r["tenant"] == tenant and True or False,
-            "last_seen_days": max(0, (now - r["updated_at"]).days),
-        })
-    out.sort(key=lambda e: (-e["level"], -(e["gold"] + e["bank"])))
-    return {"players": out[:200], "total": len(out)}
+        return await social.leaderboard(conn, tenant, body.player)
 
 
 class FactionCreateIn(BaseModel):
@@ -262,25 +209,11 @@ class FactionTargetIn(BaseModel):
 @app.post("/v1/faction/list")
 async def v1_faction_list(body: FactionListIn,
                           tenant: str = Depends(auth.verify_tenant)) -> dict:
-    """The ledger: top 10 banners by table size; q searches server-side.
-    Includes the caller's open request so the UI shows the pending state."""
+    """The banner ledger — body shared with /play/api's faction browser."""
     from . import factions
     pool = await db.get_pool()
     async with pool.acquire() as conn:
-        rows = await factions.search_factions(conn, body.q)
-        total = int(await conn.fetchval(
-            "SELECT count(*) FROM ascent_factions") or 0)
-        requested = await factions.my_request(conn, tenant, body.player)
-        # 019: the board's call-to-action needs to know the viewer sits
-        # at no table (members get no join buttons, no pitch)
-        mine = await factions.member_row(conn, tenant, body.player)
-    return {"factions": rows,
-            "total": total,
-            "requested": requested or "",
-            "in_faction": (mine or {}).get("faction") or "",
-            "banners": factions.banner_slugs(),
-            "found_fee": factions.FOUND_FEE,
-            "found_min_level": factions.FOUND_MIN_LEVEL}
+        return await factions.browse(conn, tenant, body.player, body.q)
 
 
 @app.post("/v1/faction/status")
@@ -382,29 +315,9 @@ async def v1_faction_kick(body: FactionKickIn,
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
-            me = await factions.member_row(conn, tenant, body.player)
-            if me is None or me["role"] != "steward":
-                raise HTTPException(403, "only the steward removes members")
-            target = await factions.member_row(
-                conn, body.target_tenant, body.target_player)
-            if target is None or target["faction"] != me["faction"]:
-                raise HTTPException(404, "not at your table")
-            if (body.target_tenant, body.target_player) == \
-                    (tenant, body.player):
-                raise HTTPException(422, "leave, don't kick yourself")
-            if target["role"] == "steward":
-                # 015: admins don't kick admins — the founder can
-                founder = await conn.fetchrow(
-                    "SELECT founder_tenant, founder_player "
-                    "FROM ascent_factions WHERE name=$1", me["faction"])
-                if (founder["founder_tenant"],
-                        founder["founder_player"]) != (tenant, body.player):
-                    raise HTTPException(
-                        403, "only the founder unseats an admin")
-            await conn.execute(
-                "DELETE FROM ascent_faction_members "
-                "WHERE tenant=$1 AND player=$2",
-                body.target_tenant, body.target_player)
+            _desk_err(await factions.kick_member(
+                conn, tenant, body.player,
+                body.target_tenant, body.target_player))
     return {"ok": True}
 
 
@@ -439,25 +352,20 @@ async def v1_faction_enter(body: SceneIn,
 @app.post("/v1/faction/board")
 async def v1_faction_board(body: SceneIn,
                            tenant: str = Depends(auth.verify_tenant)) -> dict:
-    """The COMMUNITY news board — read-only, any tenant. Resolves any
-    pending weeks first so 'last week' is always settled."""
+    """The COMMUNITY news board — body shared with /play/api."""
     from . import factions
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
-            names = await conn.fetch("SELECT name FROM ascent_factions")
-            for r in names:
-                await factions.maybe_resolve(conn, r["name"])
-            await factions.maybe_post_week(conn)
-            return await factions.board(conn)
+            return await factions.settled_board(conn)
 
 
 # ── The faction desk (plan 015) ──────────────────────────────────────────
 
 def _desk_err(err: str | None) -> None:
     if err:
-        code = 403 if "only" in err else 409
-        raise HTTPException(code, err)
+        from . import factions
+        raise HTTPException(factions.desk_code(err), err)
 
 
 @app.post("/v1/faction/detail")
