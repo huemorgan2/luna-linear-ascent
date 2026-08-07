@@ -60,6 +60,36 @@ plugin-linear-ascent submodule. Renders are additive files under
 content/art/events/ — restore any regressed slug's previous mp4/gif from git.
 Floor YAMLs untouched until Phase C sign-off.
 
+## Execution status (2026-08-08, Phases A+B complete)
+
+**7 new PASSES** (floors 1–10 board 30/59 → 37/59): ash_adder (floor 8 now
+6/6), lane_boar, wick_owl, bunting_kite, guano_vole, courier_hound,
+pressed_fall (generic). ~$60 spent, ~94 paid takes, max 3 per slug per set.
+
+**Phase A/B findings, each confirmed across 3-take sets:**
+- De-catting works: stripping every cat token from the spider prompts took
+  feline chimeras from 6/6 to 0/6. Species contamination was prompt-induced;
+  spiders need no lore swap (silk_broodling, vault_weaver still fail on size).
+- Evicted beat unrenderable as worded: melt-to-empty ending failed 21/21
+  takes (6 wights + generic) — always a corpse, skeleton, or standing ink
+  pool. Fall beats pass because a fallen body IS their required end state.
+- "DESERTED" wording fully suppressed muster_wight's background armies.
+- Explicit color anchors near-100% reliable (banner_wolf chroma 1.4 → 63-82).
+- Reveal-size anchoring is the universal unsolved problem: apple, palm,
+  loaf, and boot anchors all ignored (reveals 5-10x oversize); size similes
+  literalize as props (flying loaf 2x); pre-stated reveal animals spawn
+  early beside the monster; GIANT-defender framing draws scale-reference
+  humans even with the human comparison removed.
+
+**Parked → Phase C decision list (22):** moths×3 + hornet_swarm +
+coolant_crab + drift_eel + wire_eel (species lore swaps); night_hawk
+(non-avian reveal needed); windfall_crow, rabid_boar, shadow_wolf,
+pylon_adder, shellback_tortoise, silk_broodling, vault_weaver, banner_wolf,
+native_freed (structural staging redesign — size/figure control);
+bailer_kobold (scene timing pad); lamp_eater, lamptree_wight, miner_husk,
+windfall_wight, flicker_wight, muster_wight, wrongmade_evicted (evicted-beat
+redesign).
+
 ## Operational notes
 - Grok renders via `generate_event_gifs.py <slug> --backend grok --force`,
   env from ~/Documents/Luna/luna/.env. 30s retry on API error does not count
