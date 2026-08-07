@@ -53,3 +53,15 @@ Worldd: remove the `/play` route (revert outer commit). Plugin: the
 parametrization is inert for Luna (defaults preserved), so no plugin
 rollback is needed unless the snapshot test failed — then revert the
 plugin commit before publishing.
+
+## Execution status
+
+Done — 2026-08-07. Plugin 0.50.0 (commit `35a2c00`) adds
+`render_pane(api_base=, web=)`; vendored into worldd and served at
+`GET /play` (signed-out → 303 `/#door-signin`). Live: `/play` serves
+the pane with `'/play/api'` and `const WEB = true;`; dojo 01 played a
+full hunt round in the browser. Marketplace publish of 0.50.0 is
+blocked by a server-side 500 on the upload endpoint (index still at
+0.47.0; retried post-deploy, same 500) — Luna chat play stays on
+0.47.0, which remains server-compatible; web play uses only the
+vendored copy. Retry publish when the marketplace recovers.

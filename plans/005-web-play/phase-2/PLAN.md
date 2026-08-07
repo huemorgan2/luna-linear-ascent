@@ -58,3 +58,14 @@ curl -si -b j.txt -H 'Origin: https://evil.example' \
 Remove the router mount in `main.py` (one line) and revert. No state
 to unwind — the routes write through the same `ascent_players` path
 as Luna play.
+
+## Execution status
+
+Done — 2026-08-07, commit `6f2f0f3`, live on production.
+`app/webplay.py` mounts `/play/api/*` (cookie auth + Origin check +
+per-account token bucket via `app/ratelimit.py`); `/v1` bodies for
+leaderboard/presence/faction board/list/kick extracted to shared
+functions in `social.py`/`factions.py` — no copy-paste twins, and the
+leaderboard `you` flag is per (tenant, player). Live checks: all
+routes 401 cookie-less, cross-origin POST 403, peek shape
+`{scene_id: str, floor_presence: int}`. Tests green (129).

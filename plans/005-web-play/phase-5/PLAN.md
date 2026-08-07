@@ -33,3 +33,15 @@ complete without the walkthrough (workspace rule).
 
 n/a — this phase only observes and records. Fixes it triggers get
 their own commits with their own rollbacks.
+
+## Execution status
+
+Done — 2026-08-07. All three dojo scenarios run against production
+(game 0.50.0, commit `6f2f0f3`) in real Chrome with isolated contexts
+plus a signed `/v1` probe tenant (`dojoprobe-e7beeb18`):
+01 PASS (signup → Roothollow ~50 s, no name prompt, hunt resolves),
+02 PASS (no state bleed, logout kills the session, A resumes s19 with
+identical meters from a new context), 03 PASS (same day/frontier/
+Warden/leaderboard/faction list from web and HMAC surfaces).
+Zero regressions. Results archived at
+`luna/dojo/results/005-web-play/` (summary + 5 screenshots).

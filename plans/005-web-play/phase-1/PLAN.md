@@ -53,3 +53,14 @@ name step in the intro; the names registry holds exactly one row for
 
 - `DELETE FROM ascent_tenants WHERE tenant='web';` (no player docs
   exist yet in this phase). Revert the commit.
+
+## Execution status
+
+Done — 2026-08-07, commit `6f2f0f3`, live on production.
+`migrations/015_web_play.sql` seeded the `web` tenant row and added the
+nullable `ascent_accounts.email` column; `auth.verify_tenant` refuses
+tenant `web` before the secret lookup (verified live: a signed request
+with the real web secret → 401); `game._load_doc` boots web docs
+prenamed (dojo 01: no name prompt, doc name = username, one
+`ascent_names` row). Tests: `test_web_play.py` first 3 tests +
+full suite 129 passed.

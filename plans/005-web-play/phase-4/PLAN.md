@@ -51,3 +51,13 @@ email field stored on the account.
 
 Revert the commit — presentation plus one nullable-column write; no
 data to unwind (the email column itself stays, harmless).
+
+## Execution status
+
+Done — 2026-08-07, commit `6f2f0f3`, live on production. Both doors
+(JSON and scripts-off form) land on `/play`; top bar gained
+`[ SIGN IN ]` (flips to `[ ▶ PLAY ]` when signed in); gate card gained
+a SIGN-IN option; `#door-signin` anchor works scripts-off and flips
+the door tab via JS (dojo 02 verified the flip + hidden email row);
+optional resurrection email stored trimmed or NULL (test-verified).
+`test_site.py` redirect expectation updated to `/play`.
