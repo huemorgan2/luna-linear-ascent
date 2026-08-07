@@ -20,7 +20,9 @@ name step in the intro; the names registry holds exactly one row for
    returned by any endpoint; `web` never appears in `/v1/enroll`
    output. Guard in `auth.py`: HMAC auth REJECTS tenant `web` (the
    web tenant is reachable only through phase-2's cookie routes), so
-   a leaked row can't be replayed through `/v1/*`.
+   a leaked row can't be replayed through `/v1/*`. The same migration
+   adds `ascent_accounts.email text` — nullable, no constraints — for
+   phase 4's optional resurrection email.
 2. `game.py`: extend doc creation (`_load_doc`) with an optional
    `display_name` — when set (web path only), the new doc gets
    `name` filled and whatever flag the intro uses to decide the name

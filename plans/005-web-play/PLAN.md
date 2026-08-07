@@ -46,7 +46,7 @@ wrappers around the existing logic, and serving the pane at `/play`.
 | 1 | [Identity](phase-1/PLAN.md) — the `web` tenant; account ↔ player mapping; the registrar knows your name | DB migration + `game.py`/`names.py` |
 | 2 | [Web play API](phase-2/PLAN.md) — session-authed `/play/api/*` wrapping the same functions `/v1/*` uses | `worldd/app/webplay.py` |
 | 3 | [The pane at /play](phase-3/PLAN.md) — parametrize `pane.py` (API base, cookie auth, 401 → door); serve it | plugin repo + vendor |
-| 4 | [The funnel](phase-4/PLAN.md) — signup lands you IN the game; homepage says so | `site.py` + homepage |
+| 4 | [The funnel](phase-4/PLAN.md) — signup AND login land you IN the game; sign-in at the top of the page, not just the bottom; optional resurrection email on signup | `site.py` + homepage |
 | 5 | [Dojo + ship](phase-5/PLAN.md) — walkthroughs, full ship ritual, live probe | dojo results + deploy |
 
 Phases execute in order; each is verified before the next begins.
@@ -74,6 +74,10 @@ Phases execute in order; each is verified before the next begins.
 - **The registrar already knows you.** Signup claimed your username;
   the in-game name prompt is skipped for web players — your character
   IS your account name. No name-claim race between door and gate.
+- **Email is optional and dumb on purpose** (Roy, 2026-08-07): one
+  nullable column, one optional form field on signup. No validation
+  beyond a length cap, no verification mail, no recovery flow built —
+  it exists so a lost password can be resurrected by hand later.
 
 ## Verification (plan-level; exact commands in each phase)
 
