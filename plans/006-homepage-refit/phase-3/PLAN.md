@@ -36,4 +36,7 @@ the phrase "No matter what happens on the hundredth floor".
 
 ## Execution status
 
-_(appended after execution)_
+**DONE 2026-08-08.** .strip → .floorcol vertical column, floors 1–6 only, captions
+"Floor N · NAME" (Warden sublines kept); Stone copy leads with "No matter what happens
+on the hundredth floor — we remember." Verified on production at 1280 and 375 px, no
+horizontal scroll.

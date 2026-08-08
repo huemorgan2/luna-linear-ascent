@@ -57,4 +57,8 @@ index.html/site.css hunks (all in one phase commit → `git revert`).
 
 ## Execution status
 
-_(appended after execution)_
+**DONE 2026-08-08.** portrait_maiden (woman in full plate) and portrait_wick_giant
+(colossal dwarf archwizard, staff) generated with the 030 pipeline (nano-banana-pro,
+Bayer 1-bit; ink 12%/18%/20%). Site trio wired: maiden / elf_aegis / wick_giant 140x260
+on a shared ground line (+60 px head). Game's portrait_wick_100x200.png replaced with the
+same wizard (plugin 0a17571, hash-verified against the vendor). Live on production.

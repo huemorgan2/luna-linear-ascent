@@ -55,4 +55,9 @@ the 005 scroll layout.
 
 ## Execution status
 
-_(appended after execution)_
+**DONE 2026-08-08.** In-place player shipped in site.js: one card visible, advance only
+when gif cycle (data-ms) AND typewriter (28 ms/char) finish + 1.4 s hold; split chapters
+swap _intro→_loop; dot rail with gold live dot + marching ░▒▓▒░ train; no skip control.
+One fix during local verify: boot observer had threshold 0.2 on the tall #lore section
+(can never fire) → observe cards[0] with rootMargin -25%. Verified 45 s hands-off on
+production: refugee→stone→theft in place, scrollY unchanged, console clean.

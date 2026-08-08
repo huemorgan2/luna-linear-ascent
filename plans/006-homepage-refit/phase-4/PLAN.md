@@ -43,4 +43,15 @@ no unpublish is needed.
 
 ## Execution status
 
-_(appended after execution)_
+**DONE 2026-08-08.** Plugin: my portrait committed as 0a17571 on top of the parallel
+session's committed 0.51.0 (95c2e86 mercy revamp + c3c37c5 tools — already on origin/main,
+so the vendor ships them by design); their uncommitted work stashed around vendor_game.sh
+and restored (7 files they re-regenerated mid-dance kept their newer live copies; stash
+"006-ship" retained as backup). Tests: plugin 920 passed/1 skipped; worldd 130 passed.
+Shipped a26c952, deploy dep-d9re35740ujc73b947ig → /health game 0.51.0.
+REGRESSION caught by dojo: Cloudflare served 4 h-stale site.js against new HTML (origin
+sent no Cache-Control). Fixed b6ea68f (?v=0.51.0 asset URLs + origin max-age=60
+must-revalidate on /static code files, test added), deploy dep-d9re5kv40ujc73b99g30.
+Dojo 006-01 full walkthrough on production: ALL PASS (results archived at luna
+00901f36, dojo/results/006-homepage-refit/). Marketplace upload still 500 (external) —
+0.51.0 zip packaged from clean HEAD archive; publish retry pending.
