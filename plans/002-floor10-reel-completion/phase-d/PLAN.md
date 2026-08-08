@@ -68,3 +68,25 @@ WORLDD HALF SHIPPED, MARKETPLACE HALF BLOCKED ON FULL DISK.
   scenes, 0.47.0 renderer) until the disk decision unblocks the publish.
   Decision owed by user: delete-and-republish / grow disk / prune endpoint.
 
+
+## Execution status addendum (2026-08-09, disk decision executed)
+
+User chose option 1 (grow disk). Executed + one self-inflicted incident:
+
+- Disk grown 1→5 GB via blueprint (luna-marketplaces 2df193a); resize
+  applied without redeploy; uploads unblocked.
+- INCIDENT: a queued retry loop for the 0.51.1 publish ran ~11 h late
+  (machine suspended). In the gap the parallel session shipped 0.52→0.57
+  (unblocked by the same disk grow). The late 0.51.1 upload then overwrote
+  marketplace latest_version — the upload endpoint sets latest
+  unconditionally (service plugins.py:209, no semver compare). Hybrid
+  window (0.57.0 scenes / 0.51.1 renderer): ~15 minutes.
+- FIX (re-publish path, since versions are immutable and DB access is
+  classifier-blocked): 0.57.1 bumped from origin/main 1ce47b9 (identical
+  content, plugin 5291d81), 980 tests passed, published — index 0.57.1,
+  sha256 fa081c8a… matches local zip. worldd re-vendored 0.57.1 (parent
+  a076927), manual deploy dep-d9rpm2ajobas73e055a0, /health game 0.57.1.
+- FINAL STATE: marketplace == worldd == 0.57.1 (0.57.0 content, which
+  includes all phase C reels). 0.51.1 remains as an archived version.
+- Lesson: never leave a publish retry loop running unattended; re-check
+  the live index version immediately before any upload.
