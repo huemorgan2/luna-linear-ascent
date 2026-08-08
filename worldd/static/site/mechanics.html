@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LINEAR ASCENT — mechanics</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23060606'/%3E%3Crect x='6' y='2' width='4' height='12' fill='%23f2b632'/%3E%3Crect x='4' y='12' width='8' height='2' fill='%23f2b632'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/site/site.css?v=0.51.0">
+<style>
+  body { overflow-x: auto; }
+  #mech { max-width: 1180px; margin: 0 auto; padding: 0 1rem 4rem; }
+  #mech h1 { color: var(--bright); margin: 1.5rem 0 .25rem; }
+  .subtitle { color: var(--dim); margin-bottom: 1.25rem; }
+  .tabs { display: flex; gap: .5rem; margin: 1rem 0;
+          border-bottom: 1px solid var(--line); padding-bottom: .5rem; }
+  .tab { cursor: pointer; padding: .35rem 1.1rem; color: var(--gold);
+         border: 1px solid var(--line); background: none; }
+  .tab.on { background: var(--gold); color: var(--bg);
+            border-color: var(--gold); font-weight: bold; }
+  .pane { display: none; }
+  .pane.on { display: block; }
+  table.mech { border-collapse: collapse; width: 100%;
+               font-size: .95rem; margin-bottom: 1.5rem; }
+  table.mech th, table.mech td { border: 1px solid var(--line);
+    padding: .2rem .5rem; text-align: right; white-space: nowrap; }
+  table.mech th { color: var(--bright); background: #141410;
+                  position: sticky; top: 0; }
+  table.mech td.l, table.mech th.l { text-align: left; }
+  tr.floorhead td { background: var(--paper); color: var(--gold);
+                    text-align: left; font-weight: bold; }
+  tr.warden td { color: var(--dim); }
+  td.hard { color: #e05a5a; }
+  td.easy { color: #7ec87e; }
+  .legend { color: var(--dim); margin: .75rem 0 1.25rem;
+            max-width: 72rem; }
+  .legend b { color: var(--fg); }
+  .simbox { border: 1px solid var(--gold); padding: 1rem;
+            margin: 1rem 0 2rem; background: var(--paper); }
+  .simbox h2 { color: var(--bright); margin-bottom: .5rem; }
+  .simrow { display: flex; flex-wrap: wrap; gap: .75rem;
+            align-items: center; margin-bottom: .5rem; }
+  .simrow label { color: var(--dim); }
+  .simbox select, .simbox input {
+    background: #2a2a2a; color: var(--fg); border: 1px solid var(--line);
+    font: inherit; padding: .15rem .35rem; }
+  .simbox button { background: var(--gold); color: var(--bg);
+    border: none; font: inherit; font-weight: bold;
+    padding: .25rem 1rem; cursor: pointer; }
+  #simout { white-space: pre; color: var(--fg); margin-top: .75rem; }
+  .filter { margin: .5rem 0 1rem; }
+  .filter input { background: #2a2a2a; color: var(--fg);
+    border: 1px solid var(--line); font: inherit; padding: .2rem .4rem; }
+  h3.slot { color: var(--bright); text-transform: uppercase;
+            margin: 1.5rem 0 .5rem; }
+</style>
+</head>
+<body>
+
+<header id="bar">
+  <span id="bar-left" aria-hidden="true">BACK ROOM · THE LEDGER</span>
+  <span id="bar-right" aria-hidden="true">LINEAR ASCENT</span>
+  <a id="bar-cta" href="/">[ THE GATE ]</a>
+</header>
+
+<div id="mech">
+  <h1>THE MECHANICS LEDGER</h1>
+  <div class="subtitle">Every number the tower runs on — generated from
+    the engine's own tables. Unlinked, unindexed: the designer's page.</div>
+
+  <div class="tabs">
+    <button class="tab on" data-pane="floors">FLOORS</button>
+    <button class="tab" data-pane="levels">LEVELS</button>
+  </div>
+
+  <div id="pane-floors" class="pane on">
+    <div class="legend" id="floors-legend"></div>
+    <div class="simbox" id="sim">
+      <h2>FIGHT SIMULATOR</h2>
+      <div class="simrow">
+        <label>Floor <select id="sim-floor"></select></label>
+        <label>Monster <select id="sim-monster"></select></label>
+        <label>Specimen <select id="sim-spec"></select></label>
+      </div>
+      <div class="simrow">
+        <label>Player level <input id="sim-level" type="number"
+               min="1" value="1" style="width:4rem"></label>
+        <label>Gear <select id="sim-gear">
+          <option value="ref">at-level forge set (reference)</option>
+          <option value="base">starter gear only</option>
+        </select></label>
+        <label>Class <select id="sim-class">
+          <option value="melee">warrior (melee)</option>
+          <option value="ranged">archer (bow)</option>
+        </select></label>
+        <label>Fights <input id="sim-n" type="number" min="100"
+               max="20000" value="3000" style="width:5.5rem"></label>
+        <button id="sim-run">RUN</button>
+      </div>
+      <div id="simout" class="dim">Pick a monster and run.</div>
+    </div>
+    <div class="filter">Jump to floor:
+      <input id="floor-jump" type="number" min="1" max="100"
+             style="width:4.5rem">
+      <span class="dim">(scrolls the table)</span></div>
+    <div id="floors-table"></div>
+  </div>
+
+  <div id="pane-levels" class="pane">
+    <div class="legend" id="levels-legend"></div>
+    <div id="levels-table"></div>
+    <h3 class="slot">THE FORGE — every rung, every price</h3>
+    <div class="legend">Prices in gold. LVL/FLR = the gate: the level you
+      must hold and the floor the smith asks about. Off-class weapons cost
+      ×<span id="offmult"></span>. Styles: keen = more bonus, less
+      durability; warded = pricier, lasts longer.</div>
+    <div id="gear-table"></div>
+    <h3 class="slot">APOTHECARY &amp; RELICS</h3>
+    <div id="shop-table"></div>
+  </div>
+</div>
+
+<script src="/static/site/mechanics-data.js?v=0.1.0"></script>
+<script src="/static/site/mechanics.js?v=0.1.0"></script>
+</body>
+</html>

@@ -67,6 +67,25 @@ async def test_homepage_refit(client):
     assert r.headers["cache-control"] == "public, max-age=60, must-revalidate"
 
 
+async def test_mechanics_ledger_is_there_but_unlinked(client):
+    """The back room: /mechanics shows every number, and the homepage
+    never mentions it — you have to know the door exists."""
+    r = await client.get("/mechanics")
+    assert r.status_code == 200
+    body = r.text
+    assert "MECHANICS LEDGER" in body
+    assert "FLOORS" in body and "LEVELS" in body
+    assert 'name="robots" content="noindex"' in body
+    assert "googleapis" not in body and "cdn." not in body
+    # the baked data file is served and carries the tables
+    data = (await client.get("/static/site/mechanics-data.js")).text
+    assert data.startswith("// generated")
+    assert '"floors":' in data and '"levels":' in data
+    assert '"killLevel":' in data
+    # unlinked: the front door does not know the back room
+    assert "mechanics" not in (await client.get("/")).text.lower()
+
+
 async def test_health_is_untouched_by_the_site(client):
     r = await client.get("/health")
     assert r.status_code == 200 and r.json()["ok"] is True

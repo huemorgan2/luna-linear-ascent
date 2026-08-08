@@ -39,6 +39,14 @@ async def homepage():
     return FileResponse(SITE_DIR / "index.html", media_type="text/html")
 
 
+# The back room: every number the tower runs on, one unlinked page.
+# Data is baked by tools/gen_mechanics.py — rerun it when balance moves.
+
+@router.get("/mechanics", include_in_schema=False)
+async def mechanics():
+    return FileResponse(SITE_DIR / "mechanics.html", media_type="text/html")
+
+
 # ── The public world feed (no auth — this is the shop window) ────────────
 
 PUBLIC_TTL_S = 60.0
