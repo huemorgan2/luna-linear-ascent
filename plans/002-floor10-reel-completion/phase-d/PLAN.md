@@ -46,5 +46,25 @@ disk-blocked backlog), so this publish also heals an existing hybrid surface.
   0.51.2 built from the pre-phase-C commit (0a17571).
 - Plugin repo: `git revert` the bump commit.
 
-## Execution status
-(appended after execution)
+## Execution status (2026-08-08)
+
+WORLDD HALF SHIPPED, MARKETPLACE HALF BLOCKED ON FULL DISK.
+
+- Working tree cleaned of 11 parked slugs' failing takes (22 files backed up
+  to scratchpad); package dir verified clean vs HEAD.
+- Bump 0.51.1 committed (plugin 7af71c3) and pushed; 921 plugin tests passed,
+  1 skipped.
+- Vendored 0.51.1 (30 py, 100 yaml); parent vendor commit pushed
+  (a5000f8..4179304). Render auto-deploy did NOT fire (recurring known
+  issue); manual deploy dep-d9rfi3qjnfac73fjmkng succeeded.
+- VERIFIED: /health returns "game": "0.51.1", db true.
+- Marketplace upload of plugin-linear-ascent-0.51.1.zip (45 MB, sha256
+  99468ec4...) failed HTTP 500 twice + once via direct curl. Root cause
+  confirmed in luna-marketplaces logs (srv-d8m7nct8nd3s73dofrm0):
+  "OSError: [Errno 28] No space left on device" in
+  app/routers/plugins.py:119 upload_plugin. The 1 GB disk is full.
+  Render SSH inspection was classifier-blocked; stopped per plan step 8.
+- Marketplace remains at 0.47.0 → players see a hybrid surface (0.51.1
+  scenes, 0.47.0 renderer) until the disk decision unblocks the publish.
+  Decision owed by user: delete-and-republish / grow disk / prune endpoint.
+
