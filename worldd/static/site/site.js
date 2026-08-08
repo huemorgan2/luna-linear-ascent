@@ -97,6 +97,11 @@
   fetch("/v1/public/world").then(function (r) { return r.json(); })
     .then(fillWorld).catch(function () { /* the page stands anyway */ });
 
+  /* 006: the story plays itself when motion is welcome — the scroll
+     cards stay in the markup for scripts-off and reduced-motion */
+  var PLAYER = !STILL
+    && document.querySelectorAll("#lore .card[data-movie]").length > 1;
+
   /* ── the eyebrow follows the climb ──────────────────────────────── */
   var sections = document.querySelectorAll("section[data-floor]");
   if ("IntersectionObserver" in window) {
@@ -118,7 +123,8 @@
         typeCard(e.target);
       });
     }, { rootMargin: "0px 0px -10% 0px" });
-    document.querySelectorAll(".card, .strip figure").forEach(function (c) {
+    document.querySelectorAll(".card, .floorcol figure").forEach(function (c) {
+      if (PLAYER && c.closest("#lore")) return;   // the player owns these
       c.classList.add("veil");
       cob.observe(c);
     });
@@ -147,6 +153,139 @@
       })();
     })();
   }
+
+  /* ── 006: the story plays itself — one card, in place, no skip ──
+     Each chapter: its GIF plays a full cycle (split slugs run _intro
+     once then swap to the _loop tail, the way the game's card does)
+     while the lines type at reading speed. Only when BOTH are done
+     does the next chapter take the stage. It rounds IX → I forever. */
+  var READ_MS = 28;      /* per character — a reading pace */
+  var LINE_GAP = 350;    /* breath between lines */
+  var HOLD_MS = 1400;    /* the finished card holds before the switch */
+  var INTRO_MS = 4800;   /* every split _intro runs 4800ms */
+
+  function storyPlayer() {
+    var lore = $("lore");
+    var cards = [].slice.call(
+      (lore || document).querySelectorAll(".card[data-movie]"));
+    if (!lore || cards.length < 2) return;
+
+    /* the stage keeps one height — the tallest chapter's — so the
+       movie truly plays "in the same place" */
+    var tallest = 0;
+    cards.forEach(function (c) {
+      tallest = Math.max(tallest, c.offsetHeight);
+    });
+    cards.forEach(function (c) {
+      c.style.minHeight = tallest + "px";
+    });
+
+    /* the dot rail: one mark per chapter, plus a marching dot train */
+    var rail = document.createElement("div");
+    rail.id = "story-rail";
+    rail.setAttribute("aria-hidden", "true");
+    var dots = cards.map(function () {
+      var s = document.createElement("span");
+      s.className = "raildot";
+      s.textContent = "·";
+      rail.appendChild(s);
+      return s;
+    });
+    var train = document.createElement("div");
+    train.id = "story-train";
+    train.textContent = "░▒▓▒░";
+    rail.appendChild(train);
+    lore.appendChild(rail);
+    lore.classList.add("playing");
+
+    var seq = 0;
+    function playArt(c) {
+      var img = c.querySelector("img.px");
+      if (!img) return;
+      var base = "/static/intro-movie/intro_" + c.getAttribute("data-movie");
+      var tag = "?p" + (++seq);            /* restart the GIF's clock */
+      if (c.hasAttribute("data-split")) {
+        img.src = base + "_intro_320x200.gif" + tag;
+        setTimeout(function () {
+          img.src = base + "_loop_320x200.gif" + tag;
+        }, INTRO_MS);
+      } else {
+        img.src = base + "_320x200.gif" + tag;
+      }
+    }
+
+    function typeChapter(card, done) {
+      var lines = [].slice.call(card.querySelectorAll("p.t"));
+      if (!lines.length) { done(); return; }
+      lines.forEach(function (p) {
+        if (!p.dataset.full) p.dataset.full = p.textContent;
+        p.textContent = "";
+        p.classList.add("untyped");
+      });
+      var li = 0;
+      (function nextLine() {
+        if (li >= lines.length) { done(); return; }
+        var p = lines[li++], full = p.dataset.full, i = 0;
+        p.classList.remove("untyped");
+        p.classList.add("caret");
+        (function tick() {
+          i += 1;
+          p.textContent = full.slice(0, i);
+          if (i < full.length) setTimeout(tick, READ_MS);
+          else {
+            p.classList.remove("caret");
+            setTimeout(nextLine, LINE_GAP);
+          }
+        })();
+      })();
+    }
+
+    function play(i) {
+      cards.forEach(function (c, j) {
+        c.classList.toggle("off", j !== i);
+      });
+      dots.forEach(function (d, j) {
+        d.textContent = j === i ? "●" : (j < i ? "○" : "·");
+        d.classList.toggle("live", j === i);
+      });
+      var c = cards[i];
+      c.classList.remove("on");            /* restep the materialize */
+      void c.offsetWidth;
+      c.classList.add("on");
+      playArt(c);
+      var artMs = parseInt(c.getAttribute("data-ms"), 10) || 6240;
+      var artDone = false, typed = false;
+      function maybe() {
+        if (!artDone || !typed) return;
+        setTimeout(function () {
+          play((i + 1) % cards.length);
+        }, HOLD_MS);
+      }
+      setTimeout(function () { artDone = true; maybe(); }, artMs);
+      typeChapter(c, function () { typed = true; maybe(); });
+    }
+
+    /* roll the reel when the stage first comes into view */
+    var started = false;
+    var boot = function () {
+      if (started) return;
+      started = true;
+      play(0);
+    };
+    if ("IntersectionObserver" in window) {
+      var sob = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          sob.disconnect();
+          boot();
+        });
+      }, { rootMargin: "0px 0px -25% 0px" });
+      sob.observe(cards[0]);
+    } else {
+      boot();
+    }
+  }
+  if (PLAYER) storyPlayer();
 
   /* ── the fight that plays itself (real engine flavor, scripted) ─── */
   var W = 10;

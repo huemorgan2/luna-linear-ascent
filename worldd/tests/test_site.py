@@ -37,6 +37,31 @@ async def test_homepage_serves_the_terminal(client):
     assert "googleapis" not in body and "cdn." not in body
 
 
+async def test_homepage_refit(client):
+    """006: the movie plays in place, the cast has its faces, six floors
+    stand in a column, and the Stone remembers."""
+    body = (await client.get("/")).text
+    # nine tagged chapters for the in-place player — and no skip, ever
+    assert body.count("data-movie=") == 9
+    assert body.count("data-split") == 4          # theft/refugee/stone/shard
+    assert "skip" not in body.lower()
+    # the cast: the woman, the armoured elf, the giant wizard
+    assert "portrait_maiden_100x200.png" in body
+    assert "portrait_elf_aegis_100x200.png" in body
+    assert "portrait_wick_giant_140x260.png" in body
+    for f in ("portrait_maiden_100x200.png", "portrait_elf_aegis_100x200.png",
+              "portrait_wick_giant_140x260.png"):
+        assert (await client.get(f"/static/site/art/{f}")).status_code == 200
+    # floors: the first six, vertical, titled the way people say them
+    assert "Floor 1 · THE FENCEROWS" in body
+    assert "Floor 6 · THE HOLLOW LANES" in body
+    assert "F1 ·" not in body
+    assert "floor6_world" in body and "floor7_world" not in body
+    assert "floorcol" in body
+    # the Stone remembers, no matter what
+    assert "No matter what happens on the hundredth floor" in body
+
+
 async def test_health_is_untouched_by_the_site(client):
     r = await client.get("/health")
     assert r.status_code == 200 and r.json()["ok"] is True

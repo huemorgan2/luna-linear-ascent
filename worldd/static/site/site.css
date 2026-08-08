@@ -177,15 +177,34 @@ section { padding: 2rem 0; }
 .card img.px { display: block; margin: 0 auto 1rem; }
 
 img.px { image-rendering: pixelated; width: min(640px, 100%); height: auto; }
-.trio img.px, .strip img.px { width: auto; max-width: 100%; }
+.trio img.px, .floorcol img.px { width: auto; max-width: 100%; }
 
 .closer { color: var(--bright); text-align: center; margin-top: 1rem; }
 
 /* materialize: sections arrive in steps, not fades — fades are anti-1-bit */
-.card, .strip figure { opacity: 1; }
+.card, .floorcol figure { opacity: 1; }
 .veil { opacity: 0; }
 .on { animation: mat .45s steps(5) both; }
 @keyframes mat { from { opacity: 0; } to { opacity: 1; } }
+
+/* ── 006: the story plays itself — one card in place, dots on rail ── */
+#lore.playing .card.off { display: none; }
+#story-rail {
+  max-width: 72ch; margin: 0 auto; padding: 0 1ch;
+  text-align: center; color: var(--dim);
+  overflow: hidden; white-space: nowrap;
+}
+#story-rail .raildot { display: inline-block; padding: 0 .5ch; }
+#story-rail .raildot.live { color: var(--gold);
+                            animation: blink 1s steps(1) infinite; }
+#story-train {
+  color: var(--dim); white-space: pre;
+  animation: march 3.6s steps(24) infinite;
+}
+@keyframes march {
+  from { transform: translateX(-40%); }
+  to   { transform: translateX(40%); }
+}
 
 /* typewriter */
 .t.untyped { visibility: hidden; }
@@ -200,20 +219,24 @@ img.px { image-rendering: pixelated; width: min(640px, 100%); height: auto; }
 
 /* ── your climb ────────────────────────────────────────────────────── */
 .trio { display: flex; gap: 2ch; justify-content: center; flex-wrap: wrap;
-        margin-top: 1rem; }
+        align-items: flex-end; margin-top: 1rem; }
 .trio figure { text-align: center; max-width: 24ch; }
 .trio img { width: 100px; }
+/* the sorcerer is a giant — two heads taller, wider; feet on the same
+   ground line as the others (flex-end), head above their margin */
+.trio figure.giant img { width: 140px; }
 .trio figcaption { margin-top: .5rem; }
 
 #demo-lines { min-height: 5.2rem; }
 #demo-lines p { margin-bottom: 0; }
 .demo-opts { justify-content: center; }
 
-/* ── the floors strip ──────────────────────────────────────────────── */
-.strip { display: flex; gap: 2ch; overflow-x: auto; padding: 0 1ch 1rem; }
-.strip figure { flex: 0 0 auto; width: 320px; text-align: center; }
-.strip img { width: 320px; }
-.strip figcaption { margin-top: .5rem; }
+/* ── the floors — a vertical climb, no scroller (006) ──────────────── */
+.floorcol { display: flex; flex-direction: column; align-items: center;
+            gap: 2rem; padding: 0 1ch 1rem; }
+.floorcol figure { width: 320px; max-width: 100%; text-align: center; }
+.floorcol img { width: 320px; max-width: 100%; }
+.floorcol figcaption { margin-top: .5rem; }
 
 /* ── the society quad ──────────────────────────────────────────────── */
 .quad { display: grid; grid-template-columns: repeat(auto-fit, minmax(30ch, 1fr));
@@ -267,4 +290,5 @@ footer p { margin-bottom: .5rem; }
   #ticker-inner { animation: none; padding-left: 0; }
   .on { animation: none; }
   .caret::after { animation: none; }
+  #story-train, #story-rail .raildot.live { animation: none; }
 }
