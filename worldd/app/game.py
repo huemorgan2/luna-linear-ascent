@@ -103,6 +103,24 @@ def _patch_kill_receipt(doc: dict, scene) -> None:
                    {"kind": "aether", "n": int(receipt.get("xp", 0))}]
 
 
+def _patch_loot_receipt(doc: dict, scene) -> None:
+    """042: the raid resolved in THIS request — `_fx_loot` queued the
+    attacker's verdict after the engine had already drawn the "you slip
+    toward the camp" card. The verdict takes the card's face here; the
+    profile's buttons stay so the raider can walk back. Popping it now
+    also keeps it from re-playing on the next act."""
+    q = doc.get("pending_events") or []
+    if not q or (q[0] or {}).get("eyebrow") != "THE FIELDS · AFTER":
+        return
+    ev = q.pop(0)
+    scene.eyebrow = ev.get("eyebrow", "")
+    scene.headline = ev.get("headline", "")
+    scene.support = ev.get("support", "")
+    scene.body_lines = list(ev.get("body_lines") or [])
+    scene.event_kind = ev.get("event_kind", "")
+    scene.banner = ev.get("banner", "")
+
+
 async def _claim_name(conn, tenant: str, player: str, doc: dict,
                       option: str, text: str) -> str:
     """004: the registrar, before the engine writes anything.
@@ -174,6 +192,8 @@ async def run_act(tenant: str, player: str, option: str, text: str,
             ledger = doc.pop("_ledger", [])
             await social.execute_effects(conn, tenant, player, doc)
             _patch_kill_receipt(doc, scene)
+            if option == "pf_loot_go":
+                _patch_loot_receipt(doc, scene)
             doc.pop("_world", None)
             doc["scene"] = scene.to_dict()
             await _save_doc(conn, tenant, player, doc, ledger)

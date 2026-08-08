@@ -129,7 +129,14 @@ async def test_cold_camp_loses_carried_gold_never_the_bank(
     row = next(o for o in s["options"] if o["id"] == "pf_loot")
     assert not row.get("locked"), row
     await act(client, tenant_a, "tenant-a", pa, option="pf_loot")
-    await act(client, tenant_a, "tenant-a", pa, option="pf_loot_go")
+    verdict = await act(client, tenant_a, "tenant-a", pa,
+                        option="pf_loot_go")
+    # the verdict rides THIS response — not the next act's card
+    assert verdict["headline"] == "You cleaned out their camp"
+    assert any("carried gold seized" in ln
+               for ln in verdict["body_lines"])
+    s_after = await scene(client, tenant_a, "tenant-a", pa)
+    assert s_after.get("eyebrow") != "THE FIELDS · AFTER"   # no replay
     da = await _doc(pool, "tenant-a", pa)
     db_ = await _doc(pool, "tenant-b", pb)
     haul = 1000 - db_["gold"]

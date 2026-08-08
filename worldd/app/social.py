@@ -1258,8 +1258,9 @@ async def _fx_loot(conn, tenant: str, player: str, doc: dict,
             event_kind="loot",
         ).to_dict())
         report("The camp answered", f"{v_name}'s defense threw you back.",
-               [f"− ◈ {tithe:,} carried gold lost"] if tithe else
-               ["You crawled home with your pockets intact."],
+               ([f"− ◈ {tithe:,} carried gold lost"] if tithe else
+                ["You crawled home with your pockets intact."])
+               + [f"− beaten down to {doc['hp']}/{pstate.max_hp(doc)} hp"],
                kind="death")
         line = f"{a_name} tried {v_name}'s camp and crawled home"
         await conn.execute(
