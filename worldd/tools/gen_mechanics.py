@@ -7,10 +7,12 @@ changes:
 
     .venv/bin/python tools/gen_mechanics.py
 
-The Kill Level column is Monte-Carlo'd here, offline: for each monster
-(common specimen, full-HP player in the design's at-level reference
-gear) it is the lowest player level whose single-fight win chance is
-~90% (accepted at >= 85%). Ground monsters are fought as a warrior
+The Kill Bar column is Monte-Carlo'd here, offline: for each monster
+(common specimen, full-HP player) it is the lowest BAR — the design's
+reference loadout of floor B: level min(B, 30), floor-B gear — whose
+single-fight win chance is ~90% (accepted at >= 85%). Bars run 1–101;
+past level cap 30 the ladder climbs by steel alone (043). Ground
+monsters are fought as a warrior
 (melee — must eat the crossing blow and every counter); flying ones as
 an archer (melee cannot touch them). The fight model mirrors
 engine/combat.py: player strikes first, damage rolls uniform in
@@ -45,11 +47,12 @@ MAX_ROUNDS = 400           # a fight longer than this counts as a loss
 
 # ── the fight model (mirror of engine/combat.py, no consumables) ─────────
 
-def _player(level: int) -> tuple[int, int, int]:
-    """(ATK, DEF, HP) of the design's at-level reference player."""
-    lvl = min(level, eco.LEVEL_CAP)
-    atk, dfs = eco._at_level_loadout(lvl)
-    return atk, dfs, eco.reference_player_hp(lvl)
+def _player(bar: int) -> tuple[int, int, int]:
+    """(ATK, DEF, HP) of the bar's reference player: level min(bar, 30)
+    in floor-`bar` reference gear — _at_level_loadout caps the level
+    itself, so past 30 the loadout keeps climbing by steel."""
+    atk, dfs = eco._at_level_loadout(bar)
+    return atk, dfs, eco.reference_player_hp(bar)
 
 
 def _monster(floor: int, traits) -> tuple[int, int, int, dict]:
@@ -68,15 +71,15 @@ def _monster_blow(m_atk: int, p_def: int, halved: bool) -> int:
     return dmg // 2 if halved else dmg
 
 
-def _traced_fight(level: int, floor: int, traits):
+def _traced_fight(bar: int, floor: int, traits, dtype: str = "melee"):
     """One fight, attack every round. (won, rounds, player HP lost)."""
-    p_atk, p_def, p_hp = _player(level)
+    p_atk, p_def, p_hp = _player(bar)
     hp0 = p_hp
     m_atk, m_def, m_hp, prof = _monster(floor, traits)
     mspd = prof["speed"]
     dodge = eco.dodge_pct(eco.PLAYER_BASE_SPEED, mspd)
-    ranged = bool(prof.get("flying"))          # archer vs flyers
-    dtype = "ranged" if ranged else "melee"
+    ranged = dtype == "ranged"                 # archer flow; magic fights
+    #                                            like melee, typed magic
     gap, at_range, rounds = 1, True, 0
     while rounds < MAX_ROUNDS:
         rounds += 1
@@ -108,40 +111,66 @@ def _traced_fight(level: int, floor: int, traits):
     return 0, rounds, hp0 - max(p_hp, 0)
 
 
-def win_rate(level: int, floor: int, traits, sims: int) -> float:
-    wins = sum(_traced_fight(level, floor, traits)[0] for _ in range(sims))
+def win_rate(bar: int, floor: int, traits, sims: int,
+             dtype: str = "melee") -> float:
+    wins = sum(_traced_fight(bar, floor, traits, dtype)[0]
+               for _ in range(sims))
     return wins / sims
 
 
-def kill_level(floor: int, traits) -> tuple[int | None, float]:
-    """Lowest level with ~90% (>= 85%) win chance, and its rate."""
-    lo, hi = 1, eco.LEVEL_CAP
-    if win_rate(hi, floor, traits, SCAN_SIMS) < WIN_ACCEPT:
-        return None, win_rate(hi, floor, traits, CONFIRM_SIMS)
-    while lo < hi:                             # win rate rises with level
+def _kill_bar_typed(floor: int, traits,
+                    dtype: str) -> tuple[int | None, float]:
+    lo, hi = 1, eco.BAR_MAX
+    if win_rate(hi, floor, traits, SCAN_SIMS, dtype) < WIN_ACCEPT:
+        return None, win_rate(hi, floor, traits, CONFIRM_SIMS, dtype)
+    while lo < hi:                             # win rate rises with the bar
         mid = (lo + hi) // 2
-        if win_rate(mid, floor, traits, SCAN_SIMS) >= WIN_TARGET:
+        if win_rate(mid, floor, traits, SCAN_SIMS, dtype) >= WIN_TARGET:
             hi = mid
         else:
             lo = mid + 1
-    lvl = lo
-    rate = win_rate(lvl, floor, traits, CONFIRM_SIMS)
-    while lvl > 1:                             # the ±5 tolerance walks down
-        below = win_rate(lvl - 1, floor, traits, CONFIRM_SIMS)
+    bar = lo
+    rate = win_rate(bar, floor, traits, CONFIRM_SIMS, dtype)
+    while bar > 1:                             # the ±5 tolerance walks down
+        below = win_rate(bar - 1, floor, traits, CONFIRM_SIMS, dtype)
         if below < WIN_ACCEPT:
             break
-        lvl, rate = lvl - 1, below
-    while rate < WIN_ACCEPT and lvl < eco.LEVEL_CAP:
-        lvl += 1
-        rate = win_rate(lvl, floor, traits, CONFIRM_SIMS)
-    return lvl, rate
+        bar, rate = bar - 1, below
+    while rate < WIN_ACCEPT and bar < eco.BAR_MAX:
+        bar += 1
+        rate = win_rate(bar, floor, traits, CONFIRM_SIMS, dtype)
+    return bar, rate
 
 
-def fight_profile(level: int, floor: int, traits, sims: int = 800):
-    """(win rate, avg rounds, avg HP lost) at a given level."""
+def kill_bar(floor: int, traits) -> tuple[int | None, float, str]:
+    """Lowest bar with ~90% (>= 85%) win chance, its rate, and the
+    damage type that gets it — the class the creature does NOT counter:
+    physical (bow for flyers, blade otherwise) unless armor halves
+    physical harder than resist halves magic, then the staff. Magic is
+    never the headline against an unarmored shape even though it would
+    shave the DEF axis — the ladder is read through the fair class."""
+    prof = eco.profile_from_traits(traits)
+    physical = "ranged" if prof.get("flying") else "melee"
+    phys_mult = eco.TIER_MULT.get(prof["armor"], 1.0)
+    magic_mult = eco.TIER_MULT.get(prof["resist"], 1.0)
+    dtypes = ((physical, "magic") if phys_mult >= magic_mult
+              else ("magic", physical))
+    best = (None, 0.0, dtypes[0])
+    for dtype in dtypes:
+        bar, rate = _kill_bar_typed(floor, traits, dtype)
+        if bar is not None:
+            return bar, rate, dtype            # the fair class first
+        if rate > best[1]:
+            best = (None, rate, dtype)
+    return best
+
+
+def fight_profile(bar: int, floor: int, traits, sims: int = 800,
+                  dtype: str = "melee"):
+    """(win rate, avg rounds, avg HP lost) at a given bar."""
     wins = rounds_sum = hp_sum = 0
     for _ in range(sims):
-        w, r, lost = _traced_fight(level, floor, traits)
+        w, r, lost = _traced_fight(bar, floor, traits, dtype)
         wins += w
         rounds_sum += r
         hp_sum += lost
@@ -151,10 +180,10 @@ def fight_profile(level: int, floor: int, traits, sims: int = 800):
 # ── rewards (averages, common specimen, no fade / luck / race) ──────────
 
 def reward_avgs(floor: int, traits, prof) -> tuple[float, float]:
-    threat = eco.kill_reward_mult(floor, traits)
-    xp = eco.xp_per_kill(floor) * threat
-    gold = (eco.gold_per_kill(floor) * threat
-            * eco.profile_gold_mult(prof))
+    """043: pay keys off the creature's bar — no threat multiplier."""
+    bar = eco.creature_bar(floor, traits)
+    xp = eco.xp_per_kill(bar)
+    gold = eco.gold_per_kill(bar) * eco.profile_gold_mult(prof)
     return xp, gold
 
 
@@ -181,8 +210,9 @@ def build_floors() -> list[dict]:
         for e in fl.encounters:
             atk, dfs, hp, prof = _monster(n, e.traits)
             xp, gold = reward_avgs(n, e.traits, prof)
-            kl, kl_rate = kill_level(n, e.traits)
-            at = fight_profile(kl, n, e.traits) if kl else (0.0, 0.0, 0.0)
+            kl, kl_rate, kl_type = kill_bar(n, e.traits)
+            at = (fight_profile(kl, n, e.traits, dtype=kl_type)
+                  if kl else (0.0, 0.0, 0.0))
             monsters.append({
                 "id": e.id, "name": e.name, "kind": e.kind or "native",
                 "traits": list(e.traits),
@@ -194,7 +224,9 @@ def build_floors() -> list[dict]:
                 "bulwark": bool(prof.get("bulwark")),
                 "speed": prof["speed"],
                 "xpAvg": round(xp, 1), "goldAvg": round(gold, 1),
+                "targetBar": eco.creature_bar(n, e.traits),
                 "killLevel": kl,
+                "killType": kl_type,
                 "killPct": round(100 * kl_rate, 1),
                 "killRounds": round(at[1], 1),
                 "killHpLost": round(at[2], 1),
@@ -248,6 +280,25 @@ def build_levels(floors: list[dict]) -> list[dict]:
     return out
 
 
+def build_bars() -> list[dict]:
+    """043: the 1–101 ladder the simulator climbs — per bar, the
+    reference player (level min(bar, 30), floor-bar steel) and the
+    starter-gear body at the same level."""
+    out = []
+    for b in range(1, eco.BAR_MAX + 1):
+        atk, dfs = eco._at_level_loadout(b)
+        lvl = eco.reference_level(b)
+        out.append({
+            "bar": b, "level": lvl,
+            "refAtk": atk, "refDef": dfs,
+            "refHp": eco.reference_player_hp(b),
+            "baseAtk": eco.player_atk(lvl, eco.STARTER_WEAPON.bonus),
+            "baseDef": eco.player_def(lvl, 0, 0),
+            "baseHp": eco.player_max_hp(lvl),
+        })
+    return out
+
+
 def build_gear() -> list[dict]:
     rows = []
     for g in eco.FORGE.values():
@@ -282,6 +333,7 @@ def build_shops() -> dict:
 def build_constants() -> dict:
     return {
         "levelCap": eco.LEVEL_CAP,
+        "barMax": eco.BAR_MAX,
         "playerSpeed": eco.PLAYER_BASE_SPEED,
         "chipDivisor": eco.CHIP_DIVISOR,
         "tierMult": eco.TIER_MULT,
@@ -305,6 +357,7 @@ def main() -> None:
         "constants": build_constants(),
         "floors": floors,
         "levels": build_levels(floors),
+        "bars": build_bars(),
         "gear": build_gear(),
         "shops": build_shops(),
     }

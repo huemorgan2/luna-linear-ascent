@@ -24,18 +24,19 @@
     "0.55 HP … alpha ×2 HP, ×1.2 ATK — table shifts with depth). " +
     "<b>XP/Gold</b> = average per kill before the ±" + C.xpJitterPct +
     "%/±" + C.goldJitterPct + "% roll — both are guaranteed drops, " +
-    "there is no coin chance. <b>KILL LV</b> is the invented number: " +
-    "the lowest player level (full HP, at-level forge gear) that wins " +
-    "a straight fight ~" + C.winTargetPct + "% of the time (accepted ≥" +
-    C.winAcceptPct + "%); warriors fight ground monsters, archers the " +
-    "flyers. <b>RNDS / HP LOST</b> are the averages at that level. " +
-    "“—” means even a capped level-" + C.levelCap + " body in " +
-    "floor-30 reference steel falls short: past there the climb is " +
-    "gear tiers, not levels. Energy allows ~" + C.fightsPerDay +
+    "there is no coin chance. <b>KILL BAR</b> is the invented number: " +
+    "the ladder runs 1–" + C.barMax + ", bar B = level min(B, " +
+    C.levelCap + ") in floor-B reference steel (past the level cap the " +
+    "climb is gear alone). The kill bar is the lowest bar that wins a " +
+    "straight full-HP fight ~" + C.winTargetPct + "% of the time " +
+    "(accepted ≥" + C.winAcceptPct + "%), fought by the class the " +
+    "creature does not counter — ⚔ blade, ➶ bow (flyers), ✦ staff " +
+    "(armored shapes). <b>RNDS / HP LOST</b> are the " +
+    "averages at that bar. Energy allows ~" + C.fightsPerDay +
     " wilds fights per day (1 energy / " + C.energyRegenMin + " min).";
 
   const cols = ["MONSTER", "KIND", "TRAITS", "SPAWN%", "ATK", "DEF",
-    "HP", "ARM", "RES", "SPD", "XP", "GOLD", "KILL LV", "WIN%",
+    "HP", "ARM", "RES", "SPD", "XP", "GOLD", "KILL BAR", "WIN%",
     "RNDS", "HP LOST"];
   let html = '<table class="mech"><thead><tr>' + cols.map((c, i) =>
     `<th${i < 3 ? ' class="l"' : ""}>${c}</th>`).join("") +
@@ -46,9 +47,10 @@
       `${f.zone.toUpperCase()} — ${f.biome} · gate: ${f.gateTown}` +
       `</td></tr>`;
     for (const m of f.monsters) {
+      const kglyph = {melee: "⚔", ranged: "➶", magic: "✦"}[m.killType] || "";
       const kl = m.killLevel === null ? '<td class="hard">—</td>' :
         `<td class="${m.killLevel <= f.floor ? "easy" : "hard"}">` +
-        `${m.killLevel}</td>`;
+        `${m.killLevel}<span class="dim"> ${kglyph}</span></td>`;
       const flags = (m.flying ? " ✈" : "") + (m.bulwark ? " ▣" : "");
       html += "<tr>" +
         `<td class="l">${m.name}${flags}</td>` +
@@ -231,12 +233,13 @@
     const f = M.floors.find((x) => x.floor === +selFloor.value);
     const m = f.monsters[+selMon.value];
     const spec = f.specimens[selSpec.value];
-    const lvl = Math.max(1, Math.min(C.levelCap, +$("sim-level").value));
-    const L = M.levels[lvl - 1];
+    const bar = Math.max(1, Math.min(C.barMax, +$("sim-level").value));
+    const B = M.bars[bar - 1];
+    const L = M.levels[B.level - 1];
     const gear = $("sim-gear").value;
     const P = gear === "ref" ?
-      { atk: L.refAtk, def: L.refDef, hp: L.refHp } :
-      { atk: L.baseAtk, def: L.baseDef, hp: L.baseHp };
+      { atk: B.refAtk, def: B.refDef, hp: B.refHp } :
+      { atk: B.baseAtk, def: B.baseDef, hp: B.baseHp };
     let dtype = $("sim-class").value;
     if (m.flying && dtype === "melee") {
       $("simout").textContent =
@@ -263,7 +266,8 @@
     $("simout").textContent =
       `${n} fights vs ${selSpec.value} ${m.name} ` +
       `(ATK ${mon.atk} DEF ${mon.def} HP ${fmt(mon.hp)})\n` +
-      `player L${lvl} ${gear === "ref" ? "reference" : "starter"} set: ` +
+      `player bar ${bar} (L${B.level}) ` +
+      `${gear === "ref" ? "reference" : "starter"} set: ` +
       `ATK ${P.atk} DEF ${P.def} HP ${P.hp} — ${dtype}\n\n` +
       `WIN ${winPct.toFixed(1)}%   avg rounds ${(rsum / n).toFixed(1)}` +
       `   avg HP lost ${(hsum / n).toFixed(1)} / ${P.hp}\n` +
