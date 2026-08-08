@@ -148,19 +148,35 @@ def would_probably_kill(p: dict, floor, enc) -> bool:
         economy.LETHAL_SHARE * max(1, p["hp"]))
 
 
-def hunt_table(p: dict, floor) -> list[tuple[int, str]]:
+def hunt_table(p: dict, floor, deep: bool = False) -> list[tuple[int, str]]:
     """The floor's roster, weighted for THIS player. Content weights are
-    scaled up first so the 80% cut still has resolution."""
+    scaled up first so the cuts still have resolution. 039: prey draws
+    fade with altitude and the lethal-draw mercy loosens — the floor
+    shapes the table, not just the costumes. A DEEP hunt drops prey
+    entirely — feeble bites AND frail bodies — and skips the rubber
+    band: the player chose this."""
+    if deep:
+        table = [(e.weight * 100, e.id) for e in floor.encounters
+                 if not {"feeble", "frail"}
+                 & set(tuple(getattr(e, "traits", ()) or ()))]
+        # a roster of nothing but prey (none exist today) falls back
+        return table or [(e.weight * 100, e.id) for e in floor.encounters]
     table = []
+    fade = economy.prey_weight_mult(floor.floor)
+    cut = economy.rubber_band_cut(floor.floor)
     for e in floor.encounters:
         w = e.weight * 100
+        traits = tuple(getattr(e, "traits", ()) or ())
+        if "feeble" in traits:
+            w = max(1, round(w * fade))
         if would_probably_kill(p, floor, e):
-            w = max(1, round(w * economy.RUBBER_BAND_CUT))
+            w = max(1, round(w * cut))
         table.append((w, e.id))
     return table
 
 
-def start_encounter(p: dict, floor, enc, kind: str = "wilds") -> Scene:
+def start_encounter(p: dict, floor, enc, kind: str = "wilds",
+                    deep: bool = False) -> Scene:
     # 017 §2: the defense profile — armor/resist tiers, flying, bulwark,
     # speed — derived from qualitative content traits, priced in economy.
     traits = tuple(getattr(enc, "traits", ()) or ()) if enc is not None else ()
@@ -184,15 +200,27 @@ def start_encounter(p: dict, floor, enc, kind: str = "wilds") -> Scene:
         hp = round(hp * economy.BULWARK_HP_MULT)
     specimen = "common"
     if kind == "wilds":
-        # 008: specimen roll — same averages, real variance. Visible on
-        # the opener so fighting an alpha is an informed choice.
+        # 008: specimen roll — real variance, visible on the opener so
+        # fighting an alpha is an informed choice. 039: weights are
+        # floor-shaped — runts thin out at altitude; a DEEP hunt rolls
+        # its own table (no runts at all).
+        spec_table = (economy.DEEP_SPECIMENS if deep
+                      else economy.specimen_table(floor.floor))
         specimen = state.rng_pick(
-            p, [(s["weight"], k) for k, s in economy.SPECIMENS.items()])
-        spec = economy.SPECIMENS[specimen]
+            p, [(s["weight"], k) for k, s in spec_table.items()
+                if s["weight"] > 0])
+        spec = spec_table[specimen]
         atk = round(atk * spec["atk"])
         hp = round(hp * spec["hp"])
         if spec["tag"]:
             prose = f"{prose} This one is {spec['tag']}."
+    if deep and kind == "wilds":
+        # 039 §2: the prime — harder in ATK and SPEED, NEVER in HP.
+        # The fight gets scarier, not longer.
+        atk = round(atk * economy.DEEP_ATK_MULT)
+        prof["speed"] += economy.DEEP_SPEED_BONUS
+        prose = ("You leave the lit paths. What finds you out here "
+                 f"was never hunted thin. {prose}")
     if specimen == "alpha":
         prof["speed"] += economy.ALPHA_SPEED_BONUS
     p["encounter"] = {
@@ -209,6 +237,7 @@ def start_encounter(p: dict, floor, enc, kind: str = "wilds") -> Scene:
         "was": ((getattr(enc, "was", "") or "")
                 if kind != "warden" and enc is not None else ""),
         "specimen": specimen, "traits": list(traits),
+        "deep": bool(deep and kind == "wilds"),
         "profile": prof,
         "atk": atk, "def": dfs, "hp": hp, "hp_max": hp,
         "floor": floor.floor, "shot_used": False,
@@ -370,12 +399,14 @@ def _drop_ranges(p: dict, floor) -> dict:
     profile × threat), so the promise and the payout can't drift."""
     e = p["encounter"]
     fade = economy.fade_multiplier(p["unlocked_floor"], floor.floor)
-    threat = economy.kill_reward_mult(e.get("traits") or ())
+    threat = economy.kill_reward_mult(floor.floor, e.get("traits") or ())
+    deep = economy.deep_reward_mult(floor.floor) if e.get("deep") else 1.0
     g_mult = (economy.SPECIMENS[e.get("specimen", "common")]["gold"]
-              * economy.profile_gold_mult(_profile(p)) * threat * fade)
+              * economy.profile_gold_mult(_profile(p)) * threat * fade
+              * deep)
     g = economy.gold_per_kill(floor.floor)
     x = economy.xp_per_kill(floor.floor)
-    x_mult = threat * fade
+    x_mult = threat * fade * deep
     return {
         "gold": [max(1, round(g * 0.5 * g_mult)),
                  max(1, round(g * 1.5 * g_mult))],
@@ -1044,9 +1075,14 @@ def _victory(p: dict, floor) -> Scene:
         # XP carried no threat modifier at all — a limping runt and a
         # hulking savage were worth the same aether, which is why every
         # kill on a floor felt identical.
-        threat = economy.kill_reward_mult(e.get("traits") or ())
+        threat = economy.kill_reward_mult(floor.floor, e.get("traits") or ())
         xp = max(1, round(xp * threat))
         gold = max(1, round(gold * threat))
+        if e.get("deep"):
+            # 039 §2: the deep hunt pays its premium in BOTH currencies
+            mult = economy.deep_reward_mult(floor.floor)
+            xp = max(1, round(xp * mult))
+            gold = max(1, round(gold * mult))
     if p.get("race") == "elf":
         xp = round(xp * (1 + economy.ELF_XP_BONUS))
     buff = state.faction_buff_pct(p, "xp")
