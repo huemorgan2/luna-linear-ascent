@@ -118,6 +118,8 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
         # 015: the pending request, so the hall shows the asked state
         w["faction_requested"] = await factions.my_request(
             conn, tenant, player) or ""
+        # 042: the Guild Hall wall — every banner, joinable on the spot
+        w["guild_dir"] = await factions.directory(conn)
 
     # 032: the Guildhall's civic wall — this week's standings and the
     # hall of banners — hangs for everyone, member or not.
@@ -201,6 +203,11 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
         news_floor, day - 1)
     w["gossip"] = _condense_war([dict(r) for r in gossip])[:3]
 
+    # 042: who stands where — every room's tiles, and a Stone of Names
+    # payload for everyone the viewer could click this act.
+    w["rooms"] = await _rooms(conn)
+    w["profiles"] = await _profiles(conn, doc, w)
+
     doc["_world"] = w
 
 
@@ -223,7 +230,7 @@ async def _faction_panel(conn, tenant: str, player: str,
     from . import factions
     fac = await conn.fetchrow(
         "SELECT banner, join_fee, weekly_dues, treasury,"
-        " founder_tenant, founder_player "
+        " founder_tenant, founder_player, requirements "
         "FROM ascent_factions WHERE name=$1", name)
     if fac is None:
         return {}
@@ -263,6 +270,8 @@ async def _faction_panel(conn, tenant: str, player: str,
         "name": name, "banner": fac["banner"],
         "join_fee": int(fac["join_fee"]), "dues": int(fac["weekly_dues"]),
         "store": int(fac["treasury"]), "role": my_role,
+        # 042: the door rules — the steward's card edits these
+        "requirements": factions.parse_requirements(fac["requirements"]),
         "pending_requests": pending,
         "members": [{
             "name": m["name"] or m["player"], "role": m["role"],
@@ -549,6 +558,164 @@ async def _grant_targets(conn, doc: dict) -> list[str]:
             if r["name"] and r["name"] != me][:6]
 
 
+# ── 042: rooms + the Stone of Names ──────────────────────────────────────
+# The engine's presence.room_key mirrors _room_key_of exactly — floor
+# rooms are scoped "{loc}:{floor}", the banner hall is "hall:{guild}",
+# sleepers stand in the room they sleep in, a profile reader stands
+# where they came from.
+
+_FLOOR_ROOMS = ("gate_town", "warden_keep", "boss_keep", "memorial")
+_ARMOR_TIERS = ((9, "aegis"), (7, "plate"), (5, "scale"),
+                (3, "chain"), (1, "leather"))
+_ROOM_TILE_CAP = 80            # the engine caps at 70; a little headroom
+_PROFILE_CAP = 80
+LOOT_INACTIVE_S = 3600         # an hour of silence makes a camp cold
+
+
+def _armor_slug(d: dict) -> str:
+    """rags → … → aegis from the equipped armour, the renderer's ladder."""
+    g = economy.FORGE.get((d.get("gear") or {}).get("armor") or "")
+    tier = g.tier if g else 0
+    for t, s in _ARMOR_TIERS:
+        if tier >= t:
+            return s
+    return "rags"
+
+
+def _room_key_of(d: dict) -> str:
+    if d.get("stage") != "playing":
+        return ""
+    loc = str(d.get("location") or "")
+    floor = int(d.get("floor") or 1)
+    if loc == "profile":       # reading the Stone happens where you stand
+        back = d.get("profile_back") or {}
+        loc = str(back.get("loc") or "town")
+        floor = int(back.get("floor") or 1)
+    if loc == "sleeping":
+        loc = str((d.get("sleeping") or {}).get("where") or "lodge")
+    if not loc:
+        return ""
+    if loc in _FLOOR_ROOMS:
+        return f"{loc}:{max(1, floor)}"
+    if loc == "hall":
+        g = str(d.get("guild") or "")
+        return f"hall:{g}" if g else ""
+    return loc
+
+
+def _tile_of(d: dict) -> dict:
+    return {"opt": f"pv:{d['name']}", "name": d["name"],
+            "level": int(d.get("level", 1)),
+            "race": str(d.get("race") or ""),
+            "armor": _armor_slug(d),
+            "sleeping": bool(d.get("sleeping")),
+            "gold": int(d.get("gold", 0)),
+            "energy": int(pstate.energy_now(d))}
+
+
+async def _rooms(conn) -> dict:
+    """Every room's tiles: climbers who acted within a day, plus every
+    sleeper (a sleeping body is IN the bunkroom however long it lies)."""
+    rows = await conn.fetch(
+        "SELECT doc FROM ascent_players WHERE doc->>'stage'='playing' "
+        "AND (updated_at > now() - interval '24 hours' "
+        "     OR doc->'sleeping' IS NOT NULL)")
+    rooms: dict[str, list] = {}
+    for r in rows:
+        d = json.loads(r["doc"])
+        if not d.get("name"):
+            continue
+        key = _room_key_of(d)
+        if not key:
+            continue
+        tiles = rooms.setdefault(key, [])
+        if len(tiles) < _ROOM_TILE_CAP:
+            tiles.append(_tile_of(d))
+    return rooms
+
+
+def _item_label(slug: str) -> str:
+    it = (economy.APOTHECARY.get(slug) or economy.FORGE.get(slug)
+          or getattr(economy, "RELICS", {}).get(slug))
+    return it.name if it else slug.replace("_", " ")
+
+
+async def _profiles(conn, doc: dict, w: dict) -> dict:
+    """The Stone of Names payload — everyone the viewer could click this
+    act: their room, the live warden board, the memorial roll on their
+    floor, and the page already open. The bank NEVER rides here."""
+    names: set[str] = set()
+    for t in (w.get("rooms") or {}).get(_room_key_of(doc)) or []:
+        names.add(t["name"])
+    for s in (w.get("warden") or {}).get("strikers") or []:
+        if s.get("name"):
+            names.add(s["name"])
+    rec = (w.get("fallen") or {}).get(str(int(doc.get("floor") or 1)))
+    for s in (rec or {}).get("roll") or []:
+        if s.get("name"):
+            names.add(s["name"])
+    if doc.get("profile_view"):
+        names.add(str(doc["profile_view"]))
+    names.discard(doc.get("name"))
+    if not names:
+        return {}
+    rows = await conn.fetch(
+        "SELECT tenant, player, doc, updated_at FROM ascent_players "
+        "WHERE doc->>'stage'='playing' AND doc->>'name' = ANY($1::text[]) "
+        "ORDER BY updated_at", sorted(names)[:_PROFILE_CAP])
+    # what each climber gave their banner — three cheap grouped reads
+    coins = {(r["tenant"], r["player"]): int(r["n"]) for r in await conn.fetch(
+        "SELECT tenant, player, sum(amount) AS n FROM ascent_faction_ledger "
+        "WHERE amount > 0 AND kind IN ('join_fee','dues','donation') "
+        "GROUP BY tenant, player")}
+    racked = {(r["tenant"], r["player"]): int(r["n"]) for r in await conn.fetch(
+        "SELECT tenant, player, count(*) AS n FROM ascent_armory "
+        "GROUP BY tenant, player")}
+    cut = {(r["tenant"], r["player"]): int(r["n"]) for r in await conn.fetch(
+        "SELECT tenant, player, sum(dmg) AS n FROM ascent_warden_damage "
+        "GROUP BY tenant, player")}
+    now = pstate.now()
+    day = pstate.world_day()
+    out: dict[str, dict] = {}
+    for r in rows:                       # newest row wins a name collision
+        d = json.loads(r["doc"])
+        nm = d.get("name")
+        if not nm:
+            continue
+        key = (r["tenant"], r["player"])
+        age_s = max(0.0, (now - r["updated_at"]).total_seconds())
+        inv = d.get("inventory") or {}
+        out[nm] = {
+            "name": nm,
+            "level": int(d.get("level", 1)),
+            "race": str(d.get("race") or ""),
+            "clazz": str(d.get("clazz") or ""),
+            "armor": _armor_slug(d),
+            "sleeping": bool(d.get("sleeping")),
+            "gold": int(d.get("gold", 0)),
+            "energy": int(pstate.energy_now(d)),
+            "atk": pstate.atk(d), "dfs": pstate.dfs(d),
+            "hp": int(d.get("hp", 1)), "hp_max": pstate.max_hp(d),
+            "guild": d.get("guild") or "",
+            "contribution": {"coins": coins.get(key, 0),
+                             "items": racked.get(key, 0),
+                             "warden": cut.get(key, 0)},
+            "gear": [_item_label(s) for s in (d.get("gear") or {}).values()
+                     if s],
+            "inventory": [{"name": _item_label(s), "count": int(n)}
+                          for s, n in sorted(inv.items()) if int(n) > 0],
+            "same_guild": bool(doc.get("guild"))
+            and d.get("guild") == doc.get("guild"),
+            "protected": (
+                int(d.get("level", 1))
+                <= economy.BEGINNER_PROTECTION_MAX_LEVEL
+                or int(d.get("lodged_until_day", -1)) >= day + 1),
+            "lootable": age_s >= LOOT_INACTIVE_S,
+            "last_seen_min": int(age_s // 60),
+        }
+    return out
+
+
 # ── Effects ──────────────────────────────────────────────────────────────
 
 async def execute_effects(conn, tenant: str, player: str,
@@ -596,6 +763,37 @@ async def execute_effects(conn, tenant: str, player: str,
                                               e["guild"], doc)
             if err:
                 doc.pop("guild", None)   # optimistic colors come down
+        elif kind == "faction_join":
+            # 042: the directory join — the engine charged the posted
+            # fee; the server is authoritative on the door rules. On any
+            # refusal the colors come down and join_faction has already
+            # refunded the doc.
+            from . import factions
+            err = await factions.join_faction(conn, tenant, player,
+                                              e["guild"], doc)
+            if err:
+                doc.pop("guild", None)
+                await conn.execute(
+                    "INSERT INTO ascent_letters (to_tenant, to_player,"
+                    " from_name, body) VALUES ($1,$2,$3,$4)",
+                    tenant, player, "the Guildhall clerk",
+                    f"The {e['guild']} table refused you — {err}.")
+            else:
+                await conn.execute(
+                    "INSERT INTO ascent_happenings (world_day, kind, line)"
+                    " VALUES ($1,'faction',$2)", pstate.world_day(),
+                    f"{doc.get('name') or player} joined {e['guild']}")
+        elif kind == "faction_rules":
+            # 042: the steward writes the door — non-stewards no-op
+            from . import factions
+            await factions.set_requirements(
+                conn, tenant, player,
+                int(e.get("min_level", 0) or 0),
+                bool(e.get("invite_only")))
+        elif kind == "gift_item":
+            await _fx_gift_item(conn, tenant, player, doc, e)
+        elif kind == "loot_attempt":
+            await _fx_loot(conn, tenant, player, doc, e)
         elif kind == "faction_request":
             # 015: joining is a request an admin accepts at the desk
             from . import factions
@@ -899,6 +1097,185 @@ def _death_report(victim: str, attacker: str, loot: int) -> Scene:
     )
 
 
+# ── 042: gifts and looting ───────────────────────────────────────────────
+
+async def _fx_gift_item(conn, tenant: str, player: str, doc: dict,
+                        e: dict) -> None:
+    """The engine already lifted the piece from the sender's pack. A
+    vanished receiver hands it straight back — never a silent loss."""
+    slug = str(e.get("slug", ""))
+    to_name = str(e.get("to_name", ""))
+    label = _item_label(slug)
+    a_name = doc.get("name") or player
+    row = await _find_player_by_name(conn, to_name)
+    if row is None:
+        inv = doc.setdefault("inventory", {})
+        inv[slug] = int(inv.get(slug, 0)) + 1
+        await conn.execute(
+            "INSERT INTO ascent_letters (to_tenant, to_player, from_name,"
+            " body) VALUES ($1,$2,$3,$4)",
+            tenant, player, "the relay office",
+            f"Your {label} came back — {to_name} is nowhere on the Stone.")
+        return
+    victim = json.loads(row["doc"])
+    vinv = victim.setdefault("inventory", {})
+    vinv[slug] = int(vinv.get(slug, 0)) + 1
+    victim.setdefault("pending_events", []).append(Scene(
+        eyebrow="THE RELAY OFFICE · A PARCEL",
+        headline=f"{a_name} sent you the {label}",
+        support="It sits in your pack already.",
+        body_lines=[f"+ 1 {label} — a gift, wrapped in relay paper"],
+        event_kind="loot",
+    ).to_dict())
+    await conn.execute(
+        "UPDATE ascent_players SET doc=$3 WHERE tenant=$1 AND player=$2",
+        row["tenant"], row["player"], json.dumps(victim))
+    await conn.execute(
+        "INSERT INTO ascent_ledger (tenant, player, kind, note)"
+        " VALUES ($1,$2,'gift_in',$3)",
+        row["tenant"], row["player"], f"{label} from {a_name}")
+
+
+async def _fx_loot(conn, tenant: str, player: str, doc: dict,
+                   e: dict) -> None:
+    """042: rob a camp. The hour of silence decides the odds — a cold
+    camp defends at a quarter strength, an active one answers at double.
+    Carried gold only; the Vault's balance is beyond any blade. Every
+    attempt lands a row in ascent_loot_attempts, win or lose."""
+    target = str(e.get("target_name", ""))
+    a_name = doc.get("name") or player
+    row = await conn.fetchrow(
+        "SELECT tenant, player, doc, updated_at FROM ascent_players "
+        "WHERE doc->>'name' = $1 AND doc->>'stage'='playing' "
+        "ORDER BY updated_at DESC LIMIT 1", target)
+    day = pstate.world_day()
+
+    async def log(outcome: str, haul: int = 0, item: str = "") -> None:
+        await conn.execute(
+            "INSERT INTO ascent_loot_attempts (tenant, player,"
+            " target_tenant, target_player, outcome, haul, item)"
+            " VALUES ($1,$2,$3,$4,$5,$6,$7)",
+            tenant, player,
+            row["tenant"] if row else "", row["player"] if row else "",
+            outcome, haul, item)
+
+    def report(headline: str, support: str, lines: list[str],
+               kind: str = "loot") -> None:
+        doc.setdefault("pending_events", []).insert(0, Scene(
+            eyebrow="THE FIELDS · AFTER",
+            headline=headline, support=support, body_lines=lines,
+            event_kind=kind,
+        ).to_dict())
+
+    if row is None:
+        pstate.gain_energy(doc, economy.COST_PVP_ATTACK)
+        report(f"{target}'s camp is gone",
+               "The Stone shows no such name tonight.",
+               ["Your energy comes back — there was nothing to case."])
+        await log("blocked")
+        return
+    victim = json.loads(row["doc"])
+    v_name = victim.get("name") or target
+    # server-side law recheck — the injected payload only shaped the
+    # card. The membership TABLE is the guild authority (doc strings
+    # sync lazily and can lag a join by one load).
+    from . import factions
+    mine = await factions.member_row(conn, tenant, player)
+    theirs = await factions.member_row(conn, row["tenant"], row["player"])
+    if mine and theirs and mine["faction"] == theirs["faction"]:
+        report("You stopped at the banner",
+               "You drink under the same colors.", [])
+        await log("blocked")
+        return
+    if (int(victim.get("level", 1))
+            <= economy.BEGINNER_PROTECTION_MAX_LEVEL
+            or int(victim.get("lodged_until_day", -1)) >= day + 1):
+        report("The tower stood in your way",
+               f"{v_name} sleeps under its protection tonight.", [])
+        await log("blocked")
+        return
+    age_s = max(0.0, (pstate.now() - row["updated_at"]).total_seconds())
+    active = age_s < LOOT_INACTIVE_S
+    swing = 0.8 + 0.4 * (pstate.rng_int(doc, 0, 1000) / 1000.0)
+    defense = _power(victim) * (2.0 if active else 0.25)
+    win = _power(doc) * swing >= defense
+
+    if win:
+        pct = 10 + pstate.rng_int(doc, 0, 15)          # 10–25% of carried
+        haul = int(victim.get("gold", 0)) * pct // 100
+        victim["gold"] = int(victim.get("gold", 0)) - haul
+        doc["gold"] = int(doc.get("gold", 0)) + haul
+        item_slug, item_line = "", []
+        vinv = victim.get("inventory") or {}
+        stealable = sorted(s for s, n in vinv.items() if int(n) > 0)
+        if stealable and pstate.rng_int(doc, 0, 99) < 7:
+            item_slug = stealable[pstate.rng_int(doc, 0,
+                                                 len(stealable) - 1)]
+            vinv[item_slug] = int(vinv[item_slug]) - 1
+            if vinv[item_slug] <= 0:
+                vinv.pop(item_slug, None)
+            inv = doc.setdefault("inventory", {})
+            inv[item_slug] = int(inv.get(item_slug, 0)) + 1
+            item_line = [f"+ their {_item_label(item_slug)}, "
+                         "lifted from the bedroll"]
+        victim.setdefault("pending_events", []).append(Scene(
+            eyebrow="ROOTHOLLOW · A BAD MORNING",
+            headline=f"{a_name} went through your camp",
+            support="An hour of silence is an open door.",
+            body_lines=[f"− ◈ {haul:,} carried gold, taken"]
+            + ([f"− the {_item_label(item_slug)}"] if item_slug else [])
+            + ["Banked gold untouched. The Vault keeps its word."],
+            event_kind="death", banner="death",
+        ).to_dict())
+        report("You cleaned out their camp",
+               f"{v_name} never stirred.",
+               [f"+ ◈ {haul:,} carried gold seized"] + item_line)
+        line = f"{a_name} looted {v_name}'s camp (◈ {haul:,} taken)"
+        await conn.execute(
+            "INSERT INTO ascent_ledger (tenant, player, kind, gold, note)"
+            " VALUES ($1,$2,'loot_win',$3,$4)",
+            tenant, player, haul, f"vs {v_name}")
+        await conn.execute(
+            "INSERT INTO ascent_ledger (tenant, player, kind, gold, note)"
+            " VALUES ($1,$2,'loot_lost',$3,$4)",
+            row["tenant"], row["player"], -haul, f"by {a_name}")
+        await log("win", haul, item_slug)
+    else:
+        # the camp answers — at 200% when its keeper is awake
+        doc["hp"] = max(1, pstate.max_hp(doc) // 4)
+        tithe = int(doc.get("gold", 0)) // 10 if active else 0
+        if tithe:
+            doc["gold"] = int(doc.get("gold", 0)) - tithe
+            victim["gold"] = int(victim.get("gold", 0)) + tithe
+        victim.setdefault("pending_events", []).append(Scene(
+            eyebrow="ROOTHOLLOW · WORD FROM THE FIELDS",
+            headline=f"{a_name} tried your camp — and lost",
+            support=("You answered at twice your strength."
+                     if active else
+                     "Your camp defended itself in your absence."),
+            body_lines=([f"+ ◈ {tithe:,} pried from their pack"]
+                        if tithe else []),
+            event_kind="loot",
+        ).to_dict())
+        report("The camp answered", f"{v_name}'s defense threw you back.",
+               [f"− ◈ {tithe:,} carried gold lost"] if tithe else
+               ["You crawled home with your pockets intact."],
+               kind="death")
+        line = f"{a_name} tried {v_name}'s camp and crawled home"
+        await conn.execute(
+            "INSERT INTO ascent_ledger (tenant, player, kind, gold, note)"
+            " VALUES ($1,$2,'loot_fail',$3,$4)",
+            tenant, player, -tithe, f"vs {v_name}")
+        await log("fail")
+    # the victim's clock is NOT touched — being robbed doesn't wake you
+    await conn.execute(
+        "UPDATE ascent_players SET doc=$3 WHERE tenant=$1 AND player=$2",
+        row["tenant"], row["player"], json.dumps(victim))
+    await conn.execute(
+        "INSERT INTO ascent_happenings (world_day, kind, line) "
+        "VALUES ($1,'loot',$2)", day, line)
+
+
 # ── Shared frontier Warden strikes (007 §3) ──────────────────────────────
 
 async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
@@ -947,6 +1324,7 @@ async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
             horns = list(v.get("horns", []))
         # the PRE-pity base, frozen — post-024 resize, never the raw row
         st["hp_max"] = int(st["base"])
+    taken = max(0, int(e.get("taken", 0)))
     strikers = list(st["strikers"])
     for s in strikers:
         if s.get("tenant") == tenant and s.get("player") == player:
@@ -954,12 +1332,26 @@ async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
             s["name"] = name
             s["ts"] = pstate.now().isoformat()      # 006: the hour roll
             s["guild"] = doc.get("guild") or ""     # 006: standings
+            # 042: the live board wears the newest shape of the climber
+            s["taken"] = int(s.get("taken", 0)) + taken
+            s["level"] = int(doc.get("level", 1))
+            s["race"] = str(doc.get("race") or "")
+            s["armor"] = _armor_slug(doc)
             break
     else:
         strikers.append({"tenant": tenant, "player": player,
                          "name": name, "dmg": dmg,
                          "ts": pstate.now().isoformat(),
-                         "guild": doc.get("guild") or ""})
+                         "guild": doc.get("guild") or "",
+                         "taken": taken,
+                         "level": int(doc.get("level", 1)),
+                         "race": str(doc.get("race") or ""),
+                         "armor": _armor_slug(doc)})
+    # 042: the per-strike roll survives the live record's truncation
+    await conn.execute(
+        "INSERT INTO ascent_warden_damage (floor, tenant, player, name,"
+        " dmg, taken) VALUES ($1,$2,$3,$4,$5,$6)",
+        floor, tenant, player, name, dmg, taken)
     hp = st["hp"] - dmg
     if hp > 0:
         # 022/006: the Crier calls the wound at 75/50/25% — once per
@@ -1245,7 +1637,17 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
             "ts": pstate.now().isoformat(),
             "warden": warden_name,
             "top": top.get("name") or "?",
-            "top_dmg": int(top.get("dmg", 0))}))
+            "top_dmg": int(top.get("dmg", 0)),
+            # 042: the honored fallen — faces on the memorial wall,
+            # ranked by damage dealt, forever
+            "roll": [{"name": s.get("name") or "?",
+                      "dmg": int(s.get("dmg", 0)),
+                      "level": int(s.get("level", 1) or 1),
+                      "race": str(s.get("race") or ""),
+                      "armor": str(s.get("armor") or "")}
+                     for s in sorted(strikers,
+                                     key=lambda s: -int(s.get("dmg", 0))
+                                     )[:100]]}))
 
     for s in strikers:
         finisher = s.get("tenant") == tenant and s.get("player") == player

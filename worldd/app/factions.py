@@ -467,8 +467,43 @@ async def create_faction(conn, tenant: str, player: str, name: str,
         tenant, player, name, pstate.world_day())
 
 
+def parse_requirements(raw) -> dict:
+    """042: the door rules column — jsonb text or dict, always a dict."""
+    if isinstance(raw, str):
+        try:
+            raw = json.loads(raw)
+        except ValueError:
+            raw = {}
+    return raw if isinstance(raw, dict) else {}
+
+
+async def _door_gate(conn, fac, tenant: str, player: str,
+                     doc: dict | None, via_request: bool) -> str | None:
+    """042: why this banner's door refuses the joiner — None when open.
+    The server is authoritative; the engine's copy of the same checks
+    only shapes the card."""
+    req = parse_requirements(fac["requirements"])
+    if req.get("invite_only") and not via_request:
+        return "that table seats by invitation — ask at their desk"
+    cap = int(req.get("member_cap", 0) or 0)
+    if cap:
+        n = int(await conn.fetchval(
+            "SELECT count(*) FROM ascent_faction_members WHERE faction=$1",
+            fac["name"]) or 0)
+        if n >= cap:
+            return "no chair left at that table"
+    min_level = int(req.get("min_level", 0) or 0)
+    if min_level:
+        if doc is None:
+            doc = await _load_doc(conn, tenant, player)
+        if int((doc or {}).get("level", 1)) < min_level:
+            return f"their door reads: level {min_level}+"
+    return None
+
+
 async def join_faction(conn, tenant: str, player: str, name: str,
-                       doc: dict | None = None) -> str | None:
+                       doc: dict | None = None,
+                       via_request: bool = False) -> str | None:
     """Join = pay the fee (gold then bank) into the store.
 
     Effect path (doc passed): the engine already charged the doc — this
@@ -476,10 +511,12 @@ async def join_faction(conn, tenant: str, player: str, name: str,
     caller saves. HTTP path (doc=None): load, charge, save here.
     032: the fee clips to the coffer's cap — the joiner is only ever
     charged what fits (nothing is burned by a full coffer).
+    042: the door rules gate here, authoritatively; an admin's approve
+    passes via_request=True and walks past invite_only.
     Returns an error string or None."""
     fac = await conn.fetchrow(
-        "SELECT name, join_fee, treasury, coffer_tier FROM ascent_factions "
-        "WHERE name=$1 FOR UPDATE", name)
+        "SELECT name, join_fee, treasury, coffer_tier, requirements "
+        "FROM ascent_factions WHERE name=$1 FOR UPDATE", name)
     fee = int(fac["join_fee"]) if fac else 0
     take = (coffer_take(fac["treasury"], fac["coffer_tier"], fee)
             if fac else 0)
@@ -494,6 +531,10 @@ async def join_faction(conn, tenant: str, player: str, name: str,
     if await member_row(conn, tenant, player):
         refund(fee)
         return "you already sit at a table — leave it first"
+    gate = await _door_gate(conn, fac, tenant, player, doc, via_request)
+    if gate:
+        refund(fee)
+        return gate
     if engine_paid and take < fee:
         # the engine charged the posted fee; the brim hands the rest back
         refund(fee - take)
@@ -996,12 +1037,18 @@ async def request_join(conn, tenant: str, player: str,
     if await member_row(conn, tenant, player):
         return "you already sit at a table — leave it first"
     fac = await conn.fetchrow(
-        "SELECT name FROM ascent_factions WHERE name=$1", name)
+        "SELECT name, requirements FROM ascent_factions WHERE name=$1",
+        name)
     if fac is None:
         return "that banner no longer flies"
     doc = await _load_doc(conn, tenant, player)
     if doc is None or doc.get("stage") != "playing":
         return "no character"
+    # 042: a request under the level bar would only rot at the desk
+    req = parse_requirements(fac["requirements"])
+    min_level = int(req.get("min_level", 0) or 0)
+    if min_level and int(doc.get("level", 1)) < min_level:
+        return f"their door reads: level {min_level}+"
     # one open request per player — asking elsewhere moves the request
     await conn.execute(
         "INSERT INTO ascent_faction_requests (tenant, player, faction,"
@@ -1051,7 +1098,8 @@ async def approve_request(conn, tenant: str, player: str,
         target_tenant, target_player, faction)
     if req is None:
         return "no such request at your desk"
-    err = await join_faction(conn, target_tenant, target_player, faction)
+    err = await join_faction(conn, target_tenant, target_player, faction,
+                             via_request=True)
     if err:
         return err
     await conn.execute(
@@ -1200,16 +1248,53 @@ async def faction_detail(conn, tenant: str, player: str,
     return d
 
 
-async def search_factions(conn, q: str = "", limit: int = 10) -> list[dict]:
+async def search_factions(conn, q: str = "", limit: int = 10,
+                          offset: int = 0) -> list[dict]:
     """Top banners by table size; q narrows by name (server-side)."""
     rows = await conn.fetch(
         "SELECT f.name, f.banner, f.join_fee, f.weekly_dues, f.treasury, "
-        "count(m.player) AS members FROM ascent_factions f "
+        "f.requirements, count(m.player) AS members FROM ascent_factions f "
         "LEFT JOIN ascent_faction_members m ON m.faction=f.name "
         "WHERE ($1 = '' OR f.name ILIKE '%' || $1 || '%') "
-        "GROUP BY f.name, f.banner, f.join_fee, f.weekly_dues, f.treasury "
-        "ORDER BY members DESC, f.name LIMIT $2", q.strip()[:24], limit)
-    return [dict(r) for r in rows]
+        "GROUP BY f.name, f.banner, f.join_fee, f.weekly_dues, f.treasury,"
+        " f.requirements "
+        "ORDER BY members DESC, f.name LIMIT $2 OFFSET $3",
+        q.strip()[:24], limit, max(0, int(offset)))
+    out = []
+    for r in rows:
+        d = dict(r)
+        d["requirements"] = parse_requirements(d["requirements"])
+        out.append(d)
+    return out
+
+
+DIRECTORY_CAP = 100        # 042: the wall shows at most 100 banners
+
+
+async def directory(conn) -> dict:
+    """042: the Guild Hall wall — every banner joinable on the spot,
+    biggest tables first, capped at 100 rows. {rows, total}."""
+    total = int(await conn.fetchval(
+        "SELECT count(*) FROM ascent_factions") or 0)
+    rows = await search_factions(conn, "", limit=DIRECTORY_CAP)
+    return {"rows": rows, "total": total}
+
+
+async def set_requirements(conn, tenant: str, player: str,
+                           min_level: int, invite_only: bool) -> str | None:
+    """042: a steward writes the door rules. Anyone else is a no-op."""
+    faction = await is_admin(conn, tenant, player)
+    if faction is None:
+        return "only the steward writes the door"
+    req = {}
+    if int(min_level) > 0:
+        req["min_level"] = max(0, min(30, int(min_level)))
+    if invite_only:
+        req["invite_only"] = True
+    await conn.execute(
+        "UPDATE ascent_factions SET requirements=$2::jsonb WHERE name=$1",
+        faction, json.dumps(req))
+    return None
 
 
 async def leave_faction(conn, tenant: str, player: str) -> None:
