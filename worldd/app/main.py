@@ -62,6 +62,12 @@ async def request_log(request: Request, call_next):
     if request.url.path.startswith("/v1/") and not ratelimit.allow(tenant):
         return JSONResponse({"detail": "rate limited"}, status_code=429)
     response = await call_next(request)
+    # The CDN caches by extension for hours when the origin stays silent —
+    # a ship then serves new HTML with stale JS/CSS. Code assets must
+    # revalidate fast; index.html itself too. Art keeps the CDN default.
+    p = request.url.path
+    if p.startswith("/static/") and p.endswith((".js", ".css", ".html")):
+        response.headers["Cache-Control"] = "public, max-age=60, must-revalidate"
     ms = (time.monotonic() - start) * 1000
     log.info("req tenant=%s %s %s -> %d %.0fms",
              tenant, request.method, request.url.path,

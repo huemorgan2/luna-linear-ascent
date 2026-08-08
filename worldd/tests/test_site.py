@@ -60,6 +60,11 @@ async def test_homepage_refit(client):
     assert "floorcol" in body
     # the Stone remembers, no matter what
     assert "No matter what happens on the hundredth floor" in body
+    # a ship must not serve new HTML with the CDN's stale JS/CSS:
+    # versioned asset URLs + fast revalidation from the origin
+    assert 'site.css?v=' in body and 'site.js?v=' in body
+    r = await client.get("/static/site/site.js")
+    assert r.headers["cache-control"] == "public, max-age=60, must-revalidate"
 
 
 async def test_health_is_untouched_by_the_site(client):
