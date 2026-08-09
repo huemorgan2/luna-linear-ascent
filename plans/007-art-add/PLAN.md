@@ -99,6 +99,28 @@ Re-run the audit inventory + viewer-agent pass over floors 1–10: expected
 end state = 0 portrait mismatches, 0 wrong-species reveals in own reels,
 generic fallback count ≤ 1 (muster_wight only, if still parked).
 
+## Execution status — Phase 1 (2026-08-09)
+
+DONE. All 10 P0 portraits regenerated and committed (plugin 17a2255).
+- 8/10 passed on take 1 (rat, newt, vole, shrew, dormouse, salamander,
+  jackal, thorn-wight). windfall_haunt needed take 2 (take 1 showed a
+  figure carrying the light; take 2 is a handless drifting lantern —
+  exact lore). hornet_swarm: take 2 regressed to a single kaiju-beast;
+  kept take 1 (boiling dark carpet, reconstructed losslessly from the
+  audit flatten — ink 44% matches generator log).
+- Plugin tests: 978 passed, 1 skipped, 2 FAILED — both failures
+  reproduce on clean HEAD (parallel session's in-flight 044 state:
+  test_026 getaway-blood, test_multiplayer strike-join); NOT caused by
+  this change (art-only, 0 code lines).
+- NOT pushed: local plugin main carries 2 unpushed parallel-session
+  commits (0d46577, 4971eee — their plan 044 "image-first kill reels,
+  floor 6 stills"); remote main is dcf5172 (diverged). Pushing would
+  publish their WIP. Push + vendor + ship deferred to Phase 4
+  coordination.
+- COORDINATION FLAG: parallel session's plan 044 is building kill
+  reels/stills for floor 6 — overlaps Phase 2 of this plan. Reconcile
+  before spending grok budget on floor-6+ reels.
+
 ## Operational notes
 - Gemini key for portraits and grok key for reels both come from
   `~/Documents/Luna/luna/.env` — never committed; secret-scan before
