@@ -65,7 +65,7 @@ def energy_cap(gear_tier: int, race: str = "") -> int:
 
 # ── §1b The XP pool (006: aether = crystallized experience) ──────────────
 # The mana meter is gone. The ✦ bar is the XP inside the current level:
-# earned by fighting, spent on honing / spells / scans. Spending delays the
+# earned by fighting, spent on honing / spells / mending. Spending delays the
 # next level, never lowers one. All costs are priced in frontier kills so
 # they stay a real decision at every level.
 
@@ -80,11 +80,6 @@ def hone_xp(unlocked_floor: int) -> int:
 def sleep_xp_cost(floor: int) -> int:
     """✦ to Sleep past a fight: exactly the kill being skipped."""
     return xp_per_kill(floor)
-
-
-def scan_xp_cost(floor: int) -> int:
-    """✦ for a shard scan when no optics charges remain."""
-    return round(0.5 * xp_per_kill(floor))
 
 
 def gear_player_level_req(tier: int) -> int:
@@ -699,7 +694,7 @@ def xp_need(level: int) -> int:
     """XP to go from `level` to `level+1`: 24 · L^1.5. Below LEVEL_CAP the
     bar is hard — surplus from a kill is discarded. At LEVEL_CAP the
     Guildhall refuses training and the ✦ pool becomes pure currency
-    (honing, spells, scans — the sinks that already exist)."""
+    (honing, spells, mending — the sinks that already exist)."""
     return round(XP_NEED_BASE * level ** 1.5)
 
 
@@ -1796,6 +1791,24 @@ def item_pool(item: GearItem) -> int:
     return pool
 
 
+def endurance(item: GearItem, left: int | None = None) -> int:
+    """045: the END number on the card — one honest unit per slot.
+
+    Guard pieces (shield/armor) show the DAMAGE the piece can still turn:
+    wear per blow is `rate · blocked_by_piece / (bonus/2)` pool-uses, so
+    `pool · bonus / (2·rate)` is damage — the number falls by what the
+    piece absorbs, which is how a player reads "endurance 100, blows of
+    54+36+10, broken". Weapons/shoes already wear one use per
+    swing/stride, so their pool IS the count.
+    """
+    pool = item_pool(item) if left is None else max(0, left)
+    if item.slot == "shield":
+        return round(pool * item.bonus / (2 * SHIELD_WEAR_RATE))
+    if item.slot == "armor":
+        return round(pool * item.bonus / (2 * ARMOR_WEAR_RATE))
+    return pool
+
+
 def repair_price(item: GearItem, missing_frac: float) -> int:
     """The Forge mends for a fraction of what the smith charged."""
     return max(1, round(REPAIR_PRICE_PCT * item.price
@@ -1821,8 +1834,6 @@ APOTHECARY: dict[str, ShopItem] = {i.slug: i for i in [
     ShopItem("energy_cell", "Energy cell", 200, "energy_5", "max 1/day"),
     ShopItem("luck_charm", "Luck charm", 300, "luck_today",
              "better loot & present rolls until tomorrow"),
-    ShopItem("scout_optics", "Scout optics", 100, "scout_3",
-             "sidekick reveals enemy stats, 3 charges"),
 ]}
 
 # ── 006 §3.7: the relic catalog v1 ───────────────────────────────────────

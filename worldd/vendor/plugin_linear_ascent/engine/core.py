@@ -76,6 +76,9 @@ def _pack_strip(p: dict) -> list[dict]:
         if left is not None and g.price > 0:
             pool = economy.item_pool(g)
             cell["dur"] = max(0.0, min(1.0, left / pool)) if pool else 1.0
+            # 045: the hover names the number, not just the fraction.
+            cell["dur_left"] = economy.endurance(g, left)
+            cell["dur_max"] = economy.endurance(g)
         strip.append(cell)
     pack = p.get("inventory") or {}
     order = sorted(pack.items(),
@@ -87,13 +90,25 @@ def _pack_strip(p: dict) -> list[dict]:
             name, kind = economy.APOTHECARY[slug].name, "item"
         elif slug in economy.RELICS:
             name, kind = economy.RELICS[slug].name, "relic"
+        cell = {"slug": slug, "kind": "item", "count": int(count),
+                "name": slug.replace("_", " ")}
+        if slug in economy.APOTHECARY:
+            cell["name"] = economy.APOTHECARY[slug].name
+        elif slug in economy.RELICS:
+            cell["name"], cell["kind"] = economy.RELICS[slug].name, "relic"
         elif slug in economy.FORGE:
             g = economy.FORGE[slug]
-            name, kind = g.name, g.slot
-        else:
-            name, kind = slug.replace("_", " "), "item"
-        strip.append({"slug": slug, "kind": kind, "count": int(count),
-                      "name": name})
+            cell["name"], cell["kind"] = g.name, g.slot
+            # 045: packed gear carries its wear too — a spare bought
+            # used should say so before it's promoted to the hand.
+            left = (p.get("durability_pack") or {}).get(slug)
+            if left is not None and g.price > 0:
+                pool = economy.item_pool(g)
+                cell["dur"] = (max(0.0, min(1.0, left / pool))
+                               if pool else 1.0)
+                cell["dur_left"] = economy.endurance(g, left)
+                cell["dur_max"] = economy.endurance(g)
+        strip.append(cell)
     return strip
 
 
@@ -162,6 +177,29 @@ def pack_actions(p: dict, slug: str) -> tuple[list[Option], str]:
     if slug in economy.RELICS:
         return [], "Carried into the fight — it offers itself when it can act."
     if slug in economy.FORGE:
+        # 045: gear promotes itself from the pack — one weapon held, one
+        # shield, one armour; the slot decides which.
+        g = economy.FORGE[slug]
+        if g.slot in economy.DURABILITY_SLOTS and have:
+            if p["gear"].get(g.slot) == slug:
+                return [], ("Already in your hand."
+                            if g.slot in ("weapon", "shield")
+                            else "Already worn.")
+            if g.slot == "weapon":
+                label = "Use this"
+            elif g.slot == "shield":
+                label = ("Hold this focus" if g.line == "sorcerer"
+                         else "Use as shield")
+            elif g.slot == "armor":
+                label = "Wear this"
+            else:
+                label = "Wear these"
+            worn = p["gear"].get(g.slot)
+            hint = (f"swap out the {economy.FORGE[worn].name}"
+                    if worn and worn in economy.FORGE else "from your pack")
+            if (p.get("hone") or {}).get(g.slot):
+                hint += " · honing resets"
+            return [Option(f"wear_{slug}", label, hint)], ""
         return [], "The Forge swaps gear in and out of the pack."
     return [], ""
 
@@ -169,14 +207,18 @@ def pack_actions(p: dict, slug: str) -> tuple[list[Option], str]:
 def _pack_use(p: dict, oid: str) -> Scene | None:
     """027: a pack action taken from the strip — legal in any room, never
     in a fight. Returns None when the id isn't a pack action."""
-    if oid not in PACK_USE_IDS or p.get("encounter"):
+    wearing = oid.startswith("wear_")
+    if (oid not in PACK_USE_IDS and not wearing) or p.get("encounter"):
         return None
-    slug = oid.removeprefix("use_")
+    slug = oid.removeprefix("wear_" if wearing else "use_")
     acts, why = pack_actions(p, slug)
     if not any(o.id == oid for o in acts):
         s = _build_scene(p)
         s.shard_note = why or "Nothing happens."
         return s
+    if wearing:
+        # 045: promote from the pack — same swap the Forge row performs.
+        return _wear_from_pack(p, slug, _build_scene)
     if slug == "luck_charm":
         p["flags"]["luck_day"] = state.world_day()
         note = ("+ the charm cracks in your fist — fortune leans your way "
@@ -1118,12 +1160,19 @@ def _rack(p: dict, items: list, opts: list, lines: list) -> None:
 
     # 031 §14: the stat rides IN the hint now — the Forge's card grid
     # has no body lines to carry it, and richer hints hurt no shop
+    # 045: END rides next to the stat — what the piece can take (guard
+    # steel: damage turned; weapons/shoes: swings/strides) is half the
+    # price tag's meaning.
+    def _end(g):
+        return f"END {economy.endurance(g):,}"
+
     for g in show:
-        hint = (f"pay ◈ {g.price:,} · {_stat(g)} · worn — spare"
-                if g.slug == worn else f"pay ◈ {g.price:,} · {_stat(g)}")
+        hint = f"pay ◈ {g.price:,} · {_stat(g)} · {_end(g)}"
+        if g.slug == worn:
+            hint += " · worn — spare"
         opts.append(Option(f"buy_{g.slug}", g.name, hint))
         flavor = f", {g.flavor}" if g.flavor else ""
-        lines.append(f"{g.name}{flavor} — {_stat(g)}")
+        lines.append(f"{g.name}{flavor} — {_stat(g)}, {_end(g)}")
         # 025 §4: the newest rung is also a CHOICE — the same steel cut
         # keen (sharper, spends itself) or warded (patient). Older rungs
         # stay one row so the rack never becomes a catalogue.
@@ -1131,8 +1180,10 @@ def _rack(p: dict, items: list, opts: list, lines: list) -> None:
             for v in economy.gear_styles(g):
                 opts.append(Option(f"buy_{v.slug}", v.name,
                                    f"pay ◈ {v.price:,} · {_stat(v)} · "
+                                   f"{_end(v)} · "
                                    f"{economy.STYLE_WORD[v.style]}"))
-                lines.append(f"{v.name} — {_stat(v)}, {v.flavor}")
+                lines.append(f"{v.name} — {_stat(v)}, {_end(v)}, "
+                             f"{v.flavor}")
     if nxt is not None:
         # 022/002: past the level cap the gate is the WORLD's floor,
         # not your level — the locked row says which one bars it.
@@ -1141,8 +1192,9 @@ def _rack(p: dict, items: list, opts: list, lines: list) -> None:
                 else f"level {economy.rung_player_level_req(nxt)}")
         opts.append(Option(
             f"buy_{nxt.slug}", nxt.name,
-            f"🔒 {gate} · pay ◈ {nxt.price:,} · {_stat(nxt)}", locked=True))
-        lines.append(f"{nxt.name} — {_stat(nxt)}, "
+            f"🔒 {gate} · pay ◈ {nxt.price:,} · {_stat(nxt)} · "
+            f"{_end(nxt)}", locked=True))
+        lines.append(f"{nxt.name} — {_stat(nxt)}, {_end(nxt)}, "
                      "the rung you're saving for")
 
 
@@ -1284,7 +1336,9 @@ def _forge_scene(p: dict) -> Scene:
         opts.append(Option(
             f"repair_{slot}",
             f"Repair {g.name}" + (" — broken" if left <= 0 else ""),
-            f"pay ◈ {rprice:,} · +{hone_xp} XP"))
+            f"pay ◈ {rprice:,} · +{hone_xp} XP · "
+            f"END {economy.endurance(g, left):,} → "
+            f"{economy.endurance(g):,}"))
         if tokens > 0:
             opts.append(Option(
                 f"token_{slot}",
@@ -1660,9 +1714,6 @@ def _medlab_buy(p: dict, oid: str) -> Scene:
     elif slug == "luck_charm":
         p["flags"]["luck_day"] = state.world_day()
         note += " — fortune leans your way until tomorrow"
-    elif slug == "scout_optics":
-        p["sidekick"]["scout_charges"] += 3
-        note += " — your shard can scan 3 enemies"
     else:
         p["inventory"][slug] = p["inventory"].get(slug, 0) + 1
     s = _medlab_scene(p)

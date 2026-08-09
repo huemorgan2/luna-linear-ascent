@@ -606,12 +606,6 @@ def fight_scene(p: dict, floor, opener: bool = False, note: str = "") -> Scene:
             f"{economy.FLARE_AETHER} XP · every hot blade sees it",
             aether=True))
     opts += _relic_options(p)
-    charges = p["sidekick"]["scout_charges"]
-    opts.append(Option(
-        "scout", "Ask the shard to scan it",
-        f"{charges} charges" if charges > 0
-        else f"{economy.scan_xp_cost(floor.floor)} XP",
-        aether=True))
 
     body = [e["prose"]] if opener else []
     if opener:
@@ -1241,16 +1235,33 @@ def _victory(p: dict, floor) -> Scene:
         # one shard per point of XP so a big kill looks like a big kill.
         tally=[{"kind": "gold", "n": gold},
                {"kind": "aether", "n": xp_landed}],
+        # 045: the exit card carries the floor's tiles like the gate
+        # town does — the reel branch keeps its two bare buttons.
+        option_art=(None if first_clear else _floor_art(floor)),
         fx=_kill_fx(e, e["name"], first_clear, _damage_type(p)),
     )
 
 
+def _floor_art(floor) -> dict:
+    from . import core
+    return core._gate_town_art(floor)
+
+
 def _after_fight_options(p: dict, floor) -> list[Option]:
-    opts = [Option("hunt", "Hunt the wilds again", "1 ⚡")]
-    if p["unlocked_floor"] > floor.floor:
-        opts.append(Option("gate", "Back to the tower gate"))
-    opts.append(Option("keep", "The Warden's keep", "3 ⚡"))
-    opts.append(Option("town", "Return to Roothollow"))
+    """045: a fight's exit card shows the floor's REAL menu. This was a
+    hand-rolled copy of four rows — no deep hunt, no stew or pack heals
+    right when they matter most, and a stale keep label after the Warden
+    fell. The gate town owns the list; borrow it."""
+    from . import core
+    opts = core._gate_town_options(p, floor)
+    for i, o in enumerate(opts):
+        if o.id == "hunt":
+            opts[i] = Option("hunt", "Hunt the wilds again", o.hint)
+            # the gate row is the gate-town SCENE's affordance, not part
+            # of its option list — keep it for the climber passing through
+            if p["unlocked_floor"] > floor.floor:
+                opts.insert(i + 1, Option("gate", "Back to the tower gate"))
+            break
     return opts
 
 
@@ -1706,33 +1717,6 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
         s.body_lines.insert(0, "You speak the Severing Word once, "
                             "quietly, and the fight is simply over.")
         return s
-
-    if option_id == "scout":
-        if p["sidekick"]["scout_charges"] > 0:
-            p["sidekick"]["scout_charges"] -= 1
-        elif not state.spend_xp(p, economy.scan_xp_cost(floor.floor)):
-            return fight_scene(p, floor, note=(
-                f"The shard needs {economy.scan_xp_cost(floor.floor)} XP of "
-                "what you've learned — you haven't learned enough yet."))
-        pline = _profile_line(_profile(p))
-        # 003: the scan's edge over the free dossier — exact numbers
-        # plus the monster's NEXT INTENT, odds named.
-        intent = ""
-        if _range_state(p) == "at_range":
-            pc = round(100 * economy.p_close(_mspd(p),
-                                             economy.player_speed(p)))
-            intent = (f" It will try to close this round — "
-                      f"{pc}% it makes it.")
-        elif _profile(p).get("speed",
-                             economy.SPEED_NORMAL) >= economy.SPEED_FAST:
-            intent = " It is faster than you — it will stay on you."
-        return fight_scene(
-            p, floor,
-            note=f"◆ scan: {e['name']} — ATK {e['atk']} / DEF {e['def']} / "
-                 f"HP {e['hp']}/{e['hp_max']}"
-                 + (f" · {pline}" if pline else "")
-                 + f". Your ATK {state.atk(p)} / DEF {state.dfs(p)}."
-                 + intent)
 
     if option_id == "flare":
         # 022/008: doesn't spend the round — the burst startles the
