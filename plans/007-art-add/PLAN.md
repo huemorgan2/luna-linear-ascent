@@ -61,7 +61,41 @@ correct species with no prompt hand-editing.
 - **Rollback**: `git checkout -- content/art/creatures/<slug>_320x112.png`
   (all 10 are tracked files).
 
-### Phase 2 — wrong-species reels (P0/P1)
+### Phase 2 — reels: misfits, gaps, and quality (P0/P1) — REVISED 2026-08-09
+
+User go + new art direction (2026-08-09): "fix all issues and missing
+visuals until the 10th floor … the freed animations are not the best.
+some turn the animal from itself into itself. the freed animals need to
+look smaller and real. mice are not giants … render the animations not
+as real — render them as drawing shaded animations, then turn them to
+1 bit."
+
+Three standing rules for every take, on top of the phase-C checklist:
+1. **Drawn, not photoreal.** New mercy prefix: hand-drawn shaded
+   animation (bold ink outlines, flat shading planes) instead of the
+   photoreal MERCY_PREFIX; the 1-bit Bayer pass keys off drawn shapes,
+   not photographic noise. Prefix stays compact (grok 4096-byte cap).
+2. **Reveal is SMALL and REAL.** The freed animal must read tiny next
+   to the defender (cup-hands / bootprint blocking subs applied to all
+   freed slugs) — a revealed mouse is mouse-sized, full stop.
+3. **No self-into-self.** The monster phase must read monstrous —
+   clearly bigger/wronger than the reveal; a reel where the fought
+   animal already looks like the revealed animal FAILS.
+
+Work list, take cap 3 per slug (~$0.64/take), judge every take:
+- Batch A (misfit + missing): hornet_swarm_freed, wire_eel_freed,
+  drift_eel_freed, greywell_ogre_fall, lamptree_wight_evicted,
+  rabid_boar_freed, pylon_adder_freed, muster_wight_evicted.
+- Batch B (quality re-rolls flagged by the audit): mire_boar_freed +
+  guano_vole_freed (self-into-self — monster renders small),
+  blind_shoal_freed (fish floats mid-air), wick_owl_freed (duck-like
+  owlet), reed_adder_freed + ash_adder_freed (legged lizard mid-reel),
+  bunting_kite_freed (draconic), silk_broodling_freed (illegible
+  reveal).
+- Pilot first: 2 slugs in the drawn style, judged, style tuned, then
+  the batches.
+
+### Phase 2 (original scope, superseded by above)
 - **Goal**: hornet_swarm_freed reveals mice (not a bear); wire_eel_freed
   reveals a fish; drift_eel_freed reads lamprey/eel; greywell_ogre_fall
   figure has ogre bulk. Own reels for rabid_boar_freed + pylon_adder_freed
