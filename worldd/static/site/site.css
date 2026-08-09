@@ -93,15 +93,14 @@ section { padding: 2rem 0; }
 }
 .gate-bg img,
 .gate-bg img.px {
-  /* beat the global img.px 640px cap. The hero gif is the layered-tower
-     drawing, 1-bit, with its weather animated in the frames. Cover
-     crops vertically on wide screens; the slide + scale-up moves the
-     tower right of center so it clears the signup card. */
+  /* beat the global img.px 640px cap. The hero gif is the stacked-tray
+     tower drawing, 1-bit, clouds animated in the frames. The tower sits
+     in the right third of the image itself, so no transform is needed —
+     cover just crops vertically on wide screens. */
   display: block; width: 100%; height: 100%;
   max-width: none;
   object-fit: cover;
   object-position: center 30%;
-  transform: translateX(6%) scale(1.13);
   image-rendering: pixelated;
 }
 /* signup card sits in the open left of the hero */
@@ -151,10 +150,7 @@ section { padding: 2rem 0; }
     left: 1ch; right: 1ch; bottom: 2.75rem;
     max-width: none;
   }
-  /* phones: the card covers the width anyway — recenter the tower and
-     let cover crop the flanks */
-  .gate-bg img,
-  .gate-bg img.px { transform: translateX(2%) scale(1.06); }
+  /* phones: cover crops the flanks; composition is baked into the gif */
 }
 
 /* ── scene cards ───────────────────────────────────────────────────── */
