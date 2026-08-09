@@ -155,6 +155,60 @@ DONE. All 10 P0 portraits regenerated and committed (plugin 17a2255).
   reels/stills for floor 6 — overlaps Phase 2 of this plan. Reconcile
   before spending grok budget on floor-6+ reels.
 
+## Execution status — Phase 2 (2026-08-09)
+
+DONE. All 16 floor 1–10 mercy reels regenerated in the drawn style
+(`--style drawn`, plugin tool commit 0d01c0c; anchors + reels commit
+2adf4f9) and judged frame-by-frame on the final 1-bit gif (new
+scratchpad `gif_sheet.py` — judge what survives the Bayer pass, not the
+raw mp4). 16/16 PASS against the three standing rules. NOT pushed
+(parallel session's unpushed commits still on local main — Phase 4).
+
+Take ledger (25 grok takes ≈ $16):
+- **Take-1 pass (9)**: hornet_swarm (pilot), mire_boar (pilot),
+  rabid_boar, pylon_adder, lamptree_wight, drift_eel, reed_adder,
+  ash_adder, bunting_kite*. (*t1 kept but gif rebuilt at 71 frames —
+  frame 0 held a double-monster; dropped the frame instead of spending
+  a re-roll.)
+- **Take-2 pass (5)**: blind_shoal + muster_wight (t1 static
+  arrow-line → forced sword melee), silk_broodling (t1 near-black
+  final hold), greywell_ogre (t1 opening-frame bow glitch),
+  guano_vole (t1 monster rendered true-animal-size → `_MERCY_BULK`).
+- **Take-3 pass (2)**: wire_eel + wick_owl (t2 persistent shell —
+  monster survives the burst and stands beside the reveal →
+  `_MERCY_VANISH`). Both at the cap; nothing parked.
+- muster_wight had failed 3/3 in phase C — the drawn style + forced
+  melee got it through on take 2. Generic-fallback trio (muster_wight,
+  pylon_adder, rabid_boar) now have own reels.
+
+New fail families discovered + their standing fixes (in the tool, so
+future floors inherit them):
+- **Persistent shell** → `_MERCY_VANISH` anchor (shell VANISHES
+  COMPLETELY at the burst).
+- **Small monster / self-into-self** → `_MERCY_BULK` anchor (monster
+  TOWERS over the defender until the burst).
+- **Arrow-line stretch** (archer strike renders as a static line) →
+  `_MERCY_FORCE_MELEE` set, kind-guarded so evicted templates keep
+  their own beat.
+- Drawn-mode scrub: color anchors stripped, photoreal motion closer
+  swapped for "weighty drawn motion", wire_eel white-fish reveal given
+  ink edges (invisible on pale ground otherwise).
+
+Byte discipline: drawn prefix held to 247 B; all 16 prompts verified
+≤ 4096 UTF-8 bytes post-em-dash-fold; 0 overs at generation time.
+
+Plugin tests after commit: 978 passed, 1 skipped, 2 failed
+(7.32 s). The 2 known failures reproduce on
+clean HEAD (parallel session's in-flight state: test_026 getaway-blood,
+test_multiplayer strike-join) — pre-existing, not from this change.
+
+Phase 3 (P2 polish) — largely absorbed: every P2 reel row (reed_adder,
+ash_adder, bunting_kite, blind_shoal, silk_broodling, wick_owl) was
+regenerated and passed in Phase 2. Remaining P2 items are portraits
+(lamp_eater canon pick, lane_wolf, bunting_kite portrait) — optional,
+untouched. Phase 4 (ship) still blocked on parallel-session
+coordination.
+
 ## Operational notes
 - Gemini key for portraits and grok key for reels both come from
   `~/Documents/Luna/luna/.env` — never committed; secret-scan before
