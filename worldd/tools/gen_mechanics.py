@@ -272,8 +272,9 @@ def build_levels(floors: list[dict]) -> list[dict]:
             "daysToFill": round(need / per_day, 2) if per_day else None,
             "grindFloor": grind["floor"],
             "baseAtk": eco.player_atk(lvl, eco.STARTER_WEAPON.bonus),
-            "baseDef": eco.player_def(lvl, 0, 0),
-            "baseHp": eco.player_max_hp(lvl),
+            "baseDef": eco.player_def(lvl, eco.GATE_SHIELD.bonus,
+                                      eco.GATE_ARMOR.bonus),
+            "baseHp": eco.player_max_hp(lvl, eco.GATE_ARMOR.bonus),
             "refAtk": atk, "refDef": dfs,
             "refHp": eco.reference_player_hp(lvl),
         })
@@ -283,7 +284,8 @@ def build_levels(floors: list[dict]) -> list[dict]:
 def build_bars() -> list[dict]:
     """043: the 1–101 ladder the simulator climbs — per bar, the
     reference player (level min(bar, 30), floor-bar steel) and the
-    starter-gear body at the same level."""
+    gate-issue body at the same level (starter weapon + the free
+    buckler/jerkin every character carries from creation)."""
     out = []
     for b in range(1, eco.BAR_MAX + 1):
         atk, dfs = eco._at_level_loadout(b)
@@ -293,8 +295,9 @@ def build_bars() -> list[dict]:
             "refAtk": atk, "refDef": dfs,
             "refHp": eco.reference_player_hp(b),
             "baseAtk": eco.player_atk(lvl, eco.STARTER_WEAPON.bonus),
-            "baseDef": eco.player_def(lvl, 0, 0),
-            "baseHp": eco.player_max_hp(lvl),
+            "baseDef": eco.player_def(lvl, eco.GATE_SHIELD.bonus,
+                                      eco.GATE_ARMOR.bonus),
+            "baseHp": eco.player_max_hp(lvl, eco.GATE_ARMOR.bonus),
         })
     return out
 

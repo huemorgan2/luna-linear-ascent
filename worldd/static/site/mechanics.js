@@ -89,8 +89,9 @@
     "asks to grant the level. <b>DAYS</b> = the practical pace: the " +
     "bar filled by hunting the matching floor at ~" + C.fightsPerDay +
     " fights/day (spawn-weighted average XP, common specimens). " +
-    "<b>BASE</b> = naked stats + starter weapon (+" +
-    C.starterWeaponBonus + "); <b>REFERENCE</b> = the at-level forge " +
+    "<b>BASE</b> = the gate-issue set every fresh character carries: " +
+    "starter weapon (+" + C.starterWeaponBonus + ") plus the free " +
+    "buckler and jerkin; <b>REFERENCE</b> = the at-level forge " +
     "set the balance is tuned against.";
 
   let lv = '<table class="mech"><thead><tr><th>LV</th><th>XP NEED</th>' +
@@ -267,7 +268,7 @@
       `${n} fights vs ${selSpec.value} ${m.name} ` +
       `(ATK ${mon.atk} DEF ${mon.def} HP ${fmt(mon.hp)})\n` +
       `player bar ${bar} (L${B.level}) ` +
-      `${gear === "ref" ? "reference" : "starter"} set: ` +
+      `${gear === "ref" ? "reference" : "gate-issue"} set: ` +
       `ATK ${P.atk} DEF ${P.def} HP ${P.hp} — ${dtype}\n\n` +
       `WIN ${winPct.toFixed(1)}%   avg rounds ${(rsum / n).toFixed(1)}` +
       `   avg HP lost ${(hsum / n).toFixed(1)} / ${P.hp}\n` +
