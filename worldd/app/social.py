@@ -297,11 +297,17 @@ async def _faction_panel(conn, tenant: str, player: str,
 
 
 async def _census(conn) -> dict:
-    """Climbers by current floor (town counts as floor 1 — Roothollow)."""
+    """Climbers by current floor (town counts as floor 1 — Roothollow).
+
+    046: ACTIVE means seen this week — the count sizes the warden
+    quorum curve (economy.required_strikers), and Roy's rule is "10% of
+    all actives, active in the last week". Without the window every
+    account that ever played kept inflating the top-floor quorums."""
     rows = await conn.fetch(
         "SELECT greatest(coalesce((doc->>'floor')::int, 0), 1) AS fl, "
         "count(*) AS n FROM ascent_players "
-        "WHERE doc->>'stage'='playing' GROUP BY 1")
+        "WHERE doc->>'stage'='playing' "
+        "AND updated_at > now() - interval '7 days' GROUP BY 1")
     by_floor = {int(r["fl"]): int(r["n"]) for r in rows}
     return {"total": sum(by_floor.values()), "by_floor": by_floor}
 
