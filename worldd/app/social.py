@@ -696,6 +696,10 @@ async def _profiles(conn, doc: dict, w: dict) -> dict:
             "level": int(d.get("level", 1)),
             "race": str(d.get("race") or ""),
             "clazz": str(d.get("clazz") or ""),
+            # 048: the trained hands are public — rank 10 is the
+            # banner-hall toast, mastery the master's mark.
+            "training": d.get("training") or {},
+            "mastery": d.get("mastery") or {},
             "armor": _armor_slug(d),
             "sleeping": bool(d.get("sleeping")),
             "gold": int(d.get("gold", 0)),
