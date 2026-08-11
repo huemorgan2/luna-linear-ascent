@@ -67,15 +67,16 @@
       const kl = m.killLevel === null ? '<td class="hard">—</td>' :
         `<td class="${m.killLevel <= f.floor ? "easy" : "hard"}">` +
         `${m.killLevel}<span class="dim"> ${kglyph}</span></td>`;
-      const flags =
+      const signs =
         (m.type !== "plain" ?
-          ` <span title="${m.type}">${SIGN[m.type]}</span>` : "") +
-        (m.bulwark ? ' <span title="bulwark">▣</span>' : "");
+          `<span title="${m.type}">${SIGN[m.type]}</span>` : "") +
+        (m.bulwark ? ` <span title="bulwark">▣</span>` : "");
       const h = (x) => x === null ? "—" : fmt(x);
       const hits = `${h(m.hitsBlade)} / ${h(m.hitsBow)} / ` +
         h(m.hitsStaff);
       html += "<tr>" +
-        `<td class="l">${m.name}${flags}</td>` +
+        `<td class="l">${signs ?
+          `<span class="signs">${signs}</span>` : ""}${m.name}</td>` +
         `<td class="l dim">${m.kind}</td>` +
         `<td class="l dim">${m.traits.join(" ") || "—"}</td>` +
         `<td>${m.spawnPct}</td><td>${m.atk}</td><td>${m.def}</td>` +

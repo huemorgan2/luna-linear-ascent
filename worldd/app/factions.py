@@ -201,12 +201,25 @@ async def members_of(conn, faction: str) -> list[dict]:
     rows = await conn.fetch(
         "SELECT m.tenant, m.player, m.role, m.joined_day, m.arrears,"
         "       p.doc->>'name' AS name,"
-        "       coalesce((p.doc->>'level')::int, 1) AS level "
+        "       coalesce((p.doc->>'level')::int, 1) AS level,"
+        "       p.doc->>'training' AS training,"
+        "       p.doc->>'mastery' AS mastery "
         "FROM ascent_faction_members m "
         "LEFT JOIN ascent_players p ON p.tenant=m.tenant "
         "  AND p.player=m.player "
         "WHERE m.faction=$1 ORDER BY m.joined_day, m.player", faction)
-    return [dict(r) for r in rows]
+    out = []
+    for r in rows:
+        d = dict(r)
+        # 048: the trained hands ride the member row — the banner hall
+        # toasts its tenth ranks and masters by name
+        for k in ("training", "mastery"):
+            try:
+                d[k] = json.loads(d[k]) if d[k] else {}
+            except (TypeError, ValueError):
+                d[k] = {}
+        out.append(d)
+    return out
 
 
 async def week_attendance(conn, faction: str, week: int) -> dict:
@@ -1198,6 +1211,8 @@ async def faction_detail(conn, tenant: str, player: str,
             "you": (m["tenant"], m["player"]) == (tenant, player),
             "arrears": bool(m["arrears"]),
             "days": attend.get((m["tenant"], m["player"]), 0),
+            "training": m.get("training") or {},
+            "mastery": m.get("mastery") or {},
         })
     if not founder_name:
         # founder may have left the table — the mark on the page remains
