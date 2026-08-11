@@ -71,6 +71,7 @@
   <div class="tabs">
     <button class="tab on" data-pane="floors">FLOORS</button>
     <button class="tab" data-pane="levels">LEVELS</button>
+    <button class="tab" data-pane="training">TRAINING</button>
   </div>
 
   <div id="pane-floors" class="pane on">
@@ -89,10 +90,13 @@
           <option value="ref">at-level forge set (reference)</option>
           <option value="base">gate-issue set (fresh character)</option>
         </select></label>
-        <label>Class <select id="sim-class">
-          <option value="melee">warrior (melee)</option>
-          <option value="ranged">archer (bow)</option>
+        <label>Path <select id="sim-path">
+          <option value="blade">blade</option>
+          <option value="bow">bow</option>
+          <option value="staff">staff</option>
         </select></label>
+        <label>Rank (0–10) <input id="sim-rank" type="number"
+               min="0" max="10" value="6" style="width:3.5rem"></label>
         <label>Fights <input id="sim-n" type="number" min="100"
                max="20000" value="3000" style="width:5.5rem"></label>
         <button id="sim-run">RUN</button>
@@ -111,16 +115,21 @@
     <div id="levels-table"></div>
     <h3 class="slot">THE FORGE — every rung, every price</h3>
     <div class="legend">Prices in gold. LVL/FLR = the gate: the level you
-      must hold and the floor the smith asks about. Off-class weapons cost
-      ×<span id="offmult"></span>. Styles: keen = more bonus, less
-      durability; warded = pricier, lasts longer.</div>
+      must hold and the floor the smith asks about. Any hands may buy any
+      weapon — the trained rank is the only tax (048). Styles: keen =
+      more bonus, less durability; warded = pricier, lasts longer.</div>
     <div id="gear-table"></div>
     <h3 class="slot">APOTHECARY &amp; RELICS</h3>
     <div id="shop-table"></div>
   </div>
+
+  <div id="pane-training" class="pane">
+    <div class="legend" id="training-legend"></div>
+    <div id="training-table"></div>
+  </div>
 </div>
 
-<script src="/static/site/mechanics-data.js?v=0.61.0"></script>
-<script src="/static/site/mechanics.js?v=0.61.0"></script>
+<script src="/static/site/mechanics-data.js?v=0.61.1"></script>
+<script src="/static/site/mechanics.js?v=0.61.1"></script>
 </body>
 </html>

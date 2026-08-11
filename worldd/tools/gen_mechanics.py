@@ -11,13 +11,15 @@ The Kill Bar column is Monte-Carlo'd here, offline: for each monster
 (common specimen, full-HP player) it is the lowest BAR — the design's
 reference loadout of floor B: level min(B, 30), floor-B gear — whose
 single-fight win chance is ~90% (accepted at >= 85%). Bars run 1–101;
-past level cap 30 the ladder climbs by steel alone (043). Ground
-monsters are fought as a warrior
-(melee — must eat the crossing blow and every counter); flying ones as
-an archer (melee cannot touch them). The fight model mirrors
-engine/combat.py: player strikes first, damage rolls uniform in
-[stat/2, stat], chip floor ceil(raw/4), armor/resist tier multipliers,
-dodge from speed advantage, the range ladder for bows.
+past level cap 30 the ladder climbs by steel alone (043). 048: the
+weapon decides — each monster is fought by the PATH its type does not
+counter (bow vs fly, staff vs armoured, blade otherwise) with rank-6
+reference hands (the migration default). The fight model mirrors
+engine/combat.py: player strikes first, the trained hand sets the miss
+chance and the floor of the roll band (TRAIN_MISS_PCT /
+TRAIN_ROLL_FLOOR), chip floor ceil(raw/4), the TYPE_MULT triangle,
+dodge from speed advantage, the range ladder for bows (the gap>1 draw
+bonus only for rank-8 hands).
 """
 
 from __future__ import annotations
@@ -37,6 +39,8 @@ from plugin_linear_ascent import economy as eco               # noqa: E402
 from plugin_linear_ascent.content import schema               # noqa: E402
 
 RNG = random.Random(0x5EED)
+REF_RANK = 6               # the reference climber's trained rank (048
+#                            phase 6: the migration default)
 FIGHTS_PER_DAY = round(24 * 60 / eco.ENERGY_REGEN_MIN)        # sustained
 WIN_TARGET = 0.90
 WIN_ACCEPT = 0.85          # 90% ± 5 — the plan's tolerance
@@ -71,15 +75,21 @@ def _monster_blow(m_atk: int, p_def: int, halved: bool) -> int:
     return dmg // 2 if halved else dmg
 
 
-def _traced_fight(bar: int, floor: int, traits, dtype: str = "melee"):
+def _traced_fight(bar: int, floor: int, traits, path: str = "blade",
+                  rank: int = REF_RANK):
     """One fight, attack every round. (won, rounds, player HP lost)."""
     p_atk, p_def, p_hp = _player(bar)
     hp0 = p_hp
     m_atk, m_def, m_hp, prof = _monster(floor, traits)
+    mtype = prof["type"]
+    if path == "blade" and mtype == "fly":
+        return 0, 1, 0                         # steel can never reach it
     mspd = prof["speed"]
     dodge = eco.dodge_pct(eco.PLAYER_BASE_SPEED, mspd)
-    ranged = dtype == "ranged"                 # archer flow; magic fights
-    #                                            like melee, typed magic
+    ranged = path == "bow"                     # staff fights like melee,
+    #                                            typed through the triangle
+    miss = eco.TRAIN_MISS_PCT(rank) / 100
+    roll_lo = round(eco.TRAIN_ROLL_FLOOR(rank) * p_atk)
     gap, at_range, rounds = 1, True, 0
     while rounds < MAX_ROUNDS:
         rounds += 1
@@ -92,10 +102,19 @@ def _traced_fight(bar: int, floor: int, traits, dtype: str = "melee"):
             if p_hp <= 0:
                 return 0, rounds, hp0
             continue
-        mult = ((eco.bow_gap_mult(gap) if at_range else eco.BOW_CLOSE_MULT)
-                if ranged else 1.0)
-        raw = RNG.randint(p_atk // 2, p_atk)
-        m_hp -= eco.typed_damage(dtype, round(raw * mult), m_def, prof)
+        if miss and RNG.random() < miss:       # the untrained hand
+            dmg = 0                            # swings wide; the round is
+        else:                                  # spent, the counter lands
+            mult = 1.0
+            if ranged:
+                mult = (eco.bow_gap_mult(gap) if at_range
+                        else eco.BOW_CLOSE_MULT)
+                if mult > 1 and rank < eco.GAP_DRAW_RANK:
+                    mult = 1.0                 # the draw pays rank-8 hands
+            raw = RNG.randint(roll_lo, p_atk)
+            dmg = eco.typed_damage_048(path, round(raw * mult),
+                                       m_def, mtype)
+        m_hp -= dmg
         if m_hp <= 0:
             return 1, rounds, hp0 - p_hp       # no counter on the kill
         if at_range:                           # the gap is armor
@@ -112,65 +131,87 @@ def _traced_fight(bar: int, floor: int, traits, dtype: str = "melee"):
 
 
 def win_rate(bar: int, floor: int, traits, sims: int,
-             dtype: str = "melee") -> float:
-    wins = sum(_traced_fight(bar, floor, traits, dtype)[0]
+             path: str = "blade") -> float:
+    wins = sum(_traced_fight(bar, floor, traits, path)[0]
                for _ in range(sims))
     return wins / sims
 
 
 def _kill_bar_typed(floor: int, traits,
-                    dtype: str) -> tuple[int | None, float]:
+                    path: str) -> tuple[int | None, float]:
     lo, hi = 1, eco.BAR_MAX
-    if win_rate(hi, floor, traits, SCAN_SIMS, dtype) < WIN_ACCEPT:
-        return None, win_rate(hi, floor, traits, CONFIRM_SIMS, dtype)
+    if win_rate(hi, floor, traits, SCAN_SIMS, path) < WIN_ACCEPT:
+        return None, win_rate(hi, floor, traits, CONFIRM_SIMS, path)
     while lo < hi:                             # win rate rises with the bar
         mid = (lo + hi) // 2
-        if win_rate(mid, floor, traits, SCAN_SIMS, dtype) >= WIN_TARGET:
+        if win_rate(mid, floor, traits, SCAN_SIMS, path) >= WIN_TARGET:
             hi = mid
         else:
             lo = mid + 1
     bar = lo
-    rate = win_rate(bar, floor, traits, CONFIRM_SIMS, dtype)
+    rate = win_rate(bar, floor, traits, CONFIRM_SIMS, path)
     while bar > 1:                             # the ±5 tolerance walks down
-        below = win_rate(bar - 1, floor, traits, CONFIRM_SIMS, dtype)
+        below = win_rate(bar - 1, floor, traits, CONFIRM_SIMS, path)
         if below < WIN_ACCEPT:
             break
         bar, rate = bar - 1, below
     while rate < WIN_ACCEPT and bar < eco.BAR_MAX:
         bar += 1
-        rate = win_rate(bar, floor, traits, CONFIRM_SIMS, dtype)
+        rate = win_rate(bar, floor, traits, CONFIRM_SIMS, path)
     return bar, rate
+
+
+def avg_hits(hp: int, m_def: int, prof: dict, bar: int) -> dict:
+    """Attacks to kill for the bar's reference player on each path, at
+    REF_RANK hands' mean swing (mirrors combat's _pred_damage; misses
+    not counted). The bow is read at gap 1 — the kiting shot, ×1.0.
+    None = the path cannot land at all (blade vs a flyer)."""
+    p_atk, _ = eco._at_level_loadout(bar)
+    raw = round((round(eco.TRAIN_ROLL_FLOOR(REF_RANK) * p_atk)
+                 + p_atk) / 2)
+    out = {}
+    for path in ("blade", "bow", "staff"):
+        if path == "blade" and prof["type"] == "fly":
+            out["hits_" + path] = None
+            continue
+        dmg = eco.typed_damage_048(path, raw, m_def, prof["type"])
+        out["hits_" + path] = None if dmg <= 0 else -(-hp // dmg)
+    return out
+
+
+# 048: the fair path per type — the full answer first, then the best
+# half. Blade is the headline against plain (the melee default).
+FAIR_PATHS = {
+    "fly": ("bow", "staff"),
+    "armoured": ("staff", "blade"),
+    "magic_resist": ("blade", "bow"),
+    "plain": ("blade",),
+}
 
 
 def kill_bar(floor: int, traits) -> tuple[int | None, float, str]:
     """Lowest bar with ~90% (>= 85%) win chance, its rate, and the
-    damage type that gets it — the class the creature does NOT counter:
-    physical (bow for flyers, blade otherwise) unless armor halves
-    physical harder than resist halves magic, then the staff. Magic is
-    never the headline against an unarmored shape even though it would
-    shave the DEF axis — the ladder is read through the fair class."""
+    weapon path that gets it — the path the creature's type does NOT
+    counter (the ×1.0 cell of the triangle), falling back to the best
+    half-answer if even the fair path cannot get there."""
     prof = eco.profile_from_traits(traits)
-    physical = "ranged" if prof.get("flying") else "melee"
-    phys_mult = eco.TIER_MULT.get(prof["armor"], 1.0)
-    magic_mult = eco.TIER_MULT.get(prof["resist"], 1.0)
-    dtypes = ((physical, "magic") if phys_mult >= magic_mult
-              else ("magic", physical))
-    best = (None, 0.0, dtypes[0])
-    for dtype in dtypes:
-        bar, rate = _kill_bar_typed(floor, traits, dtype)
+    paths = FAIR_PATHS[prof["type"]]
+    best = (None, 0.0, paths[0])
+    for path in paths:
+        bar, rate = _kill_bar_typed(floor, traits, path)
         if bar is not None:
-            return bar, rate, dtype            # the fair class first
+            return bar, rate, path             # the fair path first
         if rate > best[1]:
-            best = (None, rate, dtype)
+            best = (None, rate, path)
     return best
 
 
 def fight_profile(bar: int, floor: int, traits, sims: int = 800,
-                  dtype: str = "melee"):
+                  path: str = "blade"):
     """(win rate, avg rounds, avg HP lost) at a given bar."""
     wins = rounds_sum = hp_sum = 0
     for _ in range(sims):
-        w, r, lost = _traced_fight(bar, floor, traits, dtype)
+        w, r, lost = _traced_fight(bar, floor, traits, path)
         wins += w
         rounds_sum += r
         hp_sum += lost
@@ -210,8 +251,9 @@ def build_floors() -> list[dict]:
         for e in fl.encounters:
             atk, dfs, hp, prof = _monster(n, e.traits)
             xp, gold = reward_avgs(n, e.traits, prof)
+            hits = avg_hits(hp, dfs, prof, eco.creature_bar(n, e.traits))
             kl, kl_rate, kl_type = kill_bar(n, e.traits)
-            at = (fight_profile(kl, n, e.traits, dtype=kl_type)
+            at = (fight_profile(kl, n, e.traits, path=kl_type)
                   if kl else (0.0, 0.0, 0.0))
             monsters.append({
                 "id": e.id, "name": e.name, "kind": e.kind or "native",
@@ -219,11 +261,14 @@ def build_floors() -> list[dict]:
                 "note": eco.archetype_note(e.traits),
                 "spawnPct": round(100 * weights[e.id] / wsum, 1),
                 "atk": atk, "def": dfs, "hp": hp,
-                "armor": prof["armor"], "resist": prof["resist"],
+                "type": prof["type"],
                 "flying": bool(prof.get("flying")),
                 "bulwark": bool(prof.get("bulwark")),
                 "speed": prof["speed"],
                 "xpAvg": round(xp, 1), "goldAvg": round(gold, 1),
+                "hitsBlade": hits["hits_blade"],
+                "hitsBow": hits["hits_bow"],
+                "hitsStaff": hits["hits_staff"],
                 "targetBar": eco.creature_bar(n, e.traits),
                 "killLevel": kl,
                 "killType": kl_type,
@@ -327,9 +372,76 @@ def build_shops() -> dict:
                    for r in eco.RELICS.values()],
         "honePricePct": eco.HONE_PRICE_PCT,
         "repairPricePct": eco.REPAIR_PRICE_PCT,
-        "offClassPriceMult": eco.OFF_CLASS_PRICE_MULT,
+        # 048: the off-class weapon tax died with the classes — the
+        # trained rank is the only tax on a weapon.
         "arrowPack": {"size": eco.ARROW_PACK_SIZE,
                       "price": eco.ARROW_PACK_PRICE},
+    }
+
+
+def _fit_level(xp: int) -> int:
+    """The lowest body level whose bar holds `xp` — the fits-the-bar
+    law: an XP price is honest only if one level's hard bar can pay it
+    (048 phase 6)."""
+    lvl = 1
+    while eco.xp_need(lvl) < xp and lvl < eco.LEVEL_CAP:
+        lvl += 1
+    return lvl
+
+
+def build_training() -> dict:
+    """The School's ledger — rank costs, the hand's curves, the gate
+    table, and the merchandise (048)."""
+    ranks = []
+    cum = 0
+    for r in range(1, 11):
+        xp = eco.train_xp(r)
+        cum += xp
+        ranks.append({
+            "rank": r, "xp": xp, "cumXp": cum,
+            "gold10": eco.train_gold(r, 10),
+            "gold30": eco.train_gold(r, 30),
+            "missPct": eco.TRAIN_MISS_PCT(r),
+            "rollFloorPct": round(100 * eco.TRAIN_ROLL_FLOOR(r)),
+            "fitLevel": _fit_level(xp),
+            "fitXpNeed": eco.xp_need(_fit_level(xp)),
+        })
+    return {
+        "ranks": ranks,
+        "missPct0": eco.TRAIN_MISS_PCT(0),
+        "rollFloorPct0": round(100 * eco.TRAIN_ROLL_FLOOR(0)),
+        "gates": [
+            {"path": "blade", "name": "shield wall",
+             "rank": eco.WALL_RANK},
+            {"path": "bow", "name": "shot from cover",
+             "rank": eco.TREELINE_RANK},
+            {"path": "bow", "name": "give ground",
+             "rank": eco.GAP_OPEN_RANK},
+            {"path": "bow", "name": "the open-gap draw pays",
+             "rank": eco.GAP_DRAW_RANK},
+            {"path": "staff", "name": "the lullaby",
+             "rank": eco.SLEEP_RANK},
+        ],
+        "merch": [
+            {"name": "2nd weapon slot (CARRY)", "xp": eco.CARRY2_XP,
+             "gold": eco.CARRY2_GOLD, "level": 1,
+             "fitLevel": _fit_level(eco.CARRY2_XP)},
+            {"name": "3rd weapon slot (CARRY)", "xp": eco.CARRY3_XP,
+             "gold": None, "goldAnchor": eco.CARRY3_GOLD_ANCHOR,
+             "level": eco.CARRY3_LEVEL,
+             "fitLevel": _fit_level(eco.CARRY3_XP)},
+            {"name": "mastery study (at rank 10)", "xp": eco.MASTERY_XP,
+             "gold": None, "level": None,
+             "fitLevel": _fit_level(eco.MASTERY_XP)},
+        ],
+        "masteryDiscount": eco.MASTERY_DISCOUNT,
+        "masteryDiscountMaxRank": eco.MASTERY_DISCOUNT_MAX_RANK,
+        "masteryTeeth": {
+            "riposteReturn": eco.RIPOSTE_RETURN,
+            "longDrawCritMult": eco.LONG_DRAW_CRIT_MULT,
+            "longDrawTop": eco.LONG_DRAW_TOP,
+            "focusMult": eco.FOCUS_MULT,
+        },
     }
 
 
@@ -339,7 +451,15 @@ def build_constants() -> dict:
         "barMax": eco.BAR_MAX,
         "playerSpeed": eco.PLAYER_BASE_SPEED,
         "chipDivisor": eco.CHIP_DIVISOR,
-        "tierMult": eco.TIER_MULT,
+        "typeMult": eco.TYPE_MULT,
+        "typeSpeed": eco.TYPE_SPEED,
+        "refRank": REF_RANK,
+        "gapDrawRank": eco.GAP_DRAW_RANK,
+        "trainMissPct": [eco.TRAIN_MISS_PCT(r) for r in range(11)],
+        "trainRollFloor": [eco.TRAIN_ROLL_FLOOR(r) for r in range(11)],
+        "earlyCoinFloors": eco.EARLY_COIN_FLOORS,
+        "earlyCoinMult": {f: eco.early_coin_mult(f)
+                          for f in range(1, eco.EARLY_COIN_FLOORS + 1)},
         "bowGapMult": eco.BOW_GAP_MULT,
         "bowCloseMult": eco.BOW_CLOSE_MULT,
         "bulwarkHpMult": eco.BULWARK_HP_MULT,
@@ -363,6 +483,7 @@ def main() -> None:
         "bars": build_bars(),
         "gear": build_gear(),
         "shops": build_shops(),
+        "training": build_training(),
     }
     out = os.path.join(_HERE, "static", "site", "mechanics-data.js")
     with open(out, "w", encoding="utf-8") as f:
