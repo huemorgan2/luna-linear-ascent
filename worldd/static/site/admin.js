@@ -73,6 +73,7 @@ function route() {
   else if (parts[0] === "feedback" && parts[1])
     renderThread(Number(parts[1]));
   else if (parts[0] === "feedback") renderFeedback();
+  else if (parts[0] === "world") renderWorld();
   else renderPlayers(q);
 }
 
@@ -104,6 +105,7 @@ async function enter() {
 // ── Tabs ────────────────────────────────────────────────────────────────
 
 function setTab(name) {
+  $("tabWorld").classList.toggle("on", name === "world");
   $("tabPlayers").classList.toggle("on", name === "players");
   $("tabFeedback").classList.toggle("on", name === "feedback");
 }
@@ -120,6 +122,68 @@ async function pollUnread() {
   } catch (e) { /* the gate handles a 401 */ }
 }
 setInterval(() => { if (!$("console").hidden) pollUnread(); }, 60000);
+
+// ── WORLD ───────────────────────────────────────────────────────────────
+
+async function renderWorld() {
+  setTab("world");
+  $("main").innerHTML = `<p class="dim">…</p>`;
+  const w = await apiJson("/admin/api/world");
+  const floors = Object.keys(w.census.by_floor || {})
+    .map(Number).sort((a, b) => b - a);
+  $("main").innerHTML = `
+    <div class="cardgrid">
+      <div class="card">
+        <h3>Population</h3>
+        ${kv([
+          ["docs", w.population.total.toLocaleString()],
+          ["playing", w.population.playing.toLocaleString()],
+          ["seen today", w.population.seen_today.toLocaleString()],
+          ["active 7d", w.census.total.toLocaleString()],
+        ])}
+      </div>
+      <div class="card">
+        <h3>Frontier</h3>
+        ${kv([
+          ["floor", w.frontier],
+          ["warden hp", w.warden && w.warden.hp != null ?
+            w.warden.hp.toLocaleString() : "untouched"],
+          ["strikers", w.warden ? w.warden.strikers : "—"],
+        ])}
+        <p class="dim" style="font-size:12px">the 7-day census sizes the
+          warden quorum — active means seen this week</p>
+      </div>
+      <div class="card">
+        <h3>Postbox</h3>
+        ${kv([
+          ["threads", w.feedback.threads],
+          ["unread", w.feedback.unread ?
+            `<span class="unread">${w.feedback.unread}</span>` : "0"],
+        ])}
+      </div>
+      <div class="card">
+        <h3>Ledger</h3>
+        ${kv([
+          ["rows", w.ledger.rows.toLocaleString()],
+          ["gold net", w.ledger.gold_net.toLocaleString()],
+          ["xp net", w.ledger.xp_net.toLocaleString()],
+        ])}
+      </div>
+      <div class="card" style="grid-column:1/-1">
+        <h3>Climbers by floor — 7-day census</h3>
+        ${floors.length ? `<div class="scroll"><table>
+          <tr><th class="num">floor</th><th class="num">climbers</th>
+              <th></th></tr>
+          ${floors.map((f) => `
+            <tr><td class="num">${f}</td>
+                <td class="num">${w.census.by_floor[f]}</td>
+                <td class="dim">${"▪".repeat(Math.min(
+                  60, w.census.by_floor[f]))}</td></tr>`).join("")}
+        </table></div>` :
+          `<span class="dim">nobody seen this week</span>`}
+      </div>
+    </div>`;
+}
 
 // ── PLAYERS ─────────────────────────────────────────────────────────────
 
@@ -390,6 +454,7 @@ async function renderThread(fid) {
 
 $("keygo").onclick = enter;
 $("keyin").onkeydown = (e) => { if (e.key === "Enter") enter(); };
+$("tabWorld").onclick = () => nav("#/world");
 $("tabPlayers").onclick = () => nav("#/players");
 $("tabFeedback").onclick = () => nav("#/feedback");
 $("keyout").onclick = () => { localStorage.removeItem(KEY_STORE); gate(); };

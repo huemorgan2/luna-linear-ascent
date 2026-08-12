@@ -236,3 +236,27 @@ async def test_feedback_unread_badge(client, tenant_a):
     # and the badge is behind the key like everything else
     r = await client.get("/admin/api/feedback/unread")
     assert r.status_code == 401
+
+
+async def test_world_overview(client, tenant_a):
+    """The WORLD tab: census, population, frontier, postbox, ledger."""
+    player = _p("world")
+    await create(client, tenant_a, "tenant-a", player, f"Wld{player[-4:]}")
+
+    r = await client.get("/admin/api/world", headers=ADMIN)
+    assert r.status_code == 200
+    w = r.json()
+    assert w["frontier"] >= 1
+    pop = w["population"]
+    assert pop["total"] >= 1
+    assert pop["playing"] <= pop["total"]
+    assert pop["seen_today"] >= 1          # we just made a climber
+    # a fresh climber is playing and was seen now — the census sees them
+    assert w["census"]["total"] >= 1
+    assert sum(w["census"]["by_floor"].values()) == w["census"]["total"]
+    assert w["feedback"]["threads"] >= 0
+    assert w["ledger"]["rows"] >= 0
+    assert "warden" in w                    # present, may be null
+
+    r = await client.get("/admin/api/world")
+    assert r.status_code == 401

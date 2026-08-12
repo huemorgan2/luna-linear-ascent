@@ -18,7 +18,7 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
 
-from . import db, feedback, site
+from . import db, feedback, site, social
 from .config import get_config
 from .game import pstate  # gamepath made the plugin importable
 
@@ -258,6 +258,53 @@ async def weapons() -> dict:
         "slug": g.slug, "name": g.name, "line": g.line or "shared",
         "tier": g.tier, "rung": g.rung, "style": g.style,
         "bonus": g.bonus, "price": g.price} for g in items]}
+
+
+# ── World ────────────────────────────────────────────────────────────────
+
+@router.get("/admin/api/world", dependencies=[Depends(_admin)])
+async def world_overview() -> dict:
+    """The tower at a glance: census (the same 7-day window that sizes
+    warden quorums), population, frontier + its warden pool, postbox
+    and ledger vitals."""
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        raw = await conn.fetchval(
+            "SELECT value FROM ascent_world WHERE key='frontier'")
+        frontier = int(json.loads(raw)) if raw else 1
+        census = await social._census(conn)
+        pop = await conn.fetchrow(
+            "SELECT count(*) AS total, "
+            "count(*) FILTER (WHERE doc->>'stage'='playing') AS playing, "
+            "count(*) FILTER (WHERE updated_at > now() - interval '1 day')"
+            " AS seen_today FROM ascent_players")
+        ledger = await conn.fetchrow(
+            "SELECT count(*) AS n, coalesce(sum(gold),0) AS gold, "
+            "coalesce(sum(xp),0) AS xp FROM ascent_ledger")
+        fb = await conn.fetchrow(
+            "SELECT count(*) AS threads, coalesce(sum(admin_unread),0) "
+            "AS unread FROM ascent_feedback")
+        wraw = await conn.fetchval(
+            "SELECT value FROM ascent_world WHERE key='warden:'||$1",
+            str(frontier))
+    warden = None
+    if wraw:
+        v = json.loads(wraw)
+        warden = {"hp": v.get("hp"),
+                  "strikers": len(v.get("strikers") or [])}
+    return {
+        "frontier": frontier,
+        "census": census,
+        "population": {"total": int(pop["total"]),
+                       "playing": int(pop["playing"]),
+                       "seen_today": int(pop["seen_today"])},
+        "warden": warden,
+        "feedback": {"threads": int(fb["threads"]),
+                     "unread": int(fb["unread"])},
+        "ledger": {"rows": int(ledger["n"]),
+                   "gold_net": int(ledger["gold"]),
+                   "xp_net": int(ledger["xp"])},
+    }
 
 
 # ── Feedback ─────────────────────────────────────────────────────────────
