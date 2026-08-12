@@ -100,7 +100,18 @@ async def test_shared_warden_one_hp_pool_kill_opens_for_all(
     s = await act(client, tenant_b, "tenant-b", pb, option="strike")
     if any(o["id"] == "close_in" for o in s["options"]):
         await act(client, tenant_b, "tenant-b", pb, option="close_in")
-    s = await act(client, tenant_b, "tenant-b", pb, option="attack")
+    # 048: a swing can miss — the warden holds at 1 HP either way, so
+    # keep B topped up and swinging until the blow lands.
+    for _ in range(20):
+        s = await act(client, tenant_b, "tenant-b", pb, option="attack")
+        if "falls" in s["headline"]:
+            break
+        await pool.execute(
+            "UPDATE ascent_players SET doc = jsonb_set(jsonb_set(doc,"
+            " '{hp}', '999'::jsonb), '{energy}', '999'::jsonb)"
+            " WHERE tenant='tenant-b' AND player=$1", pb)
+        if any(o["id"] == "close_in" for o in s["options"]):
+            await act(client, tenant_b, "tenant-b", pb, option="close_in")
     # 033: the kill card IS the fall reel, and it pays on the spot —
     # worldd lands the settled split on the outgoing card.
     assert "falls" in s["headline"]
