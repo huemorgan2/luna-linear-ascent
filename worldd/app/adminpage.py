@@ -12,6 +12,7 @@ desk side — threads, messages, replies signed as the admin.
 from __future__ import annotations
 
 import json
+import time
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
@@ -29,14 +30,34 @@ router = APIRouter()
 SITE_DIR = Path(__file__).resolve().parent.parent / "static" / "site"
 
 
+# the key door locks after too many wrong guesses from one address —
+# the session-cookie door stays open, so a locked-out admin signs in
+_FAILS: dict[str, list[float]] = {}
+_FAIL_LIMIT = 10
+_FAIL_WINDOW = 900.0
+
+
+def _key_fails(ip: str) -> list[float]:
+    now = time.monotonic()
+    fails = [t for t in _FAILS.get(ip, []) if now - t < _FAIL_WINDOW]
+    _FAILS[ip] = fails
+    return fails
+
+
 def _admin(request: Request, x_admin_key: str = Header(default="")) -> None:
     # two ways past the lock: the X-Admin-Key that guards main.py's
     # /admin endpoints, or a signed-in site session whose username is a
     # feedback admin (004: a name is an identity) — huemorgan3 walks in
     # without typing the key.
     cfg = get_config()
-    if cfg.admin_key and x_admin_key == cfg.admin_key:
-        return
+    if x_admin_key:
+        ip = request.client.host if request.client else "?"
+        fails = _key_fails(ip)
+        if len(fails) >= _FAIL_LIMIT:
+            raise HTTPException(429, "too many wrong keys — come back later")
+        if cfg.admin_key and x_admin_key == cfg.admin_key:
+            return
+        fails.append(time.monotonic())
     user = site.session_user(request)
     if user and user.lower() in feedback.admin_names():
         return

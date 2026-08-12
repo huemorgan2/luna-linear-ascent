@@ -291,3 +291,28 @@ async def test_raw_doc_and_luna_user_search(client, tenant_a):
     r = await client.get(
         f"/admin/api/player/doc?tenant=tenant-a&player={player}")
     assert r.status_code == 401
+
+
+async def test_admin_key_bruteforce_lock(client):
+    """Ten wrong keys lock the key door for that address; the cookie
+    door stays open, and keyless knocks are never counted."""
+    from app import adminpage
+    adminpage._FAILS.clear()
+    try:
+        for _ in range(adminpage._FAIL_LIMIT):
+            r = await client.get("/admin/api/players",
+                                 headers={"X-Admin-Key": "guess"})
+            assert r.status_code == 401
+        r = await client.get("/admin/api/players",
+                             headers={"X-Admin-Key": "guess"})
+        assert r.status_code == 429
+        # locked means locked — even the right key waits
+        r = await client.get("/admin/api/players", headers=ADMIN)
+        assert r.status_code == 429
+        # a keyless knock is not a guess: plain 401, no lock
+        r = await client.get("/admin/api/players")
+        assert r.status_code == 401
+    finally:
+        adminpage._FAILS.clear()
+    r = await client.get("/admin/api/players", headers=ADMIN)
+    assert r.status_code == 200
