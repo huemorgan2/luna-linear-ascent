@@ -103,15 +103,15 @@ async def test_creation_flow_over_http(client, tenant_a):
     assert "demon king" in s["headline"].lower()      # the title card
     s = await act(client, tenant_a, "tenant-a", player, option="begin")
     assert "shard" in s["headline"].lower()
-    s = await act(client, tenant_a, "tenant-a", player, option="dwarf")
+    s = await act(client, tenant_a, "tenant-a", player, option="giant")
     assert "username" in s["headline"].lower()   # 048: no class step
     s = await act(client, tenant_a, "tenant-a", player, text="Borin")
     assert "Borin" in s["headline"]
 
-    # character sheet reflects the dwarf
+    # character sheet reflects the giant
     body, headers = signed(tenant_a, "tenant-a", {"player": player})
     r = await client.post("/v1/character", content=body, headers=headers)
-    assert r.json()["race"] == "dwarf"
+    assert r.json()["race"] == "giant"
 
 
 async def test_idempotent_act_replays_same_scene(client, tenant_a):
