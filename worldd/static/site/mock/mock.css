@@ -1,0 +1,170 @@
+/* mock/roothollow — the game under the homepage's terminal law (plan 008).
+   Loads AFTER site.css. site.css stays untouched; this file only
+   (a) swaps the ink for the CGA 16-color palette and
+   (b) restates the game's components — door rows, meters, card wall,
+   enemy plate, school bars — in the one-font one-size ANSI grammar. */
+
+:root {
+  --bg: #000000;      /* CGA 0  black       */
+  --fg: #aaaaaa;      /* CGA 7  light gray  */
+  --dim: #555555;     /* CGA 8  dark gray   */
+  --bright: #ffffff;  /* CGA 15 white       */
+  --gold: #ffff55;    /* CGA 14 yellow      */
+  --line: #555555;
+  --paper: #000000;
+  /* game inks, CGA only */
+  --hp: #55ff55;      /* CGA 10 light green */
+  --en: #55ffff;      /* CGA 11 light cyan  */
+  --xp: #ff55ff;      /* CGA 13 light magenta */
+  --hurt: #ff5555;    /* CGA 12 light red   */
+  --brown: #aa5500;   /* CGA 6  brown       */
+}
+
+/* a touch more air than the homepage's 1.3 */
+html { line-height: 1.5; }
+
+/* no CRT scanlines on the mock */
+body::after { display: none; }
+
+/* site.css hardcodes a few near-blacks; in CGA there is only black */
+.card { background: var(--bg); outline-color: var(--dim); }
+.card .eyebrow { background: var(--fg); color: var(--bg); } /* true reverse video */
+
+.hp   { color: var(--hp); }
+.en   { color: var(--en); }
+.xp   { color: var(--xp); }
+.hurt { color: var(--hurt); }
+.brown { color: var(--brown); }
+
+/* ── the room banner: 1-bit art as a CSS mask, tinted with one ink ── */
+.banner {
+  display: block;
+  width: calc(100% + 4ch);
+  margin: -1rem -2ch 0;
+  background-color: var(--fg);
+  mask-size: 100% 100%; -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat; -webkit-mask-repeat: no-repeat;
+  image-rendering: pixelated;
+  border-bottom: 1px solid var(--line);
+}
+.banner + .eyebrow { margin-top: 0; }
+
+/* ── door rows: an ANSI menu, dot leaders instead of borders ──────── */
+.doors { display: flex; flex-direction: column; margin-top: 1rem; }
+.door {
+  display: flex; align-items: baseline; gap: 1ch;
+  width: 100%; background: none; border: 0; cursor: pointer;
+  text-align: left; color: var(--fg);
+}
+.door .key { white-space: pre; color: var(--gold); }
+.door .lbl { color: var(--bright); }
+.door .leader { flex: 1; overflow: hidden; white-space: nowrap;
+                color: var(--dim); }
+.door .leader::after { content: "· · · · · · · · · · · · · · · · · · · "
+  "· · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·"; }
+.door .hint { color: var(--dim); white-space: nowrap; }
+.door .hint .gold { color: var(--gold); }
+.door:hover { background: var(--gold); }
+.door:hover .key, .door:hover .lbl, .door:hover .leader,
+.door:hover .hint, .door:hover .hint .gold, .door:hover .badge
+  { color: var(--bg); }
+.door:hover .badge { background: var(--bg); color: var(--gold); }
+/* a locked door is dim ink; its hover is the gray reverse video */
+.door.locked .lbl { color: var(--dim); }
+.door.locked .key { color: var(--dim); }
+.door.locked:hover { background: var(--dim); }
+/* something waits behind this door — cyan is the notification ink */
+.badge { background: var(--en); color: var(--bg); padding: 0 .5ch; }
+
+/* ── meters: bars are text, drawn in ▓ and ░ ──────────────────────── */
+.rail { border: 1px dashed var(--line); padding: .5rem 1ch;
+        margin-top: 1rem; }
+.rail .meter { color: var(--fg); }
+.rail .meter .blocks { color: inherit; }
+.meter.hp, .meter.hp .val { color: var(--hp); }
+.meter.en, .meter.en .val { color: var(--en); }
+.meter.xp, .meter.xp .val { color: var(--xp); }
+.meter.foe { color: var(--fg); }
+.meter.low { color: var(--hurt); }
+.meter .lab { color: var(--fg); }
+
+/* ── the profile: 1-bit portrait beside the meters ────────────────── */
+.profile { display: flex; gap: 2ch; align-items: flex-end;
+           margin-top: 1rem; }
+.profile .portrait { flex: none; width: 100px; aspect-ratio: 100/200;
+  background-color: var(--fg);
+  mask-size: 100% 100%; -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat; -webkit-mask-repeat: no-repeat;
+  image-rendering: pixelated;
+  border: 1px solid var(--line); }
+.profile .pcol { flex: 1; min-width: 0; }
+.profile .rail { margin-top: 0; }
+
+/* ── the fight ────────────────────────────────────────────────────── */
+.plate { border: 1px solid var(--line); padding: .5rem 1ch;
+         margin-top: 1rem; }
+.logline { margin-bottom: 0; }
+.logline::before { content: "· "; color: var(--dim); }
+.shardline { color: var(--dim); }
+
+
+/* ── the forge card wall ──────────────────────────────────────────── */
+.ggrid { display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(20ch, 1fr));
+         gap: 1ch; margin-top: 1rem; }
+.gcard {
+  border: 1px solid var(--line); background: none; cursor: pointer;
+  padding: .75rem 1ch .5rem; position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  gap: .15rem; text-align: center; color: var(--fg);
+}
+.gcard .key { position: absolute; top: 0; left: .5ch; color: var(--gold); }
+.gcard .gicon { width: 56px; height: 56px; background-color: var(--fg);
+  mask-size: 100% 100%; -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat; -webkit-mask-repeat: no-repeat;
+  image-rendering: pixelated; }
+.gcard .gname { color: var(--bright); }
+.gcard .gcost { color: var(--gold); }
+.gcard .gstat { color: var(--fg); }
+.gcard .gdur { color: var(--dim); }
+.gcard.worn { border-color: var(--hp); }
+.gcard.worn::after { content: "▣ worn"; color: var(--hp); }
+.gcard:hover { background: var(--gold); }
+.gcard:hover .key, .gcard:hover .gname, .gcard:hover .gcost,
+.gcard:hover .gstat, .gcard:hover .gdur, .gcard:hover::after
+  { color: var(--bg); }
+.gcard:hover .gicon { background-color: var(--bg); }
+
+/* ── folds: the ▣ legend and the dossier as a details shelf ───────── */
+.fold summary { cursor: pointer; color: var(--gold); list-style: none; }
+.fold summary::-webkit-details-marker { display: none; }
+.fold summary::before { content: "▸ "; }
+.fold[open] summary::before { content: "▾ "; }
+.fold summary:hover { background: var(--gold); color: var(--bg); }
+.fold .foldbody { border: 1px dashed var(--line); padding: .5rem 1ch;
+                  margin: .5rem 0; }
+.fold .foldbody p { margin-bottom: .25rem; }
+
+/* ── the school ───────────────────────────────────────────────────── */
+.schoolrow { white-space: pre; overflow-x: auto; margin-bottom: .25rem; }
+.schoolrow .bar { color: var(--fg); }
+.schoolrow.mastered .bar { color: var(--gold); }
+.schoolrow .path { color: var(--bright); }
+
+/* ── the crier's sheet, in brown ink ──────────────────────────────── */
+.papercard .eyebrow { background: var(--brown); color: var(--bg); }
+.papercard p { color: var(--brown); }
+.papercard .pit::before { content: "· "; }
+
+/* headlines read as written, not shouted */
+.card h2 { text-transform: none; }
+
+/* 1-bit glyphs, tinted by the surrounding ink — never emoji */
+.eg { width: 16px; height: 16px; display: inline-block;
+  vertical-align: -3px; background-color: currentColor;
+  mask-size: 100% 100%; -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat; -webkit-mask-repeat: no-repeat;
+  image-rendering: pixelated; }
+
+/* the reply line */
+.reply { color: var(--dim); margin-top: .75rem; }
