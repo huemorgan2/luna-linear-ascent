@@ -26,20 +26,20 @@ BANNED_WORDS = (
 _FORBIDDEN_NUMERIC_KEYS = {"atk", "def", "hp", "xp", "gold", "damage", "price"}
 # Encounter traits: qualitative flags the engine turns into numbers
 # (economy.py profile_from_traits) — content stays prose-only.
-# 017 §2.2: armor/resist tiers, flying, bulwark, speed. Legacy "armored"
-# maps to armor_med and is only legal on floors > 10 until phase 008
-# migrates them.
+# 048 phase 7: content speaks types natively — at most ONE type trait
+# per monster (fly / armoured / magic_resist; plain = none), beside the
+# archetype and the orthogonal bulwark. The legacy vocabulary
+# (armor_*/resist_*/flying/fast/slow/armored) is REJECTED: speed rides
+# the type, and the tier grades died with the triangle.
 ALLOWED_TRAITS = {
-    "armor_low", "armor_med", "armor_high",
-    "resist_low", "resist_med", "resist_high",
-    "flying", "bulwark", "slow", "fast",
-    "armored",  # legacy — lint forbids it on floors ≤ 10
+    "fly", "armoured", "magic_resist", "bulwark",
     # 025 §1: the stat archetype — the body and the bite. Legal from floor
     # 1: this is the variance the first floor never had, and it is the
     # difference between four animals and one animal in four costumes.
     "frail", "lean", "sturdy", "hulking",
     "feeble", "fierce", "savage",
 }
+TYPE_TRAITS = ("fly", "armoured", "magic_resist")
 
 ARCHETYPE_TRAITS = {"frail", "lean", "sturdy", "hulking",
                     "feeble", "fierce", "savage"}
@@ -49,17 +49,25 @@ ARCHETYPE_TRAITS = {"frail", "lean", "sturdy", "hulking",
 # floor 1 with the archetypes — being outrun is chase math, not damage,
 # and "some of them you have to run from" is the point of the first floor.
 TRAIT_INTRO_FLOOR = {
-    "armor": 2, "resist": 3, "flying": 4,
+    "armoured": 2, "magic_resist": 3, "fly": 4,
     "bulwark": 6,
 }
 
 
-def _trait_family(trait: str) -> str:
-    if trait.startswith("armor_") or trait == "armored":
-        return "armor"
-    if trait.startswith("resist_"):
-        return "resist"
-    return trait
+def _check_traits(traits, floor: int, where: str) -> None:
+    """048 phase 7: the native vocabulary, the staircase, and the
+    one-type-per-monster law — in one place so tests can aim at it."""
+    for t in traits:
+        if t not in ALLOWED_TRAITS:
+            raise ContentError(f"{where}: unknown trait {t!r}")
+        intro = TRAIT_INTRO_FLOOR.get(t)
+        if intro is not None and floor < intro:
+            raise ContentError(
+                f"{where}: trait {t!r} before its intro "
+                f"floor {intro} (017 staircase)")
+    if sum(1 for t in traits if t in TYPE_TRAITS) > 1:
+        raise ContentError(f"{where}: more than one type trait — a "
+                           "monster is ONE thing (048)")
 
 
 class ContentError(ValueError):
@@ -155,18 +163,7 @@ def _load_floor_file(path: str) -> Floor:
         if int(e.get("weight", 1)) <= 0:
             raise ContentError(f"{where}/{e['id']}: weight must be positive")
         traits = tuple(e.get("traits") or ())
-        for t in traits:
-            if t not in ALLOWED_TRAITS:
-                raise ContentError(f"{where}/{e['id']}: unknown trait {t!r}")
-            if t == "armored" and f <= 10:
-                raise ContentError(
-                    f"{where}/{e['id']}: legacy trait 'armored' — floors "
-                    "1-10 use the 017 tier traits")
-            intro = TRAIT_INTRO_FLOOR.get(_trait_family(t))
-            if intro is not None and f < intro:
-                raise ContentError(
-                    f"{where}/{e['id']}: trait {t!r} before its intro "
-                    f"floor {intro} (017 staircase)")
+        _check_traits(traits, f, f"{where}/{e['id']}")
         _check_prose(e["prose"], f"{where}/{e['id']}")
         lore = str(e.get("lore") or "").strip()
         if lore:
@@ -229,27 +226,23 @@ _floors: dict[int, Floor] | None = None
 
 
 def _class_pool_errors(fl: Floor) -> list[str]:
-    """008: every class keeps a hunting pool on every floor ≥ 11 —
-    at least two encounter types it hits at full damage (no bulwark,
-    no speed counter). The sim gate proves the pool wins; this lint
-    proves the pool EXISTS before anyone runs a sim."""
+    """008/048: no floor strands a PATH — at least TWO encounters it
+    answers at ×1.0 with no bulwark tax (the phase-7 retag restored
+    the old ≥2 spread). Speed is priced by the chase model, not
+    excluded here."""
     errors = []
-    for clazz, dtype in economy.DAMAGE_TYPE.items():
+    for path in ("blade", "bow", "staff"):
         good = 0
         for e in fl.encounters:
+            mtype = economy.type_of(e.traits)
             prof = economy.profile_from_traits(e.traits)
-            if dtype == "melee" and prof["flying"]:
-                continue
-            tier = prof["resist"] if dtype == "magic" else prof["armor"]
-            if economy.TIER_MULT[tier] < 1.0 or prof["bulwark"]:
-                continue
-            if dtype == "ranged" and prof["speed"] >= economy.SPEED_FAST:
+            if economy.TYPE_MULT[mtype][path] < 1.0 or prof["bulwark"]:
                 continue
             good += 1
         if good < 2:
             errors.append(
-                f"floor {fl.floor}: {clazz} has {good} full-damage "
-                "targets — needs ≥2 (008 spread rule)")
+                f"floor {fl.floor}: {path} has {good} full-damage "
+                "targets — every floor owes each path two (048)")
     return errors
 
 
@@ -266,13 +259,9 @@ def _archetype_errors(fl: Floor) -> list[str]:
             prey += 1
         if bite in ("fierce", "savage"):
             threat += 1
-        halves = (economy.TIER_MULT[prof["armor"]] <= 0.5
-                  or economy.TIER_MULT[prof["resist"]] <= 0.5
-                  or prof["bulwark"])
-        if body and halves:
-            errors.append(
-                f"floor {fl.floor}/{e.id}: body trait {body!r} stacked on a "
-                "damage-halving profile — both multiply fight length (025)")
+        # 048: the halves×body slog check died with the tiers — the
+        # triangle guarantees every type a full answer, so a long body
+        # is only long for the paths that chose the wrong tool.
         # A blade cannot reach a flying thing (017's one legal zero), so a
         # flyer with a real bite is an unanswerable death for a warrior —
         # not a fight they may lose — until the shop sells the Sky-Hook.
@@ -300,18 +289,14 @@ def _band_spread_errors(band: list[Floor]) -> list[str]:
     for fl in band:
         for e in fl.encounters:
             prof = economy.profile_from_traits(e.traits)
-            if economy.TIER_MULT[prof["armor"]] <= 0.5:
-                have.add("armor_med+")
-            if economy.TIER_MULT[prof["resist"]] <= 0.5:
-                have.add("resist_med+")
-            for flag in ("flying", "bulwark"):
-                if prof[flag]:
-                    have.add(flag)
+            have.add(prof["type"])
+            if prof["bulwark"]:
+                have.add("bulwark")
             if prof["speed"] >= economy.SPEED_FAST:
                 have.add("fast")
             if prof["speed"] <= economy.SPEED_SLOW:
                 have.add("slow")
-    need = {"armor_med+", "resist_med+", "flying", "bulwark",
+    need = {"armoured", "magic_resist", "fly", "bulwark",
             "fast", "slow"}
     return [f"band {lo}-{hi}: no {m} encounter (008 spread rule)"
             for m in sorted(need - have)]

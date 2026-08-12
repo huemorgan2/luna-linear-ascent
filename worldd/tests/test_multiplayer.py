@@ -39,7 +39,6 @@ async def create_player(client, secret, tenant, name):
         await act(client, secret, tenant, player, option="next")
     await act(client, secret, tenant, player, option="begin")
     await act(client, secret, tenant, player, option="human")
-    await act(client, secret, tenant, player, option="warrior")
     await act(client, secret, tenant, player, text=name)
     return player
 
@@ -63,18 +62,27 @@ async def test_shared_warden_one_hp_pool_kill_opens_for_all(
     if "close_in" in ids:
         await act(client, tenant_a, "tenant-a", pa, option="close_in")
     await act(client, tenant_a, "tenant-a", pa, option="attack")
-    # break away — the fight's total lands as ONE effect when A gets out
+    # break away — the fight's total lands as ONE effect when A gets out.
+    # 048: rank-2 hands can miss, so a fled swing may carry no wound —
+    # walk back in and swing again until one lands.
     v = None
     for _ in range(20):
         await pool.execute(
-            "UPDATE ascent_players SET doc = jsonb_set(doc, '{hp}',"
-            " '999'::jsonb) WHERE tenant='tenant-a' AND player=$1", pa)
+            "UPDATE ascent_players SET doc = jsonb_set(jsonb_set(doc,"
+            " '{hp}', '999'::jsonb), '{energy}', '999'::jsonb)"
+            " WHERE tenant='tenant-a' AND player=$1", pa)
         s = await act(client, tenant_a, "tenant-a", pa, option="run")
         row = await pool.fetchrow(
             "SELECT value FROM ascent_world WHERE key='warden:1'")
         if row and json.loads(row["value"]).get("strikers"):
             v = json.loads(row["value"])
             break
+        s = await act(client, tenant_a, "tenant-a", pa, option="keep")
+        if any(o["id"] == "strike" for o in s["options"]):
+            s = await act(client, tenant_a, "tenant-a", pa, option="strike")
+        if any(o["id"] == "close_in" for o in s["options"]):
+            await act(client, tenant_a, "tenant-a", pa, option="close_in")
+        await act(client, tenant_a, "tenant-a", pa, option="attack")
     assert v, "fleeing must persist the wounds to the world pool"
     assert v["strikers"][0]["name"] == "Aldo" and v["strikers"][0]["dmg"] > 0
 

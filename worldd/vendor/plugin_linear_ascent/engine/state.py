@@ -37,10 +37,10 @@ def world_day_f(at: dt.datetime | None = None) -> float:
 def new_player(luna_user: str) -> dict:
     ts = now().isoformat()
     return {
-        "version": 6,
+        "version": 7,
         "luna_user": luna_user,
-        "stage": "intro",              # intro → creation_race → creation_class → creation_name → playing
-        "name": None, "race": None, "clazz": None,
+        "stage": "intro",              # intro → creation_race → creation_name → playing
+        "name": None, "race": None,
         "level": 1, "xp": 0,
         "hp": economy.player_max_hp(1, economy.GATE_ARMOR.bonus),
         "gold": 50, "bank": 0, "bank_day": world_day(),
@@ -67,6 +67,13 @@ def new_player(luna_user: str) -> dict:
                   "death_save": False},
         "sidekick": {"insight": 1, "carried": None},
         "telemetry_day": world_day(),
+        # 048: trained rank 0–10 per weapon path — the player's skill.
+        # Creation trains the starting path; the School sells the rest.
+        "training": {"blade": 0, "bow": 0, "staff": 0},
+        # 048 phase 3: CARRY — weapon slugs in hand; held[0] IS the
+        # equipped weapon, the School sells the 2nd and 3rd slot.
+        "slots": 1,
+        "held": [economy.STARTER_WEAPON.slug],
     }
 
 
@@ -250,7 +257,7 @@ def ensure_current(p: dict) -> None:
         clazz = p.get("clazz")
         if (p.get("stage") == "playing" and clazz in economy.CLASS_STARTERS
                 and p["gear"].get("weapon") == economy.STARTER_WEAPON.slug):
-            starter = economy.class_starter(clazz)
+            starter = economy.CLASS_STARTERS[clazz]
             p["gear"]["weapon"] = starter.slug
             if clazz in ("archer", "sorcerer"):
                 from .scene import Option, Scene
@@ -331,7 +338,7 @@ def ensure_current(p: dict) -> None:
             starters.add(economy.STARTER_WEAPON.slug)
             item = economy.FORGE.get(worn)
             if worn in starters:
-                p["gear"]["weapon"] = economy.class_starter(clazz).slug
+                p["gear"]["weapon"] = economy.CLASS_STARTERS[clazz].slug
             elif item and item.line and item.line != clazz:
                 twin = economy.line_twin(item, clazz)
                 if twin:
@@ -381,6 +388,60 @@ def ensure_current(p: dict) -> None:
         if not p["gear"].get("armor"):
             p["gear"]["armor"] = economy.GATE_ARMOR.slug
         p["version"] = 6
+    if p.get("version", 1) < 7:
+        # 048: the School era — training lives on every doc. A legacy
+        # doc is honored on its class's path at a rank that scales with
+        # the climb: 6 (≈ the old on-class feel) as the floor of it,
+        # +1 per ten floors opened, capped at 9 — the tenth rank and
+        # the master's studies stay earned.
+        if "training" not in p:
+            p["training"] = {"blade": 0, "bow": 0, "staff": 0}
+            path = economy.PATH_OF_LINE.get(p.get("clazz") or "")
+            if path:
+                rank = economy.legacy_rank(p.get("unlocked_floor", 1))
+                p["training"][path] = rank
+                if p.get("stage") == "playing":
+                    from .scene import Option, Scene
+                    pretty = {"blade": "Blade", "bow": "Bow",
+                              "staff": "Staff"}[path]
+                    body = [f"▪ {pretty} — trained rank {rank}"]
+                    if rank > 6:
+                        body.append("▪ the deep floors counted — the "
+                                    "School reads the Stone")
+                    body.append("▪ the School trains all three paths, "
+                                "for XP and coin")
+                    p.setdefault("pending_events", []).insert(0, Scene(
+                        eyebrow="ROOTHOLLOW · A LETTER FROM THE SCHOOL",
+                        headline="The guilds dissolved their halls into "
+                                 "one School",
+                        support="Every gate town teaches every weapon "
+                                "now. Your years on the path are "
+                                "honored.",
+                        shard_note="A trained hand is a trained hand, "
+                                   "whatever the guild called it.",
+                        body_lines=body,
+                        options=[Option("town", "So be it")],
+                        event_kind="present",
+                    ).to_dict())
+        p["version"] = 7
+    # 048 phase 3: carry slots + held list, self-healing on every load —
+    # held[0] mirrors the hand, length never exceeds slots, and paid
+    # overflow returns to the pack instead of vanishing.
+    if "slots" not in p:
+        p["slots"] = 1
+    held = p.setdefault("held", [])
+    w = (p.get("gear") or {}).get("weapon")
+    if w:
+        if w in held:
+            held.remove(w)
+        held.insert(0, w)
+    cap = max(1, int(p["slots"]))
+    for slug in held[cap:]:
+        g = economy.FORGE.get(slug)
+        if g and g.price > 0:
+            p.setdefault("inventory", {})[slug] = \
+                p["inventory"].get(slug, 0) + 1
+    del held[cap:]
     # Soft clamp: XP used to bank past a full bar. Anyone already over
     # is brought back to the bar — surplus never bought a level anyway.
     if xp_room(p) is not None:

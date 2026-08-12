@@ -197,6 +197,14 @@ def pack_actions(p: dict, slug: str) -> tuple[list[Option], str]:
             worn = p["gear"].get(g.slot)
             hint = (f"swap out the {economy.FORGE[worn].name}"
                     if worn and worn in economy.FORGE else "from your pack")
+            # 048 phase 3: an untrained path warns BEFORE the swap —
+            # no silent numbers, even on a tooltip.
+            if g.slot == "weapon":
+                path = economy.PATH_OF_LINE.get(g.line, "")
+                if path and not int((p.get("training") or {})
+                                    .get(path, 0)):
+                    hint += (f" · untrained {path} — miss "
+                             f"{economy.TRAIN_MISS_PCT(0)}%, weak swings")
             if (p.get("hone") or {}).get(g.slot):
                 hint += " · honing resets"
             return [Option(f"wear_{slug}", label, hint)], ""
@@ -208,7 +216,17 @@ def _pack_use(p: dict, oid: str) -> Scene | None:
     """027: a pack action taken from the strip — legal in any room, never
     in a fight. Returns None when the id isn't a pack action."""
     wearing = oid.startswith("wear_")
-    if (oid not in PACK_USE_IDS and not wearing) or p.get("encounter"):
+    if oid not in PACK_USE_IDS and not wearing:
+        return None
+    if p.get("encounter"):
+        if wearing:
+            # 048 phase 3: the promote is refused mid-fight WITH a
+            # reason — not the generic "not one of the paths".
+            s = _build_scene(p)
+            s.shard_note = ("Not mid-fight — you don't re-rig your "
+                            "hands with teeth in your face. The swap "
+                            "waits for the road.")
+            return s
         return None
     slug = oid.removeprefix("wear_" if wearing else "use_")
     acts, why = pack_actions(p, slug)
@@ -552,7 +570,9 @@ def _build_scene(p: dict) -> Scene:
     if p["stage"] == "creation_race":
         return _creation_race_scene(p)
     if p["stage"] == "creation_class":
-        return _creation_class_scene(p)
+        # legacy doc parked on the dead class question — hand it the
+        # starter kit and move it along to the name.
+        return _creation_finish_race(p)
     if p["stage"] == "creation_name":
         return _creation_name_scene(p)
     # 030 Phase 8: mid-movie a refresh replays the current beat; the
@@ -575,6 +595,7 @@ def _build_scene(p: dict) -> Scene:
         "board": _board_scene,
         "stone": _stone_scene, "gate": _gate_scene,
         "gate_town": _gate_town_scene,
+        "school": _school_scene,
         "relay": social.relay_scene, "fields": social.fields_scene,
         "guildhall": social.guildhall_scene, "hall": hall.hall_scene,
         "grants": social.grant_scene,
@@ -694,7 +715,7 @@ def _dispatch(p: dict, oid: str) -> Scene:
     if p["stage"] == "creation_race":
         return _creation_pick_race(p, oid)
     if p["stage"] == "creation_class":
-        return _creation_pick_class(p, oid)
+        return _creation_finish_race(p)
     if p["stage"] == "creation_name":
         return _creation_name_scene(p)     # name comes as text
     if p.get("movie_floor"):
@@ -814,26 +835,19 @@ def _creation_race_scene(p: dict) -> Scene:
 
 def _creation_pick_race(p: dict, oid: str) -> Scene:
     p["race"] = oid
-    p["stage"] = "creation_class"
-    return _creation_class_scene(p)
+    return _creation_finish_race(p)
 
 
-def _creation_class_scene(p: dict) -> Scene:
-    return Scene(
-        eyebrow="THE TOWER GATE · REGISTRAR",
-        headline=f"A {p['race']} — and how do you fight?",
-        support="Class shapes which options appear when it matters.",
-        options=[Option(c, c.capitalize(), economy.CLASSES[c].split(":")[0])
-                 for c in economy.CLASSES],
-    )
-
-
-def _creation_pick_class(p: dict, oid: str) -> Scene:
-    p["clazz"] = oid
-    # 017 §1: the gate issues the weapon of your calling — warriors a
-    # rusted sword, archers a basic bow (arrows never run out),
-    # sorcerers a worn staff. It never breaks and is never lost.
-    p["gear"]["weapon"] = economy.class_starter(oid).slug
+def _creation_finish_race(p: dict) -> Scene:
+    """048: the class question died — every climber walks in with the
+    gate's Rusted Sword and two ranks of bladework (enough to swing
+    honestly on floor 1; the School sells the rest). The weapon in the
+    hand decides everything the class used to."""
+    p.setdefault("training", {"blade": 0, "bow": 0, "staff": 0})
+    if p["training"].get("blade", 0) < 2:
+        p["training"]["blade"] = 2
+    p["gear"]["weapon"] = economy.CLASS_STARTERS["warrior"].slug
+    p["held"] = [p["gear"]["weapon"]]
     if p.get("name"):
         # 005 web play: the door already carved this name at signup —
         # the registrar recognizes the account and waves them through.
@@ -1074,6 +1088,11 @@ def _dispatch_location(p: dict, oid: str) -> Scene:
         if loc == "memorial":
             # 034 §3: the only way out of a monument is back to the camp.
             p["location"] = "gate_town"
+        elif loc == "school":
+            # 048: the School opens off the gate camp, not the square —
+            # without this row the generic handler ate the door and the
+            # student was locked in (the T5 sim found it).
+            p["location"] = "gate_town"
         else:
             p["location"] = "town" if loc in town_menus + ("grants",) \
                 else p["location"]
@@ -1107,6 +1126,8 @@ def _dispatch_location(p: dict, oid: str) -> Scene:
         return _gate_pick(p, oid)
     if loc == "gate_town":
         return _gate_town_action(p, oid)
+    if loc == "school":
+        return _school_action(p, oid)
     if loc == "relay":
         return social.relay_action(p, oid)
     if loc == "fields":
@@ -1216,7 +1237,7 @@ def _relic_rows(p: dict, shop: str, opts: list, lines: list) -> None:
     folds into a <details> block — ▣ opens the fold, ▣. closes it;
     the renderer draws the summary, to_text draws a plain divider."""
     stock = economy.relic_stock(shop, p["unlocked_floor"],
-                                p.get("clazz") or "")
+                                combat._held_lines(p))
     if not stock:
         return
     fold = len(lines) > 8
@@ -1240,9 +1261,12 @@ def _relic_buy(p: dict, slug: str, scene_fn) -> Scene:
         s.shard_note = (f"The {r.name} waits behind the counter until "
                         f"floor {r.floor} stands open to you.")
         return s
-    if r.clazz and (p.get("clazz") or "") != r.clazz:
+    if r.line and r.line not in combat._held_lines(p):
         s = scene_fn(p)
-        s.shard_note = f"The {r.name} is {r.clazz}'s work — not yours."
+        word = {"warrior": "blade", "archer": "bow",
+                "sorcerer": "staff"}.get(r.line, r.line)
+        s.shard_note = (f"The {r.name} answers only to a {word} — "
+                        "nothing in your hands can use it.")
         return s
     if r.hold1 and p["inventory"].get(slug, 0) >= 1:
         s = scene_fn(p)
@@ -1266,39 +1290,30 @@ def _relic_buy(p: dict, slug: str, scene_fn) -> Scene:
 
 
 def _forge_scene(p: dict) -> Scene:
-    clazz = p.get("clazz") or ""
     opts, lines = [], []
-    nod = ""
-    # weapons: your own line at the Forge — staves live at the Arcanum
-    if clazz in ("warrior", "archer"):
-        _rack(p, economy.weapon_line(clazz), opts, lines)
-    elif clazz == "sorcerer":
-        # 031 §14: the one line worth keeping rides as a notice, not prose
-        nod = ("The smith nods at your staff and points across "
-               "the square: staves and focuses live at the Arcanum.")
-    if clazz != "sorcerer":
-        # shields serve warrior and archer; the caster's guard is the
-        # Arcanum's focus (same slot, different shop)
-        _rack(p, economy.gear_rungs("shield"), opts, lines)
+    # 048: the smith sells every physical line to every hand at list
+    # price — the trained rank is the only tax on strange steel.
+    # Staves and focuses still live at the Arcanum.
+    nod = ("The smith nods across the square: staves and "
+           "focuses live at the Arcanum.")
+    _rack(p, economy.weapon_line("warrior"), opts, lines)
+    _rack(p, economy.weapon_line("archer"), opts, lines)
+    _rack(p, economy.gear_rungs("shield"), opts, lines)
     _rack(p, economy.gear_rungs("armor"), opts, lines)
     _rack(p, economy.gear_rungs("shoes"), opts, lines)
-    # 004 §3.2: the off-class rack — the other physical line, one rung
-    # back, at triple price. A tool for a bad matchup, never a build.
-    off_lines = {"warrior": ("archer",), "archer": ("warrior",),
-                 "sorcerer": ("warrior", "archer")}.get(clazz, ())
-    for line in off_lines:
-        g = economy.off_class_offer(line, p["level"], p["unlocked_floor"])
-        if g:
-            price = economy.off_class_price(g)
-            opts.append(Option(f"buy_{g.slug}", g.name,
-                               f"pay ◈ {price:,} · off-class"))
-            lines.append(f"{g.name} — not your weapon: ×3 the coin, "
-                         "half the bite, and one shot in four goes wide")
-    if clazz != "archer":
+    # 048: the gate-issue basics of the other lines hang by the door —
+    # a flat coin buys a second path's first weapon. Never wears,
+    # never lost, never sold back.
+    owned = set(combat._held_slugs(p)) | set(p.get("inventory") or {})
+    for slug in ("basic_bow", "worn_staff"):
+        if slug in owned:
+            continue
+        g = economy.FORGE[slug]
         opts.append(Option(
-            "buy_arrow_pack", "Arrow pack",
-            f"pay ◈ {economy.ARROW_PACK_PRICE} · {economy.ARROW_PACK_SIZE} "
-            "arrows"))
+            f"buy_{slug}", g.name,
+            f"pay ◈ {economy.BASIC_WEAPON_PRICE} · never wears, "
+            "never lost"))
+        lines.append(f"{g.name} — {g.flavor}")
     _relic_rows(p, "forge", opts, lines)      # 006: quivers and tools
     for g in _wearable_pack(p):
         if p["gear"].get(g.slot) != g.slug:
@@ -1310,11 +1325,6 @@ def _forge_scene(p: dict) -> Scene:
     for slot in economy.HONE_SLOTS:
         slug = p["gear"].get(slot)
         lvl = state.hone_level(p, slot)
-        item = economy.FORGE.get(slug or "")
-        # off-class gear never hones (004 §3.2)
-        if slot == "weapon" and item is not None and item.line \
-                and clazz and item.line != clazz:
-            continue
         if slug and lvl < cap:
             name = economy.FORGE[slug].name
             opts.append(Option(f"hone_{slot}", f"Hone {name} +{lvl + 1}",
@@ -1454,11 +1464,10 @@ def _forge_repair(p: dict, slot: str) -> Scene:
 
 def _gear_purchase(p: dict, g, scene_fn) -> Scene:
     """Shared buy path for the Forge and the Arcanum: level gate,
-    off-class ×3 pricing, equip + old piece to the pack."""
-    clazz = p.get("clazz") or ""
-    off = bool(g.line) and clazz and g.line != clazz
+    equip + old piece to the pack. 048: list price for every hand —
+    the trained rank is the only tax on a strange line."""
     req = economy.rung_player_level_req(g)
-    price = economy.off_class_price(g) if off else g.price
+    price = g.price
     if p["level"] < req:
         s = scene_fn(p)
         s.shard_note = (f"{g.name} answers to level {req} hands — you are "
@@ -1495,6 +1504,16 @@ def _gear_purchase(p: dict, g, scene_fn) -> Scene:
         return s
     p["gold"] -= price
     p["gear"][g.slot] = g.slug
+    # 048 phase 3: the hand changed — held[0] follows, the old piece
+    # leaves the held list (it rides to the pack below, not both).
+    if g.slot == "weapon":
+        held = p.setdefault("held", [])
+        if old in held:
+            held.remove(old)
+        if g.slug in held:
+            held.remove(g.slug)
+        held.insert(0, g.slug)
+        del held[max(1, int(p.get("slots", 1))):]
     if g.slot in p.get("hone", {}):
         p["hone"][g.slot] = 0        # honing lives on the item it honed
     # 005: wear lives on the item too — stash the old piece's remaining
@@ -1509,8 +1528,6 @@ def _gear_purchase(p: dict, g, scene_fn) -> Scene:
     else:
         stat = "ATK" if g.slot == "weapon" else "DEF"
         note = f"+ {g.name} equipped ({g.slot} +{g.bonus} {stat})"
-    if off:
-        note += " — off-class: half the bite, one in four goes wide"
     if old and economy.FORGE[old].price > 0:
         p["inventory"][old] = p["inventory"].get(old, 0) + 1
         note += f" — your {economy.FORGE[old].name} goes to your pack"
@@ -1548,12 +1565,59 @@ def _wear_from_pack(p: dict, slug: str, scene_fn) -> Scene:
     if g.price > 0:
         p.setdefault("durability", {})[g.slot] = stash.pop(
             slug, economy.item_pool(g))
+    # 048 phase 3: CARRY — a free slot keeps the old weapon in hand
+    # instead of bumping it to the pack; held[0] is always the hand.
+    kept = False
+    if g.slot == "weapon":
+        held = p.setdefault("held", [])
+        if slug in held:
+            held.remove(slug)
+        held.insert(0, slug)
+        cap = max(1, int(p.get("slots", 1)))
+        kept = bool(old) and old in held[1:cap]
+        del held[cap:]
     note = f"+ {g.name} back on"
-    if old and economy.FORGE.get(old) and economy.FORGE[old].price > 0:
+    if kept:
+        note += (f" — the {economy.FORGE[old].name} stays in your "
+                 "other hand")
+    elif old and economy.FORGE.get(old) and economy.FORGE[old].price > 0:
         p["inventory"][old] = p["inventory"].get(old, 0) + 1
         note += f" — the {economy.FORGE[old].name} goes to your pack"
     s = scene_fn(p)
     s.body_lines.insert(0, note)
+    return s
+
+
+def _basic_buy(p: dict, slug: str, scene_fn) -> Scene:
+    """048: a gate-issue basic of another line — flat coin, never
+    wears, never lost. It goes into a free carry slot if one is open,
+    else into the pack (promote it on the road)."""
+    g = economy.FORGE[slug]
+    owned = set(combat._held_slugs(p)) | set(p.get("inventory") or {})
+    if slug in owned:
+        s = scene_fn(p)
+        s.shard_note = f"You already carry a {g.name} — one is plenty; " \
+                       "it never wears out."
+        return s
+    price = economy.BASIC_WEAPON_PRICE
+    if p["gold"] < price:
+        s = scene_fn(p)
+        s.shard_note = (f"{g.name} wants ◈ {price}; you carry "
+                        f"◈ {p['gold']:,}.")
+        return s
+    p["gold"] -= price
+    held = p.setdefault("held", [])
+    cap = max(1, int(p.get("slots", 1)))
+    if len(held) < cap:
+        held.append(slug)
+        where = "into your free hand"
+    else:
+        p["inventory"][slug] = p["inventory"].get(slug, 0) + 1
+        where = "into your pack"
+    combat._ledger(p, "buy", gold=-price, note=slug)
+    s = scene_fn(p)
+    s.body_lines.insert(0, f"+ {g.name} — {where}. The School teaches "
+                           "any weapon to bite.")
     return s
 
 
@@ -1567,27 +1631,13 @@ def _forge_buy(p: dict, oid: str) -> Scene:
     if oid.startswith("token_") and oid.removeprefix("token_") in \
             economy.DURABILITY_SLOTS:
         return _forge_token_mend(p, oid.removeprefix("token_"))
-    if oid == "buy_arrow_pack":
-        if p["gold"] < economy.ARROW_PACK_PRICE:
-            s = _forge_scene(p)
-            s.shard_note = (f"A pack of arrows is ◈ "
-                            f"{economy.ARROW_PACK_PRICE} and you carry "
-                            f"◈ {p['gold']:,}.")
-            return s
-        p["gold"] -= economy.ARROW_PACK_PRICE
-        p["inventory"]["arrows"] = (p["inventory"].get("arrows", 0)
-                                    + economy.ARROW_PACK_SIZE)
-        combat._ledger(p, "buy", gold=-economy.ARROW_PACK_PRICE,
-                       note="arrow_pack")
-        s = _forge_scene(p)
-        s.body_lines.insert(0, f"+ {economy.ARROW_PACK_SIZE} arrows — "
-                            f"{p['inventory']['arrows']} in the quiver")
-        return s
     if oid.startswith("wear_"):
         return _wear_from_pack(p, oid.removeprefix("wear_"), _forge_scene)
     slug = oid.removeprefix("buy_")
     if slug in economy.RELICS and economy.RELICS[slug].shop == "forge":
         return _relic_buy(p, slug, _forge_scene)
+    if slug in ("basic_bow", "worn_staff"):
+        return _basic_buy(p, slug, _forge_scene)
     g = economy.FORGE.get(slug)
     if not g:
         return _forge_scene(p)
@@ -1608,24 +1658,11 @@ def _arcanum_scene(p: dict) -> Scene:
         s.shard_note = (f"The Arcanum wants level {economy.ARCANUM_LEVEL} "
                         "hands. Climb first.")
         return s
-    clazz = p.get("clazz") or ""
     opts, lines = [], []
-    if clazz == "sorcerer":
-        _rack(p, economy.weapon_line("sorcerer"), opts, lines)
-        _rack(p, economy.gear_rungs("shield", "sorcerer"), opts, lines)
-    else:
-        # 004 §3.2: staves off the rack, one rung back, triple coin —
-        # focuses answer only to a caster's hand.
-        g = economy.off_class_offer("sorcerer", p["level"],
-                                    p["unlocked_floor"])
-        if g:
-            opts.append(Option(f"buy_{g.slug}", g.name,
-                               f"pay ◈ {economy.off_class_price(g):,} · "
-                               "off-class"))
-            lines.append(f"{g.name} — not your weapon: ×3 the coin, "
-                         "half the bite, and one cast in four fizzles")
-        lines.append("The focuses behind the counter won't wake for "
-                     "you — caster's gear, caster's hand.")
+    # 048: star-charts for every hand — the full staff line and the
+    # focuses at list price; the trained rank is the only gate.
+    _rack(p, economy.weapon_line("sorcerer"), opts, lines)
+    _rack(p, economy.gear_rungs("shield", "sorcerer"), opts, lines)
     _relic_rows(p, "arcanum", opts, lines)    # 006: the mage relics
     opts.append(Option("back", "Back to the square"))
     return Scene(
@@ -1653,15 +1690,6 @@ def _arcanum_buy(p: dict, oid: str) -> Scene:
         s = _arcanum_scene(p)
         s.shard_note = "The shopkeeper tilts her head: steel is the " \
                        "smith's trade. The Forge is across the square."
-        return s
-    if g.slot == "shield" and (p.get("clazz") or "") != "sorcerer":
-        # 005 design decision: only BUYING a focus is class-gated. One
-        # already owned (class change, hand-me-down) keeps working as a
-        # shield and may be honed/repaired — it's the wearer's guard
-        # now, and durability taxes it like any other paid piece.
-        s = _arcanum_scene(p)
-        s.shard_note = ("The focus goes dark in your hand — it answers "
-                        "only to a caster.")
         return s
     return _gear_purchase(p, g, _arcanum_scene)
 
@@ -2034,8 +2062,9 @@ def _sleep_menu_scene(p: dict) -> Scene:
 def _sleep_fx(p: dict, where: str) -> str:
     """One sleeping animation per showcase character per place — the art
     canon puts every figure on one of the three class silhouettes."""
-    clazz = p.get("clazz") or "warrior"
-    return f"sleep_{where}_{clazz}"
+    g = economy.FORGE.get(p["gear"].get("weapon") or "")
+    look = (g.line if g and g.line else "") or "warrior"
+    return f"sleep_{where}_{look}"
 
 
 def _sleeping_scene(p: dict, note: str = "") -> Scene:
@@ -2670,9 +2699,28 @@ def _gate_pick(p: dict, oid: str) -> Scene:
     return _floor_arrival_scene(p, n)
 
 
+def _roster_lines(fl) -> list[str]:
+    """048 T2: the hunt roster with EVERY number and its sign — the
+    player reads the floor before stepping past the wire."""
+    out = ["Out past the wire:"]
+    for enc in fl.encounters:
+        traits = tuple(getattr(enc, "traits", ()) or ())
+        atk, dfs, hp = economy.creature_stats(fl.floor, traits)
+        prof = economy.profile_from_traits(traits)
+        if prof.get("bulwark"):
+            hp = round(hp * economy.BULWARK_HP_MULT)
+        sign = economy.TYPE_SIGN.get(prof.get("type", "plain"), "")
+        spd = prof.get("speed", economy.SPEED_NORMAL)
+        out.append(f"{enc.name}{' ' + sign if sign else ''} — "
+                   f"HP {hp} · ATK {atk} · DEF {dfs} · "
+                   f"SPD {spd}{economy.speed_word(spd)}")
+    return out
+
+
 def _floor_arrival_scene(p: dict, n: int) -> Scene:
     fl = schema.get_floor(n)
     lines = [fl.arrival]
+    lines += _roster_lines(fl)
     lines += _presence_floor_lines(p, n)
     # 020: the floor BELOW a milestone warns at the gate, before the
     # ⚡ is spent — this floor's own Warden is one thing, the next is a
@@ -2753,6 +2801,9 @@ def _gate_town_options(p: dict, fl) -> list[Option]:
     npc = getattr(fl, "npc", None)
     if npc is not None:
         opts.append(Option("talk", f"Talk — {npc.name}", npc.role))
+    # 048: every gate town teaches — the School door, next to the fire.
+    opts.append(Option("school", "The School",
+                       "any weapon, taught to bite"))
     opts.append(Option("town", "Return to Roothollow"))
     return opts
 
@@ -2794,9 +2845,233 @@ def _npc_scene(p: dict, fl) -> Scene:
     )
 
 
+# ── The School (048: train, mastery, carry — every gate town) ────────
+
+_PATH_GLYPH = {"blade": "⚔", "bow": "➶", "staff": "✦"}
+_PATH_ORDER = ("blade", "bow", "staff")
+
+
+def _school_bar(rank: int) -> str:
+    return "▰" * rank + "▱" * (10 - rank)
+
+
+def _school_discounted(p: dict, path: str) -> bool:
+    """A master pays 80% on the OTHER paths' ranks 1-5."""
+    m = p.get("mastery") or {}
+    return any(m.get(k) for k in _PATH_ORDER if k != path)
+
+
+def _school_scene(p: dict) -> Scene:
+    fl = schema.get_floor(max(1, p["floor"]))
+    front = max(1, p["unlocked_floor"])
+    training = p.get("training") or {}
+    mastery = p.get("mastery") or {}
+    lines, opts = [], []
+    for path in _PATH_ORDER:
+        r = int(training.get(path, 0))
+        g = _PATH_GLYPH[path]
+        if r >= 10:
+            # the bar turns gold — rank 10 is a public achievement
+            lines.append(f"{g} {path.upper()} — trained rank 10 "
+                         f"{_school_bar(10)} · GOLD")
+            if mastery.get(path):
+                lines.append("   MASTERY — studied. The hand hits "
+                             "10% harder — everything, always.")
+            else:
+                lines.append(f"   MASTERY — the master offers the "
+                             f"{path} study: {economy.MASTERY_XP} XP")
+                opts.append(Option(f"mastery_{path}",
+                                   f"Study {path} mastery",
+                                   f"{economy.MASTERY_XP} XP"))
+            continue
+        nxt = r + 1
+        xp = economy.train_xp_cost(nxt, _school_discounted(p, path))
+        gold = economy.train_gold(nxt, front)
+        lines.append(f"{g} {path.upper()} — trained rank {r} "
+                     f"{_school_bar(r)} · next: rank {nxt} — "
+                     f"{xp} XP + ◈ {gold}")
+        m0, m1 = economy.TRAIN_MISS_PCT(r), economy.TRAIN_MISS_PCT(nxt)
+        f0 = round(economy.TRAIN_ROLL_FLOOR(r) * 100)
+        f1 = round(economy.TRAIN_ROLL_FLOOR(nxt) * 100)
+        lines.append(f"   rank {nxt}: miss {m0}%→{m1}%, worst swing "
+                     f"{f0}%→{f1}% of full power")
+        opts.append(Option(f"train_{path}",
+                           f"Train {path} to rank {nxt}",
+                           f"{xp} XP + ◈ {gold}"))
+    slots = int(p.get("slots", 1))
+    carry = (f"✥ CARRY — {slots} weapon "
+             f"slot{'s' if slots != 1 else ''}")
+    if slots == 1:
+        carry += (f" · 2nd slot — {economy.CARRY2_XP} XP + "
+                  f"◈ {economy.CARRY2_GOLD}")
+        opts.append(Option("buy_carry2", "Learn to carry a 2nd weapon",
+                           f"{economy.CARRY2_XP} XP + "
+                           f"◈ {economy.CARRY2_GOLD}"))
+    elif slots == 2:
+        if p["level"] < economy.CARRY3_LEVEL:
+            lock = (f"needs level {economy.CARRY3_LEVEL} — "
+                    f"you: {p['level']}")
+            carry += f" · 3rd slot — locked ({lock})"
+            opts.append(Option("buy_carry3",
+                               "Learn to carry a 3rd weapon", lock,
+                               locked=True))
+        else:
+            gold3 = economy.carry3_gold(front)
+            carry += (f" · 3rd slot — {economy.CARRY3_XP} XP + "
+                      f"◈ {gold3}")
+            opts.append(Option("buy_carry3",
+                               "Learn to carry a 3rd weapon",
+                               f"{economy.CARRY3_XP} XP + ◈ {gold3}"))
+    lines.append(carry)
+    opts.append(Option("back", f"Back to {fl.gate_town}"))
+    return Scene(
+        eyebrow=f"FLOOR {fl.floor} · {fl.gate_town.upper()} · "
+                "THE SCHOOL",
+        headline="The School",
+        support="Any hand can hold any weapon. The School teaches it "
+                "to bite. Training spends the XP bar — the same pool "
+                "the Guildhall levels from.",
+        body_lines=lines,
+        options=opts,
+        meters=combat.meters(p),
+    )
+
+
+def _school_action(p: dict, oid: str) -> Scene:
+    if oid == "back":
+        p["location"] = "gate_town"
+        return _gate_town_scene(p)
+    if oid.startswith("train_"):
+        path = oid.removeprefix("train_")
+        if path in _PATH_GLYPH:
+            return _school_train(p, path)
+    if oid.startswith("mastery_"):
+        path = oid.removeprefix("mastery_")
+        if path in _PATH_GLYPH:
+            return _school_mastery(p, path)
+    if oid in ("buy_carry2", "buy_carry3"):
+        return _school_carry(p, oid)
+    return _school_scene(p)
+
+
+def _school_refuse(p: dict, why: str) -> Scene:
+    s = _school_scene(p)
+    s.shard_note = why
+    return s
+
+
+def _school_train(p: dict, path: str) -> Scene:
+    r = int(p["training"].get(path, 0))
+    if r >= 10:
+        return _school_refuse(
+            p, f"Rank 10 — the School has nothing left to teach "
+               f"your {path}. The master, though, might.")
+    nxt = r + 1
+    xp = economy.train_xp_cost(nxt, _school_discounted(p, path))
+    gold = economy.train_gold(nxt, max(1, p["unlocked_floor"]))
+    if p["xp"] < xp:
+        return _school_refuse(
+            p, f"Rank {nxt} {path} wants {xp} XP — your bar holds "
+               f"{p['xp']}. Kills fill it.")
+    if p["gold"] < gold:
+        return _school_refuse(
+            p, f"The instructor's fee is ◈ {gold} — you carry "
+               f"◈ {p['gold']:,}.")
+    p["xp"] -= xp
+    p["gold"] -= gold
+    p["training"][path] = nxt
+    combat._ledger(p, "train", gold=-gold, xp=-xp, note=f"{path} {nxt}")
+    if nxt == 10 and not p["flags"].get(f"invited_{path}"):
+        # rank 10 — the invitation card, once, ever
+        p["flags"][f"invited_{path}"] = True
+        p.setdefault("pending_events", []).insert(0, Scene(
+            eyebrow="THE SCHOOL · AN INVITATION",
+            headline=f"The {path} master will see you now",
+            support="Rank 10 — the drills end where the studies "
+                    "begin.",
+            body_lines=[
+                f"▪ {path} mastery — a study of "
+                f"{economy.MASTERY_XP} XP, at any School",
+                "▪ a master's hand hits 10% harder — everything, "
+                "always",
+                "▪ a master pays 80% on the other paths' first "
+                "five ranks",
+                "▪ a tenth rank is toasted in every banner hall — "
+                "the tower knows its masters by name",
+            ],
+            options=[Option("town", "So be it")],
+            event_kind="present",
+        ).to_dict())
+    s = _school_scene(p)
+    s.body_lines.insert(
+        0, f"+ {path} — trained rank {nxt}. The drills stick.")
+    return s
+
+
+def _school_mastery(p: dict, path: str) -> Scene:
+    if int(p["training"].get(path, 0)) < 10:
+        return _school_refuse(
+            p, "The studies open at rank 10 — train first.")
+    if (p.get("mastery") or {}).get(path):
+        return _school_refuse(
+            p, "Already studied — the master has no second lesson.")
+    if p["xp"] < economy.MASTERY_XP:
+        return _school_refuse(
+            p, f"The study wants {economy.MASTERY_XP} XP — your bar "
+               f"holds {p['xp']}.")
+    p["xp"] -= economy.MASTERY_XP
+    p.setdefault("mastery", {})[path] = True
+    combat._ledger(p, "train", xp=-economy.MASTERY_XP,
+                   note=f"mastery {path}")
+    s = _school_scene(p)
+    s.body_lines.insert(
+        0, f"+ {path} MASTERY — the study is yours. Your hand hits "
+           "10% harder now — everything, always.")
+    return s
+
+
+def _school_carry(p: dict, oid: str) -> Scene:
+    slots = int(p.get("slots", 1))
+    if oid == "buy_carry2":
+        if slots != 1:
+            return _school_refuse(p, "Your hands already know the "
+                                     "second grip.")
+        xp, gold = economy.CARRY2_XP, economy.CARRY2_GOLD
+    else:
+        if slots >= 3:
+            return _school_refuse(p, "Three is all the hands you have.")
+        if slots < 2:
+            return _school_refuse(p, "The second grip comes first.")
+        if p["level"] < economy.CARRY3_LEVEL:
+            return _school_refuse(
+                p, f"The third hand is a veteran's trick — needs "
+                   f"level {economy.CARRY3_LEVEL} — you: "
+                   f"{p['level']}.")
+        xp, gold = economy.CARRY3_XP, economy.carry3_gold(
+            max(1, p["unlocked_floor"]))
+    if p["xp"] < xp:
+        return _school_refuse(
+            p, f"The grip wants {xp} XP — your bar holds "
+               f"{p['xp']}.")
+    if p["gold"] < gold:
+        return _school_refuse(
+            p, f"The grip's fee is ◈ {gold} — you carry "
+               f"◈ {p['gold']:,}.")
+    p["xp"] -= xp
+    p["gold"] -= gold
+    p["slots"] = slots + 1
+    combat._ledger(p, "train", gold=-gold, xp=-xp,
+                   note=f"carry {slots + 1}")
+    s = _school_scene(p)
+    s.body_lines.insert(
+        0, f"+ CARRY — {slots + 1} weapon slots now. The weight "
+           "settles across your back.")
+    return s
+
+
 def _gate_town_scene(p: dict) -> Scene:
     fl = schema.get_floor(max(1, p["floor"]))
-    body = _presence_floor_lines(p, fl.floor)
+    body = _roster_lines(fl) + _presence_floor_lines(p, fl.floor)
     fw = _live_flare(p)
     if fw:
         body.insert(0, f"▪ a RED FLARE hangs over the wilds — "
@@ -2817,6 +3092,9 @@ def _gate_town_action(p: dict, oid: str) -> Scene:
     fl = schema.get_floor(max(1, p["floor"]))
     if oid == "talk" and getattr(fl, "npc", None) is not None:
         return _npc_scene(p, fl)
+    if oid == "school":
+        p["location"] = "school"
+        return _school_scene(p)
     if oid == "answer_flare":
         fw = _live_flare(p)
         if fw is None:

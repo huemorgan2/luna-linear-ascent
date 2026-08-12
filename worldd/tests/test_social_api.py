@@ -17,14 +17,14 @@ async def tenants(client):
     return a, b
 
 
-async def create(client, secret, tenant, player, name,
-                 race="human", clazz="warrior"):
+async def create(client, secret, tenant, player, name, race="human"):
+    # 048: creation is classless — race, then the name. The gate hands
+    # every climber the Rusted Sword.
     await scene(client, secret, tenant, player)
     for _ in range(9):                                # 016: through the movie
         await act(client, secret, tenant, player, option="next")
     await act(client, secret, tenant, player, option="begin")
     await act(client, secret, tenant, player, option=race)
-    await act(client, secret, tenant, player, option=clazz)
     return await act(client, secret, tenant, player, text=name)
 
 
@@ -178,7 +178,7 @@ async def test_roster_payload_lists_all_climbers(client, tenants):
     pa, pb = f"a-{uuid.uuid4().hex[:6]}", f"b-{uuid.uuid4().hex[:6]}"
     na, nb = f"Vex{pa[-4:]}", f"Wren{pb[-4:]}"
     await create(client, a, "tenant-a", pa, na)
-    await create(client, b, "tenant-b", pb, nb, race="elf", clazz="archer")
+    await create(client, b, "tenant-b", pb, nb, race="elf")
 
     # the board caps at 12, floor-sorted — put B near the tower's top so
     # leftover climbers from other sessions in the dev DB can't push it off
@@ -191,7 +191,7 @@ async def test_roster_payload_lists_all_climbers(client, tenants):
     # B out-climbs the fresh chars: on the board with class, floor, wealth
     mine = [e for e in entries if e["name"] == nb]
     assert mine, entries
-    assert mine[0]["race"] == "elf" and mine[0]["clazz"] == "archer"
+    assert mine[0]["race"] == "elf"    # 048: clazz is a legacy field
     assert mine[0]["floor"] == 97
     assert mine[0]["bank_rank"] >= 1
     assert "bank" not in mine[0]          # rank is public, balance is not

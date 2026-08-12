@@ -104,12 +104,11 @@ async def test_creation_flow_over_http(client, tenant_a):
     s = await act(client, tenant_a, "tenant-a", player, option="begin")
     assert "shard" in s["headline"].lower()
     s = await act(client, tenant_a, "tenant-a", player, option="dwarf")
-    assert "how do you fight" in s["headline"]
-    s = await act(client, tenant_a, "tenant-a", player, option="warrior")
+    assert "username" in s["headline"].lower()   # 048: no class step
     s = await act(client, tenant_a, "tenant-a", player, text="Borin")
     assert "Borin" in s["headline"]
 
-    # character sheet reflects the dwarf warrior
+    # character sheet reflects the dwarf
     body, headers = signed(tenant_a, "tenant-a", {"player": player})
     r = await client.post("/v1/character", content=body, headers=headers)
     assert r.json()["race"] == "dwarf"
@@ -127,9 +126,9 @@ async def test_idempotent_act_replays_same_scene(client, tenant_a):
     s2 = await act(client, tenant_a, "tenant-a", player,
                    option="human", idem=idem)      # replay
     assert s1 == s2
-    # state advanced exactly once: next distinct act still on class stage
-    s3 = await act(client, tenant_a, "tenant-a", player, option="warrior")
-    assert "name" in s3["headline"].lower()
+    # state advanced exactly once: the next distinct act is the name stage
+    s3 = await act(client, tenant_a, "tenant-a", player, option="noop")
+    assert "username" in s3["headline"].lower()
 
 
 async def test_frontier_is_shared_across_tenants(client, tenant_a, tenant_b):
@@ -142,7 +141,6 @@ async def test_frontier_is_shared_across_tenants(client, tenant_a, tenant_b):
         await act(client, tenant_b, "tenant-b", player, option="next")
     await act(client, tenant_b, "tenant-b", player, option="begin")
     await act(client, tenant_b, "tenant-b", player, option="elf")
-    await act(client, tenant_b, "tenant-b", player, option="archer")
     await act(client, tenant_b, "tenant-b", player, text="Fleet")
     s = await act(client, tenant_b, "tenant-b", player, option="gate")
     labels = [o["label"] for o in s["options"]]

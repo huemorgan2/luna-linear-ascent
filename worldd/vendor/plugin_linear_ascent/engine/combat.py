@@ -109,7 +109,9 @@ def meters(p: dict) -> Meters:
         # 031 §4: the header line — who is climbing
         name=p.get("name") or "",
         race=p.get("race") or "",
-        clazz=p.get("clazz") or "",
+        # 048: the class field died — the wire slot carries the path of
+        # the weapon in hand so old clients keep a sane header.
+        clazz=economy.PATH_OF_LINE.get(_weapon_line(p), ""),
         # the banner: worldd injects w["faction"] for members; local
         # dev mode keeps the legacy doc-string guild name.
         faction=(((p.get("_world") or {}).get("faction") or {})
@@ -136,8 +138,9 @@ def would_probably_kill(p: dict, floor, enc) -> bool:
     prof = economy.profile_from_traits(traits)
     if prof["bulwark"]:
         hp = round(hp * economy.BULWARK_HP_MULT)
-    dmg = economy.typed_damage(_damage_type(p), round(0.75 * state.atk(p)),
-                              dfs, prof)
+    dmg = economy.typed_damage_048(
+        _train_path(p), round(0.75 * state.atk(p)), dfs, prof["type"],
+        focus=bool((p.get("mastery") or {}).get("staff")))
     if dmg <= 0:
         return True            # a blade that cannot reach it — 017's zero
     rounds = max(1, -(-hp // dmg))
@@ -268,12 +271,13 @@ def _hard_counter(p: dict, prof: dict) -> bool:
     walls: steel can't touch wings, arrows snap on real plate, spells
     die on real spellguard."""
     dt = _damage_type(p)
+    t = prof.get("type", "plain")
     if dt == "melee":
-        return bool(prof.get("flying"))
+        return t == "fly"
     if dt == "ranged":
-        return prof.get("armor", "none") in ("med", "high")
+        return t == "armoured"
     if dt == "magic":
-        return prof.get("resist", "none") in ("med", "high")
+        return t == "magic_resist"
     return False
 
 
@@ -330,33 +334,31 @@ def _advance_chase(p: dict) -> str:
         # 006: it cannot close through the net — this attempt is the
         # net's last service.
         e.pop("netted", None)
-        return f"The {e['name']} tears at the net instead of the ground."
+        return f"{_the(e['name'])} tears at the net instead of the ground."
     if state.roll_ok(p, economy.p_close(_mspd(p), economy.player_speed(p))):
         gap = _gap(p) - 1
         e["gap"] = gap
         if gap <= 0:
             e["range"] = "close"
-            return f"The {e['name']} closes the gap — it is on you now."
-        return (f"The {e['name']} eats a length of the open ground — "
+            return f"{_the(e['name'])} closes the gap — it is on you now."
+        return (f"{_the(e['name'])} eats a length of the open ground — "
                 f"{gap} between you now.")
-    return f"The {e['name']} comes on across open ground."
+    return f"{_the(e['name'])} comes on across open ground."
 
 
 def _profile_tiers(prof: dict) -> list[str]:
-    """The profile as named tiers — the [i] dossier's rows and the text
+    """The profile as its sign — the [i] dossier's rows and the text
     fallback's compact line share this list."""
     bits = []
-    if prof.get("armor", "none") != "none":
-        bits.append(f"plate {economy.TIER_LABEL[prof['armor']]}")
-    if prof.get("resist", "none") != "none":
-        bits.append(f"spellguard {economy.TIER_LABEL[prof['resist']]}")
-    if prof.get("flying"):
-        bits.append("AIRBORNE")
+    t = prof.get("type", "plain")
+    if t != "plain":
+        bits.append(f"{economy.TYPE_SIGN[t]} {economy.TYPE_NAME[t]}")
     if prof.get("bulwark"):
         bits.append("bulwark")
-    if prof.get("speed", economy.SPEED_NORMAL) >= economy.SPEED_FAST:
+    spd = prof.get("speed", economy.SPEED_NORMAL)
+    if spd >= economy.SPEED_FAST:
         bits.append("fast")
-    elif prof.get("speed", economy.SPEED_NORMAL) <= economy.SPEED_SLOW:
+    elif spd <= economy.SPEED_SLOW:
         bits.append("slow")
     return bits
 
@@ -521,10 +523,10 @@ def _relic_options(p: dict) -> list[Option]:
     if inv.get("sky_hook") and prof.get("flying"):
         opts.append(Option("use_hook", "Set the sky-hook",
                            f"{inv['sky_hook']} uses left"))
-    if inv.get("strip_potion") and prof.get("resist", "none") != "none":
+    if inv.get("strip_potion") and prof.get("type") == "magic_resist":
         opts.append(Option("use_strip", "Hurl the strip potion",
                            "spellguard, gone"))
-    if inv.get("curse_scroll") and prof.get("armor", "none") != "none":
+    if inv.get("curse_scroll") and prof.get("type") == "armoured":
         opts.append(Option("use_curse", "Read the curse scroll",
                            "its plate, halved"))
     if inv.get("polymorph_dust") and e["kind"] != "warden":
@@ -543,9 +545,53 @@ def _relic_options(p: dict) -> list[Option]:
     return opts
 
 
+def _pred_damage(p: dict, path: str, rank: int) -> int:
+    """048 T2: the number on the attack row BEFORE the click — this
+    rank's mean swing through the triangle against THIS monster."""
+    e = p["encounter"]
+    atk_full = state.atk(p)
+    lo = round(economy.TRAIN_ROLL_FLOOR(rank) * atk_full)
+    return economy.typed_damage_048(
+        path, round((lo + atk_full) / 2), e["def"],
+        _profile(p).get("type", "plain"),
+        focus=bool((p.get("mastery") or {}).get("staff")))
+
+
+def _verdict(p: dict) -> list[str]:
+    """048 T2: the verdict before the first swing — every held weapon's
+    ACTUAL answer with its rank, and the full answer the player does
+    NOT hold, named as the lever. Path words only (the pane is
+    class-free)."""
+    mtype = _profile(p).get("type", "plain")
+    lead = {"fly": "⚡ It flies.", "armoured": "⛨ Armoured.",
+            "magic_resist": "✧ Spellguarded."}.get(mtype, "")
+    lines = []
+    held_paths = set()
+    for slug in _held_slugs(p):
+        g = economy.FORGE[slug]
+        path = economy.PATH_OF_LINE.get(g.line, "blade")
+        held_paths.add(path)
+        mult = economy.TYPE_MULT[mtype][path]
+        word = ("cannot reach it" if mult <= 0
+                else economy.answer_word(mult))
+        lines.append(f"Your {g.name}: {word} — "
+                     f"{path} rank {_rank_of(p, path)}.")
+    if not any(economy.TYPE_MULT[mtype][h] >= 1.0 for h in held_paths):
+        full = {"blade": "Steel bites full", "bow": "A bow bites full",
+                "staff": "A staff bites full"}
+        for path in ("blade", "bow", "staff"):
+            if path not in held_paths \
+                    and economy.TYPE_MULT[mtype][path] >= 1.0:
+                lines.append(f"{full[path]} — yours is rank "
+                             f"{_rank_of(p, path)}.")
+                break
+    if lead and lines:
+        lines[0] = f"{lead} {lines[0]}"
+    return lines
+
+
 def fight_scene(p: dict, floor, opener: bool = False, note: str = "") -> Scene:
     e = p["encounter"]
-    clazz = p.get("clazz")
     at_range = _range_state(p) == "at_range"
     # every swing at a Warden costs energy — priced on the row.
     strike_hint = (f"{economy.COST_WARDEN_STRIKE} ⚡"
@@ -555,19 +601,50 @@ def fight_scene(p: dict, floor, opener: bool = False, note: str = "") -> Scene:
     if at_range and _damage_type(p) == "melee":
         opts = [Option("close_in", "Close in", "cross the ground")]
     else:
-        opts = [Option("attack", "Attack", strike_hint)]
-    # 040: one verb for making ground. The archer's gap ladder (036) and
-    # the footwork break (031 §7) read as duplicates on the menu, so only
-    # one "Open distance" row ever shows: the archer's — always works,
-    # the monster may collect a toll — replaces the gamble outright.
-    archer_gap = (clazz == "archer" and _damage_type(p) == "ranged"
-                  and _gap(p) < economy.GAP_MAX)
-    if archer_gap:
-        nxt = _gap(p) + 1
+        # 048 T2: rank and predicted damage on the row, before the click.
+        lead_path = _train_path(p)
+        lead_hint = (f"{lead_path} rank {_train_rank(p)} — "
+                     f"~{_pred_damage(p, lead_path, _train_rank(p))} "
+                     "vs this one")
+        if strike_hint:
+            lead_hint = f"{strike_hint} · {lead_hint}"
+        opts = [Option("attack", "Attack", lead_hint)]
+    # 048: one attack row per HELD weapon — the lead hand is "attack",
+    # the other slots swing by name (choosing one promotes it). Steel
+    # in a side slot can't reach at range: close in first.
+    cur = p["gear"].get("weapon") or ""
+    for slug in _held_slugs(p):
+        if slug == cur:
+            continue
+        g = economy.FORGE[slug]
+        if at_range and economy.DAMAGE_TYPE.get(g.line, "melee") == "melee":
+            continue
+        path = economy.PATH_OF_LINE.get(g.line, "blade")
         opts.append(Option(
-            "create_distance", "Open distance",
-            f"class · shot ×{economy.bow_gap_mult(nxt):g} "
-            f"at {nxt} length{'s' if nxt > 1 else ''}"))
+            f"attack_{slug}", f"Attack — {g.name}",
+            f"{path} rank {_rank_of(p, path)} — "
+            f"~{_pred_damage(p, path, _rank_of(p, path))} vs this one"))
+    # 040: one verb for making ground. The bow's gap ladder (036) and
+    # the footwork break (031 §7) read as duplicates on the menu, so only
+    # one "Open distance" row ever shows: the marksman's — always works,
+    # the monster may collect a toll — replaces the gamble outright.
+    # 048 N7: giving ground ON PURPOSE is rank-6 bowwork; the draw
+    # bonus on the row appears once rank 8 makes it real.
+    bow_rank = _rank_of(p, "bow")
+    if _damage_type(p) == "ranged" and _gap(p) < economy.GAP_MAX:
+        nxt = _gap(p) + 1
+        if bow_rank >= economy.GAP_OPEN_RANK:
+            hint = (f"shot ×{economy.bow_gap_mult(nxt):g} "
+                    f"at {nxt} length{'s' if nxt > 1 else ''}"
+                    if bow_rank >= economy.GAP_DRAW_RANK
+                    else f"give ground on purpose — "
+                         f"{nxt} length{'s' if nxt > 1 else ''}")
+            opts.append(Option("create_distance", "Open distance", hint))
+        else:
+            opts.append(Option(
+                "create_distance", "Open distance",
+                f"needs Bow rank {economy.GAP_OPEN_RANK} "
+                f"(you: {bow_rank})", locked=True))
     # 031 §7: you cannot open ground from something as fast as you —
     # the row only shows when your legs actually beat its legs.
     elif not at_range and economy.player_speed(p) > _mspd(p):
@@ -576,25 +653,45 @@ def fight_scene(p: dict, floor, opener: bool = False, note: str = "") -> Scene:
         Option("stand", "Stand your ground"),
         Option("run", "Run away"),
     ]
-    if clazz == "warrior":
-        opts.append(Option("shield_wall", "Shield wall", "class", aether=True))
-    elif clazz == "sorcerer":
-        opts.append(Option("sleep_spell", "Sleep spell",
-                           f"class · {economy.sleep_xp_cost(floor.floor)} XP",
-                           aether=True))
-    elif clazz == "archer" and not e["shot_used"] \
-            and not e.get("attacked") and at_range \
-            and _damage_type(p) == "ranged":
-        # 004: the long shot needs a bow in hand — an archer swinging
-        # off-class steel has no string to draw.
-        # 040: it is the OPENING move — taken from the distance, before
-        # the first attack. Once you have attacked, the cover is blown
-        # and the row is gone for the rest of the fight; in close
-        # quarters there is no treeline to shoot from.
-        opts.append(Option(
-            "treeline_shot", "Treeline shot",
-            f"class · {strike_hint}" if strike_hint else "class",
-            aether=True))
+    # 048 N7: the weapon in a slot opens its row; the trained rank
+    # unlocks it. A locked row stays clickable and explains itself.
+    shield = economy.FORGE.get(p["gear"].get("shield") or "")
+    if _held_melee(p) and shield and shield.line != "sorcerer":
+        r = _rank_of(p, "blade")
+        if r >= economy.WALL_RANK:
+            opts.append(Option("shield_wall", "Shield wall", "",
+                               aether=True))
+        else:
+            opts.append(Option(
+                "shield_wall", "Shield wall",
+                f"needs Blade rank {economy.WALL_RANK} (you: {r})",
+                locked=True, aether=True))
+    if _held_of_line(p, "sorcerer"):
+        r = _rank_of(p, "staff")
+        if r >= economy.SLEEP_RANK:
+            opts.append(Option(
+                "sleep_spell", "Sleep spell",
+                f"{economy.sleep_xp_cost(floor.floor)} XP", aether=True))
+        else:
+            opts.append(Option(
+                "sleep_spell", "Sleep spell",
+                f"needs Staff rank {economy.SLEEP_RANK} (you: {r})",
+                locked=True, aether=True))
+    if _held_of_line(p, "archer") and not e["shot_used"] \
+            and not e.get("attacked") and at_range:
+        # 040: the OPENING move — taken from the distance, before the
+        # first attack. Once you have attacked, the cover is blown and
+        # the row is gone for the rest of the fight; in close quarters
+        # there is no treeline to shoot from.
+        r = _rank_of(p, "bow")
+        if r >= economy.TREELINE_RANK:
+            opts.append(Option("treeline_shot", "Treeline shot",
+                               strike_hint, aether=True))
+        else:
+            opts.append(Option(
+                "treeline_shot", "Treeline shot",
+                f"needs Bow rank {economy.TREELINE_RANK} (you: {r})",
+                locked=True, aether=True))
     if p["inventory"].get("trollblood_tonic"):
         opts.append(Option("drink_tonic", "Drink trollblood tonic", "full heal"))
     # 022/008: below a quarter bar, a dying climber can call the floor —
@@ -618,6 +715,9 @@ def fight_scene(p: dict, floor, opener: bool = False, note: str = "") -> Scene:
             f"You — ATK {state.atk(p)} with your {weapon_name(p)}, "
             f"DEF {state.dfs(p)} "
             + (f"behind your {guard}." if guard else "on reflex alone."))
+        # 048 T2: the sign's whole triangle, then the verdict.
+        body.append(economy.type_line(_profile(p).get("type", "plain")))
+        body += _verdict(p)
     if note:
         body.append(note)
     fx_note = e.pop("_fx_note", "")
@@ -640,11 +740,16 @@ def fight_scene(p: dict, floor, opener: bool = False, note: str = "") -> Scene:
     if hot > 1:
         body.append(f"{hot} blades hot on this floor.")
     body += state.presence_delta_lines(p, floor.floor)
+    _sign = economy.TYPE_SIGN.get(_profile(p).get("type", "plain"), "")
     return Scene(
         eyebrow=_eyebrow(p, floor),
         # 003: the headline keeps ATK/DEF; HP lives in the always-on
         # enemy bar (scene.enemy) from round one.
-        headline=f"{e['name']} — ATK {e['atk']} / DEF {e['def']}",
+        headline=(f"{e['name']}"
+                  f"{' ' + _sign if _sign else ''} — "
+                  f"HP {max(0, e['hp'])}/{e['hp_max']} · "
+                  f"ATK {e['atk']} · DEF {e['def']} · "
+                  f"SPD {_mspd(p)}{economy.speed_word(_mspd(p))}"),
         support="It is between you and the way forward.",
         shard_note=_shard_advice(p, floor) if opener else "",
         body_lines=body,
@@ -744,8 +849,20 @@ def _monster_hit(p: dict, halved: bool = False, least: int = 0,
     broke = [note for note in
              (_wear(p, "shield", _shield_wear(p, blocked)),
               _wear(p, "armor", _armor_wear(p, blocked))) if note]
-    return {"dmg": dmg, "raw": raw, "blocked": blocked, "broke": broke,
-            "apple": soaked}
+    hit = {"dmg": dmg, "raw": raw, "blocked": blocked, "broke": broke,
+           "apple": soaked}
+    # 048 N4: the riposte — a blocked or shallow blow, answered in the
+    # same breath. Studied blade hands only, steel in a slot, close in.
+    if ((p.get("mastery") or {}).get("blade") and _held_melee(p)
+            and _range_state(p) != "at_range" and blocked >= dmg):
+        atk_full = state.atk(p)
+        lo = round(economy.TRAIN_ROLL_FLOOR(_rank_of(p, "blade"))
+                   * atk_full)
+        back = max(1, round(economy.RIPOSTE_RETURN
+                            * (lo + atk_full) / 2))
+        e["hp"] -= back
+        hit["riposte"] = back
+    return hit
 
 
 def _shield_wear(p: dict, blocked: int) -> int:
@@ -766,14 +883,17 @@ def _counter_text(p: dict, hit: dict, lead: str = "") -> str:
     e = p["encounter"]
     guard = guard_name(p)
     dmg, blocked = hit["dmg"], hit["blocked"]
-    lead = lead or f"The {e['name']} answers"
+    lead = lead or f"{_the(e['name'])} answers"
     # 005: the round a guard piece snaps, the card says so right here.
     tail = " " + " ".join(hit["broke"]) if hit.get("broke") else ""
+    if hit.get("riposte"):
+        # 048 N4: the studied blade answers in the same breath.
+        tail += f" Your riposte answers — {hit['riposte']} back."
     if hit.get("netted"):
-        return (f"The {e['name']} thrashes in the net — its round is "
+        return (f"{_the(e['name'])} thrashes in the net — its round is "
                 "spent tearing cord.")
     if hit.get("veiled"):
-        return (f"The {e['name']} strikes where you were — the veil "
+        return (f"{_the(e['name'])} strikes where you were — the veil "
                 "holds; nothing finds you.")
     if hit.get("dodged"):
         return f"{lead} — you slip the blow entirely. Speed tells."
@@ -797,30 +917,44 @@ def _counter_text(p: dict, hit: dict, lead: str = "") -> str:
 
 
 def _strike_text(p: dict, dmg: int) -> str:
-    """The player's blow, explained: which weapon, how hard it bit."""
+    """The player's blow, explained: which weapon, how hard it bit —
+    and, on a bad roll, WHOSE fault it was (the hand, not luck)."""
     e = p["encounter"]
     w = weapon_name(p)
-    prof = _profile(p)
+    path = _train_path(p)
+    mtype = _profile(p).get("type", "plain")
+    swing = e.pop("_swing", None) or {}
     if dmg <= 0:
-        if prof.get("flying") and _damage_type(p) == "melee":
-            return (f"The {e['name']} lifts out of reach — your {w} "
+        if mtype == "fly" and path == "blade":
+            return (f"{_the(e['name'])} lifts out of reach — your {w} "
                     "cuts empty air. Steel can't touch what flies.")
-        return (f"Your {w} glances off the {e['name']}'s hide — "
+        return (f"Your {w} glances off {_the(e['name'], False)}'s hide — "
                 "nothing lands.")
-    tier_note = ""
-    dt = _damage_type(p)
-    if dt == "magic" and prof.get("resist", "none") != "none":
-        tier_note = (f" — its spellguard "
-                     f"({economy.TIER_LABEL[prof['resist']]}) eats part "
-                     "of the cast")
-    elif dt != "magic" and prof.get("armor", "none") != "none":
-        tier_note = (f" — its plate "
-                     f"({economy.TIER_LABEL[prof['armor']]}) turns part "
-                     "of the blow")
+    mult = economy.TYPE_MULT[mtype][path]
+    note = ""
+    if mult <= 0.2:
+        note = (f" — its {economy.TYPE_NAME[mtype]} sign turns "
+                f"{economy.PATH_WEAPON_WORD[path]} to a glance")
+    elif mult < 1.0:
+        note = (f" — its {economy.TYPE_NAME[mtype]} sign halves "
+                f"{economy.PATH_WEAPON_WORD[path]}")
+    if swing.get("crit"):
+        note += " — the long draw finds its mark"
+    # 048 S5: a bottom-of-the-band roll names the rank as the cause
+    rank = _train_rank(p)
+    lo, hi = swing.get("lo", 0), swing.get("hi", 0)
+    shallow = (rank < 8 and hi > lo
+               and swing.get("raw", hi) <= lo + 0.25 * (hi - lo))
+    if shallow:
+        better = economy.typed_damage_048(
+            path, round((economy.TRAIN_ROLL_FLOOR(min(10, rank + 2))
+                         + 1) / 2 * hi), e["def"], mtype)
+        return (f"Your rank-{rank} swing lands shallow — {dmg}{note}. "
+                f"A rank-{min(10, rank + 2)} hand cuts nearer {better}.")
     if dmg >= max(1, e["hp_max"] // 3):
         return (f"Your {w} bites deep — {dmg} damage the "
-                f"{e['name']} won't shrug off{tier_note}.")
-    return f"Your {w} takes it for {dmg}{tier_note}."
+                f"{e['name']} won't shrug off{note}.")
+    return f"Your {w} takes it for {dmg}{note}."
 
 
 def _weapon_line(p: dict) -> str:
@@ -830,17 +964,75 @@ def _weapon_line(p: dict) -> str:
 
 
 def _damage_type(p: dict) -> str:
-    # 004 §3.2: the WEAPON decides the damage type — a warrior holding
-    # a bought bow shoots (badly). Line-less docs fall back to class.
+    # 048: the WEAPON decides the damage type — nothing else is asked.
+    # Line-less salvage (the shiv) swings as steel.
     line = _weapon_line(p)
     if line:
         return economy.DAMAGE_TYPE[line]
-    return economy.DAMAGE_TYPE.get(p.get("clazz") or "", "melee")
+    return "melee"
 
 
-def _off_class(p: dict) -> bool:
-    line = _weapon_line(p)
-    return bool(line) and bool(p.get("clazz")) and line != p["clazz"]
+def _train_path(p: dict) -> str:
+    """048: the weapon in hand names the path it trains under."""
+    return economy.PATH_OF_LINE.get(_weapon_line(p), "blade")
+
+
+def _train_rank(p: dict) -> int:
+    return int((p.get("training") or {}).get(_train_path(p), 0))
+
+
+def _rank_of(p: dict, path: str) -> int:
+    return int((p.get("training") or {}).get(path, 0))
+
+
+def _the(name, cap: bool = True) -> str:
+    """048 phase 8: exactly one article. Monsters named with their own
+    ("The lamp-eater", "The Seep") never read "the The lamp-eater"."""
+    n = str(name)
+    if n[:4].lower() == "the ":
+        return n if cap else "the " + n[4:]
+    return ("The " if cap else "the ") + n
+
+
+def _held_slugs(p: dict) -> list[str]:
+    """Every weapon in the carry slots, lead hand first. Docs from
+    before the slots existed read as holding their equipped weapon."""
+    held = [s for s in (p.get("held") or []) if s in economy.FORGE]
+    if held:
+        return held
+    w = p["gear"].get("weapon")
+    return [w] if w in economy.FORGE else []
+
+
+def _held_lines(p: dict) -> set:
+    return {economy.FORGE[s].line
+            for s in _held_slugs(p) if economy.FORGE[s].line}
+
+
+def _held_of_line(p: dict, line: str) -> str:
+    for s in _held_slugs(p):
+        if economy.FORGE[s].line == line:
+            return s
+    return ""
+
+
+def _held_melee(p: dict) -> str:
+    for s in _held_slugs(p):
+        line = economy.FORGE[s].line
+        if economy.DAMAGE_TYPE.get(line, "melee") == "melee":
+            return s
+    return ""
+
+
+def _promote_held(p: dict, slug: str) -> None:
+    """Bring a held weapon into the striking hand. This is which of
+    your carried weapons LEADS — not a pack swap (those wait for the
+    road, per 045/048)."""
+    held = p.setdefault("held", [])
+    if slug in held:
+        held.remove(slug)
+    held.insert(0, slug)
+    p["gear"]["weapon"] = slug
 
 
 def _player_hit(p: dict, mult: float = 1.0, pierce: bool = False) -> int:
@@ -853,20 +1045,41 @@ def _player_hit(p: dict, mult: float = 1.0, pierce: bool = False) -> int:
     # made ground behind it is more than one — the gap ladder prices the
     # draw. Magic and steel keep full strength at every distance.
     if _damage_type(p) == "ranged":
-        mult *= economy.bow_gap_mult(_gap(p))
-    # 004 §3.2: an off-class weapon is a stopgap — half strength always.
-    if _off_class(p):
-        mult *= economy.OFF_CLASS_DMG_MULT
+        m = economy.bow_gap_mult(_gap(p))
+        if m > 1 and _train_rank(p) < economy.GAP_DRAW_RANK:
+            m = 1.0        # 048: the long draw pays only rank-8 hands
+        mult *= m
     # 006: ten oiled strikes hit harder — physical weapons only.
     if p.get("oil", 0) > 0 and _damage_type(p) != "magic":
         mult *= economy.OIL_MULT
         p["oil"] -= 1
-    raw = state.rng_int(p, state.atk(p) // 2, state.atk(p))
-    prof = _profile(p)
-    if pierce:
-        prof = dict(prof, armor="none")    # 006: the shot ignores plate
-    dmg = economy.typed_damage(_damage_type(p), round(raw * mult),
-                               e["def"], prof)
+    # 048: the trained hand sets the floor of the swing — rank 5 is the
+    # old [ATK/2, ATK] band; rank 10 never swings below 70%.
+    atk_full = state.atk(p)
+    lo = round(economy.TRAIN_ROLL_FLOOR(_train_rank(p)) * atk_full)
+    raw = state.rng_int(p, lo, atk_full)
+    path = _train_path(p)
+    mastery = p.get("mastery") or {}
+    # 048+: a master's hand hits 10% harder — every study, every
+    # weapon, every swing. Three studies stack to +30%.
+    studied = sum(1 for v in mastery.values() if v)
+    if studied:
+        mult *= 1 + economy.MASTERY_ATK_BONUS * studied
+    mtype = _profile(p).get("type", "plain")
+    if pierce and mtype == "armoured":
+        mtype = "plain"        # 006: the shot never meets the plate
+    # 048 N4: the long draw — a gap-3 shot in the top of the roll band
+    # crits, for hands that studied it.
+    crit = (path == "bow" and mastery.get("bow")
+            and _gap(p) >= economy.GAP_MAX and atk_full > lo
+            and raw >= lo + (1 - economy.LONG_DRAW_TOP) * (atk_full - lo))
+    if crit:
+        mult *= economy.LONG_DRAW_CRIT_MULT
+    dmg = economy.typed_damage_048(
+        path, round(raw * mult), e["def"], mtype,
+        focus=bool(mastery.get("staff")))
+    # the swing memo — _strike_text reads it to blame the hand, not luck
+    e["_swing"] = {"raw": raw, "lo": lo, "hi": atk_full, "crit": bool(crit)}
     if e.get("shared") and e.get("kind") == "warden":
         # 046: levels ride the pillar, so one over-levelled blow can be
         # worth many fight-units — a charge never cuts past its unit,
@@ -911,7 +1124,7 @@ def _apply_shot_effect(p: dict, effect: str) -> str:
         immune = e["kind"] == "warden" or "venomproof" in (
             e.get("traits") or [])
         if immune:
-            return (f"The venom beads off the {e['name']} — this one "
+            return (f"The venom beads off {_the(e['name'], False)} — this one "
                     "doesn't poison.")
         if e.get("poison_left"):
             return "The venom is already in it — a second dose is wasted."
@@ -921,11 +1134,11 @@ def _apply_shot_effect(p: dict, effect: str) -> str:
                 f"round, {economy.POISON_ROUNDS} rounds, past any plate.")
     if effect == "slow":
         if prof.get("speed", economy.SPEED_NORMAL) <= economy.SPEED_SLOW:
-            return (f"The {e['name']} was already dragging — the "
+            return (f"{_the(e['name'])} was already dragging — the "
                     "slowing shaft changes nothing.")
         prof["speed"] = max(1, prof["speed"] - economy.SLOW_ARROW_DELTA)
         e["profile"] = prof
-        return (f"The shaft bites tendon — the {e['name']} drops "
+        return (f"The shaft bites tendon — {_the(e['name'], False)} drops "
                 f"{economy.SLOW_ARROW_DELTA} speed for this fight.")
     return ""
 
@@ -1119,9 +1332,9 @@ def _victory(p: dict, floor) -> Scene:
         # board's only bookkeeping.
         contracts.note_kill(p, e, _damage_type(p))
     weekly.note(p, "kills")     # 022/005: the strongbox counts the week
-    downed = (f"The {e['name']} goes down — no match for your "
+    downed = (f"{_the(e['name'])} goes down — no match for your "
               f"{weapon_name(p)}."
-              if e["kind"] == "wilds" else f"The {e['name']} goes down.")
+              if e["kind"] == "wilds" else f"{_the(e['name'])} goes down.")
     # Just what landed — a full bar takes no more XP, so a kill at the
     # cap writes gold (and spoils) and stays quiet about the overflow.
     lines = [downed]
@@ -1130,7 +1343,11 @@ def _victory(p: dict, floor) -> Scene:
     if rested:
         lines.append(f"+ {rested} XP rested — ✦ {p['rested']} left "
                      "in the pool")
-    lines.append(f"+ ◈ {gold} gold")
+    if e["kind"] == "wilds" and floor.floor <= economy.EARLY_COIN_FLOORS:
+        # 048 N8: the fade must never read as a nerf — name the bounty
+        lines.append(f"+ ◈ {gold} gold (young-tower bounty)")
+    else:
+        lines.append(f"+ ◈ {gold} gold")
     if e["kind"] == "wilds" and p.get("_world") is not None:
         # 022/008: assist strikes — a floor-mate on the same prey inside
         # the window links the logs. Gold only (rested already paid on
@@ -1299,8 +1516,35 @@ def _repair_everything(p: dict) -> None:
             p["durability_pack"][slug] = economy.item_pool(g)
 
 
+def _defeat_cause(p: dict, e: dict) -> str:
+    """048 T2: every defeat names its cause and ONE lever the player
+    owns. Computed while the encounter still stands — the daily-save
+    branch clears it before its lines are built."""
+    t = (e.get("profile") or {}).get("type", "plain")
+    held = {economy.PATH_OF_LINE.get(economy.FORGE[s].line, "blade")
+            for s in _held_slugs(p)}
+    path = _train_path(p)
+    rank = _train_rank(p)
+    if t == "fly" and held <= {"blade"}:
+        return ("It flew; your blade never reached it once. A bow "
+                "answers in full — the armory sells one.")
+    if t == "armoured" and path == "bow":
+        return ("Its plate turned your arrows — that was always too "
+                "many shots. Steel halves it; a staff bites full.")
+    if t == "magic_resist" and path == "staff":
+        return ("Its spellguard ate your casts down to a glance. "
+                "Steel bites full; arrows take half.")
+    if rank <= 1:
+        return (f"Your rank-{rank} {path} hands missed and landed "
+                "shallow all fight — the School in town fixes this.")
+    return ("Nothing turned your blows — it simply hit harder than "
+            "you could trade. Better gear, or run from this one until "
+            "a floor's rungs catch you up.")
+
+
 def _death(p: dict, floor) -> Scene:
     e = p["encounter"]
+    cause = _defeat_cause(p, e)
     daily = p["daily"]
     if not daily.get("death_save"):
         daily["death_save"] = True
@@ -1316,7 +1560,7 @@ def _death(p: dict, floor) -> Scene:
         else:
             save_tax = p["gold"] - p["gold"] // 2
             p["gold"] //= 2
-        save_lines = [f"The {e['name']} loses you in the grass."]
+        save_lines = [f"{_the(e['name'])} loses you in the grass.", cause]
         if save_tax:
             save_lines.append(f"− ◈ {save_tax:,} carried gold, scattered "
                               "where you fell")
@@ -1353,7 +1597,7 @@ def _death(p: dict, floor) -> Scene:
             f"you stand back up at {p['hp']} HP. It is still here."))
     _report_shared_strike(p)       # 022/001: the wounds you left persist
     mercy = p["level"] <= economy.BEGINNER_MERCY_MAX_LEVEL
-    lines = [f"Killed by the {e['name']}."]
+    lines = [f"Killed by {_the(e['name'], False)}.", cause]
     if mercy:
         # 004 §A.2: a bad first hour can't spiral — keep everything but
         # half the carried gold. 043.2: at level 1 not even that.
@@ -1428,8 +1672,12 @@ def _death(p: dict, floor) -> Scene:
             g = economy.FORGE[slug]
             lost_names.append(g.name)
             if where == "equipped":
-                p["gear"]["weapon"] = economy.class_starter(
-                    p.get("clazz") or "").slug
+                held = p.setdefault("held", [])
+                if slug in held:
+                    held.remove(slug)
+                basic = (economy.CLASS_STARTERS.get(g.line)
+                         or economy.STARTER_WEAPON)
+                _promote_held(p, basic.slug)
                 p["hone"]["weapon"] = 0
                 (p.get("durability") or {}).pop("weapon", None)
             else:
@@ -1524,6 +1772,13 @@ def resolve_fight_action(p: dict, floor, option_id: str) -> Scene:
     the damage budget stops the over-levelled one, whose blows are worth
     three at-level fights, ending a 3-fight gate in a single charge.
     Everything else about the fight is untouched."""
+    # 048: "attack_<slug>" is the attack row of a held side-arm —
+    # promote it to the lead hand and resolve a plain attack.
+    if option_id.startswith("attack_"):
+        slug = option_id.removeprefix("attack_")
+        if slug in (p.get("held") or []) and slug in economy.FORGE:
+            _promote_held(p, slug)
+        option_id = "attack"
     e = p.get("encounter") or {}
     spends = option_id in _ROUND_ACTIONS or option_id.startswith("use_")
     keep = spends and e.get("shared") and e.get("kind") == "warden"
@@ -1594,7 +1849,7 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
             f"You slick the {weapon_name(p)} — the next "
             f"{economy.OIL_STRIKES} strikes bite +25%. "
             + _counter_text(p, hit,
-                            lead=f"The {e['name']} presses while you pour")
+                            lead=f"{_the(e['name'])} presses while you pour")
             + (f" {chase}" if chase else "")))
 
     if option_id == "throw_net" and p["inventory"].get("entangling_net") \
@@ -1604,7 +1859,7 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
             del p["inventory"]["entangling_net"]
         e["netted"] = True
         return fight_scene(p, floor, note=(
-            f"The net blooms open and drops — the {e['name']} goes down "
+            f"The net blooms open and drops — {_the(e['name'], False)} goes down "
             "thrashing in cord. Its round is spent, and it closes no "
             "ground through the mesh."))
 
@@ -1615,6 +1870,9 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
             del p["inventory"]["sky_hook"]
         prof = _profile(p)
         prof["flying"] = False
+        # 048: grounded is grounded — it fights as a plain thing now,
+        # or the triangle would keep steel at zero with the wings gone.
+        prof["type"] = "plain"
         e["profile"] = prof
         hit = _monster_hit(p)
         if p["hp"] <= 0:
@@ -1624,35 +1882,34 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
             "The sky-hook's line goes taut — whatever height it had, "
             "it fights on your ground now. "
             + _counter_text(p, hit,
-                            lead=f"The {e['name']} comes down swinging")
+                            lead=f"{_the(e['name'])} comes down swinging")
             + (f" {chase}" if chase else "")))
 
     if option_id == "use_strip" and p["inventory"].get("strip_potion") \
-            and _profile(p).get("resist", "none") != "none":
+            and _profile(p).get("type") == "magic_resist":
         p["inventory"]["strip_potion"] -= 1
         if p["inventory"]["strip_potion"] <= 0:
             del p["inventory"]["strip_potion"]
         prof = _profile(p)
-        prof["resist"] = "none"
+        prof["type"] = "plain"
         e["profile"] = prof
         hit = _monster_hit(p)
         if p["hp"] <= 0:
             return _death(p, floor)
         chase = _advance_chase(p)
         return fight_scene(p, floor, note=(
-            f"The vial bursts across the {e['name']} — its spellguard "
+            f"The vial bursts across {_the(e['name'], False)} — its spellguard "
             "dissolves like frost in rain. "
             + _counter_text(p, hit)
             + (f" {chase}" if chase else "")))
 
     if option_id == "use_curse" and p["inventory"].get("curse_scroll") \
-            and _profile(p).get("armor", "none") != "none":
+            and _profile(p).get("type") == "armoured":
         p["inventory"]["curse_scroll"] -= 1
         if p["inventory"]["curse_scroll"] <= 0:
             del p["inventory"]["curse_scroll"]
         prof = _profile(p)
-        prof["armor"] = {"high": "low", "med": "low"}.get(
-            prof["armor"], "none")
+        prof["type"] = "plain"
         e["profile"] = prof
         hit = _monster_hit(p)
         if p["hp"] <= 0:
@@ -1750,7 +2007,7 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
             + (f"{seen} hot blade{'s' if seen != 1 else ''} on this floor "
                "will see it. " if seen else
                "no torch burns close, but flares carry. ")
-            + f"The {e['name']} flinches from the light."))
+            + f"{_the(e['name'])} flinches from the light."))
 
     if option_id == "drink_tonic":
         p["inventory"]["trollblood_tonic"] -= 1
@@ -1764,7 +2021,7 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
         return fight_scene(p, floor, note=(
             "The tonic burns going down — full health. "
             + _counter_text(p, hit,
-                            lead=f"The {e['name']} strikes while you drink")
+                            lead=f"{_the(e['name'])} strikes while you drink")
             + (f" {chase}" if chase else "")))
 
     if option_id in ("close_in", "attack") and _damage_type(p) == "melee" \
@@ -1781,7 +2038,7 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
         return fight_scene(p, floor, note=(
             "You cross the open ground fast and low. "
             + _counter_text(p, hit,
-                            lead=f"The {e['name']} meets you mid-stride")
+                            lead=f"{_the(e['name'])} meets you mid-stride")
             + (f" {snap}" if snap else "")))
 
     if option_id == "open_distance" and _range_state(p) == "close":
@@ -1789,7 +2046,7 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
         # refused flat, before the turn is spent.
         if _mspd(p) >= economy.player_speed(p):
             return fight_scene(p, floor, note=(
-                f"The {e['name']} matches you stride for stride — "
+                f"{_the(e['name'])} matches you stride for stride — "
                 "no gap will open against those legs."))
         # §2.4: speed decides; on failure the monster gets a free
         # halved hit while you turn.
@@ -1808,12 +2065,18 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
         return fight_scene(p, floor, note=(
             "No gap opens — it stays with you. "
             + _counter_text(p, hit,
-                            lead=f"The {e['name']} punishes the turn")
+                            lead=f"{_the(e['name'])} punishes the turn")
             + (f" {snap}" if snap else "")))
 
-    if option_id == "create_distance" and p.get("clazz") == "archer" \
-            and _damage_type(p) == "ranged":
-        # 036: the archer's third axis — give ground ON PURPOSE. It
+    if option_id == "create_distance" and _damage_type(p) == "ranged":
+        # 048 N7: giving ground on purpose is rank-6 bowwork.
+        if _train_rank(p) < economy.GAP_OPEN_RANK:
+            e["_no_round"] = True
+            return fight_scene(p, floor, note=(
+                f"Giving ground on purpose is rank-"
+                f"{economy.GAP_OPEN_RANK} bowwork — you're at "
+                f"{_train_rank(p)}. The School trains it."))
+        # 036: the marksman's third axis — give ground ON PURPOSE. It
         # always works (this is the trade, not a gamble): the question
         # is only whether the monster collects a parting blow on the
         # way out, and THAT is what your legs are for. Every length of
@@ -1827,8 +2090,10 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
         e["range"] = "at_range"
         e["gap"] = gap + 1
         shot = (f"The gap is {e['gap']} length"
-                f"{'s' if e['gap'] > 1 else ''} now — your bow hits "
-                f"×{economy.bow_gap_mult(e['gap']):g} from here.")
+                f"{'s' if e['gap'] > 1 else ''} now"
+                + (f" — your bow hits "
+                   f"×{economy.bow_gap_mult(e['gap']):g} from here."
+                   if _train_rank(p) >= economy.GAP_DRAW_RANK else "."))
         if state.roll_ok(p, economy.p_gap_hit(economy.player_speed(p),
                                               _mspd(p))):
             # speed already had its say in p_gap_hit — no second dodge
@@ -1838,7 +2103,7 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
             return fight_scene(p, floor, note=(
                 "You give ground and it collects the toll — "
                 + _counter_text(p, hit,
-                                lead=f"the {e['name']} rakes you as "
+                                lead=f"{_the(e['name'], False)} rakes you as "
                                      "you pull away")
                 + f" {shot}" + (f" {snap}" if snap else "")))
         return fight_scene(p, floor, note=(
@@ -1901,7 +2166,21 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
             p, floor,
             note=f"{braced} {held}{broke}" + (f" {chase}" if chase else ""))
 
-    if option_id == "shield_wall" and p.get("clazz") == "warrior":
+    if option_id == "shield_wall":
+        # 048 N7: the wall wants steel in one hand, a shield on the
+        # other arm, and rank-4 bladework holding them together.
+        shield = economy.FORGE.get(p["gear"].get("shield") or "")
+        if not _held_melee(p) or not shield or shield.line == "sorcerer":
+            e["_no_round"] = True
+            return fight_scene(p, floor, note=(
+                "A shield wall needs steel in one hand and a shield "
+                "on the other arm."))
+        if _rank_of(p, "blade") < economy.WALL_RANK:
+            e["_no_round"] = True
+            return fight_scene(p, floor, note=(
+                f"The wall is rank-{economy.WALL_RANK} bladework — "
+                f"you're at {_rank_of(p, 'blade')}. "
+                "The School trains it."))
         # 017: the counter is a melee blow — it cannot reach a flyer,
         # and (002) it cannot reach a monster still crossing open ground.
         at_range = _range_state(p) == "at_range"
@@ -1934,7 +2213,20 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
             f"Shield up — nothing gets through. Your counter takes "
             f"{counter}.{tail}"))
 
-    if option_id == "sleep_spell" and p.get("clazz") == "sorcerer":
+    if option_id == "sleep_spell":
+        # 048 N7: the lullaby is shaped through a held staff by
+        # rank-6 staffwork.
+        if not _held_of_line(p, "sorcerer"):
+            e["_no_round"] = True
+            return fight_scene(p, floor, note=(
+                "The lullaby needs a staff in your hands — there is "
+                "none in your slots."))
+        if _rank_of(p, "staff") < economy.SLEEP_RANK:
+            e["_no_round"] = True
+            return fight_scene(p, floor, note=(
+                f"The lullaby is rank-{economy.SLEEP_RANK} staffwork — "
+                f"you're at {_rank_of(p, 'staff')}. "
+                "The School trains it."))
         # 022/001: the shared Warden never sleeps — there is nothing to
         # walk past; the floor opens when its pool empties, not before.
         if e.get("shared"):
@@ -1943,9 +2235,9 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
                 "hull. A war-machine wearing a body does not sleep."))
         # 017: a High spellguard shrugs the lullaby off entirely —
         # refused BEFORE the XP is spent, so probing costs nothing.
-        if _profile(p).get("resist") == "high":
+        if _profile(p).get("type") == "magic_resist":
             return fight_scene(p, floor, note=(
-                f"You shape the lullaby and the {e['name']}'s spellguard "
+                f"You shape the lullaby and {_the(e['name'], False)}'s spellguard "
                 "burns it off mid-air. This one won't sleep."))
         cost = economy.sleep_xp_cost(floor.floor)
         if not state.spend_xp(p, cost):
@@ -1958,14 +2250,28 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
         return Scene(
             eyebrow=_eyebrow(p, floor),
             headline="Sleep takes it mid-snarl",
-            body_lines=[f"The {e['name']} folds into the grass, snoring.",
+            body_lines=[f"{_the(e['name'])} folds into the grass, snoring.",
                         f"− {cost} XP burned — you step past it"],
             options=_after_fight_options(p, floor),
             meters=meters(p))
 
-    if option_id == "treeline_shot" and p.get("clazz") == "archer" \
+    if option_id == "treeline_shot" \
             and not e["shot_used"] and not e.get("attacked") \
             and _range_state(p) == "at_range":
+        # 048 N7: the shot from cover wants a held bow and rank-4
+        # bowwork; taking it brings the bow into the lead hand.
+        bow = _held_of_line(p, "archer")
+        if not bow:
+            e["_no_round"] = True
+            return fight_scene(p, floor, note=(
+                "The shot from cover needs a bow in your slots."))
+        if _rank_of(p, "bow") < economy.TREELINE_RANK:
+            e["_no_round"] = True
+            return fight_scene(p, floor, note=(
+                f"The shot from cover is rank-{economy.TREELINE_RANK} "
+                f"bowwork — you're at {_rank_of(p, 'bow')}. "
+                "The School trains it."))
+        _promote_held(p, bow)
         e["shot_used"] = True
         e["attacked"] = True
         if e.get("shared") and e["kind"] == "warden":
@@ -1978,7 +2284,7 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
         snap = _wear(p, "weapon")      # 005: the long shot is an attack
         mult, pierce, effect = _quiver_shot(p)   # 006: special ammo rides
         e.pop("veiled", None)                    # the veil breaks here too
-        if not pierce and _profile(p).get("armor") in ("med", "high"):
+        if not pierce and _profile(p).get("type") == "armoured":
             # 017: Medium+ plate over the vitals — the long shot loses
             # its double (Low plate still leaves gaps for a marksman;
             # 006: a piercing arrow never meets the plate at all)
@@ -2005,44 +2311,26 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
             + (f" {snap}" if snap else "")))
 
     # default: attack
-    # 004 §3.2: off-class hands — a bow burns bought arrows for anyone
-    # but an archer, and every off-class swing misses 25% of the time
-    # (the miss eats the round; the monster answers).
-    # 006: a nocked special arrow IS the ammo for this shot.
+    # 048: the weapon decides and the rank prices the swing — the
+    # off-class system (arrow burn, flat 25% miss) died with the
+    # classes. 006: a nocked special arrow IS the ammo for this shot.
     e["attacked"] = True           # 040: the first swing burns the treeline
-    special_ready = bool(e.get("nocked")
-                         and p["inventory"].get(e["nocked"], 0) > 0)
-    if _off_class(p):
-        if _damage_type(p) == "ranged" and not special_ready:
-            arrows = int(p["inventory"].get("arrows", 0))
-            if arrows <= 0:
-                bow = p["gear"]["weapon"]
-                p["inventory"][bow] = p["inventory"].get(bow, 0) + 1
-                p["gear"]["weapon"] = economy.class_starter(
-                    p.get("clazz") or "").slug
-                p["hone"]["weapon"] = 0
-                # 005: the bow keeps its wear in the pack; the basic
-                # weapon underneath never wears.
-                bow_dur = (p.get("durability") or {}).pop("weapon", None)
-                if bow_dur is not None:
-                    p.setdefault("durability_pack", {})[bow] = bow_dur
-                return fight_scene(p, floor, note=(
-                    "Your quiver runs dry — the bow goes over your "
-                    f"shoulder and your {weapon_name(p)} comes back "
-                    "out. The Forge sells arrows by the pack."))
-            p["inventory"]["arrows"] = arrows - 1
     snap = _wear(p, "weapon")          # 005: every swing spends the edge
     # 031 §7: while the gap is open the beast has no answer — its whole
     # round is the ground between you (_advance_chase). Closing the gap
     # or getting caught is what puts you back in its reach.
     unreachable = _range_state(p) == "at_range"
-    if _off_class(p) and state.roll_ok(p, economy.OFF_CLASS_MISS):
+    # 048: the hand decides — an untrained swing goes wide. The miss
+    # eats the round and the monster answers, exactly like any fumble.
+    rank = _train_rank(p)
+    miss = economy.TRAIN_MISS_PCT(rank) / 100
+    if miss > 0 and state.roll_ok(p, miss):
+        wide = (f"Rank-{rank} hands — your {weapon_name(p)} swings "
+                "wide. The School trains this away.")
         if unreachable:
             chase = _advance_chase(p)
             return fight_scene(p, floor, note=(
-                f"Not your weapon — your {weapon_name(p)} goes wide "
-                "of anything that matters. It cannot reach you to "
-                "make you pay."
+                wide + " It cannot reach you to make you pay."
                 + (f" {chase}" if chase else "")
                 + (f" {snap}" if snap else "")))
         back = _monster_hit(p)
@@ -2050,10 +2338,9 @@ def _resolve_round(p: dict, floor, option_id: str) -> Scene:
             return _death(p, floor)
         chase = _advance_chase(p)
         return fight_scene(p, floor, note=(
-            f"Not your weapon — your {weapon_name(p)} goes wide "
-            "of anything that matters. "
+            wide + " "
             + _counter_text(p, back,
-                            lead=f"The {e['name']} makes you pay "
+                            lead=f"{_the(e['name'])} makes you pay "
                                  "for the fumble")
             + (f" {chase}" if chase else "")
             + (f" {snap}" if snap else "")))

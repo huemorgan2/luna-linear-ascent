@@ -31,7 +31,7 @@ def character_sheet(p: dict) -> dict:
     pts = pstate.prestige(p)
     name = (p["name"] or "") + (" " + "✦" * min(pts, 3) if pts else "")
     return {
-        "name": name, "race": p["race"], "class": p["clazz"],
+        "name": name, "race": p["race"],
         "level": p["level"], "xp": p["xp"],
         "xp_to_next": (0 if at_cap
                        else max(0, economy.xp_need(p["level"]) - p["xp"])),
@@ -43,6 +43,13 @@ def character_sheet(p: dict) -> dict:
         "carried_gold": p["gold"], "banked_gold": p["bank"],
         "floor_frontier": p["unlocked_floor"], "gear": gear,
         "inventory": p["inventory"],
+        # 048: the TRAINED block — the player's skill per weapon path
+        # (never a weapon stat) — and the HOLDING row it feeds.
+        "trained": dict(p.get("training")
+                        or {"blade": 0, "bow": 0, "staff": 0}),
+        "slots": int(p.get("slots", 1)),
+        "holding": [economy.FORGE[s].name for s in (p.get("held") or [])
+                    if s in economy.FORGE],
         # 020: the ladder as data — Luna answers "what's next for me"
         # and "what do I lose at level N" from this, never by guessing.
         "next_unlocks": [

@@ -404,6 +404,12 @@ def creature_stats(floor: int, traits) -> tuple[int, int, int]:
     raw = min(CHIP_DIVISOR * per_round, per_round + p_def // 2)
     atk = max(1, round(raw / 0.75))
     atk = max(1, round(atk * FLOOR_ATK_SOFT.get(floor, 1.0)))
+    # 048 N1: the type weighs the body — flyers land many weak cuts,
+    # the armoured land rare heavy ones. On top of the bar, like the
+    # tiers were: the type layer is deliberately NOT bar-neutralized.
+    mtype = type_of(traits)
+    atk = max(1, round(atk * TYPE_ATK[mtype]))
+    hp = max(1, round(hp * TYPE_HP[mtype]))
     return atk, dfs, hp
 
 
@@ -538,13 +544,11 @@ DEEP_SPECIMENS = {k: {**s, "weight": _DEEP_WEIGHTS[k]}
 
 DAMAGE_TYPE = {"warrior": "melee", "archer": "ranged", "sorcerer": "magic"}
 
-TIER_MULT = {"none": 1.0, "low": 0.75, "med": 0.50, "high": 0.25}
-TIER_LABEL = {"none": "None", "low": "Low", "med": "Medium", "high": "High"}
-_TIER_ORDER = ("none", "low", "med", "high")
-
-# gold bumps: a hard profile pays for the diagnosis it demands
-PROFILE_GOLD = {"low": 1.1, "med": 1.25, "high": 1.4}
-FLYING_GOLD_MULT = 1.2
+# 048 phase 5: the tier system died here — one TYPE per monster now
+# bundles sign, speed, weight, and the triangle (tables below). The
+# warden reference-damage cut keeps the old low-tier number until the
+# phase-6 bake re-anchors the band.
+WARDEN_REF_CUT = 0.75
 BULWARK_GOLD_MULT = 1.5
 BULWARK_HP_MULT = 2.2          # the outlast-you enemy
 
@@ -632,74 +636,209 @@ def dodge_pct(pspd: int, mspd: int) -> int:
     return min(DODGE_CAP_PCT, round(7 * math.log2(1 + a)))
 
 
-def tier_up(tier: str) -> str:
-    return _TIER_ORDER[min(len(_TIER_ORDER) - 1,
-                           _TIER_ORDER.index(tier) + 1)]
+def type_of(traits) -> str:
+    """048 phase 7: content speaks types natively — at most one type
+    trait per monster (none = plain). The legacy bridge is
+    type_from_traits, kept for doc-migration tests only."""
+    ts = set(traits or ())
+    if "fly" in ts:
+        return "fly"
+    if "magic_resist" in ts:
+        return "magic_resist"
+    if "armoured" in ts:
+        return "armoured"
+    return "plain"
 
 
 def profile_from_traits(traits) -> dict:
-    """Defense profile from content traits. Legacy 'armored' → armor_med."""
-    prof = {"armor": "none", "resist": "none", "flying": False,
-            "bulwark": False, "speed": SPEED_NORMAL}
-    for t in traits or ():
-        if t.startswith("armor_"):
-            prof["armor"] = t[len("armor_"):]
-        elif t.startswith("resist_"):
-            prof["resist"] = t[len("resist_"):]
-        elif t == "armored":               # legacy content, pre-017 tiers
-            prof["armor"] = "med"
-        elif t == "flying":
-            prof["flying"] = True
-        elif t == "bulwark":
-            prof["bulwark"] = True
-        elif t == "slow":
-            prof["speed"] = SPEED_SLOW
-        elif t == "fast":
-            prof["speed"] = SPEED_FAST
-    if prof["bulwark"]:
-        prof["armor"] = tier_up(prof["armor"])
-    return prof
+    """048: the defense profile IS the type. One type per monster —
+    sign, speed, and the triangle answer all hang off it. `bulwark`
+    stays orthogonal (an elite wall, never a weapon-answer)."""
+    t = type_of(traits or ())
+    return {"type": t, "flying": t == "fly",
+            "bulwark": "bulwark" in set(traits or ()),
+            "speed": TYPE_SPEED[t]}
 
 
 def profile_gold_mult(prof: dict) -> float:
-    m = 1.0
-    m *= PROFILE_GOLD.get(prof.get("armor", "none"), 1.0)
-    m *= PROFILE_GOLD.get(prof.get("resist", "none"), 1.0)
-    if prof.get("flying"):
-        m *= FLYING_GOLD_MULT
+    """A signed monster pays for the diagnosis it demands."""
+    m = TYPE_GOLD.get(prof.get("type", "plain"), 1.0)
     if prof.get("bulwark"):
         m *= BULWARK_GOLD_MULT
     return m
 
 
-def typed_damage(dtype: str, raw: int, monster_def: int, prof: dict) -> int:
-    """Player damage through a defense profile. Magic ignores flat DEF but
-    eats the resist tier; melee/ranged keep raw−DEF/2 and eat the armor
-    tier. Anything that CAN hit chips ≥1 (the 013 lesson). The single
-    legal zero: melee vs flying — the blade cannot reach."""
-    if dtype == "melee" and prof.get("flying"):
+# ── 048: one type per monster — sign, speed, weight, and the triangle ──
+# (phase 1: tables + mapping only; combat still runs the tier system.)
+
+TYPE_SPEED = {"fly": 7, "armoured": 3, "magic_resist": 3, "plain": 5}
+TYPE_ATK = {"fly": 0.6, "armoured": 1.4, "magic_resist": 1.4, "plain": 1.0}
+TYPE_HP = {"fly": 0.9, "armoured": 1.2, "magic_resist": 1.0, "plain": 1.0}
+TYPE_GOLD = {"fly": 1.2, "armoured": 1.3, "magic_resist": 1.3, "plain": 1.0}
+
+TYPE_MULT = {
+    "fly":          {"blade": 0.0, "bow": 1.0, "staff": 0.6},
+    "armoured":     {"blade": 0.5, "bow": 0.15, "staff": 1.0},
+    "magic_resist": {"blade": 1.0, "bow": 0.5, "staff": 0.15},
+    "plain":        {"blade": 1.0, "bow": 1.0, "staff": 1.0},
+}
+
+TYPE_SIGN = {"fly": "⚡", "armoured": "⛨", "magic_resist": "✧",
+             "plain": ""}
+TYPE_NAME = {"fly": "fly", "armoured": "armoured",
+             "magic_resist": "magic-resistant", "plain": "plain"}
+PATH_WEAPON_WORD = {"blade": "steel", "bow": "arrows", "staff": "magic"}
+
+
+def answer_word(mult: float) -> str:
+    """The triangle cell as a spoken answer — the card's vocabulary."""
+    if mult <= 0:
+        return "can't reach"
+    if mult <= 0.2:
+        return "glance"
+    if mult < 1.0:
+        return "half"
+    return "full"
+
+
+def type_line(mtype: str) -> str:
+    """S3: the one line under the numbers — what each weapon does to
+    this type. Plain monsters say so in words."""
+    if mtype == "plain":
+        return "no sign — every weapon bites full"
+    sign = TYPE_SIGN[mtype]
+    bits = " · ".join(
+        f"{PATH_WEAPON_WORD[path]}: {answer_word(TYPE_MULT[mtype][path])}"
+        for path in ("blade", "bow", "staff"))
+    return f"{sign} {TYPE_NAME[mtype]} — {bits}"
+
+
+def speed_word(spd: int) -> str:
+    if spd >= SPEED_FAST:
+        return " (fast)"
+    if spd <= SPEED_SLOW:
+        return " (slow)"
+    return ""
+
+
+# 048 N4: the mastery studies' teeth (phase 5) — riposte, long draw,
+# focus. Sold at the School (MASTERY_XP); recorded in p["mastery"].
+RIPOSTE_RETURN = 0.25          # blocked blow answers 25% of mean swing
+LONG_DRAW_CRIT_MULT = 1.5      # gap-3 top-roll crit
+LONG_DRAW_TOP = 0.10           # the top 10% of the roll band crits
+FOCUS_MULT = 0.75              # staff's half-answers cast at ×0.75
+MASTERY_ATK_BONUS = 0.10       # each studied mastery: +10% on EVERY swing
+
+
+def legacy_rank(unlocked_floor: int) -> int:
+    """048 migration: the honored rank scales with the climb — rank 6
+    (the old on-class feel) as the floor of it, +1 per ten floors
+    opened, capped one step under the master's studies."""
+    return min(9, 6 + max(0, int(unlocked_floor)) // 10)
+
+
+PATH_OF_LINE = {"warrior": "blade", "archer": "bow", "sorcerer": "staff"}
+
+# 048 N3: trained rank 0–10 per path — the player's skill, never the
+# weapon's. Rank buys consistency: the miss fades, the worst swing rises.
+TRAIN_XP_ANCHOR = 20
+TRAIN_GOLD_ANCHOR = 8
+
+
+def TRAIN_MISS_PCT(rank: int) -> int:
+    """Chance (whole %) an attack goes wide: 25% untrained → 0% at 10."""
+    return max(0, round(25 - 2.5 * rank))
+
+
+def TRAIN_ROLL_FLOOR(rank: int) -> float:
+    """The worst swing as a share of full power: 30% → 70% at rank 10.
+    Rank 5 reproduces today's [ATK/2, ATK] band."""
+    return (30 + 4 * rank) / 100
+
+
+def train_xp(rank: int) -> int:
+    """XP the School asks for RANK (each costs more than the last).
+    One path 0→10 = 2,854 XP ≈ body levels 1→10."""
+    return round(TRAIN_XP_ANCHOR * rank ** 1.5)
+
+
+def train_gold(rank: int, frontier: int) -> int:
+    """The instructor's fee — rides the pillar so it never trivializes."""
+    return round(TRAIN_GOLD_ANCHOR * pillar(frontier) * rank)
+
+
+# 048 N4/N5: mastery studies and the CARRY skill — School merchandise.
+# A master pays 80% on the OTHER paths' first five ranks (the hands
+# already know discipline); the discount never reaches rank 6+.
+# N7: fight options answer to trained rank, not class — the gate table.
+TREELINE_RANK = 4     # bow — the shot from cover
+GAP_OPEN_RANK = 6     # bow — give ground on purpose
+GAP_DRAW_RANK = 8     # bow — the open gap starts paying ×1.25/×1.5
+WALL_RANK = 4         # blade — shield wall (a shield on the arm too)
+SLEEP_RANK = 6        # staff — the lullaby
+
+MASTERY_XP = round(train_xp(10) * 1.5)          # 948
+MASTERY_DISCOUNT = 0.8
+MASTERY_DISCOUNT_MAX_RANK = 5
+CARRY2_XP, CARRY2_GOLD = 60, 30                 # 2nd slot — level 1
+# 048 bake: the 3rd slot's XP price must FIT the level-8 bar it is
+# gated on (xp_need(8) = 543) — at the old 900 the printed gate was a
+# lie until ~level 12. 500 keeps the slot a level-8 decision.
+CARRY3_XP, CARRY3_GOLD_ANCHOR = 500, 200        # 3rd slot — level 8+
+CARRY3_LEVEL = 8
+
+
+def carry3_gold(frontier: int) -> int:
+    return round(CARRY3_GOLD_ANCHOR * pillar(frontier))
+
+
+def train_xp_cost(rank: int, discounted: bool = False) -> int:
+    xp = train_xp(rank)
+    if discounted and rank <= MASTERY_DISCOUNT_MAX_RANK:
+        xp = round(xp * MASTERY_DISCOUNT)
+    return xp
+
+
+def type_from_traits(traits) -> str:
+    """Legacy trait sets → the one 048 type. Flight is the loudest fact;
+    resist outranks armor (a warded thing reads as warded); bulwark is
+    orthogonal and never a type."""
+    ts = set(traits)
+    if "flying" in ts:
+        return "fly"
+    if any(t.startswith("resist_") for t in ts):
+        return "magic_resist"
+    if any(t.startswith("armor_") for t in ts):
+        return "armoured"
+    return "plain"
+
+
+def typed_damage_048(path: str, raw: int, monster_def: int,
+                     mtype: str, focus: bool = False) -> int:
+    """Damage of weapon path P against monster type T. Staff ignores flat
+    DEF; blade and bow eat raw−DEF/2. Anything that CAN hit chips ≥1 —
+    the single legal zero stays blade-vs-fly. `focus` is the staff
+    mastery study: its ×0.5/×0.6 answers cast at ×0.75 (the glance
+    stays a mistake)."""
+    if path == "blade" and mtype == "fly":
         return 0
-    if dtype == "magic":
-        base = raw
-        mult = TIER_MULT[prof.get("resist", "none")]
-    else:
-        base = raw - monster_def // 2
-        mult = TIER_MULT[prof.get("armor", "none")]
+    mult = TYPE_MULT[mtype][path]
+    if focus and path == "staff" and 0.5 <= mult < 0.75:
+        mult = FOCUS_MULT
+    base = raw if path == "staff" else raw - monster_def // 2
     return max(1, round(max(1, base) * mult))
 
 
 def warden_profile(floor: int) -> dict:
-    """Wardens join the system gently: nothing below floor 21, low/low
-    tiers after, med/med on milestone bosses (damage checks, not walls)."""
-    if floor % 10 == 0:
-        return profile_from_traits(("armor_med", "resist_med"))
-    if floor >= WARDEN_PROFILE_FLOOR:
-        return profile_from_traits(("armor_low", "resist_low"))
+    """048: a Warden is a damage RACE, not a triangle question — every
+    weapon bites it full. The milestone damage-check story returns with
+    the phase-6 band re-anchor."""
     return profile_from_traits(())
 
 
-XP_PER_KILL_SLOPE = 2.4        # 043: was 4 — a 40% cut, the bar filled
-                               # in a single day at every level
+XP_PER_KILL_SLOPE = 3.0        # 048: was 2.4 — +25% funds the School
+                               # sink so the one-path climber keeps the
+                               # level≈floor pace while training
 
 
 def xp_per_kill(bar: int) -> int:
@@ -714,10 +853,31 @@ def xp_per_kill(bar: int) -> int:
 GOLD_PER_KILL_ANCHOR = 8       # the floor-1 kill, unchanged since 004
 
 
+EARLY_COIN_FLOORS = 10
+
+
+def early_coin_mult(floor: int) -> float:
+    """048 N8: the young-tower bounty — ×2.0 at floor 1 fading to ×1.1
+    at 10, gone at 11. The first ten floors are the classroom: the
+    bounty funds both basic weapons and the first ranks of every path.
+    Labeled on the kill card so the fade never reads as a nerf."""
+    return 2.0 - 0.1 * (floor - 1) if floor <= EARLY_COIN_FLOORS else 1.0
+
+
 def gold_per_kill(bar: int) -> int:
     """Base gold per kill. 043: takes the creature's BAR — coin follows
     toughness. 046: the anchor rides the INCOME pillar; the old
-    linear × band-jump ladder is retired (BAND_INCOME_JUMP with it)."""
+    linear × band-jump ladder is retired (BAND_INCOME_JUMP with it).
+    048: the young-tower bounty rides IN the paycheck."""
+    return max(1, round(GOLD_PER_KILL_ANCHOR * income_pillar(bar)
+                        * early_coin_mult(bar)))
+
+
+def base_gold_per_kill(bar: int) -> int:
+    """The un-bountied paycheck — the basis for every price and fee
+    ladder. 048: the young-tower bounty is pocket coin, a gift to the
+    young climber; if fees and prices rode it, the gift would tax
+    itself away. Ladders anchor here; the paycheck pays gold_per_kill."""
     return max(1, round(GOLD_PER_KILL_ANCHOR * income_pillar(bar)))
 
 
@@ -734,8 +894,8 @@ def daily_income(floor: int) -> int:
     (≈30 fights, a tent visit every ~3 fights now that chip damage is
     real). Anchors hone prices and the tier price ladder — not paid to
     anyone directly."""
-    return round((gold_per_kill(floor) - healer_tent_price(floor) / 3)
-                 * 30)
+    return round((base_gold_per_kill(floor) - healer_tent_price(floor) / 3)
+                 * 30)   # 048: un-bountied — prices/fees must not ride the gift
 
 
 XP_NEED_BASE = 24              # 022/002: was 60 — the cap arrives in the
@@ -922,7 +1082,7 @@ def warden_stats(floor: int) -> tuple[int, int, int]:
         # 017: band-3+ wardens carry low tiers (both axes, so every class
         # feels it equally) — the reference damage drops ×0.75 and the
         # rounds/ATK budget below re-tunes itself by construction.
-        p_dmg = max(1, round(p_dmg * TIER_MULT["low"]))
+        p_dmg = max(1, round(p_dmg * WARDEN_REF_CUT))
     rounds = max(3, hp // p_dmg)
     # floors 1–5 ramp in gently: fresh climbers reach these gates with
     # partial kits (the first with the bare shiv), and the first hour
@@ -1064,7 +1224,7 @@ def strike_fight_damage(floor: int) -> int:
     w_atk, w_def, _hp = warden_stats(floor)
     p_dmg = max(1, round(0.75 * p_atk) - w_def // 2)
     if floor >= WARDEN_PROFILE_FLOOR:
-        p_dmg = max(1, round(p_dmg * TIER_MULT["low"]))
+        p_dmg = max(1, round(p_dmg * WARDEN_REF_CUT))
     # 026: the round count is the exchange the keep now actually grants
     # (warden_exchange_rounds) — one function, so the unit the pool is
     # measured in and the fight the player is sold can never drift.
@@ -1733,9 +1893,6 @@ FORGE[GATE_SHIELD.slug] = GATE_SHIELD
 FORGE[GATE_ARMOR.slug] = GATE_ARMOR
 
 
-def class_starter(clazz: str) -> GearItem:
-    return CLASS_STARTERS.get(clazz or "", STARTER_WEAPON)
-
 PAWN_BUYBACK = 0.40    # pre-006 flat rate; 006 makes it the band centre
 
 
@@ -1800,16 +1957,15 @@ def rung_floor_req(g: GearItem) -> int:
     return r if r > LEVEL_CAP else 0
 
 
-# ── 004 §3.2: off-class stopgap gear ─────────────────────────────────────
-# Any class can buy the previous-rung weapon of another line: ×3 price,
-# ×0.5 damage, a 25% miss that eats the round, never hones, and a bow in
-# off-class hands burns bought arrows. A tool for breaking a hard
-# counter, priced so it can never be a build.
+# ── 048: the armory sells every line to everyone at list price ───────────
+# The off-class system (×3 price, ×0.5 damage, 25% miss, arrow burn)
+# died with the classes — the trained rank is the only tax on a weapon
+# in the wrong hands now. The gate-issue basics of the other two lines
+# sell for a flat coin so ANY climber can start a second path.
 
-OFF_CLASS_PRICE_MULT = 3
-OFF_CLASS_DMG_MULT = 0.5
-OFF_CLASS_MISS = 0.25
-ARROW_PACK_SIZE = 10
+BASIC_WEAPON_PRICE = 60        # basic_bow / worn_staff off the wall —
+                               # never wears, never lost, never sold back
+ARROW_PACK_SIZE = 10           # legacy — old packs still hold arrows
 ARROW_PACK_PRICE = 120
 
 ARCANUM_LEVEL = 3              # 0.29.1: was 6 — the shop arrives when
@@ -1824,10 +1980,6 @@ RELAY_LEVEL = 2                # was 3
 FIELDS_LEVEL = 5
 
 
-def off_class_price(g: GearItem) -> int:
-    return g.price * OFF_CLASS_PRICE_MULT
-
-
 def line_twin(g: GearItem, line: str) -> GearItem | None:
     """The same rung of another weapon line. The three lines mirror each
     other rung for rung — same bonus, same price — so trading a piece for
@@ -1839,19 +1991,6 @@ def line_twin(g: GearItem, line: str) -> GearItem | None:
                 and other.rung == g.rung and other.style == g.style):
             return other
     return None
-
-
-def off_class_offer(line: str, level: int,
-                    unlocked_floor: int = 0) -> GearItem | None:
-    """The one off-class weapon on the rack: the rung BELOW the highest
-    this level (and, past the cap, this floor) unlocks in `line` (the
-    first rung when nothing is below)."""
-    unlocked = [g for g in weapon_line(line)
-                if rung_player_level_req(g) <= level
-                and rung_floor_req(g) <= unlocked_floor]
-    if not unlocked:
-        return None
-    return unlocked[-2] if len(unlocked) >= 2 else unlocked[0]
 
 
 def gear_tier_for_floor(floor: int) -> int:
@@ -2036,7 +2175,8 @@ class Relic:
     floor: int             # appears in stock from this unlocked floor
     shop: str              # "forge" | "arcanum" | "apothecary"
     count: int = 1         # units per purchase (arrow packs, net packs)
-    clazz: str = ""        # class-locked purchase ("" = anyone)
+    line: str = ""         # weapon-line-locked purchase ("" = anyone;
+                           # 048: sold to whoever HOLDS that line)
     hold1: bool = False    # own at most one at a time
     group: str = ""        # per-fight exclusivity ("life")
 
@@ -2064,7 +2204,7 @@ RELICS: dict[str, Relic] = {r.slug: r for r in [
     Relic("piercing_arrows", "Piercing Arrows",
           "the shot ignores armor tiers entirely",
           "five to a quiver, archer hands only",
-          0.35, 8, "forge", count=5, clazz="archer"),
+          0.35, 8, "forge", count=5, line="archer"),
     Relic("fire_arrows", "Fire Arrows",
           "+50% burst on the shot; burns regeneration out",
           "plate still turns fire-tipped shafts like any arrow",
@@ -2076,11 +2216,11 @@ RELICS: dict[str, Relic] = {r.slug: r for r in [
     Relic("entangling_net", "Entangling Net",
           "the monster loses its round tangled — it cannot close or flee",
           "three to a pack; a Warden tears through it instantly",
-          0.25, 5, "forge", count=3, clazz="warrior"),
+          0.25, 5, "forge", count=3, line="warrior"),
     Relic("sky_hook", "Sky-Hook",
           "your steel reaches the airborne for this whole fight",
           "five uses a hook, one burned per fight",
-          0.4, 6, "forge", count=5, clazz="warrior"),
+          0.4, 6, "forge", count=5, line="warrior"),
     # 010 retune (2026-07-28): vials 0.3→0.1 DI. One vial is one FIGHT,
     # so at 0.3 the mage's wall-push cost 3.6× the warrior's net and
     # broke the stacked-drain ceiling at every band; 0.1 puts all three
@@ -2088,15 +2228,15 @@ RELICS: dict[str, Relic] = {r.slug: r for r in [
     Relic("strip_potion", "Resistance-Strip Potion",
           "dissolves the target's spellguard for the fight",
           "one fight, one vial",
-          0.1, 4, "arcanum", clazz="sorcerer"),
+          0.1, 4, "arcanum", line="sorcerer"),
     Relic("curse_scroll", "Curse Scroll",
           "halves the target's plate for the fight",
           "one fight, one scroll",
-          0.1, 3, "arcanum", clazz="sorcerer"),
+          0.1, 3, "arcanum", line="sorcerer"),
     Relic("polymorph_dust", "Polymorph Dust",
           "the monster becomes a harmless critter — the fight simply ends",
           "no loot, no XP, never works on Wardens; one pinch",
-          1.2, 21, "arcanum", clazz="sorcerer"),
+          1.2, 21, "arcanum", line="sorcerer"),
     Relic("veil_draught", "Veil Draught",
           "nothing can touch you until your first attack lands",
           "one fight; only one life-guard works per fight",
@@ -2171,11 +2311,13 @@ def relic_price(slug: str, frontier: int) -> int:
     return _pretty(r.di * daily_income(max(1, frontier)))
 
 
-def relic_stock(shop: str, frontier: int, clazz: str) -> list[Relic]:
-    """What this shop shows this player, catalog order."""
+def relic_stock(shop: str, frontier: int, lines) -> list[Relic]:
+    """What this shop shows this player, catalog order. `lines` is the
+    set of weapon lines in the player's hands (048: the weapon decides
+    who a line-locked relic sells to)."""
     return [r for r in RELICS.values()
             if r.shop == shop and frontier >= r.floor
-            and (not r.clazz or r.clazz == clazz)]
+            and (not r.line or r.line in lines)]
 
 
 # ── §6c Healing (008, repriced by 013, dawn law by 022/004) ─────────────
@@ -2239,8 +2381,8 @@ BOARD_LEVEL = 2                  # 0.29.1: was 4 — the board is the day's
 BOARD_JOBS_PER_DAY = 3
 CONTRACT_CULL_GOLD_MULT = 0.8    # × N kills' base gold on the named floor
 CONTRACT_CULL_XP_MULT = 0.5      # × N kills' base XP
-CONTRACT_CLASS_GOLD_MULT = 0.5   # weapon-class jobs price off mid-tower
-CONTRACT_CLASS_XP_MULT = 0.5
+CONTRACT_PATH_GOLD_MULT = 0.5    # weapon-path jobs price off mid-tower
+CONTRACT_PATH_XP_MULT = 0.5
 CONTRACT_WARDEN_MULT = 0.5       # × warden pay at the frontier
 CONTRACT_TOKEN_CHANCE = 0.25     # a job carries a repair token sometimes
 
@@ -2331,13 +2473,6 @@ RACES = {
     "human": "Adaptable: +1 energy cap. Port-town survivors.",
     "elf": "Keen: +5% experience from kills. Their bio-lit forest is floor 23.",
     "dwarf": "Stubborn: +5% armor value. The fusion-halls are floors 11-20.",
-}
-
-CLASSES = {
-    "warrior": "Extra combat option: Shield Wall (soak a round).",
-    "sorcerer": "Extra combat option: Sleep Spell (skip a fight for its "
-                "experience price).",
-    "archer": "Extra combat option: Treeline Shot (first strike).",
 }
 
 # 046: last — the milestone stats read the whole model above.

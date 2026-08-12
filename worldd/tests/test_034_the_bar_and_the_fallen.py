@@ -44,7 +44,6 @@ async def create_player(client, secret, tenant, name):
         await act(client, secret, tenant, player, option="next")
     await act(client, secret, tenant, player, option="begin")
     await act(client, secret, tenant, player, option="human")
-    await act(client, secret, tenant, player, option="warrior")
     await act(client, secret, tenant, player, text=name)
     return player
 
