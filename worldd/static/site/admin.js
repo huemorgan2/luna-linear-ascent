@@ -98,6 +98,7 @@ async function enter() {
   $("keygate").hidden = true;
   $("console").hidden = false;
   route();                                  // honor a deep link past the gate
+  pollUnread();
 }
 
 // ── Tabs ────────────────────────────────────────────────────────────────
@@ -106,6 +107,19 @@ function setTab(name) {
   $("tabPlayers").classList.toggle("on", name === "players");
   $("tabFeedback").classList.toggle("on", name === "feedback");
 }
+
+// the FEEDBACK tab wears the waiting-mail count; refreshed on boot,
+// after any feedback view (opening a thread marks it read), and on a
+// slow clock so a desk left open stays honest
+async function pollUnread() {
+  try {
+    const d = await apiJson("/admin/api/feedback/unread");
+    const b = $("fbTabBadge");
+    b.hidden = !d.unread;
+    b.textContent = d.unread || "";
+  } catch (e) { /* the gate handles a 401 */ }
+}
+setInterval(() => { if (!$("console").hidden) pollUnread(); }, 60000);
 
 // ── PLAYERS ─────────────────────────────────────────────────────────────
 
@@ -295,6 +309,7 @@ async function renderPlayer(tenant, player, backQuery = "") {
 
 async function renderFeedback() {
   setTab("feedback");
+  pollUnread();
   $("main").innerHTML = `<div id="list" class="scroll">
     <p class="dim">…</p></div>`;
   const data = await apiJson("/admin/api/feedback");
@@ -326,6 +341,7 @@ async function renderThread(fid) {
   setTab("feedback");
   $("main").innerHTML = `<p class="dim">…</p>`;
   const t = await apiJson(`/admin/api/feedback/${fid}`);
+  pollUnread();                             // opening marked it read
   $("main").innerHTML = `
     <a class="back" href="#/feedback">← back to the postbox</a>
     <h2 style="margin:0">${esc(t.subject)}</h2>
@@ -384,4 +400,5 @@ api("/admin/api/players?limit=1").then(() => {
   $("keygate").hidden = true;
   $("console").hidden = false;
   route();
+  pollUnread();
 }).catch(() => {});

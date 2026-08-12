@@ -208,3 +208,31 @@ async def test_feedback_tab(client, tenant_a):
     mine = await fb(client, tenant_a, "tenant-a", player, "thread",
                     {"id": fid})
     assert mine["messages"][-1]["sender"] == "admin"
+
+
+async def test_feedback_unread_badge(client, tenant_a):
+    """The tab badge count: new mail raises it, reading clears it."""
+    pool = await db.get_pool()
+    await pool.execute("DELETE FROM ascent_feedback")
+    r = await client.get("/admin/api/feedback/unread", headers=ADMIN)
+    assert r.status_code == 200 and r.json()["unread"] == 0
+
+    player = _p("badge")
+    await create(client, tenant_a, "tenant-a", player, f"Bdg{player[-4:]}")
+    out = await fb(client, tenant_a, "tenant-a", player, "create", {
+        "subject": "badge test", "body": "hello?"})
+    fid = out["id"]
+    await fb(client, tenant_a, "tenant-a", player, "reply", {
+        "id": fid, "body": "still there?"})
+
+    r = await client.get("/admin/api/feedback/unread", headers=ADMIN)
+    assert r.json()["unread"] == 2
+
+    # opening the thread marks it read; the badge drops to zero
+    await client.get(f"/admin/api/feedback/{fid}", headers=ADMIN)
+    r = await client.get("/admin/api/feedback/unread", headers=ADMIN)
+    assert r.json()["unread"] == 0
+
+    # and the badge is behind the key like everything else
+    r = await client.get("/admin/api/feedback/unread")
+    assert r.status_code == 401

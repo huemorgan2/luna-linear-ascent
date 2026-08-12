@@ -270,6 +270,15 @@ async def feedback_threads() -> dict:
         return await feedback.admin_threads(conn, tenant, player)
 
 
+# registered before /{fid} — "unread" must not parse as a thread id
+@router.get("/admin/api/feedback/unread", dependencies=[Depends(_admin)])
+async def feedback_unread() -> dict:
+    pool = await db.get_pool()
+    n = await pool.fetchval(
+        "SELECT coalesce(sum(admin_unread),0) FROM ascent_feedback")
+    return {"unread": int(n)}
+
+
 @router.get("/admin/api/feedback/{fid}", dependencies=[Depends(_admin)])
 async def feedback_thread(fid: int) -> dict:
     tenant, player = _admin_ident()
