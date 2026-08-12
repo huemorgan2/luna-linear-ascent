@@ -78,12 +78,14 @@ def _row_summary(tenant: str, player: str, doc: dict, updated_at) -> dict:
 @router.get("/admin/api/players", dependencies=[Depends(_admin)])
 async def players(q: str = "", limit: int = 100) -> dict:
     """No q: the top of the tower, leaderboard ordering (level, then
-    wealth). With q: anyone whose character name or player key matches."""
+    wealth). With q: anyone whose character name, player key, or luna
+    user matches."""
     pool = await db.get_pool()
     rows = await pool.fetch(
         "SELECT tenant, player, doc, updated_at FROM ascent_players "
         "WHERE $1 = '' OR doc->>'name' ILIKE '%'||$1||'%' "
         "   OR player ILIKE '%'||$1||'%' "
+        "   OR doc->>'luna_user' ILIKE '%'||$1||'%' "
         "ORDER BY coalesce((doc->>'level')::int, 1) DESC, "
         "  coalesce((doc->>'gold')::numeric, 0)"
         "   + coalesce((doc->>'bank')::numeric, 0) DESC "
@@ -194,6 +196,19 @@ async def player_edit(body: PlayerEdit) -> dict:
     return {"ok": True, "changes": changes,
             "player": _detail(body.tenant, body.player, doc,
                               row["updated_at"])}
+
+
+@router.get("/admin/api/player/doc", dependencies=[Depends(_admin)])
+async def player_doc(tenant: str, player: str) -> dict:
+    """The raw doc, read-only — the last resort when the cards don't
+    explain a stuck climber. Edits stay named, audited verbs."""
+    pool = await db.get_pool()
+    raw = await pool.fetchval(
+        "SELECT doc FROM ascent_players WHERE tenant=$1 AND player=$2",
+        tenant, player)
+    if raw is None:
+        raise HTTPException(404, "no such player")
+    return {"doc": json.loads(raw)}
 
 
 @router.get("/admin/api/player/ledger", dependencies=[Depends(_admin)])

@@ -326,6 +326,12 @@ async function renderPlayer(tenant, player, backQuery = "") {
           doc; playing climbers only</p>
       </div>
       <div class="card" style="grid-column:1/-1">
+        <h3>Raw doc</h3>
+        <p><button class="ghost" id="showdoc">SHOW THE DOC</button></p>
+        <pre id="rawdoc" hidden
+             style="overflow-x:auto; font-size:12px; margin:0"></pre>
+      </div>
+      <div class="card" style="grid-column:1/-1">
         <h3>Ledger — last ${ledger.entries.length}</h3>
         ${ledger.entries.length ? `<div class="scroll"><table>
           <tr><th>when</th><th>kind</th><th class="num">gold</th>
@@ -360,6 +366,12 @@ async function renderPlayer(tenant, player, backQuery = "") {
     edit(body);
   };
   $("grant").onclick = () => edit({ grant: [$("wsel").value] });
+  $("showdoc").onclick = async () => {
+    const d = await apiJson(`/admin/api/player/doc?${who}`);
+    $("rawdoc").textContent = JSON.stringify(d.doc, null, 2);
+    $("rawdoc").hidden = false;
+    $("showdoc").hidden = true;
+  };
   $("rescue").onclick = async () => {
     await apiJson("/admin/api/player/rescue", {
       method: "POST",

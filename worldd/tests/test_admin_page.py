@@ -260,3 +260,34 @@ async def test_world_overview(client, tenant_a):
 
     r = await client.get("/admin/api/world")
     assert r.status_code == 401
+
+
+async def test_raw_doc_and_luna_user_search(client, tenant_a):
+    """Support tooling: the raw doc opens read-only, and a climber can
+    be found by the luna user on their doc."""
+    player = _p("raw")
+    await create(client, tenant_a, "tenant-a", player, f"Raw{player[-4:]}")
+
+    pool = await db.get_pool()
+    doc = await get_doc("tenant-a", player)
+    doc["luna_user"] = "discord:roygbiv#1234"
+    await pool.execute(
+        "UPDATE ascent_players SET doc=$3 WHERE tenant=$1 AND player=$2",
+        "tenant-a", player, json.dumps(doc))
+
+    r = await client.get(
+        f"/admin/api/player/doc?tenant=tenant-a&player={player}",
+        headers=ADMIN)
+    assert r.status_code == 200
+    d = r.json()["doc"]
+    assert d["name"] == doc["name"] and d["luna_user"] == doc["luna_user"]
+
+    r = await client.get("/admin/api/players?q=roygbiv", headers=ADMIN)
+    assert any(p["player"] == player for p in r.json()["players"])
+
+    r = await client.get(
+        "/admin/api/player/doc?tenant=tenant-a&player=ghost", headers=ADMIN)
+    assert r.status_code == 404
+    r = await client.get(
+        f"/admin/api/player/doc?tenant=tenant-a&player={player}")
+    assert r.status_code == 401
