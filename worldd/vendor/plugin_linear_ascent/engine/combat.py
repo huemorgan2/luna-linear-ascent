@@ -618,6 +618,13 @@ def fight_scene(p: dict, floor, opener: bool = False, note: str = "") -> Scene:
             continue
         g = economy.FORGE[slug]
         if at_range and economy.DAMAGE_TYPE.get(g.line, "melee") == "melee":
+            # 049.1: the row used to vanish at range — a held blade
+            # looked lost until close quarters. It shows, locked, and
+            # explains itself (048 N7 law).
+            opts.append(Option(
+                f"attack_{slug}", f"Attack — {g.name}",
+                "steel can't reach at range — close in first",
+                locked=True))
             continue
         path = economy.PATH_OF_LINE.get(g.line, "blade")
         opts.append(Option(
@@ -939,7 +946,9 @@ def _strike_text(p: dict, dmg: int) -> str:
         note = (f" — its {economy.TYPE_NAME[mtype]} sign halves "
                 f"{economy.PATH_WEAPON_WORD[path]}")
     if swing.get("crit"):
-        note += " — the long draw finds its mark"
+        note += {"blade": " — the full swing finds its mark",
+                 "bow": " — the long draw finds its mark",
+                 "staff": " — the deep focus finds its mark"}[path]
     # 048 S5: a bottom-of-the-band roll names the rank as the cause
     rank = _train_rank(p)
     lo, hi = swing.get("lo", 0), swing.get("hi", 0)
@@ -949,8 +958,13 @@ def _strike_text(p: dict, dmg: int) -> str:
         better = economy.typed_damage_048(
             path, round((economy.TRAIN_ROLL_FLOOR(min(10, rank + 2))
                          + 1) / 2 * hi), e["def"], mtype)
-        return (f"Your rank-{rank} swing lands shallow — {dmg}{note}. "
-                f"A rank-{min(10, rank + 2)} hand cuts nearer {better}.")
+        # 049.1: the verb follows the weapon in hand — a bow SHOOTS,
+        # it never "swings" or "cuts"
+        blow, verb = {"blade": ("swing", "cuts"),
+                      "bow": ("shot", "shoots"),
+                      "staff": ("cast", "casts")}[path]
+        return (f"Your rank-{rank} {blow} lands shallow — {dmg}{note}. "
+                f"A rank-{min(10, rank + 2)} hand {verb} nearer {better}.")
     if dmg >= max(1, e["hp_max"] // 3):
         return (f"Your {w} bites deep — {dmg} damage the "
                 f"{e['name']} won't shrug off{note}.")
@@ -1794,6 +1808,16 @@ def resolve_fight_action(p: dict, floor, option_id: str) -> Scene:
     if option_id.startswith("attack_"):
         slug = option_id.removeprefix("attack_")
         if slug in (p.get("held") or []) and slug in economy.FORGE:
+            g = economy.FORGE[slug]
+            if (_range_state(p) == "at_range"
+                    and economy.DAMAGE_TYPE.get(g.line, "melee")
+                    == "melee"):
+                # 049.1: the locked at-range row — refuse without
+                # promoting, spend nothing.
+                s = fight_scene(p, floor)
+                s.shard_note = (f"The {g.name} can't reach at range — "
+                                "close in first.")
+                return s
             _promote_held(p, slug)
         option_id = "attack"
     e = p.get("encounter") or {}

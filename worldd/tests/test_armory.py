@@ -75,26 +75,26 @@ async def test_donate_take_round_trip_moves_no_gold(
     untouched on both ends and the wear rides through exactly."""
     pool = await db.get_pool()
     pa, pb, name = await _crew(client, pool, tenant_a, tenant_b)
-    g = economy.FORGE["pigsticker"]
+    g = economy.FORGE["scrap_dagger"]
     pool_size = economy.item_pool(g)
     worn_left = pool_size // 3
     await _patch_doc(pool, "tenant-a", pa,
-                     inventory={"pigsticker": 1},
-                     durability_pack={"pigsticker": worn_left})
+                     inventory={"scrap_dagger": 1},
+                     durability_pack={"scrap_dagger": worn_left})
     gold_a0 = (await _doc(pool, "tenant-a", pa))["gold"]
 
     # the pawn scene offers the donate to a member
     await act(client, tenant_a, "tenant-a", pa, option="pawn")
     s = await act(client, tenant_a, "tenant-a", pa,
-                  option="donate_pigsticker")
+                  option="donate_scrap_dagger")
     assert "goes to the" in " ".join(s["body_lines"])
     row = await pool.fetchrow("SELECT * FROM ascent_armory")
-    assert row["slug"] == "pigsticker" and row["faction"] == name
+    assert row["slug"] == "scrap_dagger" and row["faction"] == name
     assert row["uses_left"] == worn_left
     assert row["donor_name"] == "Giver"
     da = await _doc(pool, "tenant-a", pa)
-    assert "pigsticker" not in (da.get("inventory") or {})
-    assert "pigsticker" not in (da.get("durability_pack") or {})
+    assert "scrap_dagger" not in (da.get("inventory") or {})
+    assert "scrap_dagger" not in (da.get("durability_pack") or {})
     assert da["gold"] == gold_a0                       # EV law, donor side
 
     # the hall's chest lists it for the other member, take moves it over
@@ -104,13 +104,13 @@ async def test_donate_take_round_trip_moves_no_gold(
     assert "1 of" in s["headline"]
     take = next(o["id"] for o in s["options"]
                 if o["id"].startswith("take_arm_"))
-    assert any("Pigsticker" in o["label"] for o in s["options"]
+    assert any("Scrap Dagger" in o["label"] for o in s["options"]
                if o["id"] == take)
     s = await act(client, tenant_b, "tenant-b", pb, option=take)
     assert "comes out of the chest" in " ".join(s["body_lines"])
     db_doc = await _doc(pool, "tenant-b", pb)
-    assert db_doc["inventory"].get("pigsticker") == 1
-    assert db_doc["durability_pack"]["pigsticker"] == worn_left  # no launder
+    assert db_doc["inventory"].get("scrap_dagger") == 1
+    assert db_doc["durability_pack"]["scrap_dagger"] == worn_left  # no launder
     assert db_doc["gold"] == gold_b0                   # EV law, taker side
     assert await pool.fetchval("SELECT count(*) FROM ascent_armory") == 0
 
@@ -119,7 +119,7 @@ async def test_one_take_a_day(client, tenant_a, tenant_b,
                                clean_armory):  # noqa: F811
     pool = await db.get_pool()
     pa, pb, name = await _crew(client, pool, tenant_a, tenant_b)
-    for slug in ("pigsticker", "wolfbite"):
+    for slug in ("scrap_dagger", "wolfbite"):
         await armory_seed(pool, name, slug)
     await act(client, tenant_b, "tenant-b", pb, option="hall")
     s = await act(client, tenant_b, "tenant-b", pb, option="hall_chest")
@@ -154,7 +154,7 @@ async def test_cap_bounces_the_deposit_with_a_letter(
     pa, pb, name = await _crew(client, pool, tenant_a, tenant_b)
     cap = factions.CHEST_SLOTS[1]
     for _ in range(cap):
-        await armory_seed(pool, name, "pigsticker")
+        await armory_seed(pool, name, "scrap_dagger")
     await _patch_doc(pool, "tenant-a", pa, inventory={"wolfbite": 1})
     await act(client, tenant_a, "tenant-a", pa, option="pawn")
     s = await act(client, tenant_a, "tenant-a", pa, option="donate_wolfbite")
@@ -177,7 +177,7 @@ async def test_members_only_both_ways(client, tenant_a, tenant_b,
     pool = await db.get_pool()
     pa, pb, name = await _crew(client, pool, tenant_a, tenant_b)
     loner = await create_player(client, tenant_b, "tenant-b", "Loner")
-    await _patch_doc(pool, "tenant-b", loner, inventory={"pigsticker": 1})
+    await _patch_doc(pool, "tenant-b", loner, inventory={"scrap_dagger": 1})
     # no faction → the pawn scene never offers the donate
     s = await act(client, tenant_b, "tenant-b", loner, option="pawn")
     assert not any(o["id"].startswith("donate_") for o in s["options"])
@@ -186,7 +186,7 @@ async def test_members_only_both_ways(client, tenant_a, tenant_b,
     doc = await _doc(pool, "tenant-b", loner)
     async with pool.acquire() as conn:
         err = await armory.deposit(conn, "tenant-b", loner, doc,
-                                   "pigsticker", None)
+                                   "scrap_dagger", None)
         assert err and "member" in err
         err = await armory.take(conn, "tenant-b", loner, doc, 1)
         assert err and "member" in err
@@ -199,15 +199,15 @@ async def test_take_keeps_the_worse_wear_never_launders(
     pool = await db.get_pool()
     pa, pb, name = await _crew(client, pool, tenant_a, tenant_b)
     fresh_left = 900
-    await armory_seed(pool, name, "pigsticker", uses=fresh_left)
+    await armory_seed(pool, name, "scrap_dagger", uses=fresh_left)
     await _patch_doc(pool, "tenant-b", pb,
-                     inventory={"pigsticker": 1},
-                     durability_pack={"pigsticker": 10})
+                     inventory={"scrap_dagger": 1},
+                     durability_pack={"scrap_dagger": 10})
     await act(client, tenant_b, "tenant-b", pb, option="hall")
     s = await act(client, tenant_b, "tenant-b", pb, option="hall_chest")
     take = next(o["id"] for o in s["options"]
                 if o["id"].startswith("take_arm_"))
     await act(client, tenant_b, "tenant-b", pb, option=take)
     d = await _doc(pool, "tenant-b", pb)
-    assert d["inventory"]["pigsticker"] == 2
-    assert d["durability_pack"]["pigsticker"] == 10    # the worse survives
+    assert d["inventory"]["scrap_dagger"] == 2
+    assert d["durability_pack"]["scrap_dagger"] == 10    # the worse survives
