@@ -426,11 +426,9 @@ def build_training() -> dict:
             {"name": "2nd weapon slot (CARRY)", "xp": eco.CARRY2_XP,
              "gold": eco.CARRY2_GOLD, "level": 1,
              "fitLevel": _fit_level(eco.CARRY2_XP)},
-            # 049.1: the level gate is gone — the 500-XP price is the
-            # gate (the bar itself can't hold it before ~level 8).
             {"name": "3rd weapon slot (CARRY)", "xp": eco.CARRY3_XP,
              "gold": None, "goldAnchor": eco.CARRY3_GOLD_ANCHOR,
-             "level": 1,
+             "level": eco.CARRY3_LEVEL,
              "fitLevel": _fit_level(eco.CARRY3_XP)},
             {"name": "mastery study (at rank 10)", "xp": eco.MASTERY_XP,
              "gold": None, "level": None,

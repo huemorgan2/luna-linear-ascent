@@ -82,7 +82,10 @@ def _card(scene_dict: dict) -> dict:
     scene = Scene.from_dict(scene_dict)
     return {"ok": True, "scene_id": scene.scene_id,
             "event_kind": scene.event_kind, "headline": scene.headline,
-            "fragment": render_scene_fragment(scene)}
+            "fragment": render_scene_fragment(scene),
+            # 050: a rule said no — the pane toasts this line and keeps
+            # the card it has instead of swapping the fragment in.
+            "refusal": getattr(scene, "refusal", "")}
 
 
 def _desk_err(err: str | None) -> None:
@@ -290,6 +293,112 @@ async def faction_enter(ident: tuple = Depends(_identity)) -> dict:
         async with conn.transaction():
             _desk_err(await factions.enter_week(conn, WEB_TENANT, player))
     return {"ok": True}
+
+
+# ── 051: the postbox (cookie flavor) ─────────────────────────────────────
+
+class FeedbackAttachmentIn(BaseModel):
+    mime: str = Field(max_length=64)
+    data: str = Field(max_length=4_000_000)
+
+
+class FeedbackCreateIn(BaseModel):
+    subject: str = Field(default="", max_length=200)
+    body: str = Field(default="", max_length=8000)
+    attachments: list[FeedbackAttachmentIn] = Field(
+        default_factory=list, max_length=8)
+
+
+class FeedbackThreadIn(BaseModel):
+    id: int = Field(gt=0)
+    as_admin: bool = False
+
+
+class FeedbackReplyIn(BaseModel):
+    id: int = Field(gt=0)
+    body: str = Field(default="", max_length=8000)
+    attachments: list[FeedbackAttachmentIn] = Field(
+        default_factory=list, max_length=8)
+    as_admin: bool = False
+
+
+@router.post("/play/api/pane/feedback/create")
+async def feedback_create(body: FeedbackCreateIn,
+                          ident: tuple = Depends(_identity)) -> dict:
+    player, _ = ident
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            return await feedback.create(
+                conn, WEB_TENANT, player, body.subject, body.body,
+                [a.model_dump() for a in body.attachments])
+
+
+@router.get("/play/api/pane/feedback/mine")
+async def feedback_mine(ident: tuple = Depends(_identity)) -> dict:
+    player, _ = ident
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        return await feedback.my_threads(conn, WEB_TENANT, player)
+
+
+@router.post("/play/api/pane/feedback/thread")
+async def feedback_thread(body: FeedbackThreadIn,
+                          ident: tuple = Depends(_identity)) -> dict:
+    player, _ = ident
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            return await feedback.thread(conn, WEB_TENANT, player, body.id,
+                                         as_admin=body.as_admin)
+
+
+@router.post("/play/api/pane/feedback/reply")
+async def feedback_reply(body: FeedbackReplyIn,
+                         ident: tuple = Depends(_identity)) -> dict:
+    player, _ = ident
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            return await feedback.reply(
+                conn, WEB_TENANT, player, body.id, body.body,
+                [a.model_dump() for a in body.attachments],
+                as_admin=body.as_admin)
+
+
+@router.get("/play/api/pane/feedback/unread")
+async def feedback_unread(ident: tuple = Depends(_identity)) -> dict:
+    player, _ = ident
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        return await feedback.unread(conn, WEB_TENANT, player)
+
+
+@router.get("/play/api/pane/feedback/admin")
+async def feedback_admin(ident: tuple = Depends(_identity)) -> dict:
+    player, _ = ident
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        return await feedback.admin_threads(conn, WEB_TENANT, player)
+
+
+@router.get("/play/api/pane/feedback/att/{att_id}")
+async def feedback_att(att_id: int, ident: tuple = Depends(_identity)):
+    player, _ = ident
+    from fastapi.responses import Response
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        mime, raw = await feedback.attachment(conn, WEB_TENANT, player,
+                                              att_id)
+    return Response(content=raw, media_type=mime,
+                    headers={"Cache-Control": "private, max-age=3600"})
 
 
 # ── Sigil art (public, like the pane shell itself) ───────────────────────

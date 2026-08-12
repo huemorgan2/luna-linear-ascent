@@ -466,6 +466,119 @@ async def v1_faction_promote(body: FactionTargetIn,
     return {"ok": True}
 
 
+# ── 051: the postbox — feedback threads, admin replies (tenant HMAC) ────
+
+class FeedbackAttachmentIn(BaseModel):
+    mime: str = Field(max_length=64)
+    data: str = Field(max_length=4_000_000)   # base64; real cap in feedback.py
+
+
+class FeedbackCreateIn(BaseModel):
+    player: str = Field(min_length=1, max_length=128)
+    subject: str = Field(default="", max_length=200)
+    body: str = Field(default="", max_length=8000)
+    attachments: list[FeedbackAttachmentIn] = Field(
+        default_factory=list, max_length=8)
+
+
+class FeedbackThreadIn(BaseModel):
+    player: str = Field(min_length=1, max_length=128)
+    id: int = Field(gt=0)
+    as_admin: bool = False
+
+
+class FeedbackReplyIn(BaseModel):
+    player: str = Field(min_length=1, max_length=128)
+    id: int = Field(gt=0)
+    body: str = Field(default="", max_length=8000)
+    attachments: list[FeedbackAttachmentIn] = Field(
+        default_factory=list, max_length=8)
+    as_admin: bool = False
+
+
+class FeedbackAttIn(BaseModel):
+    player: str = Field(min_length=1, max_length=128)
+    id: int = Field(gt=0)
+
+
+@app.post("/v1/feedback/create")
+async def v1_feedback_create(body: FeedbackCreateIn,
+                             tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            return await feedback.create(
+                conn, tenant, body.player, body.subject, body.body,
+                [a.model_dump() for a in body.attachments])
+
+
+@app.post("/v1/feedback/mine")
+async def v1_feedback_mine(body: SceneIn,
+                           tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        return await feedback.my_threads(conn, tenant, body.player)
+
+
+@app.post("/v1/feedback/thread")
+async def v1_feedback_thread(body: FeedbackThreadIn,
+                             tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            return await feedback.thread(conn, tenant, body.player, body.id,
+                                         as_admin=body.as_admin)
+
+
+@app.post("/v1/feedback/reply")
+async def v1_feedback_reply(body: FeedbackReplyIn,
+                            tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            return await feedback.reply(
+                conn, tenant, body.player, body.id, body.body,
+                [a.model_dump() for a in body.attachments],
+                as_admin=body.as_admin)
+
+
+@app.post("/v1/feedback/unread")
+async def v1_feedback_unread(body: SceneIn,
+                             tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        return await feedback.unread(conn, tenant, body.player)
+
+
+@app.post("/v1/feedback/admin")
+async def v1_feedback_admin(body: SceneIn,
+                            tenant: str = Depends(auth.verify_tenant)) -> dict:
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        return await feedback.admin_threads(conn, tenant, body.player)
+
+
+@app.post("/v1/feedback/att")
+async def v1_feedback_att(body: FeedbackAttIn,
+                          tenant: str = Depends(auth.verify_tenant)) -> dict:
+    """The screenshot, base64 in JSON — the HMAC door signs bodies, so the
+    plugin proxy decodes this back into a real image response."""
+    import base64 as _b64
+
+    from . import feedback
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        mime, raw = await feedback.attachment(conn, tenant, body.player,
+                                              body.id)
+    return {"mime": mime, "data": _b64.b64encode(raw).decode()}
+
+
 # ── Self-service enrollment (public, rate-limited) ──────────────────────
 
 ENROLL_PER_HOUR = int(os.environ.get("ASCENT_ENROLL_PER_HOUR", "5"))
