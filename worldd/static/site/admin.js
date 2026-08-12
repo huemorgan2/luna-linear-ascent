@@ -172,10 +172,12 @@ function kv(pairs) {
 async function renderPlayer(tenant, player, backQuery = "") {
   setTab("players");
   $("main").innerHTML = `<p class="dim">…</p>`;
-  const [p, weapons] = await Promise.all([
-    apiJson(`/admin/api/player?tenant=${encodeURIComponent(tenant)}` +
-            `&player=${encodeURIComponent(player)}`),
+  const who = `tenant=${encodeURIComponent(tenant)}` +
+              `&player=${encodeURIComponent(player)}`;
+  const [p, weapons, ledger] = await Promise.all([
+    apiJson(`/admin/api/player?${who}`),
     weaponsCache || apiJson("/admin/api/weapons"),
+    apiJson(`/admin/api/player/ledger?${who}&limit=30`),
   ]);
   weaponsCache = weapons;
   const byLine = {};
@@ -238,6 +240,27 @@ async function renderPlayer(tenant, player, backQuery = "") {
           [esc(it.name || it.slug), "× " + it.count])) :
           `<span class="dim">empty</span>`}
       </div>
+      <div class="card">
+        <h3>Rescue</h3>
+        <p><button class="act" id="rescue">RESCUE → TOWN</button></p>
+        <p class="dim" style="font-size:12px">full hp, encounter
+          cleared, unlodged, back in town — the unstick for a jammed
+          doc; playing climbers only</p>
+      </div>
+      <div class="card" style="grid-column:1/-1">
+        <h3>Ledger — last ${ledger.entries.length}</h3>
+        ${ledger.entries.length ? `<div class="scroll"><table>
+          <tr><th>when</th><th>kind</th><th class="num">gold</th>
+              <th class="num">xp</th><th>note</th></tr>
+          ${ledger.entries.map((e) => `
+            <tr><td class="dim">${new Date(e.at).toLocaleString()}</td>
+                <td>${esc(e.kind)}</td>
+                <td class="num">${e.gold > 0 ? "+" : ""}${e.gold.toLocaleString()}</td>
+                <td class="num">${e.xp > 0 ? "+" : ""}${e.xp.toLocaleString()}</td>
+                <td class="dim" style="white-space:normal">${esc(e.note)}</td>
+            </tr>`).join("")}
+        </table></div>` : `<span class="dim">no entries yet</span>`}
+      </div>
     </div>`;
 
   const edit = async (body) => {
@@ -259,6 +282,13 @@ async function renderPlayer(tenant, player, backQuery = "") {
     edit(body);
   };
   $("grant").onclick = () => edit({ grant: [$("wsel").value] });
+  $("rescue").onclick = async () => {
+    await apiJson("/admin/api/player/rescue", {
+      method: "POST",
+      body: JSON.stringify({ tenant: p.tenant, player: p.player }) });
+    note("rescued — full hp, back in town");
+    renderPlayer(tenant, player, backQuery);
+  };
 }
 
 // ── FEEDBACK ────────────────────────────────────────────────────────────

@@ -129,6 +129,48 @@ async def test_player_detail_edit_and_grant(client, tenant_a):
     assert r.status_code == 404
 
 
+async def test_player_ledger_and_rescue(client, tenant_a):
+    player = _p("ops")
+    await create(client, tenant_a, "tenant-a", player, f"Ops{player[-4:]}")
+
+    # jam the doc the way stuck players arrive: wounded, lodged, and a
+    # half-broken encounter in the way
+    pool = await db.get_pool()
+    doc = await get_doc("tenant-a", player)
+    doc["hp"] = 1
+    doc["lodged_until_day"] = 10_000_000
+    doc["encounter"] = {"kind": "wilds", "id": "gone_creature"}
+    doc["location"] = "fight"
+    await pool.execute(
+        "UPDATE ascent_players SET doc=$3 WHERE tenant=$1 AND player=$2",
+        "tenant-a", player, json.dumps(doc))
+
+    r = await client.post("/admin/api/player/rescue", headers=ADMIN, json={
+        "tenant": "tenant-a", "player": player})
+    assert r.status_code == 200, r.text
+    doc = await get_doc("tenant-a", player)
+    assert doc["hp"] > 1 and doc["encounter"] is None
+    assert doc["location"] == "town" and doc["lodged_until_day"] == -1
+
+    # the proof: the tower serves the doc again
+    from tests.test_world_api import scene
+    s = await scene(client, tenant_a, "tenant-a", player)
+    assert s["options"], "a rescued climber gets a live town menu"
+
+    # the trail: rescue is in the ledger, and the desk can read it
+    r = await client.get(
+        f"/admin/api/player/ledger?tenant=tenant-a&player={player}",
+        headers=ADMIN)
+    entries = r.json()["entries"]
+    assert entries and entries[0]["kind"] == "admin"
+    assert entries[0]["note"] == "rescue"
+
+    # a ghost stays a 404
+    r = await client.post("/admin/api/player/rescue", headers=ADMIN, json={
+        "tenant": "tenant-a", "player": "ghost"})
+    assert r.status_code == 404
+
+
 async def test_weapons_catalog(client):
     r = await client.get("/admin/api/weapons", headers=ADMIN)
     assert r.status_code == 200

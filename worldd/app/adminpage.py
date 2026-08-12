@@ -196,6 +196,58 @@ async def player_edit(body: PlayerEdit) -> dict:
                               row["updated_at"])}
 
 
+@router.get("/admin/api/player/ledger", dependencies=[Depends(_admin)])
+async def player_ledger(tenant: str, player: str, limit: int = 50) -> dict:
+    pool = await db.get_pool()
+    rows = await pool.fetch(
+        "SELECT created_at, kind, gold, xp, note FROM ascent_ledger "
+        "WHERE tenant=$1 AND player=$2 ORDER BY id DESC LIMIT $3",
+        tenant, player, min(max(limit, 1), 200))
+    return {"entries": [{
+        "at": r["created_at"].isoformat(), "kind": r["kind"],
+        "gold": r["gold"], "xp": r["xp"], "note": r["note"]}
+        for r in rows]}
+
+
+class RescueIn(BaseModel):
+    tenant: str
+    player: str
+
+
+@router.post("/admin/api/player/rescue", dependencies=[Depends(_admin)])
+async def player_rescue(body: RescueIn) -> dict:
+    """The unstick: full hp, no encounter, back to town, unlodged —
+    the safe state the engine itself returns climbers to."""
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            row = await conn.fetchrow(
+                "SELECT doc, updated_at FROM ascent_players "
+                "WHERE tenant=$1 AND player=$2 FOR UPDATE",
+                body.tenant, body.player)
+            if row is None:
+                raise HTTPException(404, "no such player")
+            doc = json.loads(row["doc"])
+            if doc.get("stage") != "playing":
+                raise HTTPException(400, "not a playing doc")
+            doc["hp"] = pstate.max_hp(doc)
+            doc["encounter"] = None
+            doc["scene"] = None
+            doc["location"] = "town"
+            doc["lodged_until_day"] = -1
+            await conn.execute(
+                "UPDATE ascent_players SET doc=$3 "
+                "WHERE tenant=$1 AND player=$2",
+                body.tenant, body.player, json.dumps(doc))
+            await conn.execute(
+                "INSERT INTO ascent_ledger (tenant, player, kind, gold,"
+                " xp, note) VALUES ($1,$2,'admin',0,0,'rescue')",
+                body.tenant, body.player)
+    return {"ok": True,
+            "player": _detail(body.tenant, body.player, doc,
+                              row["updated_at"])}
+
+
 @router.get("/admin/api/weapons", dependencies=[Depends(_admin)])
 async def weapons() -> dict:
     """Every weapon the forge knows — all lines, all tiers, plus the
