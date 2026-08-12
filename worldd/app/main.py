@@ -20,7 +20,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from . import auth, db, ratelimit, site, webplay
+from . import adminpage, auth, db, ratelimit, site, webplay
 from .config import get_config
 
 API_VERSION = 1
@@ -53,6 +53,9 @@ app.include_router(site.router)
 
 # 005: the game itself, session-cookie-authed, at /play + /play/api/*.
 app.include_router(webplay.router)
+
+# The admin desk: /admin console + /admin/api/* (X-Admin-Key).
+app.include_router(adminpage.router)
 
 
 @app.middleware("http")

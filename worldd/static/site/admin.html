@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>LINEAR ASCENT — admin</title>
+<style>
+  :root { --ink:#e8e8e8; --dim:#8a8a8a; --line:#3a3a3a; --bg:#0a0a0a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:14px/1.5 "SF Mono", ui-monospace, Menlo, monospace; }
+  a { color:var(--ink); }
+  .wrap { max-width:1100px; margin:0 auto; padding:16px; }
+  header { display:flex; align-items:baseline; gap:16px;
+           border-bottom:1px solid var(--line); padding-bottom:10px; }
+  h1 { font-size:15px; letter-spacing:2px; margin:0; }
+  h1 .dim { color:var(--dim); }
+  nav { display:flex; gap:4px; margin-left:auto; }
+  nav button { background:none; border:1px solid var(--line);
+               color:var(--dim); font:inherit; letter-spacing:1px;
+               padding:4px 14px; cursor:pointer; }
+  nav button.on { color:var(--bg); background:var(--ink);
+                  border-color:var(--ink); }
+  main { padding:18px 0 60px; }
+  table { width:100%; border-collapse:collapse; }
+  th { text-align:left; color:var(--dim); font-weight:normal;
+       letter-spacing:1px; font-size:11px; text-transform:uppercase;
+       border-bottom:1px solid var(--line); padding:4px 8px; }
+  td { border-bottom:1px solid #1c1c1c; padding:5px 8px;
+       white-space:nowrap; }
+  td.num, th.num { text-align:right; }
+  tr.row:hover td { background:#161616; cursor:pointer; }
+  .dim { color:var(--dim); }
+  .bar { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  input, textarea, select {
+      background:#101010; border:1px solid var(--line); color:var(--ink);
+      font:inherit; padding:5px 8px; }
+  input:focus, textarea:focus, select:focus { outline:1px solid var(--dim); }
+  button.act { background:var(--ink); color:var(--bg); border:1px solid
+               var(--ink); font:inherit; padding:5px 14px; cursor:pointer;
+               letter-spacing:1px; }
+  button.act:disabled { opacity:.4; cursor:default; }
+  button.ghost { background:none; color:var(--ink);
+                 border:1px solid var(--line); font:inherit;
+                 padding:5px 14px; cursor:pointer; }
+  .cardgrid { display:grid; grid-template-columns:repeat(auto-fit,
+              minmax(240px,1fr)); gap:14px; margin-top:14px; }
+  .card { border:1px solid var(--line); padding:12px 14px; }
+  .card h3 { margin:0 0 8px; font-size:11px; letter-spacing:2px;
+             color:var(--dim); font-weight:normal;
+             text-transform:uppercase; }
+  .kv { display:grid; grid-template-columns:auto 1fr; gap:2px 14px; }
+  .kv b { font-weight:normal; color:var(--dim); }
+  .field { display:grid; grid-template-columns:70px 1fr; gap:10px;
+           align-items:center; margin-bottom:8px; }
+  .field label { color:var(--dim); }
+  .msg { border:1px solid var(--line); padding:8px 12px; margin:10px 0; }
+  .msg.admin { border-color:var(--ink); }
+  .msg .who { font-size:11px; letter-spacing:1px; color:var(--dim);
+              margin-bottom:4px; text-transform:uppercase; }
+  .msg .who .adm { color:var(--ink); }
+  .msg img { max-width:320px; display:block; margin-top:6px;
+             image-rendering:pixelated; border:1px solid var(--line); }
+  #note { position:fixed; bottom:14px; left:50%;
+          transform:translateX(-50%); background:var(--ink);
+          color:var(--bg); padding:6px 18px; letter-spacing:1px;
+          display:none; }
+  #keygate { max-width:420px; margin:120px auto; text-align:center; }
+  #keygate input { width:100%; margin:12px 0; text-align:center; }
+  .unread { background:var(--ink); color:var(--bg); padding:0 7px;
+            font-size:11px; }
+  .back { display:inline-block; margin-bottom:12px; color:var(--dim);
+          text-decoration:none; }
+  .back:hover { color:var(--ink); }
+  .scroll { overflow-x:auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="keygate" hidden>
+    <h1>LINEAR ASCENT <span class="dim">— ADMIN</span></h1>
+    <p class="dim">the desk wants its key</p>
+    <input id="keyin" type="password" placeholder="admin key"
+           autocomplete="off">
+    <button class="act" id="keygo">ENTER</button>
+    <p id="keyerr" class="dim"></p>
+  </div>
+
+  <div id="console" hidden>
+    <header>
+      <h1>LINEAR ASCENT <span class="dim">— ADMIN</span></h1>
+      <nav>
+        <button id="tabPlayers" class="on">PLAYERS</button>
+        <button id="tabFeedback">FEEDBACK</button>
+        <button id="keyout" class="dim" title="forget the key">⏏</button>
+      </nav>
+    </header>
+    <main id="main"></main>
+  </div>
+  <div id="note"></div>
+</div>
+<script src="/static/site/admin.js?v=2"></script>
+</body>
+</html>
