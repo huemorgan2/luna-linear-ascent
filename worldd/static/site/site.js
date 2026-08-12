@@ -341,6 +341,8 @@
 
   function doorKnown(name) {
     form.style.display = "none";
+    var tabs = $("door-tabs");
+    if (tabs) tabs.style.display = "none";
     note.classList.remove("err");
     note.innerHTML = "You're in, <span class='bright'>" + name
       + "</span>. ";
@@ -367,7 +369,7 @@
       if (m.username) {
         doorKnown(m.username);
         var cta = $("bar-cta");
-        if (cta) { cta.textContent = "[ ▶ PLAY ]"; cta.href = "/play"; }
+        if (cta) { cta.textContent = "[ ▶ ENTER THE TOWER ]"; cta.href = "/play"; }
       }
     })
     .catch(function () {});
