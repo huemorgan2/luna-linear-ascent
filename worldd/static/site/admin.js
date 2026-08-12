@@ -27,14 +27,19 @@ function note(text) {
 }
 
 async function api(path, opts = {}) {
+  // an admin session cookie rides along on its own — the key header is
+  // only for desks without one
   const key = localStorage.getItem(KEY_STORE) || "";
   const r = await fetch(path, {
     ...opts,
-    headers: { "X-Admin-Key": key,
+    headers: { ...(key ? { "X-Admin-Key": key } : {}),
                ...(opts.body ? { "Content-Type": "application/json" } : {}),
                ...(opts.headers || {}) },
   });
-  if (r.status === 401) { gate("that key does not turn"); throw new Error("401"); }
+  if (r.status === 401) {
+    gate(key ? "that key does not turn" : "");
+    throw new Error("401");
+  }
   if (!r.ok) {
     let msg = r.statusText;
     try { msg = (await r.json()).detail || msg; } catch (e) { /* text */ }
@@ -343,11 +348,10 @@ $("tabPlayers").onclick = () => nav("#/players");
 $("tabFeedback").onclick = () => nav("#/feedback");
 $("keyout").onclick = () => { localStorage.removeItem(KEY_STORE); gate(); };
 
-if (localStorage.getItem(KEY_STORE)) {
-  api("/admin/api/players?limit=1").then(() => {
-    $("console").hidden = false;
-    route();
-  }).catch(() => {});
-} else {
-  gate();
-}
+// always knock first — an admin session cookie opens the desk without
+// a key; the gate only appears when neither cookie nor stored key turns
+api("/admin/api/players?limit=1").then(() => {
+  $("keygate").hidden = true;
+  $("console").hidden = false;
+  route();
+}).catch(() => {});

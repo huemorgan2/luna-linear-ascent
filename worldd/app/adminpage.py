@@ -14,11 +14,11 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
 
-from . import db, feedback
+from . import db, feedback, site
 from .config import get_config
 from .game import pstate  # gamepath made the plugin importable
 
@@ -29,11 +29,18 @@ router = APIRouter()
 SITE_DIR = Path(__file__).resolve().parent.parent / "static" / "site"
 
 
-def _admin(x_admin_key: str = Header(default="")) -> None:
-    # same lock as main.py's /admin endpoints — one key, one desk
+def _admin(request: Request, x_admin_key: str = Header(default="")) -> None:
+    # two ways past the lock: the X-Admin-Key that guards main.py's
+    # /admin endpoints, or a signed-in site session whose username is a
+    # feedback admin (004: a name is an identity) — huemorgan3 walks in
+    # without typing the key.
     cfg = get_config()
-    if not cfg.admin_key or x_admin_key != cfg.admin_key:
-        raise HTTPException(401, "bad admin key")
+    if cfg.admin_key and x_admin_key == cfg.admin_key:
+        return
+    user = site.session_user(request)
+    if user and user.lower() in feedback.admin_names():
+        return
+    raise HTTPException(401, "bad admin key")
 
 
 def _admin_ident() -> tuple[str, str]:

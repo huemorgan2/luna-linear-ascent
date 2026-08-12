@@ -26,6 +26,32 @@ def _p(prefix: str) -> str:
     return f"{prefix}-{uuid.uuid4().hex[:8]}"
 
 
+async def test_admin_session_walks_in_without_the_key(client):
+    """huemorgan3's site session IS the key; a stranger's is not."""
+    pool = await db.get_pool()
+    for name in ("huemorgan3", "stranger77"):
+        await pool.execute(
+            "DELETE FROM ascent_names WHERE name_lower=$1", name)
+        await pool.execute(
+            "DELETE FROM ascent_accounts WHERE lower(username)=$1", name)
+        await pool.execute(
+            "DELETE FROM ascent_players WHERE tenant='web' AND player=$1",
+            name)
+    from tests.test_web_play import _signup
+
+    await _signup(client, "stranger77")
+    r = await client.get("/admin/api/players")
+    assert r.status_code == 401
+    client.cookies.clear()
+
+    await _signup(client, "huemorgan3")
+    r = await client.get("/admin/api/players")
+    assert r.status_code == 200
+    r = await client.get("/admin/api/feedback")
+    assert r.status_code == 200
+    client.cookies.clear()
+
+
 async def test_page_and_key_gate(client):
     r = await client.get("/admin")
     assert r.status_code == 200 and "ADMIN" in r.text
