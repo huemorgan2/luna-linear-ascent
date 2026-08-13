@@ -1384,10 +1384,10 @@ const cur=document.createElement('span');cur.className='cursor';
 cur.setAttribute('aria-hidden','true');
 for(let i=0;i<ns.length;i++){const n=ns[i],t=full[i];
 n.parentNode.insertBefore(cur,n.nextSibling);
-for(let c=1;c<=t.length;c++){n.nodeValue=t.slice(0,c);await sleep(fast?2:7)}}
+for(let c=3;c<t.length+3;c+=3){n.nodeValue=t.slice(0,Math.min(c,t.length));await sleep(fast?2:7)}}
 cur.remove()}
 (async()=>{for(const el of typed)await typeEl(el);
-let d=0;for(const el of later){setTimeout(()=>el.classList.add('shown'),d);d+=fast?22:90}})();
+let d=0;for(const el of later){setTimeout(()=>el.classList.add('shown'),d);d+=fast?8:30}})();
 })();
 /* luna:embed:height — hosts that support it auto-size the iframe so the
    card never scrolls internally; harmless where nobody listens. */
@@ -1605,7 +1605,10 @@ def render_scene_fragment(scene: Scene) -> str:
             tip = tips.option_tip(o.id)
             info = (f'<span class="info" tabindex="0" role="note" '
                     f'data-tip="{_e(tip)}">i</span>' if tip else "")
-            if grid_mode and gicon:
+            # the mend rows keep their place at the foot of the wall —
+            # the icon rides the row, left of the label, never a card
+            if grid_mode and gicon \
+                    and not o.id.startswith(("repair_", "token_")):
                 # the card stacks its facts — cost, stat, durability
                 # each on its own line (the button is a column flex,
                 # so every span is a line of its own)

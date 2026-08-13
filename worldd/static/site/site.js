@@ -146,10 +146,10 @@
       p.classList.remove("untyped");
       p.classList.add("caret");
       (function tick() {
-        i = Math.min(full.length, i + 2);
+        i = Math.min(full.length, i + 6);
         p.textContent = full.slice(0, i);
         if (i < full.length) setTimeout(tick, 8);
-        else { p.classList.remove("caret"); setTimeout(nextLine, 120); }
+        else { p.classList.remove("caret"); setTimeout(nextLine, 40); }
       })();
     })();
   }
@@ -159,8 +159,8 @@
      once then swap to the _loop tail, the way the game's card does)
      while the lines type at reading speed. Only when BOTH are done
      does the next chapter take the stage. It rounds IX → I forever. */
-  var READ_MS = 28;      /* per character — a reading pace */
-  var LINE_GAP = 350;    /* breath between lines */
+  var READ_MS = 9;       /* per character — a brisk reading pace */
+  var LINE_GAP = 120;    /* breath between lines */
   var HOLD_MS = 1400;    /* the finished card holds before the switch */
   var INTRO_MS = 4800;   /* every split _intro runs 4800ms */
 
