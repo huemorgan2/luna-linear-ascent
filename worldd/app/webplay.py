@@ -18,6 +18,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+from html import escape as html_escape
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -100,11 +101,19 @@ def _desk_err(err: str | None) -> None:
 async def play_page(request: Request):
     """The pane, full-viewport — the exact HTML Luna renders, wired to
     /play/api with cookie auth. Signed out → the door, sign-in tab up."""
-    if not site.session_user(request):
+    user = site.session_user(request)
+    if not user:
         return RedirectResponse("/#door-signin", status_code=303)
     ensure_game_importable()
     from plugin_linear_ascent.pane import render_pane
-    return HTMLResponse(render_pane(api_base="/play/api", web=True))
+    page = render_pane(api_base="/play/api", web=True)
+    # Funnel Fighters rides only the WEBSITE's /play — injected here, so
+    # the plugin (and every Luna chat surface) stays tracker-free. The
+    # tag's data-user lets funnel.js identify without an extra fetch;
+    # usernames are names.is_legal (letters, digits, - _), safe to embed.
+    tag = (f'<script src="/static/site/funnel.js?v=1" '
+           f'data-user="{html_escape(user)}" defer></script>')
+    return HTMLResponse(page.replace("</head>", tag + "</head>", 1))
 
 
 # ── The game loop ────────────────────────────────────────────────────────

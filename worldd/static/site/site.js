@@ -367,6 +367,7 @@
   fetch("/me").then(function (r) { return r.json(); })
     .then(function (m) {
       if (m.username) {
+        if (window.ff) ff.who(m.username);
         doorKnown(m.username);
         var cta = $("bar-cta");
         if (cta) { cta.textContent = "[ ▶ ENTER THE TOWER ]"; cta.href = "/play"; }
@@ -403,17 +404,24 @@
     };
     $("tab-signup").addEventListener("click", function () {
       setMode("signup");
+      if (window.ff) ff.door("signup");
     });
     $("tab-signin").addEventListener("click", function () {
       setMode("signin");
+      if (window.ff) ff.door("signin");
     });
     setMode("signup");
 
     /* #door-signin (top bar, gate card, /play's bounce) opens the door
        with the SIGN-IN tab already up — scripts off it still anchors */
     var hashMode = function () {
-      if (location.hash === "#door-signin") setMode("signin");
-      else if (location.hash === "#door") setMode("signup");
+      if (location.hash === "#door-signin") {
+        setMode("signin");
+        if (window.ff) ff.door("signin");
+      } else if (location.hash === "#door") {
+        setMode("signup");
+        if (window.ff) ff.door("signup");
+      }
     };
     hashMode();
     addEventListener("hashchange", hashMode);
@@ -435,9 +443,18 @@
         return r.json().then(function (j) { return { ok: r.ok, j: j }; });
       }).then(function (res) {
         /* 005: the door opens INTO the game */
-        if (res.ok) { location.href = "/play"; return; }
+        if (res.ok) {
+          if (window.ff) {
+            if (path === "/signup") ff.signup("ok"); else ff.signin();
+          }
+          /* a breath so the event leaves before the page does */
+          setTimeout(function () { location.href = "/play"; }, 150);
+          return;
+        }
         note.classList.add("err");
         note.textContent = "▮ " + (res.j.detail || "sign-up failed");
+        if (path === "/signup" && window.ff)
+          ff.signup("err", res.j.detail || "unknown");
       }).catch(function () {
         note.classList.add("err");
         note.textContent = "▮ network error — try again";
@@ -446,6 +463,7 @@
     form.addEventListener("submit", function (ev) {
       ev.preventDefault();
       var path = form.getAttribute("action");
+      if (path === "/signup" && window.ff) ff.signup("try");
       if (path === "/signup"
           && form.elements.password2.value !== form.elements.password.value) {
         note.classList.add("err");
