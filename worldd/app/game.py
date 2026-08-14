@@ -175,11 +175,18 @@ async def run_act(tenant: str, player: str, option: str, text: str,
             # 010: any act marks today attended; the player's faction
             # resolves its previous week lazily on the first act of a
             # new one.
-            await factions.record_attendance(conn, tenant, player)
+            first_today = await factions.record_attendance(conn, tenant,
+                                                           player)
             mine = await factions.member_row(conn, tenant, player)
             if mine:
                 await factions.maybe_resolve(conn, mine["faction"])
             doc = await _load_doc(conn, tenant, player, display_name)
+            if first_today and doc.get("stage") == "playing":
+                await social.add_happening(
+                    conn, kind="climb",
+                    line=f"{doc.get('name') or 'A climber'} entered "
+                         "the tower",
+                    actor=doc.get("name"), faction=doc.get("guild"))
             await social.inject_world(conn, tenant, player, doc,
                                       option=option)
             before = doc.get("unlocked_floor", 1)

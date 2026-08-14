@@ -182,11 +182,14 @@ def take_gold(doc: dict, amount: int) -> bool:
 
 # ── Attendance ────────────────────────────────────────────────────────────
 
-async def record_attendance(conn, tenant: str, player: str) -> None:
-    await conn.execute(
+async def record_attendance(conn, tenant: str, player: str) -> bool:
+    """True on the first act of the day (056: the Playing feed's
+    'entered the tower' line hangs on this)."""
+    got = await conn.fetchval(
         "INSERT INTO ascent_attendance (tenant, player, world_day) "
-        "VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",
+        "VALUES ($1,$2,$3) ON CONFLICT DO NOTHING RETURNING 1",
         tenant, player, pstate.world_day())
+    return got is not None
 
 
 # ── Membership helpers ───────────────────────────────────────────────────
@@ -250,12 +253,12 @@ async def maybe_post_week(conn) -> None:
         json.dumps(week))
     if changed is not None:
         kind = week_kind(week)
-        await conn.execute(
-            "INSERT INTO ascent_happenings (world_day, kind, line) "
-            "VALUES ($1,'faction',$2)", pstate.world_day(),
-            f"This week the Ascent demands a {kind.upper()} — banners "
-            f"enter at the Guildhall (◈ {ENTRY_PER_MEMBER} a head, from "
-            "the coffer)")
+        from . import social
+        await social.add_happening(
+            conn, kind="faction",
+            line=f"This week the Ascent demands a {kind.upper()} — banners "
+                 f"enter at the Guildhall (◈ {ENTRY_PER_MEMBER} a head, from "
+                 "the coffer)")
 
 
 async def maybe_resolve(conn, faction: str) -> None:
@@ -395,19 +398,19 @@ async def _resolve(conn, fac: dict, members: list[dict], week: int,
             buff_pct = round(pct * mult * 100)
             note = await _bless(conn, eligible, buff_kind, buff_pct,
                                 week + 1)
-        await conn.execute(
-            "INSERT INTO ascent_happenings (world_day, kind, line) "
-            "VALUES ($1,'faction',$2)", pstate.world_day(),
-            f"The {name} banner won the week's {kind.upper()} — {note}")
+        from . import social
+        await social.add_happening(
+            conn, kind="faction", faction=name,
+            line=f"The {name} banner won the week's {kind.upper()} — {note}")
     elif reached:
         note = "goal met, but the hall stood empty — no prize "
         note += f"(attendance {attended}/{required})"
     else:
         note = f"fell short ({progress:,}/{target:,})"
-        await conn.execute(
-            "INSERT INTO ascent_happenings (world_day, kind, line) "
-            "VALUES ($1,'faction',$2)", pstate.world_day(),
-            f"The {name} banner {note} on the week's {kind.upper()}")
+        from . import social
+        await social.add_happening(
+            conn, kind="faction", faction=name,
+            line=f"The {name} banner {note} on the week's {kind.upper()}")
 
     await conn.execute(
         "UPDATE ascent_faction_weeks SET progress=$2, ratio=$3, "
@@ -1160,10 +1163,10 @@ async def rename_faction(conn, tenant: str, player: str,
     await conn.execute(
         "UPDATE ascent_faction_ledger SET faction=$2 WHERE faction=$1",
         faction, new_name)
-    await conn.execute(
-        "INSERT INTO ascent_happenings (world_day, kind, line) "
-        "VALUES ($1,'faction',$2)", pstate.world_day(),
-        f"The {faction} banner flies new colors — it is {new_name} now")
+    from . import social
+    await social.add_happening(
+        conn, kind="faction", faction=new_name,
+        line=f"The {faction} banner flies new colors — it is {new_name} now")
     return None
 
 

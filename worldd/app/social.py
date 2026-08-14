@@ -79,6 +79,7 @@ async def inject_world(conn, tenant: str, player: str, doc: dict,
     from . import factions
     await factions.sync_doc_guild(conn, tenant, player, doc)
     await factions.maybe_post_week(conn)
+    await maybe_sweep_feed(conn)
     if doc.get("guild"):
         await factions.maybe_resolve(conn, doc["guild"])
         # resolution may have charged THIS player's dues / paid a prize in
@@ -786,6 +787,103 @@ async def _profiles(conn, doc: dict, w: dict, option: str = "") -> dict:
     return out
 
 
+# ── 056: the Playing feed ────────────────────────────────────────────────
+# One table (ascent_happenings), one monotone id cursor. The head rides
+# an in-process cache bumped by every write, so the 2s peek never asks
+# Postgres "anything new?" — it just echoes two ints. numInstances: 1
+# makes the module-level cache the truth (render.yaml, load-bearing).
+
+ONLINE_WINDOW_MIN = 5
+ONLINE_TTL_S = 30.0
+FEED_LIMIT = 50
+
+_feed_head: dict = {"id": None}
+_online_cache: dict = {"at": None, "n": 0}
+
+
+async def add_happening(conn, *, kind: str, line: str,
+                        floor: int | None = None, actor: str | None = None,
+                        faction: str | None = None, scope: str = "world",
+                        meta: dict | None = None) -> None:
+    """The one door every feed line walks through — bumps the head."""
+    hid = await conn.fetchval(
+        "INSERT INTO ascent_happenings (world_day, kind, line, floor,"
+        " actor, faction, scope, meta)"
+        " VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb) RETURNING id",
+        pstate.world_day(), kind, str(line)[:200], int(floor or 0),
+        actor, faction, scope, json.dumps(meta) if meta else None)
+    if hid is not None:
+        _feed_head["id"] = max(int(_feed_head["id"] or 0), int(hid))
+
+
+async def feed_head(conn) -> int:
+    if _feed_head["id"] is None:
+        _feed_head["id"] = int(await conn.fetchval(
+            "SELECT COALESCE(MAX(id), 0) FROM ascent_happenings") or 0)
+    return int(_feed_head["id"])
+
+
+async def online_count(conn) -> int:
+    """Players who acted within the window — cached like presence."""
+    now = pstate.now()
+    at = _online_cache["at"]
+    if at is not None and (now - at).total_seconds() < ONLINE_TTL_S:
+        return _online_cache["n"]
+    n = await conn.fetchval(
+        "SELECT count(*) FROM ascent_players "
+        "WHERE doc->>'stage'='playing' "
+        "AND updated_at > now() - make_interval(mins => $1)",
+        ONLINE_WINDOW_MIN)
+    _online_cache["at"] = now
+    _online_cache["n"] = int(n or 0)
+    return _online_cache["n"]
+
+
+async def maybe_sweep_feed(conn) -> None:
+    """Once per world-day (same lazy kv lock as challenge_week): drop
+    faction-grain rows past 14 days. World rows stay — Stone and era
+    history read them."""
+    changed = await conn.fetchval(
+        "INSERT INTO ascent_world (key, value) VALUES ('feed_sweep_day',$1) "
+        "ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value "
+        "WHERE ascent_world.value <> EXCLUDED.value RETURNING value",
+        json.dumps(pstate.world_day()))
+    if changed is not None:
+        await conn.execute(
+            "DELETE FROM ascent_happenings WHERE scope='faction' "
+            "AND created_at < now() - interval '14 days'")
+
+
+async def playing_feed(conn, tenant: str, player: str, scope: str,
+                       since: int) -> dict:
+    """The Playing panel's rows. world = everyone's news; faction =
+    every row tagged with MY faction (both scopes — membership is
+    checked here, never trusted from the client)."""
+    from . import factions
+    since = max(0, int(since))
+    mine = await factions.member_row(conn, tenant, player)
+    my_faction = mine["faction"] if mine else None
+    if scope == "faction":
+        if my_faction is None:
+            return {"ok": True, "faction": None, "head": await
+                    feed_head(conn), "rows": []}
+        rows = await conn.fetch(
+            "SELECT id, kind, line, floor, actor, scope, created_at "
+            "FROM ascent_happenings WHERE faction=$1 AND id > $2 "
+            "ORDER BY id DESC LIMIT $3", my_faction, since, FEED_LIMIT)
+    else:
+        rows = await conn.fetch(
+            "SELECT id, kind, line, floor, actor, scope, created_at "
+            "FROM ascent_happenings WHERE scope='world' AND id > $1 "
+            "ORDER BY id DESC LIMIT $2", since, FEED_LIMIT)
+    return {
+        "ok": True, "faction": my_faction, "head": await feed_head(conn),
+        "rows": [{"id": r["id"], "kind": r["kind"], "line": r["line"],
+                  "floor": r["floor"], "actor": r["actor"],
+                  "ts": r["created_at"].isoformat()} for r in rows],
+    }
+
+
 # ── Effects ──────────────────────────────────────────────────────────────
 
 async def execute_effects(conn, tenant: str, player: str,
@@ -849,10 +947,10 @@ async def execute_effects(conn, tenant: str, player: str,
                     tenant, player, "the Guildhall clerk",
                     f"The {e['guild']} table refused you — {err}.")
             else:
-                await conn.execute(
-                    "INSERT INTO ascent_happenings (world_day, kind, line)"
-                    " VALUES ($1,'faction',$2)", pstate.world_day(),
-                    f"{doc.get('name') or player} joined {e['guild']}")
+                await add_happening(
+                    conn, kind="faction",
+                    line=f"{doc.get('name') or player} joined {e['guild']}",
+                    actor=doc.get("name") or player, faction=e["guild"])
         elif kind == "faction_rules":
             # 042: the steward writes the door — non-stewards no-op
             from . import factions
@@ -870,7 +968,15 @@ async def execute_effects(conn, tenant: str, player: str,
             await factions.request_join(conn, tenant, player, e["guild"])
         elif kind == "guild_leave":
             from . import factions
+            me = await factions.member_row(conn, tenant, player)
             await factions.leave_faction(conn, tenant, player)
+            if me is not None:
+                await add_happening(
+                    conn, kind="faction",
+                    line=f"{doc.get('name') or player} left "
+                         f"{me['faction']}",
+                    actor=doc.get("name") or player,
+                    faction=me["faction"])
         elif kind == "faction_donate":
             from . import factions
             await factions.donate(conn, tenant, player,
@@ -930,11 +1036,17 @@ async def execute_effects(conn, tenant: str, player: str,
             from . import factions
             await factions.cancel_request(conn, tenant, player)
         elif kind == "happening":
-            # engine-reported world news: deaths, warden first clears
-            await conn.execute(
-                "INSERT INTO ascent_happenings (world_day, kind, line,"
-                " floor) VALUES ($1,'climb',$2,$3)", pstate.world_day(),
-                str(e.get("line", ""))[:200], int(e.get("floor", 0)))
+            # engine-reported news; 056 rides actor/faction/scope on it
+            # so the Playing tabs can slice the stream. A faction-scoped
+            # line from a bannerless climber has no audience — dropped.
+            scope = str(e.get("scope", "world"))
+            guild = doc.get("guild") or None
+            if scope != "faction" or guild:
+                await add_happening(
+                    conn, kind="climb", line=str(e.get("line", "")),
+                    floor=int(e.get("floor", 0)) or None,
+                    actor=doc.get("name") or player, faction=guild,
+                    scope=scope, meta=e.get("meta") or None)
         elif kind == "armory_deposit":
             # 007: the engine already lifted the piece (and its wear
             # stash) out of the doc; a refusal hands it straight back
@@ -991,6 +1103,10 @@ async def _fx_faction_found(conn, tenant: str, player: str, doc: dict,
         conn, tenant, player, name, banner, doc.get("name") or player,
         join_fee=int(e.get("join_fee", 0)),
         weekly_dues=int(e.get("weekly_dues", 5)))
+    await add_happening(
+        conn, kind="faction",
+        line=f"{doc.get('name') or player} raised the banner of {name}",
+        actor=doc.get("name") or player, faction=name)
 
 
 async def _fx_faction_kick(conn, tenant: str, player: str,
@@ -1008,6 +1124,10 @@ async def _fx_faction_kick(conn, tenant: str, player: str,
             await conn.execute(
                 "DELETE FROM ascent_faction_members "
                 "WHERE tenant=$1 AND player=$2", m["tenant"], m["player"])
+            await add_happening(
+                conn, kind="faction",
+                line=f"{target} was cast out of {me['faction']}",
+                actor=target, faction=me["faction"])
             break
 
 
@@ -1137,9 +1257,8 @@ async def _fx_pvp(conn, tenant: str, player: str, doc: dict,
         "UPDATE ascent_players SET doc=$3, updated_at=now() "
         "WHERE tenant=$1 AND player=$2",
         row["tenant"], row["player"], json.dumps(victim))
-    await conn.execute(
-        "INSERT INTO ascent_happenings (world_day, kind, line) "
-        "VALUES ($1,'pvp',$2)", day, line)
+    await add_happening(conn, kind="pvp", line=line,
+                        actor=a_name, faction=doc.get("guild"))
     # attacker sees the outcome immediately as a pending event
     doc.setdefault("pending_events", []).insert(0, Scene(
         eyebrow="THE FIELDS · AFTER",
@@ -1342,9 +1461,8 @@ async def _fx_loot(conn, tenant: str, player: str, doc: dict,
     await conn.execute(
         "UPDATE ascent_players SET doc=$3 WHERE tenant=$1 AND player=$2",
         row["tenant"], row["player"], json.dumps(victim))
-    await conn.execute(
-        "INSERT INTO ascent_happenings (world_day, kind, line) "
-        "VALUES ($1,'loot',$2)", day, line)
+    await add_happening(conn, kind="loot", line=line,
+                        actor=doc.get("name") or player)
 
 
 # ── Shared frontier Warden strikes (007 §3) ──────────────────────────────
@@ -1418,6 +1536,13 @@ async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
                          "level": int(doc.get("level", 1)),
                          "race": str(doc.get("race") or ""),
                          "armor": _armor_slug(doc)})
+        # 056: the Playing feed calls each blade once per wound — the
+        # striker list IS the once-slate, so joining it is the moment
+        await add_happening(
+            conn, kind="war",
+            line=f"{name} takes up arms against {warden_name} "
+                 f"· floor {floor}",
+            floor=floor, actor=name, faction=doc.get("guild") or None)
     # 042: the per-strike roll survives the live record's truncation
     await conn.execute(
         "INSERT INTO ascent_warden_damage (floor, tenant, player, name,"
@@ -1432,11 +1557,10 @@ async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
         for t in (75, 50, 25):
             if t not in called and before > t >= after:
                 called.append(t)
-                await conn.execute(
-                    "INSERT INTO ascent_happenings (world_day, kind, line,"
-                    " floor) VALUES ($1,'war',$2,$3)", pstate.world_day(),
-                    f"{warden_name} — cut to {t}% · floor {floor}",
-                    floor)
+                await add_happening(
+                    conn, kind="war",
+                    line=f"{warden_name} — cut to {t}% · floor {floor}",
+                    floor=floor)
         await conn.execute(
             "INSERT INTO ascent_world (key, value) VALUES ($1,$2::jsonb) "
             "ON CONFLICT (key) DO UPDATE SET value=excluded.value",
@@ -1490,6 +1614,11 @@ async def _fx_horn(conn, tenant: str, player: str, doc: dict,
     body = (f"The horn: {warden_name} stands at {pct}% on floor {floor}. "
             f"The wound closes in {_fmt_countdown(st['closes_in_s'])} — "
             "come cut.")
+    await add_happening(
+        conn, kind="war",
+        line=f"{doc.get('name') or player} sounds the horn — "
+             f"{warden_name} at {pct}% · floor {floor}",
+        floor=floor, actor=doc.get("name") or player, faction=guild)
     rows = await conn.fetch(
         "SELECT tenant, player FROM ascent_players "
         "WHERE doc->>'guild' = $1 AND doc->>'stage' = 'playing'", guild)
@@ -1537,6 +1666,11 @@ async def _fx_flare(conn, tenant: str, player: str, doc: dict,
         "INSERT INTO ascent_world (key, value) VALUES ($1,$2::jsonb) "
         "ON CONFLICT (key) DO UPDATE SET value=$2::jsonb",
         key, json.dumps(v))
+    await add_happening(
+        conn, kind="war",
+        line=f"{v['name']} sends up a flare on floor {floor} — "
+             f"{v['monster']}",
+        floor=floor, actor=v["name"], faction=doc.get("guild"))
 
 
 async def _fx_flare_answer(conn, tenant: str, player: str, doc: dict,
@@ -1572,6 +1706,11 @@ async def _fx_flare_answer(conn, tenant: str, player: str, doc: dict,
         "INSERT INTO ascent_stone (line) VALUES ($1)",
         f"{name} answered a flare on floor {floor} — "
         f"{v.get('name', 'a climber')} lives to tell it")
+    await add_happening(
+        conn, kind="war",
+        line=f"{name} answered {v.get('name', 'a climber')}'s flare"
+             f" on floor {floor}",
+        floor=floor, actor=name, faction=doc.get("guild"))
 
 
 async def _fx_kill_note(conn, doc: dict, e: dict) -> None:
@@ -1777,11 +1916,10 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
             " note) VALUES ($1,$2,'warden_kill',$3,$4,$5)",
             s.get("tenant"), s.get("player"), gold_i, xp_i, warden_name)
 
-    await conn.execute(
-        "INSERT INTO ascent_happenings (world_day, kind, line, floor) "
-        "VALUES ($1,'boss',$2,$3)", day,
-        f"{warden_name} slain by {names} · floor {floor + 1} open",
-        floor)
+    await add_happening(
+        conn, kind="boss",
+        line=f"{warden_name} slain by {names} · floor {floor + 1} open",
+        floor=floor)
     await conn.execute(
         "INSERT INTO ascent_stone (line) VALUES ($1)",
         f"Floor {floor} — the deepest cut in {warden_name} was "
@@ -1800,6 +1938,10 @@ async def _fx_boss_commit(conn, tenant: str, player: str, doc: dict,
         "INSERT INTO ascent_boss_commits (floor, tenant, player, name,"
         " world_day) VALUES ($1,$2,$3,$4,$5) ON CONFLICT DO NOTHING",
         floor, tenant, player, name, day)
+    await add_happening(
+        conn, kind="war",
+        line=f"{name} pledges to the war party on floor {floor}",
+        floor=floor, actor=name, faction=doc.get("guild"))
     ms = economy.MILESTONES.get(floor)
     if ms is None:
         return
@@ -1886,10 +2028,9 @@ async def _resolve_boss(conn, tenant: str, player: str, doc: dict,
             "UPDATE ascent_world SET value=$1::jsonb "
             "WHERE key='frontier' AND (value)::int < $2",
             json.dumps(ms.floor + 1), ms.floor + 1)
-        await conn.execute(
-            "INSERT INTO ascent_happenings (world_day, kind, line) "
-            "VALUES ($1,'boss',$2)", day,
-            f"{ms.name} fell to {names} — floor {ms.floor + 1} is open")
+        await add_happening(
+            conn, kind="boss", floor=ms.floor,
+            line=f"{ms.name} fell to {names} — floor {ms.floor + 1} is open")
         await conn.execute(
             "INSERT INTO ascent_stone (line) VALUES ($1)",
             f"Floor {ms.floor} — {ms.name} cast down by {names}")
@@ -1898,10 +2039,9 @@ async def _resolve_boss(conn, tenant: str, player: str, doc: dict,
             from . import era
             await era.close_era(conn, tenant, player, doc, commits)
     else:
-        await conn.execute(
-            "INSERT INTO ascent_happenings (world_day, kind, line) "
-            "VALUES ($1,'boss',$2)", day,
-            f"{ms.name} broke a war party at the keep ({names})")
+        await add_happening(
+            conn, kind="boss", floor=ms.floor,
+            line=f"{ms.name} broke a war party at the keep ({names})")
 
 
 # ── Shared read bodies (005: /v1/* and /play/api/* call the same code) ───

@@ -152,7 +152,21 @@ async def pane_peek(ident: tuple = Depends(_identity)) -> dict:
             scene_id = ((json.loads(row["doc"]).get("scene") or {})
                         .get("scene_id") or "")
         pres = await social.floor_presence(conn, WEB_TENANT, player)
-    return {"scene_id": scene_id, "floor_presence": int(pres["hot"])}
+        online = await social.online_count(conn)
+        head = await social.feed_head(conn)
+    return {"scene_id": scene_id, "floor_presence": int(pres["hot"]),
+            "online": online, "feed_head": head}
+
+
+@router.get("/play/api/pane/playing/feed")
+async def pane_playing_feed(scope: str = "world", since: int = 0,
+                            ident: tuple = Depends(_identity)) -> dict:
+    player, _ = ident
+    from . import social
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        return await social.playing_feed(conn, WEB_TENANT, player,
+                                         scope, since)
 
 
 @router.post("/play/api/pane/room_more")

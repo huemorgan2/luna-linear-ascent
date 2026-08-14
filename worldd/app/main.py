@@ -162,7 +162,27 @@ async def v1_presence(body: SceneIn,
     from . import social
     pool = await db.get_pool()
     async with pool.acquire() as conn:
-        return await social.floor_presence(conn, tenant, body.player)
+        out = await social.floor_presence(conn, tenant, body.player)
+        out["online"] = await social.online_count(conn)
+        out["feed_head"] = await social.feed_head(conn)
+        return out
+
+
+class PlayingFeedIn(BaseModel):
+    player: str = Field(min_length=1, max_length=128)
+    scope: str = Field(default="world", max_length=16)
+    since: int = Field(default=0, ge=0)
+
+
+@app.post("/v1/playing_feed")
+async def v1_playing_feed(body: PlayingFeedIn,
+                          tenant: str = Depends(auth.verify_tenant)) -> dict:
+    """The Playing panel's rows — body shared with /play/api."""
+    from . import social
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        return await social.playing_feed(conn, tenant, body.player,
+                                         body.scope, body.since)
 
 
 # ── Score & Community (plan 010) ─────────────────────────────────────────

@@ -130,11 +130,11 @@ async def close_era(conn, tenant: str, player: str, doc: dict,
         "INSERT INTO ascent_stone (line) VALUES ($1)",
         f"ERA {era} — Vharuk cast down on day {day}; the final blow "
         f"was {finisher}'s")
-    await conn.execute(
-        "INSERT INTO ascent_happenings (world_day, kind, line, floor) "
-        "VALUES ($1,'war',$2,100)", day,
-        f"THE TOWER FALLS — Vharuk is down. Era {era} closes; "
-        "the ceremony waits in town")
+    from . import social
+    await social.add_happening(
+        conn, kind="war", floor=100,
+        line=f"THE TOWER FALLS — Vharuk is down. Era {era} closes; "
+             "the ceremony waits in town")
     return era
 
 
@@ -147,9 +147,8 @@ async def declare_last_siege(conn, active: int | None) -> None:
     line = (f"THE LAST FLOOR IS OPEN — Vharuk, the Demon King, waits at "
             f"100. The war party forms at the keep: {quorum} blades "
             "pledged inside two days end the era")
-    await conn.execute(
-        "INSERT INTO ascent_happenings (world_day, kind, line, floor) "
-        "VALUES ($1,'war',$2,100)", day, line)
+    from . import social
+    await social.add_happening(conn, kind="war", floor=100, line=line)
     await conn.execute(
         "INSERT INTO ascent_stone (line) VALUES ($1)",
         "Floor 100 stands open — the era enters its last siege")

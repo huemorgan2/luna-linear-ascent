@@ -68,14 +68,21 @@ async def test_thresholds_fire_once_per_wound(client, tenant_a, clean_world):
     doc = {"name": "Axa", "guild": ""}
     before = await _war_lines(pool)
 
+    # 056: a player's FIRST strike on a wound writes its own feed line
+    # ("takes up arms"), once per player per wound — so the materializing
+    # scratch costs one war line before any threshold fires.
     await _strike("tenant-a", "p-ax", doc, 1, 1)     # materialize the row
     v = await _warden_row(pool)
     base = int(v["hp_max"])
-    assert await _war_lines(pool) == before          # barely a scratch
+    assert await _war_lines(pool) == before + 1      # the takes-up-arms line
+    line = await pool.fetchval(
+        "SELECT line FROM ascent_happenings WHERE kind='war' "
+        "ORDER BY id DESC LIMIT 1")
+    assert "takes up arms" in line
 
-    # cut through 75%: one line, tower-wide
+    # cut through 75%: one line, tower-wide (same hand — no new striker line)
     await _strike("tenant-a", "p-ax", doc, 1, round(base * 0.30))
-    assert await _war_lines(pool) == before + 1
+    assert await _war_lines(pool) == before + 2
     line = await pool.fetchval(
         "SELECT line FROM ascent_happenings WHERE kind='war' "
         "ORDER BY id DESC LIMIT 1")
@@ -83,11 +90,11 @@ async def test_thresholds_fire_once_per_wound(client, tenant_a, clean_world):
 
     # a scratch inside the same band: no refire
     await _strike("tenant-a", "p-ax", doc, 1, 1)
-    assert await _war_lines(pool) == before + 1
+    assert await _war_lines(pool) == before + 2
 
     # one deep blow through 50 AND 25: both fire, once each
     await _strike("tenant-a", "p-ax", doc, 1, round(base * 0.45))
-    assert await _war_lines(pool) == before + 3
+    assert await _war_lines(pool) == before + 4
     v = await _warden_row(pool)
     assert sorted(v["called"], reverse=True) == [75, 50, 25]
 
