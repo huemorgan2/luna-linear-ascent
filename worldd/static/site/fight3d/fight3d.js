@@ -159,7 +159,19 @@ function initGL() {
         void main(){
           vec4 s = texture2D(tScene, vUv);
           float t = texture2D(tBayer, gl_FragCoord.xy / 8.0).r + 0.002;
-          if (s.a < 0.03) { gl_FragColor = vec4(0.0); return; }
+          if (s.a < 0.03) {
+            // outer silhouette outline: background pixels touching a
+            // body ink black so the contour reads on the bright banner
+            float na = max(
+              max(texture2D(tScene, vUv + vec2(texel.x, 0.0)).a,
+                  texture2D(tScene, vUv - vec2(texel.x, 0.0)).a),
+              max(texture2D(tScene, vUv + vec2(0.0, texel.y)).a,
+                  texture2D(tScene, vUv - vec2(0.0, texel.y)).a));
+            if (na > 0.97 && t < 0.9) {
+              gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return;
+            }
+            gl_FragColor = vec4(0.0); return;
+          }
           if (s.a < 0.97) {
             // shadow catcher: dithered contact shadow, pure black ink
             float on = step(t, s.a * 0.55);
@@ -235,7 +247,7 @@ function initGL() {
            postCam, postMat, scene, camera, clock: new THREE.Clock() };
     Object.assign(canvas.style, {
       position: "absolute", inset: "0", width: "100%", height: "100%",
-      background: "#000", imageRendering: "pixelated", zIndex: "1",
+      imageRendering: "pixelated", zIndex: "1",
     });
     return GL;
   } catch {
