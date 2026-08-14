@@ -16,6 +16,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
@@ -42,6 +43,20 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="ascent-worldd", version="0.3.0", lifespan=lifespan)
+
+# PLAN4: /play fragments carried a ~1 MB victory card before the ending
+# GIF left them; text responses stay compressible either way.
+app.add_middleware(GZipMiddleware, minimum_size=1024)
+
+# PLAN4: the vendored event reels, by slug — fight3d's degrade path only
+# (a kill card ships no GIF; when WebGL/model fails the client repaints
+# the reel from here, tinted like a banner). Mounted BEFORE /static:
+# routes match in order and the broad mount would swallow it.
+app.mount("/static/fxart",
+          StaticFiles(directory=Path(__file__).resolve().parent.parent
+                      / "vendor" / "plugin_linear_ascent" / "content"
+                      / "art" / "events"),
+          name="fxart")
 
 # Static shareables (e.g. /static/intro-movie/ — the 016 intro movie mock)
 app.mount("/static",

@@ -1,19 +1,25 @@
-// fight3d — the live 3D kill finisher (PLAN3). Website-only: webplay.py
-// injects this module next to funnel.js; the Luna chat card never sees it.
+// fight3d — the live 3D kill finisher (PLAN3/PLAN4). Website-only:
+// webplay.py injects this module next to funnel.js; the Luna chat card
+// never sees it.
 //
 // A victory card arrives with data-kill3d='{"id","race","line","breed",
-// "specimen","tint"}' on the card div (combat._victory → render.py). This
-// module watches #game for such cards, loads the player + monster GLBs on
-// demand, mounts a 320x112 canvas over the fx banner, and plays the demo2
-// liberation sequence ONCE — strike arc and tempo rolled fresh every kill
-// (wild mode), ink colored with the SAME tint the banner mask uses.
+// "specimen","tint","fx"}' on the card div (combat._victory → render.py)
+// and a BARE black .banner slot — the server ships no ending GIF for a
+// floor-1 kill. This module watches #game for such cards, mounts a
+// 320x112 canvas in the slot, and plays the demo2 liberation sequence
+// ONCE — strike arc and tempo rolled fresh every kill, the WHOLE frame
+// (scenery, characters, effects) inked in the one tint the banner would
+// have worn, over black. Never a second color.
 //
-// Degrade law: no WebGL, a missing GLB, a parse error — do nothing; the
-// GIF underneath plays exactly as before this module existed.
+// Degrade law: no WebGL, a missing GLB, a parse error — paint the old
+// fx reel (spec.fx via /static/fxart/) tinted exactly like a banner.
 //
-// Players are Tripo3D-generated rigs (research/3d-fight "3d models"), the
-// monsters are Tripo models WITHOUT rigs — walked, lunged and flinched
-// procedurally (tripoMonster), which is why quadrupeds are no problem.
+// Players AND monsters are Tripo3D-generated rigs (research/3d-fight
+// "3d models"): every monster GLB carries a baked walk clip (quadruped
+// or biped preset) played through an AnimationMixer, feet planted by
+// matching the clip rate to actual travel; the attack lunge stays
+// procedural on top. The scenery is the demo2 background loop baked
+// into a 24-frame spritesheet, sampled in the post shader.
 import * as THREE from "three";
 import { GLTFLoader } from "./vendor/GLTFLoader.js";
 
@@ -25,12 +31,12 @@ const BASE = new URL(".", import.meta.url);
 // floor-1 monster registry: normalized height, stance width, start x.
 // A creature absent here (or whose GLB 404s) simply keeps its GIF.
 const MONSTERS3D = {
-  grey_wolf:        { h: 1.70, wide: 1.12, mx: 2.0 },
-  feral_boar:       { h: 1.55, wide: 1.10, mx: 2.2 },
-  hedge_rat:        { h: 1.05, wide: 1.10, mx: 1.8 },
-  lane_wolf:        { h: 1.60, wide: 1.10, mx: 2.1 },
-  goblin_straggler: { h: 1.70, wide: 1.05, mx: 2.0 },
-  ember_shade:      { h: 2.15, wide: 1.05, mx: 2.3 },
+  grey_wolf:        { h: 1.70, wide: 1.18, mx: 2.0 },
+  feral_boar:       { h: 1.90, wide: 1.12, mx: 2.2 },
+  hedge_rat:        { h: 1.05, wide: 1.15, mx: 1.8 },
+  lane_wolf:        { h: 1.60, wide: 1.15, mx: 2.1 },
+  goblin_straggler: { h: 1.70, wide: 1.20, mx: 2.0 },
+  ember_shade:      { h: 2.15, wide: 1.15, mx: 2.3 },
 };
 
 const SPECIES = {
@@ -147,21 +153,35 @@ function initGL() {
         tBayer: { value: bayerTex },
         texel: { value: new THREE.Vector2(1 / W, 1 / H) },
         uInk: { value: new THREE.Color(0xdfe4ee) },
+        tBG: { value: bayerTex },        // placeholder until a sheet loads
+        uBGFrame: { value: 0 },
+        uBGOn: { value: 0 },
       },
       vertexShader: `
         varying vec2 vUv;
         void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
       fragmentShader: `
-        uniform sampler2D tScene, tNormal, tDepth, tBayer;
+        uniform sampler2D tScene, tNormal, tDepth, tBayer, tBG;
         uniform vec2 texel;
         uniform vec3 uInk;
+        uniform float uBGFrame, uBGOn;
         varying vec2 vUv;
         void main(){
           vec4 s = texture2D(tScene, vUv);
           float t = texture2D(tBayer, gl_FragCoord.xy / 8.0).r + 0.002;
+          // the scenery: one frame of the demo2 background loop, baked
+          // into a 24-frame sheet. White pixels wear the SAME ink as the
+          // bodies; black stays black — the frame never holds a second
+          // color. No sheet -> plain black stage.
+          vec3 bgc = vec3(0.0);
+          if (uBGOn > 0.5) {
+            vec2 buv = vec2(vUv.x,
+              1.0 - (uBGFrame + (1.0 - vUv.y)) / 24.0);
+            bgc = uInk * step(0.5, texture2D(tBG, buv).r);
+          }
           if (s.a < 0.03) {
             // outer silhouette outline: background pixels touching a
-            // body ink black so the contour reads on the bright banner
+            // body ink black so the contour reads on the lit scenery
             float na = max(
               max(texture2D(tScene, vUv + vec2(texel.x, 0.0)).a,
                   texture2D(tScene, vUv - vec2(texel.x, 0.0)).a),
@@ -170,12 +190,13 @@ function initGL() {
             if (na > 0.97 && t < 0.9) {
               gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return;
             }
-            gl_FragColor = vec4(0.0); return;
+            gl_FragColor = vec4(bgc, 1.0); return;
           }
           if (s.a < 0.97) {
-            // shadow catcher: dithered contact shadow, pure black ink
+            // shadow catcher / smoke: dithered pure-black ink punched
+            // out of whatever the scenery shows behind it
             float on = step(t, s.a * 0.55);
-            gl_FragColor = vec4(0.0, 0.0, 0.0, on);
+            gl_FragColor = vec4(bgc * (1.0 - on), 1.0);
             return;
           }
           // half-pixel ink: only the NEAR side of a depth step is inked,
@@ -258,8 +279,10 @@ function initGL() {
 
 // ── asset loading (on demand, cached, 404 → null) ─────────────────────────
 const loader = new GLTFLoader();
+const texLoader = new THREE.TextureLoader();
 const assets = {};                       // buildPlayer's registry
 const cache = {};                        // rel path -> Promise<gltf|null>
+const bgCache = {};                      // id -> Promise<Texture|null>
 
 function load(rel) {
   if (!(rel in cache)) {
@@ -269,21 +292,69 @@ function load(rel) {
   return cache[rel];
 }
 
+function loadBG(id) {
+  if (!(id in bgCache)) {
+    bgCache[id] = texLoader
+      .loadAsync(new URL(`backgrounds/${id}.png`, BASE).href)
+      .then((tex) => {
+        tex.minFilter = tex.magFilter = THREE.NearestFilter;
+        tex.generateMipmaps = false;
+        return tex;
+      })
+      .catch(() => null);
+  }
+  return bgCache[id];
+}
+
 // resolve the spec against what actually exists; null = degrade to GIF
 async function ensureFor(spec) {
   const race = SPECIES[spec.race] ? spec.race : "human";
   const line = WEAPONS[spec.line] ? spec.line : "blade";
   const kind = KIND_OF[line];
-  const [pg, wg, mg, cg] = await Promise.all([
+  // the slash clip is dead weight — the sword swing is fully hand-keyed
+  // (STRIKES), so a blade kill never fetches it
+  const [pg, wg, mg, bg, cg] = await Promise.all([
     load(`players/${race}.glb`), load(`players/${line}.glb`),
-    load(`monsters/${spec.id}.glb`), load(`players/${race}_${kind}.glb`),
+    load(`monsters/${spec.id}.glb`), loadBG(spec.id),
+    kind === "slash" ? null : load(`players/${race}_${kind}.glb`),
   ]);
   if (!pg || !wg || !mg) return null;
   assets[`t_${race}`] = pg;
   assets[`w_${line}`] = wg;
   const clips = assets[`t_${race}_clips`] || (assets[`t_${race}_clips`] = {});
   if (!(kind in clips)) clips[kind] = cg ? (cg.animations[0] || null) : null;
-  return { race, line, mg };
+  return { race, line, mg, bg };
+}
+
+// PLAN4: the first kill used to download ~6 MB before anything moved —
+// a wait as long as the old ending GIF. Warm everything while the page
+// idles: GLBs one at a time (never choking the pane), scenery sheets,
+// then the GL context + compiled shaders via one offscreen frame.
+function preload() {
+  const rels = [
+    ...Object.keys(MONSTERS3D).map((id) => `monsters/${id}.glb`),
+    "players/human.glb", "players/elf.glb", "players/giant.glb",
+    "players/blade.glb", "players/bow.glb", "players/staff.glb",
+    "players/human_shoot.glb", "players/human_cast.glb",
+    "players/elf_shoot.glb", "players/elf_cast.glb",
+    "players/giant_shoot.glb", "players/giant_cast.glb",
+  ];
+  for (const id of Object.keys(MONSTERS3D)) loadBG(id);
+  let p = Promise.resolve();
+  for (const r of rels) p = p.then(() => load(r));
+  p.then(() => {
+    const gl = initGL();
+    if (!gl) return;
+    gl.renderer.setRenderTarget(gl.rtColor);
+    gl.renderer.clear();
+    gl.renderer.render(gl.scene, gl.camera);
+    gl.renderer.setRenderTarget(gl.rtNormal);
+    gl.scene.overrideMaterial = gl.normalMat;
+    gl.renderer.render(gl.scene, gl.camera);
+    gl.scene.overrideMaterial = null;
+    gl.renderer.setRenderTarget(null);
+    gl.renderer.render(gl.postScene, gl.postCam);
+  });
 }
 
 function shadowify(o) {
@@ -578,16 +649,22 @@ function buildPlayer(speciesId, weaponId) {
   };
 }
 
-// ── rigless Tripo monster ─────────────────────────────────────────────────
-// The generated creature GLBs carry no skeleton (the Tripo rig preset is
-// biped-only) — the kill scene needs only walk-in, one lunge, and the
-// death flinch, so the whole body is driven procedurally: gallop bob and
-// rock on the way in, a nose-first lunge for its own attack, breathing
-// at rest. Black miasma puffs curl off the back exactly like demo2's
-// infected forms; the freed pop-in (natives) reuses the same model small
-// and bright, no smoke.
+// ── rigged Tripo monster (PLAN4) ──────────────────────────────────────────
+// Every creature GLB now carries a Tripo-baked skeleton and one walk clip
+// (quadruped or biped preset, animated in place). The clip plays through
+// an AnimationMixer with its rate slaved to the group's ACTUAL x travel —
+// the same trick as the player's distance-driven gait, so feet plant and
+// standing still stops the legs. The attack lunge stays procedural,
+// layered on the inner group. Black miasma puffs curl off the back
+// exactly like demo2's infected forms; the freed pop-in (natives) reuses
+// the same model small and bright, no smoke.
+//
+// The scene is SHARED per asset (never clone(true): it severs skinned
+// meshes from their skeletons) — normalize is idempotent against cached
+// dims, exactly like buildPlayer.
 function tripoMonster(gltf, { h = 1.6, wide = 1.1, freed = false } = {}) {
-  const model = gltf.scene.clone(true);
+  const src = gltf;
+  const model = src.scene;
   shadowify(model);
   model.traverse((m) => {
     if (m.isMesh && m.material?.emissive) {
@@ -596,8 +673,23 @@ function tripoMonster(gltf, { h = 1.6, wide = 1.1, freed = false } = {}) {
       m.material.emissiveIntensity = freed ? 0.30 : 0.06;
     }
   });
+  const mixer = new THREE.AnimationMixer(model);
+  const walkClip = src.animations[0] || null;
+  let walk = null;
+  if (walkClip) {
+    walk = mixer.clipAction(walkClip);
+    walk.play();
+    walk.timeScale = 0;
+    mixer.update(0.033);                 // settle into the clip's stance
+  }
+  // idempotent normalize against the settled pose, cached per asset
+  model.scale.setScalar(1);
+  model.position.set(0, 0, 0);
   model.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(model);
+  if (!src.userData.dims) {
+    src.userData.dims = new THREE.Box3().setFromObject(model);
+  }
+  const box = src.userData.dims;
   const k = h / (box.max.y - box.min.y);
   model.scale.setScalar(k);
   model.position.set(
@@ -614,25 +706,36 @@ function tripoMonster(gltf, { h = 1.6, wide = 1.1, freed = false } = {}) {
   let puffAcc = 0;
   const rnd = (a, b) => a + Math.random() * (b - a);
   let mode = "idle";                     // idle | run | attack
-  let runPh = 0, atkT = 0;
+  let atkT = 0, lastX = null;
+  // feet-plant rule: one walk cycle carries the body ~0.9 of its height,
+  // so the clip rate is travel speed over that stride
+  const vNat = walkClip ? 0.9 * h / walkClip.duration : 1;
   return {
     group: wrap,
     update: (dt, t) => {
+      // the clip rate follows the group's real travel: stepSeq lerps
+      // wrap.position.x, the legs match it, a parked monster stands
+      const x = wrap.position.x;
+      const dx = lastX === null ? 0 : x - lastX;
+      lastX = x;
+      const v = Math.abs(dx) / Math.max(dt, 1e-4);
+      if (walk) {
+        const tgt = v > 0.05
+          ? Math.min(Math.max(v / vNat, 0.6), 3.5) : 0;
+        walk.timeScale += (tgt - walk.timeScale) * Math.min(dt * 8, 1);
+      }
+      mixer.update(dt);
       // breathe: the ribcage swells; smaller once it is moving
-      inner.scale.y = 1 + (mode === "idle" ? 0.025 : 0.008)
+      inner.scale.y = 1 + (mode === "idle" ? 0.02 : 0.006)
         * Math.sin(t * 2.1);
-      if (mode === "run") {
-        runPh += dt * 11;
-        inner.position.y = Math.abs(Math.sin(runPh)) * 0.055 * h;
-        inner.rotation.x = 0.055 * Math.sin(runPh);      // gallop rock
-      } else if (mode === "attack") {
+      if (mode === "attack") {
         atkT += dt;
         const q = Math.min(atkT / 0.28, 1);
         const lunge = Math.sin(q * Math.PI);
         inner.position.z = 0.16 * h * lunge;   // local +z → at the player
         inner.rotation.x = 0.30 * lunge;       // nose-first
         inner.position.y = 0.04 * h * lunge;
-      } else {
+      } else if (mode !== "run") {
         inner.position.y *= Math.max(0, 1 - dt * 8);
         inner.rotation.x *= Math.max(0, 1 - dt * 8);
         inner.position.z *= Math.max(0, 1 - dt * 8);
@@ -665,7 +768,8 @@ function tripoMonster(gltf, { h = 1.6, wide = 1.1, freed = false } = {}) {
         }
       }
     },
-    // stepSeq speaks the animalRig clip names; map them onto the modes
+    // stepSeq speaks the animalRig clip names; run is implicit (the walk
+    // clip follows travel), attack layers the procedural lunge
     setClip: (name) => {
       if (/gallop|run/i.test(name)) { mode = "run"; return true; }
       if (/attack/i.test(name)) { mode = "attack"; atkT = 0; return true; }
@@ -1033,6 +1137,8 @@ function frame() {
           rtColor, rtNormal, normalMat, postScene, postCam } = GL;
   const dt = Math.min(clock.getDelta(), 0.1);
   const t = clock.elapsedTime;
+  // the scenery loop: 24 frames x 100 ms, same cadence as the demo2 GIFs
+  GL.postMat.uniforms.uBGFrame.value = Math.floor((t % 2.4) / 0.1) % 24;
   if (player) player.update(dt, t);
   if (monster) monster.update(dt, t + 3.1);
   if (seq) stepSeq(dt);
@@ -1076,15 +1182,23 @@ async function mountKill(card) {
   if (!reg) return;
   const slot = card.querySelector(".banner");
   if (!slot) return;
-  // NO GIF on a floor-1 death: the reel goes dark the moment we commit
-  // to the 3D scene — the fx mask would also clip the canvas. The GIF
-  // comes back only if the model or WebGL never arrives.
+  // NO GIF on a floor-1 death: the server ships this card's banner bare
+  // (an old engine may still inline the reel — blank it either way).
+  // The reel returns ONLY when the 3D scene cannot run: tinted like a
+  // banner, from the fxart route, never otherwise.
   const oldStyle = [slot.style.maskImage, slot.style.webkitMaskImage,
                     slot.style.backgroundColor];
   slot.style.maskImage = "none";
   slot.style.webkitMaskImage = "none";
   slot.style.backgroundColor = "#000";
   const restoreGif = () => {
+    if (spec.fx) {
+      const u = `url('/static/fxart/${encodeURIComponent(spec.fx)}.gif')`;
+      slot.style.backgroundColor = spec.tint || "#dfe4ee";
+      slot.style.maskImage = u;
+      slot.style.webkitMaskImage = u;
+      return;
+    }
     slot.style.maskImage = oldStyle[0];
     slot.style.webkitMaskImage = oldStyle[1];
     slot.style.backgroundColor = oldStyle[2];
@@ -1097,8 +1211,17 @@ async function mountKill(card) {
   stopLoop();
   resetStage();
   try {
-    gl.postMat.uniforms.uInk.value.set(spec.tint || "#dfe4ee");
+    // the banner's tint, lifted to a readable ink: a runt's near-black
+    // grey vanishes on a black stage, so the WHOLE frame brightens —
+    // still one color, just one the eye can find
+    const ink = new THREE.Color(spec.tint || "#dfe4ee");
+    const hsl = { h: 0, s: 0, l: 0 };
+    ink.getHSL(hsl);
+    if (hsl.l < 0.55) ink.setHSL(hsl.h, hsl.s, 0.55);
+    gl.postMat.uniforms.uInk.value.copy(ink);
   } catch { /* bad hex: keep the last ink */ }
+  if (got.bg) gl.postMat.uniforms.tBG.value = got.bg;
+  gl.postMat.uniforms.uBGOn.value = got.bg ? 1 : 0;
   try {
     curWeapon = got.line;
     player = buildPlayer(got.race, got.line);
@@ -1124,7 +1247,11 @@ async function mountKill(card) {
   slot.style.position = "relative";
   slot.appendChild(gl.canvas);
   startLoop();
-  setTimeout(() => { if (card.isConnected) liberate(); }, 550);
+  // pace: one rendered frame first (cold shaders compile on it), then
+  // the beat before the charge
+  requestAnimationFrame(() => {
+    setTimeout(() => { if (card.isConnected) liberate(); }, 550);
+  });
 }
 
 const game = document.getElementById("game");
@@ -1138,4 +1265,9 @@ if (game) {
   };
   new MutationObserver(scan).observe(game, { childList: true, subtree: true });
   scan();
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(preload, { timeout: 4000 });
+  } else {
+    setTimeout(preload, 1500);
+  }
 }
