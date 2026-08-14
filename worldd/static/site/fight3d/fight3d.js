@@ -1076,10 +1076,23 @@ async function mountKill(card) {
   if (!reg) return;
   const slot = card.querySelector(".banner");
   if (!slot) return;
+  // NO GIF on a floor-1 death: the reel goes dark the moment we commit
+  // to the 3D scene — the fx mask would also clip the canvas. The GIF
+  // comes back only if the model or WebGL never arrives.
+  const oldStyle = [slot.style.maskImage, slot.style.webkitMaskImage,
+                    slot.style.backgroundColor];
+  slot.style.maskImage = "none";
+  slot.style.webkitMaskImage = "none";
+  slot.style.backgroundColor = "#000";
+  const restoreGif = () => {
+    slot.style.maskImage = oldStyle[0];
+    slot.style.webkitMaskImage = oldStyle[1];
+    slot.style.backgroundColor = oldStyle[2];
+  };
   const got = await ensureFor(spec);    // network first; GL only on success
-  if (!got || !card.isConnected) return;
+  if (!got || !card.isConnected) { restoreGif(); return; }
   const gl = initGL();
-  if (!gl) return;
+  if (!gl) { restoreGif(); return; }
 
   stopLoop();
   resetStage();
@@ -1104,23 +1117,11 @@ async function mountKill(card) {
       : null;
   } catch {
     resetStage();
+    restoreGif();
     return;
   }
 
-  // the 3D scene REPLACES the ending GIF: drop the fx mask + tint (the
-  // mask would also clip the canvas) and run the fight's own designed
-  // background loop under the transparent shader canvas — the demo2 look
   slot.style.position = "relative";
-  slot.style.maskImage = "none";
-  slot.style.webkitMaskImage = "none";
-  slot.style.backgroundColor = "#000";
-  const bg = document.createElement("img");
-  bg.src = new URL(`backgrounds/${spec.id}.gif`, BASE).href;
-  Object.assign(bg.style, {
-    position: "absolute", inset: "0", width: "100%", height: "100%",
-    imageRendering: "pixelated",
-  });
-  slot.appendChild(bg);
   slot.appendChild(gl.canvas);
   startLoop();
   setTimeout(() => { if (card.isConnected) liberate(); }, 550);
