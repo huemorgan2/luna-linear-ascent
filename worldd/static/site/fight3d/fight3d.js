@@ -1107,7 +1107,20 @@ async function mountKill(card) {
     return;
   }
 
+  // the 3D scene REPLACES the ending GIF: drop the fx mask + tint (the
+  // mask would also clip the canvas) and run the fight's own designed
+  // background loop under the transparent shader canvas — the demo2 look
   slot.style.position = "relative";
+  slot.style.maskImage = "none";
+  slot.style.webkitMaskImage = "none";
+  slot.style.backgroundColor = "#000";
+  const bg = document.createElement("img");
+  bg.src = new URL(`backgrounds/${spec.id}.gif`, BASE).href;
+  Object.assign(bg.style, {
+    position: "absolute", inset: "0", width: "100%", height: "100%",
+    imageRendering: "pixelated",
+  });
+  slot.appendChild(bg);
   slot.appendChild(gl.canvas);
   startLoop();
   setTimeout(() => { if (card.isConnected) liberate(); }, 550);
