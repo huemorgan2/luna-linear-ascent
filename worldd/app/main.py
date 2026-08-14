@@ -20,6 +20,8 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+import asyncpg
+
 from . import adminpage, auth, db, ratelimit, site, webplay
 from .config import get_config
 
@@ -628,21 +630,30 @@ async def enroll(body: EnrollIn, request: Request) -> dict:
         tenant = f"{hint or 'luna'}-{pysecrets.token_hex(4)}"
         secret = pysecrets.token_hex(32)
         try:
-            await pool.execute(
+            result = await pool.fetchrow(
                 "INSERT INTO ascent_tenants (tenant, secret, install_id) "
-                "VALUES ($1, $2, $3)", tenant, secret, body.install_id)
-        except Exception:
-            # either a tenant-name collision (reroll) or a concurrent
-            # enroll won the install_id race (return theirs)
-            row = await pool.fetchrow(
-                "SELECT tenant, secret FROM ascent_tenants "
-                "WHERE install_id = $1", body.install_id)
-            if row:
-                return {"tenant": row["tenant"], "secret": row["secret"],
-                        "existing": True}
+                "VALUES ($1, $2, $3) "
+                "ON CONFLICT (install_id) WHERE install_id IS NOT NULL "
+                "DO NOTHING "
+                "RETURNING tenant, secret",
+                tenant, secret, body.install_id)
+        except asyncpg.UniqueViolationError:
+            # tenant-name collision (PK clash) — reroll
             continue
-        log.info("tenant enrolled: %s (ip=%s)", tenant, ip)
-        return {"tenant": tenant, "secret": secret, "existing": False}
+        if result:
+            # We won the insert
+            log.info("tenant enrolled: %s (ip=%s)", tenant, ip)
+            return {"tenant": result["tenant"], "secret": result["secret"],
+                    "existing": False}
+        # ON CONFLICT fired — someone else enrolled this install_id
+        row = await pool.fetchrow(
+            "SELECT tenant, secret FROM ascent_tenants "
+            "WHERE install_id = $1", body.install_id)
+        if row:
+            return {"tenant": row["tenant"], "secret": row["secret"],
+                    "existing": True}
+        # tenant name collision (no install_id match) — reroll
+        continue
     raise HTTPException(500, "could not allocate tenant")
 
 
@@ -663,11 +674,12 @@ class TenantIn(BaseModel):
 async def create_tenant(body: TenantIn) -> dict:
     secret = pysecrets.token_hex(32)
     pool = await db.get_pool()
-    try:
-        await pool.execute(
-            "INSERT INTO ascent_tenants (tenant, secret) VALUES ($1,$2)",
-            body.tenant, secret)
-    except Exception:
+    result = await pool.fetchrow(
+        "INSERT INTO ascent_tenants (tenant, secret) VALUES ($1, $2) "
+        "ON CONFLICT (tenant) DO NOTHING "
+        "RETURNING tenant",
+        body.tenant, secret)
+    if not result:
         raise HTTPException(409, "tenant exists")
     log.info("tenant created: %s", body.tenant)
     return {"tenant": body.tenant, "secret": secret}
