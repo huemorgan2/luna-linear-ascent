@@ -66,7 +66,7 @@ a:hover { background: var(--gold); color: var(--bg); }
 }
 #bar-right { text-align: right; overflow: hidden; text-overflow: ellipsis;
              margin-left: auto; }
-#bar-cta { color: var(--bg); font-weight: bold; text-decoration: none;
+#bar-cta { color: var(--bg); font-weight: normal; text-decoration: none;
            flex-shrink: 0; }
 #bar-cta:hover, #bar-cta:focus { background: var(--bg); color: var(--gold); }
 
