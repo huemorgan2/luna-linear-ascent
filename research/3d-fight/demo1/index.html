@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3d-fight demo1 — floor 1, The Fencerows</title>
+<style>
+  :root {
+    --ink: #0b0e14; --panel: #11151f; --border: #232a3a;
+    --dim: #8b93a7; --faint: #5b6275; --text: #e6e9f2; --aether: #5eaefc;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { min-height: 100%; background: var(--ink);
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; color: var(--text); }
+  #stage { display: flex; flex-direction: column; align-items: center;
+    gap: 0; padding: 18px 8px; }
+  #col { border: 1px solid var(--border); }
+  #head { padding: 8px 12px; background: var(--panel); font-size: 12px;
+    letter-spacing: .05em; display: flex; justify-content: space-between;
+    gap: 16px; }
+  #head b { color: var(--text); font-weight: 600; }
+  #head span { color: var(--faint); }
+  #wrap { position: relative; width: 960px; height: 540px;
+    background: #000; }
+  #wrap img, #wrap canvas { position: absolute; inset: 0;
+    width: 960px; height: 540px; image-rendering: pixelated; }
+  #tabs { display: flex; flex-wrap: wrap; background: var(--panel);
+    border-top: 1px solid var(--border); }
+  #tabs button { font: inherit; font-size: 11px; letter-spacing: .05em;
+    color: var(--dim); background: none; border: none; cursor: pointer;
+    padding: 9px 11px; border-right: 1px solid var(--border); }
+  #tabs button:hover { color: var(--text);
+    background: rgba(94,174,252,.06); }
+  #tabs button.on { color: var(--aether);
+    background: rgba(94,174,252,.12); }
+  #opts { display: flex; gap: 14px; padding: 7px 12px;
+    background: var(--panel); border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--faint); letter-spacing: .05em; }
+  #opts label { cursor: pointer; user-select: none; }
+  #foot { padding: 10px 4px; font-size: 10px; color: var(--faint);
+    letter-spacing: .1em; text-align: center; line-height: 1.6; }
+  @media (max-width: 990px) {
+    #wrap { width: 480px; height: 270px; }
+    #wrap img, #wrap canvas { width: 480px; height: 270px; }
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="col">
+    <div id="head"><b id="fname">—</b><span id="fdesc"></span></div>
+    <div id="wrap">
+      <img id="bg" alt="">
+      <canvas id="chars" width="480" height="270"></canvas>
+    </div>
+    <div id="tabs"></div>
+    <div id="opts">
+      <label><input type="checkbox" id="animBg" checked> animated background</label>
+      <label><input type="checkbox" id="showChars" checked> 3D combatants</label>
+    </div>
+  </div>
+  <div id="foot">
+    research/3d-fight demo1 · floor 1 — The Fencerows ·
+    480×270 @2x · background: designed 1-bit GIF loop ·
+    combatants: three.js → Bayer 1-bit, live
+  </div>
+</div>
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js" } }</script>
+<script type="module">
+  import { setFight, fights } from "./fight.js";
+  const F = fights();
+  const tabs = document.getElementById("tabs");
+  const bg = document.getElementById("bg");
+  const chars = document.getElementById("chars");
+  const animBg = document.getElementById("animBg");
+  const showChars = document.getElementById("showChars");
+  let cur = null;
+
+  function pick(id) {
+    cur = id;
+    bg.src = animBg.checked
+      ? `./backgrounds/${id}.gif` : `./backgrounds/${id}_still.png`;
+    document.getElementById("fname").textContent = F[id].name;
+    document.getElementById("fdesc").textContent = F[id].desc;
+    for (const b of tabs.children) b.classList.toggle("on", b.dataset.id === id);
+    setFight(id);
+  }
+  for (const id of Object.keys(F)) {
+    const b = document.createElement("button");
+    b.textContent = F[id].name; b.dataset.id = id;
+    b.onclick = () => pick(id);
+    tabs.appendChild(b);
+  }
+  animBg.onchange = () => { if (cur) bg.src = animBg.checked
+    ? `./backgrounds/${cur}.gif` : `./backgrounds/${cur}_still.png`; };
+  showChars.onchange = () => {
+    chars.style.display = showChars.checked ? "block" : "none"; };
+  pick("grey_wolf");
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+# heavy generated binaries — regenerable via the gen_* scripts / Tripo;
+# the shipped copies live under worldd/static/site/fight3d
+demo2/assets/
+3d models/models/
+node_modules/

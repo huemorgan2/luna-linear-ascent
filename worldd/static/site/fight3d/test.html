@@ -1,0 +1,37 @@
+<!doctype html>
+<!-- dev harness for fight3d.js — mimics the /play pane: a #game div that
+     swaps in a victory card with data-kill3d. Never linked from the site.
+     Usage: serve worldd/static/site, open /fight3d/test.html?id=grey_wolf
+     &race=human&line=blade&breed=native&tint=%239ae6b4 -->
+<meta charset="utf-8">
+<title>fight3d harness</title>
+<style>
+  body { background: #0d0f14; color: #d2d6e0; font: 14px monospace; }
+  .banner { width: 640px; aspect-ratio: 320/112; background-color: #2a2f3a; }
+  .card { width: 640px; }
+</style>
+<script type="importmap">
+  {"imports": {"three": "./vendor/three.module.js"}}
+</script>
+<div id="game"></div>
+<script>
+  const q = new URLSearchParams(location.search);
+  const spec = {
+    id: q.get("id") || "grey_wolf",
+    race: q.get("race") || "human",
+    line: q.get("line") || "blade",
+    breed: q.get("breed") || "native",
+    specimen: q.get("specimen") || "common",
+    tint: q.get("tint") || "#9ae6b4",
+  };
+  // swap the card in AFTER load, like the pane does
+  setTimeout(() => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.kill3d = JSON.stringify(spec);
+    card.innerHTML = '<div class="banner"></div>' +
+      '<div class="body">victory card stand-in: ' + spec.id + "</div>";
+    document.getElementById("game").appendChild(card);
+  }, 300);
+</script>
+<script type="module" src="./fight3d.js"></script>

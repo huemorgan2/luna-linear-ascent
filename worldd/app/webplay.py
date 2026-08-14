@@ -113,6 +113,14 @@ async def play_page(request: Request):
     # usernames are names.is_legal (letters, digits, - _), safe to embed.
     tag = (f'<script src="/static/site/funnel.js?v=1" '
            f'data-user="{html_escape(user)}" defer></script>')
+    # PLAN3: the live 3D kill finisher — website-only, like funnel. The
+    # importmap must land in the initial HTML, before the module loads;
+    # fight3d.js watches #game for data-kill3d cards and degrades to the
+    # GIF when WebGL or a model is missing.
+    tag += ('<script type="importmap">{"imports":{"three":'
+            '"/static/site/fight3d/vendor/three.module.js"}}</script>'
+            '<script type="module" '
+            'src="/static/site/fight3d/fight3d.js?v=1"></script>')
     return HTMLResponse(page.replace("</head>", tag + "</head>", 1))
 
 

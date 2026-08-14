@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3d models — Tripo player characters</title>
+<style>
+  :root {
+    --ink: #0b0e14; --panel: #11151f; --border: #232a3a;
+    --dim: #8b93a7; --faint: #5b6275; --text: #e6e9f2; --aether: #5eaefc;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { min-height: 100%; background: var(--ink);
+    font-family: "SF Mono", ui-monospace, Menlo, monospace; color: var(--text); }
+  #page { display: flex; flex-direction: column; align-items: center;
+    padding: 18px 8px; gap: 14px; }
+  h1 { font-size: 13px; font-weight: 600; letter-spacing: .08em; }
+  h1 span { color: var(--faint); font-weight: 400; }
+  #row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+  .card { border: 1px solid var(--border); background: var(--panel); }
+  .card .head { padding: 7px 10px; font-size: 12px; letter-spacing: .05em;
+    display: flex; justify-content: space-between; }
+  .card .head span { color: var(--faint); font-size: 10px; }
+  /* three cards together span ~60% of the viewport width */
+  .card canvas { display: block; width: 19vw; height: 22.8vw;
+    image-rendering: pixelated; background: #000; }
+  .card .weapons { display: flex; border-top: 1px solid var(--border); }
+  .card .weapons button { font: inherit; font-size: 11px; letter-spacing: .05em;
+    color: var(--dim); background: none; border: none; cursor: pointer;
+    flex: 1; padding: 8px 0; border-right: 1px solid var(--border); }
+  .card .weapons button:last-child { border-right: none; }
+  .card .weapons button:hover { color: var(--text);
+    background: rgba(94,174,252,.06); }
+  .card .weapons button.on { color: var(--aether);
+    background: rgba(94,174,252,.12); }
+  .card .note { padding: 6px 10px; font-size: 10px; color: var(--faint);
+    border-top: 1px solid var(--border); min-height: 26px; }
+  #foot { font-size: 10px; color: var(--faint); letter-spacing: .1em;
+    text-align: center; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div id="page">
+  <h1>TRIPO PLAYER CHARACTERS <span>— click to attack, live 1-bit dither</span></h1>
+  <div id="row"></div>
+  <div id="foot">
+    research/3d-fight/3d models · Tripo3D text→model→texture→rig→idle ·
+    200×240 buffer @2x · same Bayer 8×8 + near-side depth ink as demo2 ·
+    tune grips: <b>fx.grip("giant","blade",{rot:[0,0,-1.5]})</b>
+  </div>
+</div>
+<script type="importmap">
+  { "imports": { "three": "../demo2/vendor/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "../demo2/vendor/GLTFLoader.js";
+
+const W = 200, H = 240;                  // per-card pixel buffer, shown @2x
+
+const SPECIES = {
+  giant: { label: "Giant", h: 2.05 },
+  elf:   { label: "Elf",   h: 1.90 },
+  human: { label: "Human", h: 1.72 },
+};
+// grip: fraction along the weapon's long axis where the hand holds it;
+// rot/pos: WORLD-space after the long axis is normalized to +Y; the frame
+// loop cancels the live hand-bone rotation so one setting fits every rig.
+const WEAPONS = {
+  blade: { label: "Blade", len: 0.95, grip: 0.14, rot: [0.1, 0, 0.55],
+           fat: 2.6, lift: 0.25,
+           attack: "40_slash" },            // raised toward the enemy (screen-left)
+  bow:   { label: "Bow",   len: 1.30, grip: 0.50, rot: [0, 0, 0.1],
+           pos: [-0.1, 0, 0.12], fat: 2.2, lift: 0.50, // Tripo textures the limbs
+           attack: "41_shoot" },            // near-black; lift clears dither
+  staff: { label: "Staff", len: 1.45, grip: 0.45, rot: [0, 0, 0.5],
+           pos: [-0.1, 0, 0.1], attack: "42_cast" },  // leant forward, crystal clear of the head
+};
+// the natural pairing, used as each card's starting weapon
+const DEFAULT_W = { giant: "blade", elf: "bow", human: "staff" };
+
+const BAYER8 = [
+  0, 32, 8, 40, 2, 34, 10, 42, 48, 16, 56, 24, 50, 18, 58, 26,
+  12, 44, 4, 36, 14, 46, 6, 38, 60, 28, 52, 20, 62, 30, 54, 22,
+  3, 35, 11, 43, 1, 33, 9, 41, 51, 19, 59, 27, 49, 17, 57, 25,
+  15, 47, 7, 39, 13, 45, 5, 37, 63, 31, 55, 23, 61, 29, 53, 21,
+];
+
+const loader = new GLTFLoader();
+async function tryLoad(paths) {
+  for (const p of paths) {
+    try { return { gltf: await loader.loadAsync(p), path: p }; }
+    catch { /* next fallback */ }
+  }
+  return null;
+}
+
+// ── one card = one canvas, scene, dither post pass ────────────────────────
+function makeCard(spId) {
+  const sp = SPECIES[spId];
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="head"><b>${sp.label}</b><span class="src">loading…</span></div>
+    <canvas width="${W}" height="${H}"></canvas>
+    <div class="weapons"></div>
+    <div class="note"></div>`;
+  document.getElementById("row").appendChild(card);
+
+  const canvas = card.querySelector("canvas");
+  const note = card.querySelector(".note");
+  const src = card.querySelector(".src");
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
+  renderer.setPixelRatio(1);
+  renderer.setSize(W, H, false);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+
+  const rtColor = new THREE.WebGLRenderTarget(W, H, {
+    minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter,
+    depthTexture: new THREE.DepthTexture(W, H),
+  });
+  const bayerData = new Uint8Array(64);
+  for (let i = 0; i < 64; i++) bayerData[i] = BAYER8[i] * 4;
+  const bayerTex = new THREE.DataTexture(bayerData, 8, 8, THREE.RedFormat);
+  bayerTex.minFilter = bayerTex.magFilter = THREE.NearestFilter;
+  bayerTex.wrapS = bayerTex.wrapT = THREE.RepeatWrapping;
+  bayerTex.needsUpdate = true;
+
+  const postScene = new THREE.Scene();
+  const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  postScene.add(new THREE.Mesh(
+    new THREE.PlaneGeometry(2, 2),
+    new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: {
+        tScene: { value: rtColor.texture },
+        tDepth: { value: rtColor.depthTexture },
+        tBayer: { value: bayerTex },
+        texel: { value: new THREE.Vector2(1 / W, 1 / H) },
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`,
+      fragmentShader: `
+        uniform sampler2D tScene, tDepth, tBayer;
+        uniform vec2 texel;
+        varying vec2 vUv;
+        void main(){
+          vec4 s = texture2D(tScene, vUv);
+          float t = texture2D(tBayer, gl_FragCoord.xy / 8.0).r + 0.002;
+          if (s.a < 0.03) { gl_FragColor = vec4(0.0); return; }
+          if (s.a < 0.97) {          // shadow catcher: dithered contact shadow
+            float on = step(t, s.a * 0.55);
+            gl_FragColor = vec4(0.0, 0.0, 0.0, on);
+            return;
+          }
+          float d0 = texture2D(tDepth, vUv).x;
+          float behind = max(
+            max(texture2D(tDepth, vUv + vec2(texel.x, 0.0)).x,
+                texture2D(tDepth, vUv - vec2(texel.x, 0.0)).x),
+            max(texture2D(tDepth, vUv + vec2(0.0, texel.y)).x,
+                texture2D(tDepth, vUv - vec2(0.0, texel.y)).x)) - d0;
+          float edge = step(0.010, behind);
+          float lum = dot(s.rgb, vec3(0.2126, 0.7152, 0.0722));
+          lum = pow(clamp(lum, 0.0, 1.0), 0.4545);   // rt is linear; quantize perceptually
+          float shade = smoothstep(0.03, 0.95, lum);
+          shade = floor(shade * 6.0 + 0.5) / 6.0;
+          float on = step(t, shade) * (1.0 - edge);
+          gl_FragColor = vec4(vec3(on), 1.0);
+        }`,
+    })));
+
+  const scene = new THREE.Scene();
+  const VH = sp.h * 1.3;
+  const camera = new THREE.OrthographicCamera(
+    -VH * (W / H) / 2, VH * (W / H) / 2, VH / 2, -VH / 2, 0.1, 120);
+  // slight downward tilt so the floor (and the contact shadow) is visible
+  camera.position.set(0, sp.h * 0.52 + 2.0, 26);
+  camera.lookAt(new THREE.Vector3(0, sp.h * 0.48, 0));
+
+  // keep the key well below blowout so the lambert falloff over the body
+  // survives quantization — that falloff IS the shading
+  // one strong key from front-left-top: a readable light source with a
+  // clear lit side / dark side, low ambient so the falloff shows
+  scene.add(new THREE.AmbientLight(0xffffff, 0.40));
+  const key = new THREE.DirectionalLight(0xffffff, 4.2);
+  key.position.set(-6, 9, 12);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.camera.left = -4; key.shadow.camera.right = 4;
+  key.shadow.camera.top = 5; key.shadow.camera.bottom = -2;
+  key.shadow.camera.near = 2; key.shadow.camera.far = 40;
+  key.shadow.bias = -0.002;
+  scene.add(key);
+  const rim = new THREE.DirectionalLight(0xffffff, 1.5);
+  rim.position.set(8, 4, -6);
+  scene.add(rim);
+
+  // background: dark wall + mid floor — the figures get ink outlines from
+  // the depth-edge pass and the cast shadow grounds the feet
+  const wall = new THREE.Mesh(
+    new THREE.PlaneGeometry(30, 14),
+    new THREE.MeshStandardMaterial({ color: 0x101116 }));
+  wall.position.set(0, 5, -3.2);
+  wall.receiveShadow = true;
+  scene.add(wall);
+  const floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(30, 10),
+    new THREE.MeshStandardMaterial({ color: 0x17181d }));
+  floor.rotateX(-Math.PI / 2);
+  floor.position.y = -0.02;
+  floor.receiveShadow = true;
+  scene.add(floor);
+  const catcher = new THREE.Mesh(
+    new THREE.PlaneGeometry(20, 8),
+    new THREE.ShadowMaterial({ opacity: 0.85 }));
+  catcher.rotateX(-Math.PI / 2);
+  catcher.receiveShadow = true;
+  scene.add(catcher);
+
+  return { spId, sp, card, note, src, renderer, rtColor, postScene, postCam,
+           scene, camera, charRoot: null, mixer: null, handBone: null,
+           weaponWrap: null, breathe: false, k: 1 };
+}
+
+function shadowify(o) {
+  o.traverse((c) => { if (c.isMesh) { c.castShadow = true;
+    c.frustumCulled = false; } });
+}
+
+// find the right-hand bone across rig specs (mixamo / tripo / other)
+function findHand(root) {
+  let hand = null;
+  root.traverse((o) => {
+    if (hand || !o.isBone) return;
+    if (/righthand$|hand[._]?r$|r[._]?hand$/i.test(o.name)) hand = o;
+  });
+  return hand;
+}
+
+async function loadCharacter(c) {
+  const found = await tryLoad([
+    `models/${c.spId}/30_idle.glb`, `models/${c.spId}/20_rigged.glb`,
+    `models/${c.spId}/10_textured.glb`, `models/${c.spId}/00_base.glb`,
+  ]);
+  if (!found) {
+    c.src.textContent = "not generated";
+    c.note.textContent = "run gen_models.py (needs Tripo API credits)";
+    return;
+  }
+  const { gltf, path } = found;
+  c.src.textContent = path.split("/").pop();
+
+  const model = gltf.scene;
+  shadowify(model);
+
+  if (gltf.animations.length) {          // baked breathing idle from Tripo
+    c.mixer = new THREE.AnimationMixer(model);
+    c.idleAction = c.mixer.clipAction(gltf.animations[0]);
+    c.idleAction.play();
+    c.mixer.update(0.033);               // settle into the animated pose
+    c.note.textContent = "click the character to attack";
+    c.mixer.addEventListener("finished", (e) => {
+      if (e.action !== c.attackAction) return;
+      c.attackAction.fadeOut(0.15);
+      c.idleAction.reset().fadeIn(0.15).play();
+      c.attacking = false;
+    });
+  } else {                               // not rigged yet: procedural breath
+    c.breathe = true;
+    c.note.textContent = "no rig yet — procedural breathing";
+  }
+
+  // normalize to species height, feet on y=0 — measured on the ANIMATED
+  // pose (the rest pose of Tripo retarget glbs differs from the idle)
+  model.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(model);
+  const k = c.sp.h / (box.max.y - box.min.y);
+  c.k = k;
+  const root = new THREE.Group();
+  model.scale.setScalar(k);
+  model.position.set(
+    -(box.min.x + box.max.x) / 2 * k, -box.min.y * k,
+    -(box.min.z + box.max.z) / 2 * k);
+  root.add(model);
+  root.rotation.y = -1.0;                // near-profile: facing the enemy ←
+                                         // (weapon hand on the camera side)
+  c.scene.add(root);
+  c.charRoot = root;
+  c.handBone = findHand(model);
+  if (!c.handBone) c.note.textContent += " · no hand bone found";
+  if (c.handBone) {
+    // remember the settled neutral pose: equip() compensates against THIS,
+    // not the live pose, so equips don't depend on the animation phase
+    c.handBone.updateWorldMatrix(true, false);
+    c.handNeutralQuat = c.handBone.getWorldQuaternion(new THREE.Quaternion());
+  }
+}
+
+// weapon glbs, loaded once, shared by all cards
+const weaponCache = {};
+async function weaponModel(wId) {
+  if (weaponCache[wId] !== undefined) return weaponCache[wId];
+  const found = await tryLoad([
+    `models/${wId}/10_textured.glb?v=2`, `models/${wId}/00_base.glb?v=2`,
+  ]);   // ?v defeats heuristic caching (http.server sends no Cache-Control)
+  weaponCache[wId] = found ? found.gltf.scene : null;
+  return weaponCache[wId];
+}
+
+async function equip(c, wId) {
+  if (c.weaponWrap) { c.weaponWrap.removeFromParent(); c.weaponWrap = null; }
+  c.wId = wId;
+  if (!c.handBone) return;
+  const srcModel = await weaponModel(wId);
+  if (!srcModel || c.wId !== wId) return;
+  const wp = WEAPONS[wId];
+
+  const model = srcModel.clone(true);
+  shadowify(model);
+  if (WEAPONS[wId].lift) model.traverse((m) => {
+    if (!m.isMesh) return;
+    m.material = m.material.clone();
+    m.material.emissive.set(0xffffff);
+    m.material.emissiveIntensity = WEAPONS[wId].lift;
+  });
+  // Tripo props often lie DIAGONALLY in their bbox, so find the true long
+  // axis from the vertices (farthest-point pair) and rotate it onto +Y
+  model.updateMatrixWorld(true);
+  const pts = [];
+  model.traverse((m) => {
+    if (!m.isMesh) return;
+    const pos = m.geometry.attributes.position;
+    for (let i = 0; i < pos.count; i += 7)
+      pts.push(new THREE.Vector3().fromBufferAttribute(pos, i)
+        .applyMatrix4(m.matrixWorld));
+  });
+  const centroid = pts.reduce((a, p) => a.add(p), new THREE.Vector3())
+    .divideScalar(pts.length);
+  let A = pts[0], best = -1;
+  for (const p of pts) { const d = p.distanceToSquared(centroid);
+    if (d > best) { best = d; A = p; } }
+  let B = pts[0]; best = -1;
+  for (const p of pts) { const d = p.distanceToSquared(A);
+    if (d > best) { best = d; B = p; } }
+  const axis = B.clone().sub(A).normalize();
+  if (axis.y < 0) axis.negate();
+  const inner = new THREE.Group();
+  inner.quaternion.setFromUnitVectors(axis, new THREE.Vector3(0, 1, 0));
+  inner.add(model);
+  const nbox = new THREE.Box3().setFromObject(inner);
+  const nlen = nbox.max.y - nbox.min.y;
+
+  const boneScale = c.handBone.getWorldScale(new THREE.Vector3()).y || 1;
+  const s = wp.len / nlen / boneScale;   // wp.len in world metres — boneScale
+  // already contains the model's normalize factor, so k must NOT re-enter
+  const gripY = nbox.min.y + wp.grip * nlen;
+  const grip = new THREE.Group();                // origin at the grip point
+  inner.position.y = -gripY;
+  grip.add(inner);
+  // fat: transverse-only thickening — the post shader's depth-edge ink
+  // blacks out any geometry only 1–2 buffer pixels wide (every pixel is
+  // an edge), so thin props (blade, bow) must be fattened to survive
+  grip.scale.set(s * (wp.fat || 1), s, s * (wp.fat || 1));
+
+  // wp.rot/wp.pos are WORLD-space; the frame loop re-cancels the live bone
+  // rotation every tick so the weapon points the same on every rig
+  const invBone = c.handNeutralQuat.clone().invert();
+  const wrap = new THREE.Group();
+  c.weaponWant = new THREE.Quaternion()
+    .setFromEuler(new THREE.Euler(...wp.rot));
+  wrap.quaternion.copy(invBone).multiply(c.weaponWant);
+  if (wp.pos) wrap.position.copy(new THREE.Vector3(...wp.pos)
+    .applyQuaternion(invBone).divideScalar(boneScale));
+  wrap.add(grip);
+  c.handBone.add(wrap);
+  c.weaponWrap = wrap;
+}
+
+// play this weapon's attack clip once, then settle back into the idle.
+// While it runs the wrap quaternion is left alone (see frame()), so the
+// weapon rides the hand rigidly through the swing.
+async function attack(c) {
+  if (!c.mixer || c.attacking || !c.weaponWrap) return;
+  const wId = c.wId;
+  c.attackClips ??= {};
+  if (c.attackClips[wId] === undefined) {
+    const found = await tryLoad(
+      [`models/${c.spId}/${WEAPONS[wId].attack}.glb?v=2`]);
+    c.attackClips[wId] = found?.gltf.animations[0] ?? null;
+    if (c.wId !== wId) return;           // weapon switched while loading
+  }
+  const clip = c.attackClips[wId];
+  if (!clip) { c.note.textContent = "attack clip not generated yet"; return; }
+  c.attacking = true;
+  c.attackAction = c.mixer.clipAction(clip);
+  c.attackAction.reset();
+  c.attackAction.setLoop(THREE.LoopOnce, 1);
+  c.attackAction.clampWhenFinished = true;
+  c.attackAction.timeScale = 1.5;   // Tripo presets run slow — snap it up
+  c.attackAction.fadeIn(0.1).play();
+  c.idleAction.fadeOut(0.1);
+}
+
+// ── build the three cards ─────────────────────────────────────────────────
+const cards = Object.keys(SPECIES).map(makeCard);
+for (const c of cards) {
+  const host = c.card.querySelector(".weapons");
+  for (const wId of Object.keys(WEAPONS)) {
+    const b = document.createElement("button");
+    b.textContent = WEAPONS[wId].label;
+    if (wId === DEFAULT_W[c.spId]) b.classList.add("on");
+    b.onclick = () => {
+      for (const x of host.children) x.classList.toggle("on", x === b);
+      equip(c, wId);
+    };
+    host.appendChild(b);
+  }
+  const cv = c.card.querySelector("canvas");
+  cv.style.cursor = "pointer";
+  cv.onclick = () => attack(c);
+}
+await Promise.all(cards.map(loadCharacter));
+await Promise.all(cards.map((c) => equip(c, DEFAULT_W[c.spId])));
+
+// live grip tuning from the console
+window.fx = {
+  THREE,
+  cards,
+  mark() {   // debug: white ball on each right-hand bone
+    for (const c of cards) {
+      if (!c.handBone) continue;
+      const bs = c.handBone.getWorldScale(new THREE.Vector3()).y || 1;
+      c.handBone.add(new THREE.Mesh(
+        new THREE.SphereGeometry(0.05 / bs, 8, 8),
+        new THREE.MeshBasicMaterial({ color: 0xffffff })));
+    }
+    return "marked";
+  },
+  grip(spId, wId, { rot, pos, len, grip } = {}) {
+    const wp = WEAPONS[wId];
+    if (rot) wp.rot = rot;
+    if (pos) wp.pos = pos;
+    if (len) wp.len = len;
+    if (grip !== undefined) wp.grip = grip;
+    for (const c of cards) {
+      if ((!spId || c.spId === spId) && c.wId === wId) equip(c, wId);
+    }
+  },
+  bones(spId) {
+    const c = cards.find((x) => x.spId === spId);
+    const names = [];
+    c?.charRoot?.traverse((o) => { if (o.isBone) names.push(o.name); });
+    return names;
+  },
+};
+
+const clock = new THREE.Clock();
+const liveQ = new THREE.Quaternion();
+function frame() {
+  requestAnimationFrame(frame);
+  const dt = Math.min(clock.getDelta(), 0.1);
+  const t = clock.elapsedTime;
+  for (const c of cards) {
+    if (c.mixer) c.mixer.update(dt);
+    if (c.breathe && c.charRoot) {       // fallback until the rig exists
+      c.charRoot.scale.y = 1 + 0.012 * Math.sin(t * 1.9);
+      c.charRoot.rotation.z = 0.008 * Math.sin(t * 0.9);
+    }
+    if (c.weaponWrap && c.handBone && !c.attacking) {
+      // hold the weapon's WORLD orientation: the hand carries it (position)
+      // but per-rig wrist twists must not change how it points. During an
+      // attack the lock is released so the weapon swings WITH the hand.
+      c.handBone.updateWorldMatrix(true, false);
+      c.handBone.getWorldQuaternion(liveQ).invert();
+      c.weaponWrap.quaternion.copy(liveQ).multiply(c.weaponWant);
+    }
+    c.renderer.setRenderTarget(c.rtColor);
+    c.renderer.setClearColor(0x000000, 0);
+    c.renderer.clear();
+    c.renderer.render(c.scene, c.camera);
+    c.renderer.setRenderTarget(null);
+    c.renderer.clear();
+    c.renderer.render(c.postScene, c.postCam);
+  }
+}
+frame();
+</script>
+</body>
+</html>
