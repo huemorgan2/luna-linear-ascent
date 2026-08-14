@@ -80,11 +80,8 @@
 <div class="wrap">
   <div id="keygate" hidden>
     <h1>LINEAR ASCENT <span class="dim">— ADMIN</span></h1>
-    <p class="dim">the desk wants its key</p>
-    <input id="keyin" type="password" placeholder="admin key"
-           autocomplete="off">
-    <button class="act" id="keygo">ENTER</button>
-    <p id="keyerr" class="dim"></p>
+    <p class="dim">the desk opens to approved admins only —
+      <a href="/#door">sign in on the site</a> with an approved name</p>
   </div>
 
   <div id="console" hidden>
@@ -95,13 +92,13 @@
         <button id="tabPlayers" class="on">PLAYERS</button>
         <button id="tabFeedback">FEEDBACK
           <span id="fbTabBadge" class="unread" hidden></span></button>
-        <button id="keyout" class="dim" title="forget the key">⏏</button>
+        <button id="tabAdmins">ADMINS</button>
       </nav>
     </header>
     <main id="main"></main>
   </div>
   <div id="note"></div>
 </div>
-<script src="/static/site/admin.js?v=7"></script>
+<script src="/static/site/admin.js?v=8"></script>
 </body>
 </html>

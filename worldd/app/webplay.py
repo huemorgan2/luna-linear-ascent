@@ -146,6 +146,16 @@ async def pane_peek(ident: tuple = Depends(_identity)) -> dict:
     return {"scene_id": scene_id, "floor_presence": int(pres["hot"])}
 
 
+@router.post("/play/api/pane/room_more")
+async def pane_room_more(ident: tuple = Depends(_identity)) -> dict:
+    """The presence grid's MORE — the rest of the viewer's room."""
+    player, _ = ident
+    from . import social
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        return await social.room_more(conn, WEB_TENANT, player)
+
+
 # ── Score & community ────────────────────────────────────────────────────
 
 @router.get("/play/api/pane/score")

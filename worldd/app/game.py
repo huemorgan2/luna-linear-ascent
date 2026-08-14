@@ -180,7 +180,8 @@ async def run_act(tenant: str, player: str, option: str, text: str,
             if mine:
                 await factions.maybe_resolve(conn, mine["faction"])
             doc = await _load_doc(conn, tenant, player, display_name)
-            await social.inject_world(conn, tenant, player, doc)
+            await social.inject_world(conn, tenant, player, doc,
+                                      option=option)
             before = doc.get("unlocked_floor", 1)
             _sync_frontier_into_doc(doc, doc["_world"]["frontier"])
             reserved = await _claim_name(conn, tenant, player, doc,

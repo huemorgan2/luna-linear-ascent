@@ -2,8 +2,9 @@
 
 Threads belong to (tenant, player); every message is a chat turn from the
 player or from an admin. Admins are CHARACTER names (004: a name is unique
-across the whole world, so a name is an identity), configured via
-ASCENT_FEEDBACK_ADMINS. Attachments are small screenshots stored as bytea
+across the whole world, so a name is an identity), held in the
+ascent_admins table — seeded once from ASCENT_FEEDBACK_ADMINS, managed
+from the desk's ADMINS tab. Attachments are small screenshots stored as bytea
 right in the world database.
 """
 
@@ -24,9 +25,25 @@ ADMIN_LIST_LIMIT = 500
 
 
 def admin_names() -> set[str]:
+    """The env list — only the SEED for ascent_admins, read once when
+    the table is empty. The table is the truth; the desk edits it."""
     raw = os.environ.get("ASCENT_FEEDBACK_ADMINS",
                          "masterchief,huemorgan3")
     return {n.strip().lower() for n in raw.split(",") if n.strip()}
+
+
+async def admin_set(conn) -> set[str]:
+    """The approved admins, from the database. An empty table means a
+    fresh world — the env list walks in and signs the book."""
+    rows = await conn.fetch("SELECT name FROM ascent_admins")
+    if rows:
+        return {r["name"] for r in rows}
+    seed = admin_names()
+    for n in sorted(seed):
+        await conn.execute(
+            "INSERT INTO ascent_admins (name, added_by) VALUES ($1, 'seed') "
+            "ON CONFLICT (name) DO NOTHING", n)
+    return seed
 
 
 async def character_name(conn, tenant: str, player: str) -> str:
@@ -44,7 +61,7 @@ async def is_admin(conn, tenant: str, player: str) -> bool:
         # 004: the site username IS the climber name — an account that
         # hasn't stepped through the gate yet still owns its name.
         name = player
-    return name.lower() in admin_names()
+    return name.lower() in await admin_set(conn)
 
 
 def _decode_attachments(attachments: list) -> list[tuple[str, bytes]]:

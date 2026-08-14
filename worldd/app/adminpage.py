@@ -1,8 +1,9 @@
-"""The admin desk page — players and feedback, behind the admin key.
+"""The admin desk page — players and feedback, behind the admin list.
 
 /admin serves a small static console (PLAYERS and FEEDBACK tabs); its
-JSON api lives under /admin/api/* and is gated by the same X-Admin-Key
-header as the rest of the /admin endpoints. PLAYERS: the top 100 by the
+JSON api lives under /admin/api/* and opens only to a signed-in site
+session whose username is on the approved-admins list (ascent_admins —
+no key, no password prompt; the site door is the only door). PLAYERS: the top 100 by the
 leaderboard's own ordering, a search that finds anyone, and a player
 page where energy, xp, gold and bank can be set and weapons of every
 line granted straight into the pack. FEEDBACK: the 051 postbox from the
@@ -12,15 +13,13 @@ desk side — threads, messages, replies signed as the admin.
 from __future__ import annotations
 
 import json
-import time
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, Field
 
 from . import db, feedback, site, social
-from .config import get_config
 from .game import pstate  # gamepath made the plugin importable
 
 from plugin_linear_ascent import economy  # noqa: E402
@@ -30,45 +29,17 @@ router = APIRouter()
 SITE_DIR = Path(__file__).resolve().parent.parent / "static" / "site"
 
 
-# the key door locks after too many wrong guesses from one address —
-# the session-cookie door stays open, so a locked-out admin signs in
-_FAILS: dict[str, list[float]] = {}
-_FAIL_LIMIT = 10
-_FAIL_WINDOW = 900.0
-
-
-def _key_fails(ip: str) -> list[float]:
-    now = time.monotonic()
-    fails = [t for t in _FAILS.get(ip, []) if now - t < _FAIL_WINDOW]
-    _FAILS[ip] = fails
-    return fails
-
-
-def _admin(request: Request, x_admin_key: str = Header(default="")) -> None:
-    # two ways past the lock: the X-Admin-Key that guards main.py's
-    # /admin endpoints, or a signed-in site session whose username is a
-    # feedback admin (004: a name is an identity) — huemorgan3 walks in
-    # without typing the key.
-    cfg = get_config()
-    if x_admin_key:
-        ip = request.client.host if request.client else "?"
-        fails = _key_fails(ip)
-        if len(fails) >= _FAIL_LIMIT:
-            raise HTTPException(429, "too many wrong keys — come back later")
-        if cfg.admin_key and x_admin_key == cfg.admin_key:
-            return
-        fails.append(time.monotonic())
+async def _admin(request: Request) -> str:
+    """The one door: a signed-in site session whose username is on the
+    approved-admins list (004: a name is an identity). No key, so there
+    is nothing to guess and nothing to lock."""
     user = site.session_user(request)
-    if user and user.lower() in feedback.admin_names():
-        return
-    raise HTTPException(401, "bad admin key")
-
-
-def _admin_ident() -> tuple[str, str]:
-    """The key-holder acts as the first configured feedback admin —
-    004 name-is-identity holds even when nobody typed a password."""
-    names = sorted(feedback.admin_names())
-    return "web", (names[0] if names else "admin")
+    if user:
+        pool = await db.get_pool()
+        async with pool.acquire() as conn:
+            if user.lower() in await feedback.admin_set(conn):
+                return user.lower()
+    raise HTTPException(401, "the desk opens to approved admins only")
 
 
 # ── The page ─────────────────────────────────────────────────────────────
@@ -343,11 +314,58 @@ async def world_overview() -> dict:
     }
 
 
+# ── Admins ───────────────────────────────────────────────────────────────
+
+class AdminNameIn(BaseModel):
+    name: str = Field(min_length=2, max_length=40)
+
+
+@router.get("/admin/api/admins")
+async def admins_list(user: str = Depends(_admin)) -> dict:
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        await feedback.admin_set(conn)          # seed a fresh world
+        rows = await conn.fetch(
+            "SELECT name, added_by, added_at FROM ascent_admins "
+            "ORDER BY added_at, name")
+    return {"admins": [
+        {"name": r["name"], "added_by": r["added_by"],
+         "added_at": r["added_at"].isoformat()} for r in rows],
+        "you": user}
+
+
+@router.post("/admin/api/admins")
+async def admins_add(body: AdminNameIn,
+                     user: str = Depends(_admin)) -> dict:
+    name = body.name.strip().lower()
+    if not name:
+        raise HTTPException(422, "a name, not a blank")
+    pool = await db.get_pool()
+    await pool.execute(
+        "INSERT INTO ascent_admins (name, added_by) VALUES ($1, $2) "
+        "ON CONFLICT (name) DO NOTHING", name, user)
+    return {"ok": True, "name": name}
+
+
+@router.post("/admin/api/admins/remove")
+async def admins_remove(body: AdminNameIn,
+                        user: str = Depends(_admin)) -> dict:
+    name = body.name.strip().lower()
+    pool = await db.get_pool()
+    async with pool.acquire() as conn, conn.transaction():
+        n = await conn.fetchval("SELECT count(*) FROM ascent_admins")
+        if int(n) <= 1:
+            raise HTTPException(409, "the desk cannot empty itself — "
+                                     "add another admin first")
+        await conn.execute("DELETE FROM ascent_admins WHERE name=$1", name)
+    return {"ok": True, "name": name}
+
+
 # ── Feedback ─────────────────────────────────────────────────────────────
 
-@router.get("/admin/api/feedback", dependencies=[Depends(_admin)])
-async def feedback_threads() -> dict:
-    tenant, player = _admin_ident()
+@router.get("/admin/api/feedback")
+async def feedback_threads(user: str = Depends(_admin)) -> dict:
+    tenant, player = "web", user
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         return await feedback.admin_threads(conn, tenant, player)
@@ -362,9 +380,9 @@ async def feedback_unread() -> dict:
     return {"unread": int(n)}
 
 
-@router.get("/admin/api/feedback/{fid}", dependencies=[Depends(_admin)])
-async def feedback_thread(fid: int) -> dict:
-    tenant, player = _admin_ident()
+@router.get("/admin/api/feedback/{fid}")
+async def feedback_thread(fid: int, user: str = Depends(_admin)) -> dict:
+    tenant, player = "web", user
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         return await feedback.thread(conn, tenant, player, fid,
@@ -375,10 +393,10 @@ class ReplyIn(BaseModel):
     body: str = Field(min_length=1, max_length=4000)
 
 
-@router.post("/admin/api/feedback/{fid}/reply",
-             dependencies=[Depends(_admin)])
-async def feedback_reply(fid: int, body: ReplyIn) -> dict:
-    tenant, player = _admin_ident()
+@router.post("/admin/api/feedback/{fid}/reply")
+async def feedback_reply(fid: int, body: ReplyIn,
+                         user: str = Depends(_admin)) -> dict:
+    tenant, player = "web", user
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
@@ -386,10 +404,10 @@ async def feedback_reply(fid: int, body: ReplyIn) -> dict:
                                         body.body, [], as_admin=True)
 
 
-@router.get("/admin/api/feedback/attachment/{att_id}",
-            dependencies=[Depends(_admin)])
-async def feedback_attachment(att_id: int) -> Response:
-    tenant, player = _admin_ident()
+@router.get("/admin/api/feedback/attachment/{att_id}")
+async def feedback_attachment(att_id: int,
+                              user: str = Depends(_admin)) -> Response:
+    tenant, player = "web", user
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         mime, raw = await feedback.attachment(conn, tenant, player, att_id)

@@ -1,7 +1,7 @@
-/* The admin desk console — PLAYERS and FEEDBACK, behind X-Admin-Key.
-   No framework: fetch + innerHTML, same as the public site. The key
-   lives in localStorage and rides every request as a header; a 401
-   drops back to the gate.
+/* The admin desk console — WORLD, PLAYERS, FEEDBACK and ADMINS. The
+   door is the site session cookie: only usernames on the approved-admins
+   list get in — there is no key. No framework: fetch + innerHTML, same
+   as the public site; a 401 shows the sign-in note.
 
    Every view owns a hash URL (#/players, #/player/{tenant}/{player},
    #/feedback, #/feedback/{fid}) — navigation is a real location change,
@@ -9,7 +9,6 @@
 "use strict";
 
 const $ = (id) => document.getElementById(id);
-const KEY_STORE = "ascent_admin_key";
 let weaponsCache = null;
 
 function esc(s) {
@@ -27,17 +26,14 @@ function note(text) {
 }
 
 async function api(path, opts = {}) {
-  // an admin session cookie rides along on its own — the key header is
-  // only for desks without one
-  const key = localStorage.getItem(KEY_STORE) || "";
+  // the admin session cookie IS the door — nothing else rides along
   const r = await fetch(path, {
     ...opts,
-    headers: { ...(key ? { "X-Admin-Key": key } : {}),
-               ...(opts.body ? { "Content-Type": "application/json" } : {}),
+    headers: { ...(opts.body ? { "Content-Type": "application/json" } : {}),
                ...(opts.headers || {}) },
   });
   if (r.status === 401) {
-    gate(key ? "that key does not turn" : "");
+    gate();
     throw new Error("401");
   }
   if (!r.ok) {
@@ -74,6 +70,7 @@ function route() {
     renderThread(Number(parts[1]));
   else if (parts[0] === "feedback") renderFeedback();
   else if (parts[0] === "world") renderWorld();
+  else if (parts[0] === "admins") renderAdmins();
   else renderPlayers(q);
 }
 
@@ -86,20 +83,9 @@ function nav(h) {
 
 // ── The gate ────────────────────────────────────────────────────────────
 
-function gate(err) {
+function gate() {
   $("console").hidden = true;
   $("keygate").hidden = false;
-  $("keyerr").textContent = err || "";
-  $("keyin").focus();
-}
-
-async function enter() {
-  localStorage.setItem(KEY_STORE, $("keyin").value.trim());
-  try { await api("/admin/api/players?limit=1"); } catch (e) { return; }
-  $("keygate").hidden = true;
-  $("console").hidden = false;
-  route();                                  // honor a deep link past the gate
-  pollUnread();
 }
 
 // ── Tabs ────────────────────────────────────────────────────────────────
@@ -108,6 +94,7 @@ function setTab(name) {
   $("tabWorld").classList.toggle("on", name === "world");
   $("tabPlayers").classList.toggle("on", name === "players");
   $("tabFeedback").classList.toggle("on", name === "feedback");
+  $("tabAdmins").classList.toggle("on", name === "admins");
 }
 
 // the FEEDBACK tab wears the waiting-mail count; refreshed on boot,
@@ -439,7 +426,7 @@ async function renderThread(fid) {
       <div class="atts" data-atts='${esc(JSON.stringify(
         m.attachments.map((a) => a.id)))}'></div>
     </div>`).join("");
-  // attachments need the key header — fetch as blobs, not <img src>
+  // attachments need the session cookie fetch — blobs, not <img src>
   for (const box of $("msgs").querySelectorAll(".atts")) {
     for (const id of JSON.parse(box.dataset.atts)) {
       try {
@@ -462,17 +449,63 @@ async function renderThread(fid) {
   };
 }
 
+// ── ADMINS — the approved list, editable from the desk ─────────────────
+
+async function renderAdmins() {
+  setTab("admins");
+  $("main").innerHTML = `<p class="dim">…</p>`;
+  const d = await apiJson("/admin/api/admins");
+  const rows = d.admins.map((a) => `
+    <tr><td>${esc(a.name)}${a.name === d.you
+        ? ' <span class="dim">(you)</span>' : ""}</td>
+      <td class="dim">${esc(a.added_by || "—")}</td>
+      <td class="dim">${esc((a.added_at || "").slice(0, 10))}</td>
+      <td><button class="act" data-del="${esc(a.name)}"
+        ${d.admins.length <= 1 ? "disabled" : ""}>REMOVE</button></td>
+    </tr>`).join("");
+  $("main").innerHTML = `
+    <p class="dim">approved admins — these names see the button and open
+      the desk; everyone else gets a 401. site username = climber name.</p>
+    <table>
+      <tr><th>name</th><th>added by</th><th>since</th><th></th></tr>
+      ${rows}
+    </table>
+    <p style="margin-top:14px">
+      <input id="admname" placeholder="username" autocomplete="off">
+      <button class="act" id="admadd">ADD ADMIN</button>
+    </p>`;
+  $("admadd").onclick = async () => {
+    const name = $("admname").value.trim();
+    if (!name) return;
+    await apiJson("/admin/api/admins",
+                  { method: "POST", body: JSON.stringify({ name }) });
+    note("added " + name);
+    renderAdmins();
+  };
+  $("admname").onkeydown = (e) => {
+    if (e.key === "Enter") $("admadd").click();
+  };
+  for (const b of $("main").querySelectorAll("[data-del]")) {
+    b.onclick = async () => {
+      if (!confirm(`remove ${b.dataset.del} from the admins?`)) return;
+      await apiJson("/admin/api/admins/remove",
+                    { method: "POST",
+                      body: JSON.stringify({ name: b.dataset.del }) });
+      note("removed " + b.dataset.del);
+      renderAdmins();
+    };
+  }
+}
+
 // ── Boot ────────────────────────────────────────────────────────────────
 
-$("keygo").onclick = enter;
-$("keyin").onkeydown = (e) => { if (e.key === "Enter") enter(); };
 $("tabWorld").onclick = () => nav("#/world");
 $("tabPlayers").onclick = () => nav("#/players");
 $("tabFeedback").onclick = () => nav("#/feedback");
-$("keyout").onclick = () => { localStorage.removeItem(KEY_STORE); gate(); };
+$("tabAdmins").onclick = () => nav("#/admins");
 
-// always knock first — an admin session cookie opens the desk without
-// a key; the gate only appears when neither cookie nor stored key turns
+// knock — the session cookie either opens the desk or the sign-in
+// note stands
 api("/admin/api/players?limit=1").then(() => {
   $("keygate").hidden = true;
   $("console").hidden = false;

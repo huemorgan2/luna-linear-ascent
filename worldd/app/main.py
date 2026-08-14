@@ -177,6 +177,16 @@ async def v1_leaderboard(body: SceneIn,
         return await social.leaderboard(conn, tenant, body.player)
 
 
+@app.post("/v1/room_more")
+async def v1_room_more(body: SceneIn,
+                       tenant: str = Depends(auth.verify_tenant)) -> dict:
+    """The presence grid's MORE unfold — the rest of the player's room."""
+    from . import social
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        return await social.room_more(conn, tenant, body.player)
+
+
 class FactionCreateIn(BaseModel):
     player: str = Field(min_length=1, max_length=128)
     name: str = Field(min_length=3, max_length=24)

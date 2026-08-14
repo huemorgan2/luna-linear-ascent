@@ -64,7 +64,8 @@ def _condense_war(rows: list[dict]) -> list[str]:
 
 # ── Injection ────────────────────────────────────────────────────────────
 
-async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
+async def inject_world(conn, tenant: str, player: str, doc: dict,
+                       option: str = "") -> None:
     w: dict = {"social": True}
     day = pstate.world_day()
 
@@ -205,8 +206,8 @@ async def inject_world(conn, tenant: str, player: str, doc: dict) -> None:
 
     # 042: who stands where — every room's tiles, and a Stone of Names
     # payload for everyone the viewer could click this act.
-    w["rooms"] = await _rooms(conn)
-    w["profiles"] = await _profiles(conn, doc, w)
+    w["rooms"], w["rooms_n"] = await _rooms(conn)
+    w["profiles"] = await _profiles(conn, doc, w, option)
 
     doc["_world"] = w
 
@@ -573,7 +574,9 @@ async def _grant_targets(conn, doc: dict) -> list[str]:
 _FLOOR_ROOMS = ("gate_town", "warden_keep", "boss_keep", "memorial")
 _ARMOR_TIERS = ((9, "aegis"), (7, "plate"), (5, "scale"),
                 (3, "chain"), (1, "leather"))
-_ROOM_TILE_CAP = 80            # the engine caps at 70; a little headroom
+_ROOM_TILE_CAP = 21            # 3 rows of 7 — the first batch; the
+                               # rest arrives only when MORE is clicked
+_ROOM_MORE_CAP = 200           # the unfold's ceiling, however big the room
 _PROFILE_CAP = 80
 LOOT_INACTIVE_S = 3600         # an hour of silence makes a camp cold
 
@@ -619,14 +622,24 @@ def _tile_of(d: dict) -> dict:
             "energy": int(pstate.energy_now(d))}
 
 
-async def _rooms(conn) -> dict:
+def _tile_sort_key(t: dict):
+    """Awake first, level desc, then name — the engine's own order, so
+    the capped first batch is the TOP of the room, not a random slice."""
+    return (bool(t.get("sleeping")), -int(t.get("level", 1) or 1),
+            str(t.get("name", "")))
+
+
+async def _rooms(conn) -> tuple[dict, dict]:
     """Every room's tiles: climbers who acted within a day, plus every
-    sleeper (a sleeping body is IN the bunkroom however long it lies)."""
+    sleeper (a sleeping body is IN the bunkroom however long it lies).
+    Ships only the first _ROOM_TILE_CAP per room; the second dict is the
+    TRUE count per room, so the card can say MORE N PLAYERS."""
     rows = await conn.fetch(
         "SELECT doc FROM ascent_players WHERE doc->>'stage'='playing' "
         "AND (updated_at > now() - interval '24 hours' "
         "     OR doc->'sleeping' IS NOT NULL)")
     rooms: dict[str, list] = {}
+    counts: dict[str, int] = {}
     for r in rows:
         d = json.loads(r["doc"])
         if not d.get("name"):
@@ -634,10 +647,53 @@ async def _rooms(conn) -> dict:
         key = _room_key_of(d)
         if not key:
             continue
-        tiles = rooms.setdefault(key, [])
-        if len(tiles) < _ROOM_TILE_CAP:
-            tiles.append(_tile_of(d))
-    return rooms
+        counts[key] = counts.get(key, 0) + 1
+        rooms.setdefault(key, []).append(_tile_of(d))
+    for key, tiles in rooms.items():
+        tiles.sort(key=_tile_sort_key)
+        del tiles[_ROOM_TILE_CAP:]
+    return rooms, counts
+
+
+async def room_more_tiles(conn, doc: dict) -> tuple[list, int]:
+    """The unfold: the viewer's room only, up to _ROOM_MORE_CAP tiles
+    (viewer excluded), same order as the first batch. One room's worth
+    of docs — never the whole world."""
+    key = _room_key_of(doc)
+    if not key:
+        return [], 0
+    rows = await conn.fetch(
+        "SELECT doc FROM ascent_players WHERE doc->>'stage'='playing' "
+        "AND (updated_at > now() - interval '24 hours' "
+        "     OR doc->'sleeping' IS NOT NULL)")
+    tiles = []
+    me = doc.get("name")
+    for r in rows:
+        d = json.loads(r["doc"])
+        if not d.get("name") or d["name"] == me:
+            continue
+        if _room_key_of(d) != key:
+            continue
+        tiles.append(_tile_of(d))
+    total = len(tiles)
+    tiles.sort(key=_tile_sort_key)
+    return tiles[:_ROOM_MORE_CAP], total
+
+
+async def room_more(conn, tenant: str, player: str) -> dict:
+    """The pane's MORE unfold: the viewer's whole room (≤200 tiles),
+    rendered by the plugin's own tile hand so the grid stays one style."""
+    row = await conn.fetchrow(
+        "SELECT doc FROM ascent_players WHERE tenant=$1 AND player=$2",
+        tenant, player)
+    if not row:
+        return {"ok": True, "html": "", "total": 0}
+    doc = json.loads(row["doc"])
+    tiles, total = await room_more_tiles(conn, doc)
+    from .gamepath import ensure_game_importable
+    ensure_game_importable()
+    from plugin_linear_ascent.render import player_tiles_html
+    return {"ok": True, "html": player_tiles_html(tiles), "total": total}
 
 
 def _item_label(slug: str) -> str:
@@ -646,7 +702,7 @@ def _item_label(slug: str) -> str:
     return it.name if it else slug.replace("_", " ")
 
 
-async def _profiles(conn, doc: dict, w: dict) -> dict:
+async def _profiles(conn, doc: dict, w: dict, option: str = "") -> dict:
     """The Stone of Names payload — everyone the viewer could click this
     act: their room, the live warden board, the memorial roll on their
     floor, and the page already open. The bank NEVER rides here."""
@@ -662,6 +718,10 @@ async def _profiles(conn, doc: dict, w: dict) -> dict:
             names.add(s["name"])
     if doc.get("profile_view"):
         names.add(str(doc["profile_view"]))
+    # a face clicked past the shipped tiles (the MORE unfold) — its
+    # payload must ride the same act the click lands in
+    if option.startswith("pv:") and option[3:]:
+        names.add(option[3:])
     names.discard(doc.get("name"))
     if not names:
         return {}
