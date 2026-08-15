@@ -120,7 +120,7 @@ async def play_page(request: Request):
     tag += ('<script type="importmap">{"imports":{"three":'
             '"/static/site/fight3d/vendor/three.module.js"}}</script>'
             '<script type="module" '
-            'src="/static/site/fight3d/fight3d.js?v=5"></script>')
+            'src="/static/site/fight3d/fight3d.js?v=6"></script>')
     return HTMLResponse(page.replace("</head>", tag + "</head>", 1))
 
 

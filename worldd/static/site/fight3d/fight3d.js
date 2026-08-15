@@ -1247,6 +1247,9 @@ async function mountKill(card) {
   slot.style.position = "relative";
   slot.appendChild(gl.canvas);
   startLoop();
+  // gallery.html inspection mode: mount and hold — no charge, no kill.
+  // The game server never sends `demo`, so /play always fights.
+  if (spec.demo === "stand") return;
   // pace: one rendered frame first (cold shaders compile on it), then
   // the beat before the charge
   requestAnimationFrame(() => {

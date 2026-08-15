@@ -1,0 +1,109 @@
+<!doctype html>
+<!-- fight3d model gallery — the SAME fight3d.js module the game loads on
+     /play renders every scene here. Nothing is re-implemented: each panel
+     swaps in a .card[data-kill3d] exactly like the /play pane does, so
+     whatever changes in fight3d.js changes here AND in the game, equally.
+     `demo:"stand"` is the one gallery-only flag: mount and hold, no kill.
+     Never linked from the site. Open:
+       /static/site/fight3d/gallery.html   (live)
+       /fight3d/gallery.html               (dev harness on :8997) -->
+<meta charset="utf-8">
+<title>fight3d — floor 1 model gallery</title>
+<style>
+  * { box-sizing: border-box; }
+  body { background: #0d0f14; color: #d2d6e0; font: 14px monospace;
+         margin: 0; padding: 16px; }
+  h1 { font-size: 16px; margin: 0 0 4px; color: #f5b825; }
+  .note { color: #6b7280; margin: 0 0 14px; }
+  #bar { display: flex; gap: 18px; align-items: center; margin: 0 0 16px;
+         flex-wrap: wrap; }
+  #bar label { color: #9aa1ad; }
+  select { background: #171a22; color: #d2d6e0; border: 1px solid #2a2f3a;
+           font: inherit; padding: 3px 6px; }
+  #game { display: grid; grid-template-columns: repeat(2, 1fr);
+          gap: 18px; max-width: 1040px; }
+  .panel { border: 1px solid #2a2f3a; background: #11141b; padding: 10px; }
+  .panel h2 { font-size: 14px; margin: 0 0 8px; color: #d2d6e0; }
+  .panel h2 small { color: #6b7280; font-weight: normal; }
+  .mount .card { width: 100%; }
+  .mount .banner { width: 100%; aspect-ratio: 320/112;
+                   background-color: #000; }
+  .mount:empty { border: 1px dashed #2a2f3a; aspect-ratio: 320/112;
+                 display: grid; place-items: center; color: #3d434f; }
+  .mount:empty::after { content: "press a button"; }
+  .ctl { display: flex; gap: 6px; margin-top: 8px; }
+  .ctl button { background: #171a22; color: #d2d6e0; font: inherit;
+                border: 1px solid #2a2f3a; padding: 5px 10px;
+                cursor: pointer; }
+  .ctl button:hover { border-color: #f5b825; color: #f5b825; }
+</style>
+<script type="importmap">
+  {"imports": {"three": "./vendor/three.module.js"}}
+</script>
+<h1>floor 1 — the six, as the game renders them</h1>
+<p class="note">same module as /play (fight3d.js) — stand shows the model;
+blade / bow / staff replay the kill with that weapon's move.</p>
+<div id="bar">
+  <label>race <select id="race">
+    <option>human</option><option>elf</option><option>dwarf</option>
+  </select></label>
+  <label>specimen <select id="specimen">
+    <option value="common">common #d9d9d3</option>
+    <option value="runt">runt #5b5952</option>
+    <option value="tough">tough #d967c8</option>
+    <option value="alpha">alpha #f5b825</option>
+  </select></label>
+  <label>breed <select id="breed">
+    <option>native</option><option>pressed</option><option>wrongmade</option>
+  </select></label>
+</div>
+<div id="game"></div>
+<script>
+  const MONSTERS = [
+    ["grey_wolf", "Grey wolf"],
+    ["feral_boar", "Feral boar"],
+    ["hedge_rat", "Hedgerow rat"],
+    ["lane_wolf", "Lane wolf"],
+    ["goblin_straggler", "Goblin straggler"],
+    ["ember_shade", "Ember shade"],
+  ];
+  const TINT = { common: "#d9d9d3", runt: "#5b5952",
+                 tough: "#d967c8", alpha: "#f5b825" };
+  const game = document.getElementById("game");
+  for (const [id, label] of MONSTERS) {
+    const p = document.createElement("section");
+    p.className = "panel";
+    p.dataset.id = id;
+    p.innerHTML = `<h2>${label} <small>${id}</small></h2>` +
+      `<div class="mount"></div><div class="ctl">` +
+      `<button data-act="stand">stand</button>` +
+      `<button data-act="blade">attack: blade</button>` +
+      `<button data-act="bow">bow</button>` +
+      `<button data-act="staff">staff</button></div>`;
+    game.appendChild(p);
+  }
+  game.addEventListener("click", (ev) => {
+    const btn = ev.target.closest("button[data-act]");
+    if (!btn) return;
+    const act = btn.dataset.act;
+    const id = btn.closest(".panel").dataset.id;
+    const specimen = document.getElementById("specimen").value;
+    const spec = {
+      id,
+      race: document.getElementById("race").value,
+      line: act === "stand" ? "blade" : act,
+      breed: document.getElementById("breed").value,
+      specimen,
+      tint: TINT[specimen],
+    };
+    if (act === "stand") spec.demo = "stand";
+    // one GL stage, like the game: the previous card leaves first
+    for (const m of game.querySelectorAll(".mount")) m.innerHTML = "";
+    const card = document.createElement("div");
+    card.className = "card";
+    card.dataset.kill3d = JSON.stringify(spec);
+    card.innerHTML = '<div class="banner"></div>';
+    btn.closest(".panel").querySelector(".mount").appendChild(card);
+  });
+</script>
+<script type="module" src="./fight3d.js"></script>
