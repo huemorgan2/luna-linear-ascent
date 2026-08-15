@@ -76,35 +76,52 @@ MONSTERS = {
                     + STYLE),
     },
     "lane_wolf": {
+        # v2 (2026-08-15): v1 mesh auto-rigged with the forelegs collapsed
+        # to the rear (twice) — regenerated in a plain square stance.
         "prompt": ("A lean veteran pack wolf, leaner and rangier than a "
                    "dire wolf, one torn ear, an old brand scar on the "
-                   "flank, bone spurs at the shoulders, bared fangs. "
-                   + POSE_Q),
+                   "flank, bone spurs at the shoulders, bared fangs, "
+                   "standing square with all four legs straight and "
+                   "clearly separated, head level, tail low. " + POSE_Q),
         "texture": ("Pale grey short fur, near-white fangs and bone "
                     "spurs, mid-grey brand scar and torn ear. " + STYLE),
     },
     "goblin_straggler": {
-        "prompt": ("A hunched goblin deserter, wiry and mean, scrap-metal "
-                   "pauldron on one shoulder, dented stolen helm, ragged "
-                   "tunic, jagged cleaver in hand, long ears, underbite "
-                   "with crooked teeth. " + POSE_B),
-        "texture": ("Light sickly green skin, mid-grey scrap iron pauldron "
-                    "and helm, light-brown ragged tunic, near-white "
-                    "crooked teeth. " + STYLE),
+        # v3 (2026-08-15): matched to the encounter art — an armoured
+        # goblin foot-soldier. v2 held a big broadsword out from the body
+        # and Tripo's auto-rig folded the limbs around it (twice); the
+        # sword now hangs sheathed at the hip, arms in a clean A-pose.
+        "prompt": ("A goblin foot-soldier in battered steel plate armour: "
+                   "a dented cuirass, big rounded pauldrons on both "
+                   "shoulders, plate greaves, hunched forward, wiry arms "
+                   "and bandy legs, a small mean head with very long "
+                   "pointed ears sticking out sideways, hooked nose, wide "
+                   "sneering mouth of crooked teeth, empty hands, a big "
+                   "broadsword sheathed flat against his left hip, two "
+                   "short arrows stuck in his back. Fantasy game monster, "
+                   "single character, full body, standing upright in a "
+                   "clean A-pose, arms straight and held slightly away "
+                   "from the body, legs apart, nothing held in the hands."),
+        "texture": ("Light steel-grey plate armour with mid-grey dents and "
+                    "rivets, light sickly-green goblin skin, mid-grey "
+                    "leather straps and scabbard, near-white teeth and "
+                    "eyes, pale wood arrow shafts. " + STYLE),
     },
     "ember_shade": {
-        # v2 prompt: v1 ("woven from briars and fenceposts") generated
-        # disconnected floating arms — force one solid connected mass.
-        "prompt": ("A hulking humanoid wood golem, one single solid "
-                   "connected body, carved from charred oak beams, thick "
-                   "heavy arms firmly joined to broad shoulders, sturdy "
-                   "legs, iron nails studding the forearms, glowing ember "
-                   "cracks across the chest, hollow burning eyes, short "
-                   "thorny spikes on the back. Massive and solid, no "
-                   "gaps, no floating parts. " + POSE_B),
-        "texture": ("Light ash-grey charred wood weave, near-white "
-                    "glowing ember seams and eyes, mid-grey iron nails, "
-                    "pale thorns. " + STYLE),
+        # v3 (2026-08-15): the encounter art is a HOUND OF FLAME on four
+        # legs — v1/v2 (wood golem) were wrong. Quadruped rig now.
+        "prompt": ("A large hound-like beast made of living flame and "
+                   "smoke: a lean wolf-shaped four-legged body, a thick "
+                   "mane of curling fire tongues along the neck, back and "
+                   "spine, a tail of trailing flame, pointed ears, a long "
+                   "snarling muzzle with bared teeth, hollow glowing eyes, "
+                   "ember-cracked flanks. One solid connected body, no "
+                   "floating parts. Fantasy game monster, single creature, "
+                   "full body, standing on all fours in a neutral stance, "
+                   "side readable silhouette."),
+        "texture": ("Near-white flame tongues on the mane, spine and tail, "
+                    "light-grey ember cracks over a mid-grey smoky body, "
+                    "near-white glowing eyes and teeth. " + STYLE),
     },
 }
 

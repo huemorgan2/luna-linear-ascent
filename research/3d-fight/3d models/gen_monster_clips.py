@@ -25,17 +25,21 @@ import sys
 
 from gen_monsters import OUT, api, download, wait
 
-RIG_MODEL = "v2.5-20260210"
+# rig v2.5 is the NON-humanoid rigger (quadruped/hexapod/...); it mislabels
+# a humanoid's limbs and preset:walk comes out as a folded, headless mess
+# (six goblin attempts, 2026-08-15). Bipeds must use the humanoid v1.0
+# rigger, spec "tripo" (mixamo skeletons cannot be retargeted).
+RIG_MODEL = {"quadruped": "v2.5-20260210", "biped": "v1.0-20240301"}
 
 # body plan per creature — the wolves, boar and rat walk on four legs;
-# the goblin and the wood golem are bipeds
+# the goblin is the one biped (v3: the ember shade is a flame hound)
 PLANS = {
     "grey_wolf": "quadruped",
     "feral_boar": "quadruped",
     "hedge_rat": "quadruped",
     "lane_wolf": "quadruped",
     "goblin_straggler": "biped",
-    "ember_shade": "biped",
+    "ember_shade": "quadruped",   # v3: hound of flame
 }
 WALK = {"quadruped": "preset:quadruped:walk", "biped": "preset:walk"}
 
@@ -69,7 +73,8 @@ def run(cid):
     print(f"== {cid} ({plan}) ==", flush=True)
     rig = stage("rig", "20_rigged.glb", lambda: api(
         "POST", "/animations/rig", {
-            "input": man["texture"]["task"], "model": RIG_MODEL,
+            "input": man["texture"]["task"], "model": RIG_MODEL[plan],
+            "spec": "tripo",
             "rig_type": plan, "out_format": "glb",
         })["task_id"])
     stage("walk", "50_walk.glb", lambda: api(

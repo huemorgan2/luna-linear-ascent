@@ -31,12 +31,18 @@ const BASE = new URL(".", import.meta.url);
 // floor-1 monster registry: normalized height, stance width, start x.
 // A creature absent here (or whose GLB 404s) simply keeps its GIF.
 const MONSTERS3D = {
-  grey_wolf:        { h: 1.70, wide: 1.18, mx: 2.0 },
+  // h: world height, wide: side-scale, mx: bulk. yaw: the GLB's authoring
+  // turn — Tripo rigs some bodies long along x; yaw brings the head to
+  // local +z so the -90 mount faces the player instead of the camera.
+  // gait: whole-body walk motion layered on the clip — stride (>1 = fewer,
+  // longer steps), bob (rise per step, of h), rock (pitch), sway (roll).
+  grey_wolf:        { h: 1.70, wide: 1.18, mx: 2.0, yaw: -Math.PI / 2 },
   feral_boar:       { h: 1.90, wide: 1.12, mx: 2.2 },
-  hedge_rat:        { h: 1.05, wide: 1.15, mx: 1.8 },
+  hedge_rat:        { h: 1.05, wide: 1.15, mx: 1.8,
+                      gait: { stride: 1.5, bob: 0.06, rock: 0.14, sway: 0.10 } },
   lane_wolf:        { h: 1.60, wide: 1.15, mx: 2.1 },
   goblin_straggler: { h: 1.70, wide: 1.20, mx: 2.0 },
-  ember_shade:      { h: 2.15, wide: 1.15, mx: 2.3 },
+  ember_shade:      { h: 1.95, wide: 1.15, mx: 2.3, yaw: -Math.PI / 2 },
 };
 
 const SPECIES = {
@@ -662,7 +668,8 @@ function buildPlayer(speciesId, weaponId) {
 // The scene is SHARED per asset (never clone(true): it severs skinned
 // meshes from their skeletons) — normalize is idempotent against cached
 // dims, exactly like buildPlayer.
-function tripoMonster(gltf, { h = 1.6, wide = 1.1, freed = false } = {}) {
+function tripoMonster(gltf, { h = 1.6, wide = 1.1, yaw = 0, gait = null,
+                              freed = false } = {}) {
   const src = gltf;
   const model = src.scene;
   shadowify(model);
@@ -685,6 +692,7 @@ function tripoMonster(gltf, { h = 1.6, wide = 1.1, freed = false } = {}) {
   // idempotent normalize against the settled pose, cached per asset
   model.scale.setScalar(1);
   model.position.set(0, 0, 0);
+  model.rotation.set(0, yaw, 0);         // authoring turn: head → local +z
   model.updateMatrixWorld(true);
   if (!src.userData.dims) {
     src.userData.dims = new THREE.Box3().setFromObject(model);
@@ -701,6 +709,7 @@ function tripoMonster(gltf, { h = 1.6, wide = 1.1, freed = false } = {}) {
   wrap.add(inner);
   wrap.scale.set(wide, 1, wide);
   const len = (box.max.z - box.min.z) * k;   // body length (model faces ±z)
+  const G = { stride: 1, bob: 0, rock: 0, sway: 0, ...(gait || {}) };
 
   const puffs = [];
   let puffAcc = 0;
@@ -709,7 +718,8 @@ function tripoMonster(gltf, { h = 1.6, wide = 1.1, freed = false } = {}) {
   let atkT = 0, lastX = null;
   // feet-plant rule: one walk cycle carries the body ~0.9 of its height,
   // so the clip rate is travel speed over that stride
-  const vNat = walkClip ? 0.9 * h / walkClip.duration : 1;
+  // gait.stride > 1 stretches each cycle over more ground: longer steps
+  const vNat = walkClip ? 0.9 * h * G.stride / walkClip.duration : 1;
   return {
     group: wrap,
     update: (dt, t) => {
@@ -728,6 +738,18 @@ function tripoMonster(gltf, { h = 1.6, wide = 1.1, freed = false } = {}) {
       // breathe: the ribcage swells; smaller once it is moving
       inner.scale.y = 1 + (mode === "idle" ? 0.02 : 0.006)
         * Math.sin(t * 2.1);
+      // whole-body gait: the trunk rises on each step, pitches nose-down
+      // as it lands and rolls side to side — scaled by how hard the clip
+      // is running so a parked body sits still
+      let gBob = 0, gRock = 0, gSway = 0;
+      if (walk && walkClip && (G.bob || G.rock || G.sway)) {
+        const ph = (walk.time / walkClip.duration) * Math.PI * 2;
+        const w = Math.min(Math.abs(walk.timeScale), 1);
+        gBob = G.bob * h * Math.abs(Math.sin(ph)) * w;
+        gRock = G.rock * Math.sin(ph * 2) * w;
+        gSway = G.sway * Math.sin(ph) * w;
+      }
+      inner.rotation.z = gSway;
       if (mode === "attack") {
         atkT += dt;
         const q = Math.min(atkT / 0.28, 1);
@@ -735,9 +757,12 @@ function tripoMonster(gltf, { h = 1.6, wide = 1.1, freed = false } = {}) {
         inner.position.z = 0.16 * h * lunge;   // local +z → at the player
         inner.rotation.x = 0.30 * lunge;       // nose-first
         inner.position.y = 0.04 * h * lunge;
-      } else if (mode !== "run") {
-        inner.position.y *= Math.max(0, 1 - dt * 8);
-        inner.rotation.x *= Math.max(0, 1 - dt * 8);
+      } else if (mode === "run") {
+        inner.position.y = gBob;
+        inner.rotation.x = gRock;
+      } else {
+        inner.position.y = inner.position.y * Math.max(0, 1 - dt * 8) + gBob;
+        inner.rotation.x = inner.rotation.x * Math.max(0, 1 - dt * 8) + gRock;
         inner.position.z *= Math.max(0, 1 - dt * 8);
       }
       if (!freed) {
@@ -1234,6 +1259,7 @@ async function mountKill(card) {
     // fall and wrongmade are evicted — nothing remains but the banish
     curFreed = spec.breed === "native"
       ? () => tripoMonster(got.mg, { h: reg.h * 0.45, wide: reg.wide,
+                                     yaw: reg.yaw, gait: reg.gait,
                                      freed: true })
       : null;
   } catch {
