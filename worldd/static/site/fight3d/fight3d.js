@@ -332,25 +332,30 @@ async function ensureFor(spec) {
   return { race, line, mg, bg };
 }
 
-// PLAN4: the first kill used to download ~6 MB before anything moved —
-// a wait as long as the old ending GIF. Warm everything while the page
-// idles: GLBs one at a time (never choking the pane), scenery sheets,
-// then the GL context + compiled shaders via one offscreen frame.
-function preload() {
-  const rels = [
-    ...Object.keys(MONSTERS3D).map((id) => `monsters/${id}.glb`),
-    "players/human.glb", "players/elf.glb", "players/giant.glb",
-    "players/blade.glb", "players/bow.glb", "players/staff.glb",
-    "players/human_shoot.glb", "players/human_cast.glb",
-    "players/elf_shoot.glb", "players/elf_cast.glb",
-    "players/giant_shoot.glb", "players/giant_cast.glb",
-  ];
-  for (const id of Object.keys(MONSTERS3D)) loadBG(id);
-  let p = Promise.resolve();
-  for (const r of rels) p = p.then(() => load(r));
-  p.then(() => {
+// Warming — on demand, never everything. The blanket preload of every
+// monster and every rig (~25 MB, re-fetched on each page load) sat on
+// the same pipe as /act and made the whole game feel slow. Now the card
+// itself says what is coming: `data-rig3d="race:line"` on every playing
+// card (this climber's rig — one race, one weapon, one strike clip) and
+// `data-foe3d="id"` while a fight is on (this creature, its scenery).
+// Each is fetched once per page and cached; a kill card whose parts are
+// already warm mounts with no wait. GLBs go one at a time so the pane
+// never competes with itself.
+let warmChain = Promise.resolve();
+const warmed = new Set();
+function warmRel(rel) {
+  if (warmed.has(rel)) return;
+  warmed.add(rel);
+  warmChain = warmChain.then(() => load(rel));
+}
+let glWarmed = false;
+function warmGL() {
+  if (glWarmed) return;
+  glWarmed = true;
+  warmChain = warmChain.then(() => {
     const gl = initGL();
     if (!gl) return;
+    // one offscreen frame: context + compiled shaders before the kill
     gl.renderer.setRenderTarget(gl.rtColor);
     gl.renderer.clear();
     gl.renderer.render(gl.scene, gl.camera);
@@ -361,6 +366,24 @@ function preload() {
     gl.renderer.setRenderTarget(null);
     gl.renderer.render(gl.postScene, gl.postCam);
   });
+}
+function warmFor(card) {
+  const rig = card.dataset.rig3d || "";
+  if (rig) {
+    const [r, l] = rig.split(":");
+    const race = SPECIES[r] ? r : "human";
+    const line = WEAPONS[l] ? l : "blade";
+    const kind = KIND_OF[line];
+    warmRel(`players/${race}.glb`);
+    warmRel(`players/${line}.glb`);
+    if (kind !== "slash") warmRel(`players/${race}_${kind}.glb`);
+  }
+  const foe = card.dataset.foe3d || "";
+  if (foe && MONSTERS3D[foe]) {
+    loadBG(foe);
+    warmRel(`monsters/${foe}.glb`);
+    warmGL();
+  }
 }
 
 function shadowify(o) {
@@ -1289,12 +1312,10 @@ if (game) {
     // the kill card left with an innerHTML swap: the canvas went with
     // it — stop burning frames, keep the GL singleton for the next kill
     if (!game.querySelector(".card[data-kill3d]")) stopLoop();
+    // warm what THIS card says is coming — the climber's rig, the foe
+    const cur = game.querySelector(".card[data-rig3d], .card[data-foe3d]");
+    if (cur) warmFor(cur);
   };
   new MutationObserver(scan).observe(game, { childList: true, subtree: true });
   scan();
-  if ("requestIdleCallback" in window) {
-    requestIdleCallback(preload, { timeout: 4000 });
-  } else {
-    setTimeout(preload, 1500);
-  }
 }
