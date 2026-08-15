@@ -130,6 +130,7 @@ section { padding: 2rem 0; }
 .opt:hover, .opt.hot { background: var(--gold); color: var(--bg);
                        border-color: var(--gold); }
 .opt.dim2 { color: var(--dim); }
+.opt[hidden] { display: none; }
 .gold-opt { border-color: var(--gold); }
 
 /* ── the ticker — pinned to the fold's bottom edge ─────────────────── */

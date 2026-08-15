@@ -371,6 +371,13 @@
         doorKnown(m.username);
         var cta = $("bar-cta");
         if (cta) { cta.textContent = "[ ▶ ENTER THE TOWER ]"; cta.href = "/play"; }
+        /* the gate card: a signed-in climber sees one door — ENTER */
+        document.querySelectorAll(".door-only").forEach(function (el) {
+          el.hidden = true;
+        });
+        document.querySelectorAll(".known-only").forEach(function (el) {
+          el.hidden = false;
+        });
       }
     })
     .catch(function () {});
