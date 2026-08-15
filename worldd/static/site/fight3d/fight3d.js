@@ -977,7 +977,6 @@ let curWeapon = "blade";
 let curFreed = null;                    // () => freed form, natives only
 let state = "infected";                 // infected | freed
 let seq = null;                         // active liberation timeline
-let holdUntil = 0;                      // stop the loop after the pop-in
 
 function resetStage() {
   const scene = GL.scene;
@@ -987,7 +986,6 @@ function resetStage() {
   effects = [];
   seq = null;
   state = "infected";
-  holdUntil = 0;
 }
 
 function liberate() {
@@ -1124,11 +1122,12 @@ function stepSeq(dt) {
     player.group.position.x = s.homeX;
     player.idle();
     seq = null;
-    holdUntil = GL.clock.elapsedTime + 1.6;   // let the fx tail finish,
-  }                                           // then freeze the frame
+    // the scene keeps living: scenery loops, the player idles, the freed
+    // animal breathes. The loop stops only when the card leaves the DOM.
+  }
 }
 
-// ── frame loop (runs only while a kill card is up) ────────────────────────
+// ── frame loop (runs while a kill card is in the DOM) ────────────────────────
 let raf = 0;
 
 function frame() {
@@ -1159,7 +1158,6 @@ function frame() {
   renderer.clear();
   renderer.render(postScene, postCam);
 
-  if (holdUntil && t >= holdUntil && !effects.length) stopLoop();
 }
 
 function startLoop() {
