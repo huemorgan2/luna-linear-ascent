@@ -292,51 +292,15 @@ async def v1_faction_status(body: SceneIn,
 async def v1_faction_create(body: FactionCreateIn,
                             tenant: str = Depends(auth.verify_tenant)) -> dict:
     from . import factions
-    name = body.name.strip()
-    if not factions.NAME_RE.match(name):
-        raise HTTPException(422, "3–24 letters, numbers, spaces, - or '")
-    if body.banner not in factions.banner_slugs():
-        raise HTTPException(422, "unknown banner")
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
-            if await factions.member_row(conn, tenant, body.player):
-                raise HTTPException(409, "you already sit at a table — "
-                                         "leave it first")
-            row = await conn.fetchrow(
-                "SELECT doc FROM ascent_players WHERE tenant=$1 AND "
-                "player=$2 FOR UPDATE", tenant, body.player)
-            if row is None:
-                raise HTTPException(404, "no character")
-            import json as _json
-            doc = _json.loads(row["doc"])
-            if doc.get("stage") != "playing":
-                raise HTTPException(409, "finish character creation first")
-            if int(doc.get("level", 1)) < factions.FOUND_MIN_LEVEL:
-                raise HTTPException(
-                    403, "the hall charters banners for level "
-                         f"{factions.FOUND_MIN_LEVEL}+ climbers")
-            if doc.get("gold", 0) < factions.FOUND_FEE:
-                raise HTTPException(
-                    402, f"founding a banner costs ◈ {factions.FOUND_FEE}")
-            taken = await conn.fetchval(
-                "SELECT 1 FROM ascent_factions WHERE name=$1", name)
-            if taken:
-                raise HTTPException(409, "that banner already flies")
-            doc["gold"] -= factions.FOUND_FEE
-            await conn.execute(
-                "UPDATE ascent_players SET doc=$3, updated_at=now() "
-                "WHERE tenant=$1 AND player=$2",
-                tenant, body.player, _json.dumps(doc))
-            await conn.execute(
-                "INSERT INTO ascent_ledger (tenant, player, kind, gold,"
-                " note) VALUES ($1,$2,'faction_found',$3,$4)",
-                tenant, body.player, -factions.FOUND_FEE, name)
-            await factions.create_faction(
-                conn, tenant, body.player, name, body.banner,
-                doc.get("name") or body.player,
-                join_fee=body.join_fee, weekly_dues=body.weekly_dues)
-    return {"ok": True, "faction": name}
+            code, err = await factions.found_faction(
+                conn, tenant, body.player, body.name, body.banner,
+                body.join_fee, body.weekly_dues)
+            if err:
+                raise HTTPException(code, err)
+    return {"ok": True, "faction": body.name.strip()}
 
 
 @app.post("/v1/faction/join")

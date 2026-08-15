@@ -471,6 +471,55 @@ async def _bless(conn, members: list[dict], kind: str, pct: int,
 
 # ── Membership mutations (shared by API + engine effects) ───────────────
 
+async def found_faction(conn, tenant: str, player: str, name: str,
+                        banner: str, join_fee: int,
+                        weekly_dues: int) -> tuple[int, str]:
+    """The whole founding transaction — the checks, the fee, the ledger
+    line and the row — shared by the v1 API and the pane's desk (061).
+    Returns (http_code, error) — (0, "") on success."""
+    name = name.strip()
+    if not NAME_RE.match(name):
+        return 422, "3–24 letters, numbers, spaces, - or '"
+    if banner not in banner_slugs():
+        return 422, "unknown banner"
+    if not 0 <= int(join_fee) <= JOIN_FEE_MAX:
+        return 422, f"the join fee is ◈ 0 to {JOIN_FEE_MAX}"
+    if not DUES_MIN <= int(weekly_dues) <= DUES_MAX:
+        return 422, f"weekly dues are ◈ {DUES_MIN} to {DUES_MAX}"
+    if await member_row(conn, tenant, player):
+        return 409, "you already sit at a table — leave it first"
+    row = await conn.fetchrow(
+        "SELECT doc FROM ascent_players WHERE tenant=$1 AND "
+        "player=$2 FOR UPDATE", tenant, player)
+    if row is None:
+        return 404, "no character"
+    doc = json.loads(row["doc"])
+    if doc.get("stage") != "playing":
+        return 409, "finish character creation first"
+    if int(doc.get("level", 1)) < FOUND_MIN_LEVEL:
+        return 403, ("the hall charters banners for level "
+                     f"{FOUND_MIN_LEVEL}+ climbers")
+    if doc.get("gold", 0) < FOUND_FEE:
+        return 402, f"founding a banner costs ◈ {FOUND_FEE}"
+    taken = await conn.fetchval(
+        "SELECT 1 FROM ascent_factions WHERE name=$1", name)
+    if taken:
+        return 409, "that banner already flies"
+    doc["gold"] -= FOUND_FEE
+    await conn.execute(
+        "UPDATE ascent_players SET doc=$3, updated_at=now() "
+        "WHERE tenant=$1 AND player=$2",
+        tenant, player, json.dumps(doc))
+    await conn.execute(
+        "INSERT INTO ascent_ledger (tenant, player, kind, gold, note) "
+        "VALUES ($1,$2,'faction_found',$3,$4)",
+        tenant, player, -FOUND_FEE, name)
+    await create_faction(conn, tenant, player, name, banner,
+                         doc.get("name") or player,
+                         join_fee=int(join_fee), weekly_dues=int(weekly_dues))
+    return 0, ""
+
+
 async def create_faction(conn, tenant: str, player: str, name: str,
                          banner: str, founder_name: str,
                          join_fee: int = 0, weekly_dues: int = 5) -> None:

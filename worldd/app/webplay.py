@@ -54,6 +54,13 @@ class FactionTargetIn(BaseModel):
     player: str = Field(min_length=1, max_length=128)
 
 
+class FactionFoundIn(BaseModel):
+    name: str = Field(min_length=3, max_length=24)
+    banner: str = Field(default="wolf_howl", max_length=32)
+    join_fee: int = Field(default=0, ge=0, le=500)
+    weekly_dues: int = Field(default=5, ge=1, le=50)
+
+
 # ── The guard ────────────────────────────────────────────────────────────
 
 def _identity(request: Request) -> tuple[str, str]:
@@ -246,6 +253,24 @@ async def faction_request(body: FactionNameIn,
             _desk_err(await factions.request_join(conn, WEB_TENANT, player,
                                                   body.name))
     return {"ok": True, "requested": body.name}
+
+
+@router.post("/play/api/pane/faction/found")
+async def faction_found(body: FactionFoundIn,
+                        ident: tuple = Depends(_identity)) -> dict:
+    """061: raise a banner from the COMMUNITY desk — the same charter
+    the Guildhall signs, without walking there."""
+    player, _ = ident
+    from . import factions
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            code, err = await factions.found_faction(
+                conn, WEB_TENANT, player, body.name, body.banner,
+                body.join_fee, body.weekly_dues)
+            if err:
+                raise HTTPException(code, err)
+    return {"ok": True, "faction": body.name.strip()}
 
 
 @router.post("/play/api/pane/faction/cancel_request")
