@@ -275,12 +275,17 @@ async def _faction_panel(conn, tenant: str, player: str,
         # 042: the door rules — the steward's card edits these
         "requirements": factions.parse_requirements(fac["requirements"]),
         "pending_requests": pending,
+        # 059: the profile block — how many sit at the table, how many
+        # of them are on the floors right now
+        "members_count": len(members),
+        "online": sum(1 for m in members if m.get("online")),
         "members": [{
             "name": m["name"] or m["player"], "role": m["role"],
             "founder": (m["tenant"], m["player"]) == founder_key,
             "level": m["level"], "arrears": bool(m["arrears"]),
             "days": attend.get((m["tenant"], m["player"]), 0),
             "required": factions.required_days(m["joined_day"], week),
+            "online": bool(m.get("online")),
         } for m in members],
         "week": {
             "kind": kind, "target": target, "entered": entered,
@@ -854,32 +859,69 @@ async def maybe_sweep_feed(conn) -> None:
             "AND created_at < now() - interval '14 days'")
 
 
+_FEED_COLS = "id, kind, line, floor, actor, scope, created_at"
+FEED_CACHE_TTL_S = 2.0
+_feed_cache: dict = {}     # 060: key -> (head, at, rows) — newest FEED_LIMIT
+
+
+async def _feed_rows(conn, key: str, head: int, sql: str,
+                     *params) -> list:
+    """The newest FEED_LIMIT rows for `key`, served from memory while the
+    head hasn't moved and the answer is under 2 s old (a world-wide burst
+    of closed panels asking "what landed?" costs Postgres one query per
+    peek cycle, not one per client). The TTL bounds the one race: the
+    head is bumped inside the writer's transaction, so a read landing
+    before that commit could otherwise freeze a hole into the cache."""
+    hit = _feed_cache.get(key)
+    now = pstate.now()
+    if (hit is not None and hit[0] == head
+            and (now - hit[1]).total_seconds() < FEED_CACHE_TTL_S):
+        return hit[2]
+    rows = [dict(r) for r in await conn.fetch(sql, *params)]
+    _feed_cache[key] = (head, now, rows)
+    return rows
+
+
 async def playing_feed(conn, tenant: str, player: str, scope: str,
                        since: int) -> dict:
     """The Playing panel's rows. world = everyone's news; faction =
     every row tagged with MY faction (both scopes — membership is
-    checked here, never trusted from the client)."""
+    checked here, never trusted from the client); both (060: the toast
+    fetch) = world plus my faction's rows in one answer, each row
+    carrying its scope so the client's two switches can sort them."""
     from . import factions
     since = max(0, int(since))
     mine = await factions.member_row(conn, tenant, player)
     my_faction = mine["faction"] if mine else None
+    head = await feed_head(conn)
+    if scope == "faction" and my_faction is None:
+        return {"ok": True, "faction": None, "head": head, "rows": []}
+    world_sql = (f"SELECT {_FEED_COLS} FROM ascent_happenings "
+                 "WHERE scope='world' ORDER BY id DESC LIMIT $1")
+    fac_sql = (f"SELECT {_FEED_COLS} FROM ascent_happenings "
+               "WHERE faction=$1 ORDER BY id DESC LIMIT $2")
     if scope == "faction":
-        if my_faction is None:
-            return {"ok": True, "faction": None, "head": await
-                    feed_head(conn), "rows": []}
-        rows = await conn.fetch(
-            "SELECT id, kind, line, floor, actor, scope, created_at "
-            "FROM ascent_happenings WHERE faction=$1 AND id > $2 "
-            "ORDER BY id DESC LIMIT $3", my_faction, since, FEED_LIMIT)
+        rows = await _feed_rows(conn, f"faction:{my_faction}", head,
+                                fac_sql, my_faction, FEED_LIMIT)
+    elif scope == "both" and my_faction is not None:
+        w = await _feed_rows(conn, "world", head, world_sql, FEED_LIMIT)
+        f = await _feed_rows(conn, f"faction:{my_faction}", head,
+                             fac_sql, my_faction, FEED_LIMIT)
+        seen: set = set()
+        rows = []
+        for r in sorted(w + f, key=lambda r: -int(r["id"])):
+            if r["id"] not in seen:
+                seen.add(r["id"])
+                rows.append(r)
+        rows = rows[:FEED_LIMIT]
     else:
-        rows = await conn.fetch(
-            "SELECT id, kind, line, floor, actor, scope, created_at "
-            "FROM ascent_happenings WHERE scope='world' AND id > $1 "
-            "ORDER BY id DESC LIMIT $2", since, FEED_LIMIT)
+        rows = await _feed_rows(conn, "world", head, world_sql, FEED_LIMIT)
+    rows = [r for r in rows if int(r["id"]) > since]
     return {
-        "ok": True, "faction": my_faction, "head": await feed_head(conn),
+        "ok": True, "faction": my_faction, "head": head,
         "rows": [{"id": r["id"], "kind": r["kind"], "line": r["line"],
                   "floor": r["floor"], "actor": r["actor"],
+                  "scope": r["scope"],
                   "ts": r["created_at"].isoformat()} for r in rows],
     }
 
@@ -1105,7 +1147,7 @@ async def _fx_faction_found(conn, tenant: str, player: str, doc: dict,
         weekly_dues=int(e.get("weekly_dues", 5)))
     await add_happening(
         conn, kind="faction",
-        line=f"{doc.get('name') or player} raised the banner of {name}",
+        line=f"{doc.get('name') or player} founded the {name} faction",
         actor=doc.get("name") or player, faction=name)
 
 
@@ -1372,7 +1414,7 @@ async def _fx_loot(conn, tenant: str, player: str, doc: dict,
     mine = await factions.member_row(conn, tenant, player)
     theirs = await factions.member_row(conn, row["tenant"], row["player"])
     if mine and theirs and mine["faction"] == theirs["faction"]:
-        report("You stopped at the banner",
+        report("You stopped at the faction",
                "You drink under the same colors.", [])
         await log("blocked")
         return

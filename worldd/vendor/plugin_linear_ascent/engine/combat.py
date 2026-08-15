@@ -129,10 +129,22 @@ def meters(p: dict) -> Meters:
         # 048: the class field died — the wire slot carries the path of
         # the weapon in hand so old clients keep a sane header.
         clazz=economy.PATH_OF_LINE.get(_weapon_line(p), ""),
-        # the banner: worldd injects w["faction"] for members; local
+        # the faction: worldd injects w["faction"] for members; local
         # dev mode keeps the legacy doc-string guild name.
-        faction=(((p.get("_world") or {}).get("faction") or {})
-                 .get("name") or p.get("guild") or ""))
+        faction=(_wfac(p).get("name") or p.get("guild") or ""),
+        # 059: the block under the profile
+        faction_banner=str(_wfac(p).get("banner") or ""),
+        faction_members=int(_wfac(p).get("members_count")
+                            or len(_wfac(p).get("members") or [])),
+        faction_online=int(_wfac(p).get("online") or 0),
+        factions_total=(int((p.get("_world") or {}).get("factions_total"))
+                        if (p.get("_world") or {}).get("factions_total")
+                        is not None else -1))
+
+
+def _wfac(p: dict) -> dict:
+    fac = (p.get("_world") or {}).get("faction")
+    return fac if isinstance(fac, dict) else {}
 
 
 def _eyebrow(p: dict, floor) -> str:
@@ -1396,7 +1408,9 @@ def _victory(p: dict, floor) -> Scene:
     if rested:
         lines.append(f"+ {rested} XP rested — ✦ {p['rested']} left "
                      "in the pool")
-    if e["kind"] == "wilds" and floor.floor <= economy.EARLY_COIN_FLOORS:
+    bounty = (e["kind"] == "wilds"
+              and floor.floor <= economy.EARLY_COIN_FLOORS)
+    if bounty:
         # 048 N8: the fade must never read as a nerf — name the bounty
         lines.append(f"+ ◈ {gold} gold (young-tower bounty)")
     else:
@@ -1521,10 +1535,11 @@ def _victory(p: dict, floor) -> Scene:
         meters=meters(p),
         event_kind=kind,
         # 025 §6: the haul, drawn. The lines above still SAY the numbers
-        # (the agent reads those); the card lays out one coin per gold and
-        # one shard per point of XP so a big kill looks like a big kill.
-        tally=[{"kind": "gold", "n": gold},
-               {"kind": "aether", "n": xp_landed}],
+        # (the agent reads those); the card shouts each amount in the big
+        # font and lays the marks under it — XP first, then the gold.
+        tally=[{"kind": "aether", "n": xp_landed},
+               dict({"kind": "gold", "n": gold},
+                    **({"note": "young-tower bounty"} if bounty else {}))],
         # 045: the exit card carries the floor's tiles like the gate
         # town does — the reel branch keeps its two bare buttons.
         option_art=(None if first_clear else _floor_art(floor)),

@@ -283,7 +283,7 @@ async def test_note_upserts_on_the_day_key(client, tenant_a, tenant_b,
         # no banner, no board
         loner = await create_player(client, tenant_b, "tenant-b", "Loner")
         err = await factions.write_note(conn, "tenant-b", loner, "hello")
-        assert err and "no banner" in err
+        assert err and "no faction" in err
     rows = await pool.fetch(
         "SELECT player, line, world_day FROM ascent_faction_notes "
         "WHERE faction=$1 ORDER BY id", name)

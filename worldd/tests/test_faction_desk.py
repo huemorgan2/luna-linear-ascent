@@ -246,7 +246,9 @@ async def test_list_search_and_top10(client, tenant_a, clean_factions):
     r = await post(client, tenant_a, "tenant-a", "/v1/faction/list",
                    {"player": pa})
     d = r.json()
-    assert d["total"] == 12 and len(d["factions"]) == 10
+    # 059: the ledger is the "all factions" page — 50 a page, not 10
+    assert d["total"] == 12 and len(d["factions"]) == 12
+    assert factions.BROWSE_LIMIT == 50
     assert d["factions"][0]["name"] == mine     # most members first
     assert d["found_min_level"] == factions.FOUND_MIN_LEVEL
 

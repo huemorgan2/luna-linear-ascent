@@ -37,6 +37,8 @@ BASE_PCT_SMALL = 0.15
 BASE_PCT_FULL = 0.20
 FOUND_FEE = 300            # matches the engine's Guildhall fee (019)
 FOUND_MIN_LEVEL = 4        # 015: founding is a rank privilege
+ONLINE_WINDOW_MIN = 5      # 059: a member is "online" inside this window
+                           # (mirrors social.ONLINE_WINDOW_MIN)
 GOAL_KINDS = ("hoard", "cull", "climb")
 NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9 '\-]{2,23}$")
 
@@ -206,14 +208,20 @@ async def members_of(conn, faction: str) -> list[dict]:
         "       p.doc->>'name' AS name,"
         "       coalesce((p.doc->>'level')::int, 1) AS level,"
         "       p.doc->>'training' AS training,"
-        "       p.doc->>'mastery' AS mastery "
+        "       p.doc->>'mastery' AS mastery,"
+        # 059: online = acted inside the presence window while playing —
+        # the same rule as social.online_count, per member
+        "       (p.doc->>'stage'='playing' AND p.updated_at >"
+        "        now() - make_interval(mins => $2)) AS online "
         "FROM ascent_faction_members m "
         "LEFT JOIN ascent_players p ON p.tenant=m.tenant "
         "  AND p.player=m.player "
-        "WHERE m.faction=$1 ORDER BY m.joined_day, m.player", faction)
+        "WHERE m.faction=$1 ORDER BY m.joined_day, m.player",
+        faction, ONLINE_WINDOW_MIN)
     out = []
     for r in rows:
         d = dict(r)
+        d["online"] = bool(d.get("online"))
         # 048: the trained hands ride the member row — the banner hall
         # toasts its tenth ranks and masters by name
         for k in ("training", "mastery"):
@@ -256,7 +264,7 @@ async def maybe_post_week(conn) -> None:
         from . import social
         await social.add_happening(
             conn, kind="faction",
-            line=f"This week the Ascent demands a {kind.upper()} — banners "
+            line=f"This week the Ascent demands a {kind.upper()} — factions "
                  f"enter at the Guildhall (◈ {ENTRY_PER_MEMBER} a head, from "
                  "the coffer)")
 
@@ -401,7 +409,7 @@ async def _resolve(conn, fac: dict, members: list[dict], week: int,
         from . import social
         await social.add_happening(
             conn, kind="faction", faction=name,
-            line=f"The {name} banner won the week's {kind.upper()} — {note}")
+            line=f"The {name} faction won the week's {kind.upper()} — {note}")
     elif reached:
         note = "goal met, but the hall stood empty — no prize "
         note += f"(attendance {attended}/{required})"
@@ -410,7 +418,7 @@ async def _resolve(conn, fac: dict, members: list[dict], week: int,
         from . import social
         await social.add_happening(
             conn, kind="faction", faction=name,
-            line=f"The {name} banner {note} on the week's {kind.upper()}")
+            line=f"The {name} faction {note} on the week's {kind.upper()}")
 
     await conn.execute(
         "UPDATE ascent_faction_weeks SET progress=$2, ratio=$3, "
@@ -543,7 +551,7 @@ async def join_faction(conn, tenant: str, player: str, name: str,
             doc["gold"] = int(doc.get("gold", 0)) + n
     if fac is None:
         refund(fee)
-        return "that banner no longer flies"
+        return "that faction no longer flies"
     if await member_row(conn, tenant, player):
         refund(fee)
         return "you already sit at a table — leave it first"
@@ -605,7 +613,7 @@ async def donate(conn, tenant: str, player: str, amount: int,
             doc["gold"] = int(doc.get("gold", 0)) + n
     if me is None:
         refund(amount)
-        return "you have no banner"
+        return "you have no faction"
     if amount <= 0:
         return "a donation needs a number above zero"
     fac = await conn.fetchrow(
@@ -613,7 +621,7 @@ async def donate(conn, tenant: str, player: str, amount: int,
         "FOR UPDATE", me["faction"])
     if fac is None:
         refund(amount)
-        return "that banner no longer flies"
+        return "that faction no longer flies"
     take = coffer_take(fac["treasury"], fac["coffer_tier"], amount)
     if take <= 0:
         refund(amount)
@@ -655,7 +663,7 @@ async def enter_week(conn, tenant: str, player: str) -> str | None:
     from the store; refused with the shortfall shown when it can't."""
     me = await member_row(conn, tenant, player)
     if me is None:
-        return "you have no banner"
+        return "you have no faction"
     if me["role"] != "steward":
         return "only the steward signs the entry"
     name = me["faction"]
@@ -682,7 +690,7 @@ async def enter_week(conn, tenant: str, player: str) -> str | None:
         "ON CONFLICT (faction, week) DO NOTHING RETURNING id",
         name, week, kind, target, cost)
     if claimed is None:
-        return "your banner is already in this week's lists"
+        return "your faction is already in this week's lists"
     await conn.execute(
         "UPDATE ascent_factions SET treasury = treasury - $2 WHERE name=$1",
         name, cost)
@@ -713,7 +721,7 @@ async def _works_faction(conn, tenant: str,
         "SELECT name, room_tier, coffer_tier, chest_tier, beds, treasury "
         "FROM ascent_factions WHERE name=$1 FOR UPDATE", faction)
     if fac is None:
-        return None, "that banner no longer flies"
+        return None, "that faction no longer flies"
     return dict(fac), None
 
 
@@ -825,7 +833,7 @@ async def claim_bed(conn, tenant: str, player: str,
     rested-XP — dawn heals everyone regardless."""
     me = await member_row(conn, tenant, player)
     if me is None:
-        return "you have no banner"
+        return "you have no faction"
     beds = int(await conn.fetchval(
         "SELECT beds FROM ascent_factions WHERE name=$1 FOR UPDATE",
         me["faction"]) or 0)
@@ -860,7 +868,7 @@ async def write_note(conn, tenant: str, player: str,
     member per world-day — writing again the same day replaces it."""
     me = await member_row(conn, tenant, player)
     if me is None:
-        return "you have no banner"
+        return "you have no faction"
     line = " ".join(str(line).split())[:NOTE_MAX_CHARS]
     if not line:
         return "the board takes one line — write something first"
@@ -1056,7 +1064,7 @@ async def request_join(conn, tenant: str, player: str,
         "SELECT name, requirements FROM ascent_factions WHERE name=$1",
         name)
     if fac is None:
-        return "that banner no longer flies"
+        return "that faction no longer flies"
     doc = await _load_doc(conn, tenant, player)
     if doc is None or doc.get("stage") != "playing":
         return "no character"
@@ -1144,7 +1152,7 @@ async def rename_faction(conn, tenant: str, player: str,
     audit history stay attached."""
     faction = await is_admin(conn, tenant, player)
     if faction is None:
-        return "only an admin renames the banner"
+        return "only an admin renames the faction"
     new_name = new_name.strip()
     if not NAME_RE.match(new_name):
         return "3–24 letters, numbers, spaces, - or '"
@@ -1153,7 +1161,7 @@ async def rename_faction(conn, tenant: str, player: str,
     taken = await conn.fetchval(
         "SELECT 1 FROM ascent_factions WHERE name=$1", new_name)
     if taken:
-        return "that banner already flies"
+        return "that faction already flies"
     await conn.execute(
         "UPDATE ascent_factions SET name=$2 WHERE name=$1",
         faction, new_name)
@@ -1388,10 +1396,14 @@ async def settled_board(conn) -> dict:
     return await board(conn)
 
 
+BROWSE_LIMIT = 50          # 059: the ledger IS the "all factions" page
+
+
 async def browse(conn, tenant: str, player: str, q: str) -> dict:
-    """The ledger: top 10 banners by table size; q searches server-side.
-    Includes the caller's open request so the UI shows the pending state."""
-    rows = await search_factions(conn, q)
+    """The ledger: top factions by table size (50); q searches
+    server-side. Includes the caller's open request so the UI shows the
+    pending state."""
+    rows = await search_factions(conn, q, limit=BROWSE_LIMIT)
     total = int(await conn.fetchval(
         "SELECT count(*) FROM ascent_factions") or 0)
     requested = await my_request(conn, tenant, player)
