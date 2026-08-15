@@ -1084,8 +1084,12 @@ async def execute_effects(conn, tenant: str, player: str,
             scope = str(e.get("scope", "world"))
             guild = doc.get("guild") or None
             if scope != "faction" or guild:
+                # 062: the engine may tag a line (kill / levelup) so
+                # the Playing feed can color it; untagged news is climb.
+                tag = str(e.get("tag") or "").strip().lower()
                 await add_happening(
-                    conn, kind="climb", line=str(e.get("line", "")),
+                    conn, kind=tag if tag in ("kill", "levelup") else "climb",
+                    line=str(e.get("line", "")),
                     floor=int(e.get("floor", 0)) or None,
                     actor=doc.get("name") or player, faction=guild,
                     scope=scope, meta=e.get("meta") or None)
