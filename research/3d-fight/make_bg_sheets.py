@@ -13,13 +13,14 @@ from pathlib import Path
 from PIL import Image
 
 HERE = Path(__file__).parent
-SRC = HERE / "demo2" / "backgrounds"
+SRCS = [HERE / "demo2" / "backgrounds",        # floor 1
+        HERE / "backgrounds_floors"]           # floors 2–6 + wardens
 DST = (HERE.parent.parent / "worldd" / "static" / "site" / "fight3d"
        / "backgrounds")
 W, H, FRAMES = 320, 112, 24
 
 DST.mkdir(parents=True, exist_ok=True)
-for gif in sorted(SRC.glob("*.gif")):
+for gif in sorted(g for d in SRCS for g in d.glob("*.gif")):
     im = Image.open(gif)
     sheet = Image.new("1", (W, H * FRAMES), 0)
     n = getattr(im, "n_frames", 1)

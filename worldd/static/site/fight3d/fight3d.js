@@ -30,6 +30,9 @@ const BASE = new URL(".", import.meta.url);
 
 // floor-1 monster registry: normalized height, stance width, start x.
 // A creature absent here (or whose GLB 404s) simply keeps its GIF.
+// bipeds stand a 3/4 turn toward the climber (yaw 0 = full face to camera,
+// -PI/2 = pure profile) — the same read as the player's PLAYER_YAW
+const BIPED_YAW = -0.6;
 const MONSTERS3D = {
   // h: world height, wide: side-scale, mx: bulk. yaw: the GLB's authoring
   // turn — Tripo rigs some bodies long along x; yaw brings the head to
@@ -41,8 +44,64 @@ const MONSTERS3D = {
   hedge_rat:        { h: 1.05, wide: 1.15, mx: 1.8,
                       gait: { stride: 1.5, bob: 0.06, rock: 0.14, sway: 0.10 } },
   lane_wolf:        { h: 1.60, wide: 1.15, mx: 2.1 },
-  goblin_straggler: { h: 1.70, wide: 1.20, mx: 2.0 },
+  goblin_straggler: { h: 1.70, wide: 1.20, mx: 2.0, yaw: BIPED_YAW },
   ember_shade:      { h: 1.95, wide: 1.15, mx: 2.3, yaw: -Math.PI / 2 },
+  // floor 2 — the Rustwater Adit
+  marsh_wolf:         { h: 1.60, wide: 1.15, mx: 2.1 },
+  cave_cricket:       { h: 1.20, wide: 1.15, mx: 1.9, yaw: -Math.PI / 2,
+                        gait: { stride: 1.4, bob: 0.08, rock: 0.10 } },
+  shellback_tortoise: { h: 1.30, wide: 1.20, mx: 2.2, yaw: -Math.PI / 2,
+                        gait: { stride: 1.8, bob: 0.03, sway: 0.08 } },
+  kobold_digger:      { h: 1.50, wide: 1.15, mx: 1.9, yaw: BIPED_YAW },
+  orc_overseer:       { h: 2.10, wide: 1.15, mx: 2.3, yaw: BIPED_YAW },
+  rust_seep:          { h: 1.30, wide: 1.20, mx: 2.0 },
+  warden_002:         { h: 2.60, wide: 1.15, mx: 2.6, yaw: -Math.PI / 2 },
+  // floor 3 — the Drowned Pasture
+  sluice_wolf:        { h: 1.70, wide: 1.15, mx: 2.1, yaw: -Math.PI / 2 },
+  reed_adder:         { h: 0.35, wide: 1.20, mx: 2.4, yaw: Math.PI,
+                        gait: { stride: 1.6, sway: 0.12 } },
+  mire_boar:          { h: 1.90, wide: 1.12, mx: 2.2, yaw: -Math.PI / 2 },
+  wire_eel:           { h: 0.60, wide: 1.20, mx: 2.1,
+                        gait: { stride: 1.6, sway: 0.14 } },
+  windfall_haunt:     { h: 1.80, wide: 1.15, mx: 2.2 },
+  warden_003:         { h: 2.60, wide: 1.15, mx: 2.6, yaw: -Math.PI / 2 },
+  // floor 4 — the Lightless Glade
+  glade_stag:         { h: 2.20, wide: 1.12, mx: 2.3, yaw: -Math.PI / 2 },
+  dusk_hare:          { h: 1.00, wide: 1.15, mx: 1.8,
+                        gait: { stride: 1.5, bob: 0.08, rock: 0.14 } },
+  glare_moth:         { h: 1.30, wide: 1.20, mx: 2.0,
+                        gait: { stride: 1.4, bob: 0.06 } },
+  wick_owl:           { h: 1.60, wide: 1.20, mx: 2.0, yaw: BIPED_YAW },
+  lamp_eater:         { h: 1.30, wide: 1.20, mx: 2.0 },
+  lamptree_wight:     { h: 2.20, wide: 1.15, mx: 2.4, yaw: BIPED_YAW },
+  warden_004:         { h: 2.70, wide: 1.15, mx: 2.7, yaw: Math.PI },
+  // floor 5 — the Flooded Mine
+  blind_shoal:        { h: 1.10, wide: 1.20, mx: 1.9,
+                        gait: { stride: 1.5, sway: 0.12 } },
+  drift_eel:          { h: 0.45, wide: 1.20, mx: 2.2,
+                        gait: { stride: 1.6, sway: 0.14 } },
+  downs_courser:      { h: 1.90, wide: 1.12, mx: 2.2, yaw: Math.PI },
+  coolant_crab:       { h: 1.20, wide: 1.20, mx: 2.0,
+                        gait: { stride: 1.4, sway: 0.10 } },
+  bailer_kobold:      { h: 1.50, wide: 1.15, mx: 1.9, yaw: BIPED_YAW },
+  miner_husk:         { h: 1.80, wide: 1.15, mx: 2.1, yaw: BIPED_YAW },
+  warden_005:         { h: 1.60, wide: 1.20, mx: 3.2,
+                        gait: { stride: 1.5, sway: 0.10 } },
+  // floor 6 — the Threshold Dark
+  grave_moth:         { h: 1.30, wide: 1.20, mx: 2.0,
+                        gait: { stride: 1.4, bob: 0.06 } },
+  guano_vole:         { h: 1.00, wide: 1.15, mx: 1.8, yaw: -Math.PI / 2,
+                        gait: { stride: 1.5, bob: 0.06, rock: 0.12 } },
+  silk_broodling:     { h: 1.20, wide: 1.20, mx: 2.0, yaw: -Math.PI / 2,
+                        gait: { stride: 1.4, bob: 0.04 } },
+  vault_weaver:       { h: 2.00, wide: 1.20, mx: 2.4, yaw: -Math.PI / 2,
+                        gait: { stride: 1.4, bob: 0.04 } },
+  lane_boar:          { h: 1.80, wide: 1.12, mx: 2.2, yaw: -Math.PI / 2 },
+  wrapped_husk:       { h: 1.80, wide: 1.15, mx: 2.1, yaw: BIPED_YAW },
+  warden_006:         { h: 2.80, wide: 1.20, mx: 2.8, yaw: -Math.PI / 2,
+                        gait: { stride: 1.4, bob: 0.04 } },
+  // floor 1's Warden
+  warden_001:         { h: 2.60, wide: 1.15, mx: 2.6, yaw: -Math.PI / 2 },
 };
 
 const SPECIES = {

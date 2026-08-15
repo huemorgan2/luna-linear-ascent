@@ -28,6 +28,10 @@ OUT = os.path.join(_HERE, "backgrounds")
 
 _prov = os.path.join(_ROOT, "plugin-image-gen",
                      "plugin_image_gen", "providers.py")
+if not os.path.exists(_prov):   # the plugin moved into luna-plugins
+    _prov = os.path.join(_ROOT, "..", "luna-plugins", "plugins",
+                         "plugin-image-gen", "plugin_image_gen",
+                         "providers.py")
 _spec = importlib.util.spec_from_file_location("providers", _prov)
 providers = importlib.util.module_from_spec(_spec)
 sys.modules["providers"] = providers

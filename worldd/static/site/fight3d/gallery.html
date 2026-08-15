@@ -40,7 +40,7 @@
 <script type="importmap">
   {"imports": {"three": "./vendor/three.module.js"}}
 </script>
-<h1>floor 1 — the six, as the game renders them</h1>
+<h1>the tower's creatures, as the game renders them</h1>
 <p class="note">same module as /play (fight3d.js) — stand shows the model;
 blade / bow / staff replay the kill with that weapon's move.</p>
 <div id="bar">
@@ -59,18 +59,56 @@ blade / bow / staff replay the kill with that weapon's move.</p>
 </div>
 <div id="game"></div>
 <script>
-  const MONSTERS = [
-    ["grey_wolf", "Grey wolf"],
-    ["feral_boar", "Feral boar"],
-    ["hedge_rat", "Hedgerow rat"],
-    ["lane_wolf", "Lane wolf"],
-    ["goblin_straggler", "Goblin straggler"],
-    ["ember_shade", "Ember shade"],
+  const FLOORS = [
+    ["1 — the Fencerows", [
+      ["grey_wolf", "Grey wolf"], ["feral_boar", "Feral boar"],
+      ["hedge_rat", "Hedgerow rat"], ["lane_wolf", "Lane wolf"],
+      ["goblin_straggler", "Goblin straggler"], ["ember_shade", "Ember shade"],
+      ["warden_001", "Warden Brackjaw"]]],
+    ["2 — the Rustwater Adit", [
+      ["marsh_wolf", "Marsh wolf"], ["cave_cricket", "Cave cricket"],
+      ["shellback_tortoise", "Shellback tortoise"], ["kobold_digger", "Kobold digger"],
+      ["orc_overseer", "Orc overseer"], ["rust_seep", "Rust seep"],
+      ["warden_002", "Warden, floor 2"]]],
+    ["3 — the Drowned Pasture", [
+      ["sluice_wolf", "Sluice wolf"], ["reed_adder", "Reed adder"],
+      ["mire_boar", "Mire boar"], ["wire_eel", "Wire eel"],
+      ["windfall_haunt", "Windfall haunt"], ["warden_003", "Warden, floor 3"]]],
+    ["4 — the Lightless Glade", [
+      ["glade_stag", "Glade stag"], ["dusk_hare", "Dusk hare"],
+      ["glare_moth", "Glare moth"], ["wick_owl", "Wick owl"],
+      ["lamp_eater", "Lamp eater"], ["lamptree_wight", "Lamptree wight"],
+      ["warden_004", "Warden, floor 4"]]],
+    ["5 — the Flooded Mine", [
+      ["blind_shoal", "Blind shoal"], ["drift_eel", "Drift eel"],
+      ["downs_courser", "Downs courser"], ["coolant_crab", "Coolant crab"],
+      ["bailer_kobold", "Bailer kobold"], ["miner_husk", "Miner husk"],
+      ["warden_005", "Warden, floor 5"]]],
+    ["6 — the Threshold Dark", [
+      ["grave_moth", "Grave moth"], ["guano_vole", "Guano vole"],
+      ["silk_broodling", "Silk broodling"], ["vault_weaver", "Vault weaver"],
+      ["lane_boar", "Lane boar"], ["wrapped_husk", "Wrapped husk"],
+      ["warden_006", "Warden, floor 6"]]],
   ];
+  // ?ids=a,b,c shows just those; ?floor=N one floor
+  const q = new URLSearchParams(location.search);
+  const only = q.get("ids") ? new Set(q.get("ids").split(",")) : null;
+  const MONSTERS = [];
+  for (const [fl, list] of FLOORS) {
+    if (q.get("floor") && !fl.startsWith(q.get("floor") + " ")) continue;
+    for (const m of list) if (!only || only.has(m[0])) MONSTERS.push([...m, fl]);
+  }
   const TINT = { common: "#d9d9d3", runt: "#5b5952",
                  tough: "#d967c8", alpha: "#f5b825" };
   const game = document.getElementById("game");
-  for (const [id, label] of MONSTERS) {
+  let lastFloor = null;
+  for (const [id, label, fl] of MONSTERS) {
+    if (fl !== lastFloor) {
+      lastFloor = fl;
+      const h = document.createElement("h1");
+      h.textContent = "Floor " + fl;
+      game.appendChild(h);
+    }
     const p = document.createElement("section");
     p.className = "panel";
     p.dataset.id = id;
