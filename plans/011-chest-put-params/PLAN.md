@@ -76,3 +76,30 @@ either direction.
   only its own hunks and does not commit those.
 - No deploy performed as part of this plan; ship rides the next
   explicit deploy per the production workflow.
+
+## Execution status (2026-08-16)
+
+- **Plugin submodule** — `economy.gear_card_stats` + both hint call
+  sites committed as `985412c`; tests
+  (`tests/test_chest_card_params.py`, 6 tests) committed as `18ca39c`.
+  A concurrent session was mid-flight on plan 010 in the same checkout
+  and reset the shared index between stage and commit — the code half
+  was re-committed through a private `GIT_INDEX_FILE` with a
+  compare-and-swap `update-ref`, staging only this plan's hunks; the
+  010 worktree changes were left untouched and uncommitted.
+- **Vendor copy** — same three edits applied to
+  `worldd/vendor/plugin_linear_ascent/` (this commit).
+- **Verification** — targeted: 6/6 new tests pass. Full plugin suite:
+  1178 passed, 3 failed — the same 3 fail with this plan's edits
+  stashed (pre-existing: `test_022_001`, `test_026`, `test_kill3d`),
+  0 failures introduced. Vendor: direct scene render through
+  `worldd/vendor` shows `+1520 ATK · durability 975 of 1,950 · no coin
+  — the faction keeps it` on the chest PUT card (worn piece) and the
+  identical fragment on the pawn donate row.
+- **Dojo** — scenario committed in `luna` as `22350610`; the browser
+  walkthrough has NOT run yet — it needs a deployed build with a
+  faction member holding worn gear, so it rides the next deploy's
+  acceptance gate.
+- **Not done** — no push, no deploy, no plugin version bump, no
+  submodule pointer bump (left to the deploy owner; plan 010 is
+  in-flight in the same checkout).
