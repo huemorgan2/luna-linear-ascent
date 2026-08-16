@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import html as htmlmod
 import json
 import logging
 import os
@@ -18,11 +19,13 @@ import secrets as pysecrets
 import time
 from pathlib import Path
 
+import base64
+
 import asyncpg
 from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 
-from . import db
+from . import db, google_oauth
 from .config import get_config
 
 log = logging.getLogger("worldd.site")
@@ -45,6 +48,54 @@ async def homepage():
 @router.get("/mechanics", include_in_schema=False)
 async def mechanics():
     return FileResponse(SITE_DIR / "mechanics.html", media_type="text/html")
+
+
+# Promotion log — unlinked, like /mechanics. Source is a markdown file.
+# /promotion.md is the raw page; /promotion wraps it in the terminal face.
+
+_PROMO_WRAP = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LINEAR ASCENT — promotion log</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23060606'/%3E%3Crect x='6' y='2' width='4' height='12' fill='%23f2b632'/%3E%3Crect x='4' y='12' width='8' height='2' fill='%23f2b632'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/site/site.css?v=0.81.2">
+<style>
+  main.promo { max-width: 84ch; margin: 3.5rem auto 4rem; padding: 0 1ch; }
+  pre.md { white-space: pre-wrap; word-break: break-word; color: var(--fg);
+           line-height: 1.35; }
+</style>
+</head>
+<body>
+<header id="bar">
+  <span id="bar-left">PROMOTION LOG</span>
+  <span id="bar-right">LINEAR ASCENT</span>
+  <a id="bar-cta" href="/promotion.md">[ .MD ]</a>
+</header>
+<main class="promo">
+  <div class="card wide">
+    <div class="eyebrow">UNLINKED · RAW NOTES</div>
+    <p class="dim">Canonical markdown: <a href="/promotion.md">/promotion.md</a></p>
+    <pre class="md">BODY</pre>
+  </div>
+</main>
+</body>
+</html>
+"""
+
+
+@router.get("/promotion.md", include_in_schema=False)
+async def promotion_md():
+    return FileResponse(
+        SITE_DIR / "promotion.md", media_type="text/plain; charset=utf-8")
+
+
+@router.get("/promotion", include_in_schema=False)
+async def promotion():
+    raw = (SITE_DIR / "promotion.md").read_text(encoding="utf-8")
+    return HTMLResponse(_PROMO_WRAP.replace("BODY", htmlmod.escape(raw)))
 
 
 # ── The public world feed (no auth — this is the shop window) ────────────
@@ -244,6 +295,13 @@ async def _credentials(request: Request) -> tuple[str, str, str, str, bool]:
             str(form.get("email", "")).strip()[:254], False)
 
 
+def _set_session_cookie(resp, request: Request, username: str) -> None:
+    proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+    resp.set_cookie(SESSION_COOKIE, _session_token(username),
+                    max_age=SESSION_MAX_AGE, httponly=True,
+                    samesite="lax", secure=(proto == "https"), path="/")
+
+
 def _door_response(request: Request, username: str, wants_json: bool,
                    note: str):
     if wants_json:
@@ -252,11 +310,7 @@ def _door_response(request: Request, username: str, wants_json: bool,
     else:
         # 005: the door opens INTO the game — scripts-off included
         resp = RedirectResponse("/play", status_code=303)
-    proto = request.headers.get("x-forwarded-proto",
-                                request.url.scheme)
-    resp.set_cookie(SESSION_COOKIE, _session_token(username),
-                    max_age=SESSION_MAX_AGE, httponly=True,
-                    samesite="lax", secure=(proto == "https"), path="/")
+    _set_session_cookie(resp, request, username)
     return resp
 
 
@@ -327,6 +381,267 @@ async def logout(request: Request):
     return resp
 
 
+# ── The Gmail door (010) ─────────────────────────────────────────────────
+# Two short-lived, HMAC-signed cookies carry the OAuth round-trip without a
+# server-side session store: OAUTH_COOKIE holds the CSRF nonce + PKCE
+# verifier (and, if the caller was already signed in, the account to LINK);
+# PENDING_COOKIE holds the verified Google identity between the callback and
+# the moment a brand-new climber picks a name.
+
+OAUTH_COOKIE = "ascent_oauth"
+PENDING_COOKIE = "ascent_pending"
+OAUTH_MAX_AGE = 600
+PENDING_MAX_AGE = 900
+
+
+def _blob_sign(payload: dict) -> str:
+    raw = base64.urlsafe_b64encode(
+        json.dumps(payload).encode()).rstrip(b"=").decode()
+    return f"{raw}.{_sign(raw)}"
+
+
+def _blob_read(token: str) -> dict | None:
+    try:
+        raw, sig = token.split(".", 1)
+    except ValueError:
+        return None
+    if not hmac.compare_digest(_sign(raw), sig):
+        return None
+    try:
+        pad = "=" * (-len(raw) % 4)
+        data = json.loads(base64.urlsafe_b64decode(raw + pad))
+    except Exception:
+        return None
+    if int(data.get("exp", 0)) < int(time.time()):
+        return None
+    return data
+
+
+def _cookie(resp, request: Request, name: str, value: str,
+            max_age: int) -> None:
+    proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+    resp.set_cookie(name, value, max_age=max_age, httponly=True,
+                    samesite="lax", secure=(proto == "https"), path="/")
+
+
+def _finish_session(request: Request, username: str):
+    """Land a signed-in climber in the game, clearing the round-trip crumbs."""
+    resp = RedirectResponse("/play", status_code=303)
+    _set_session_cookie(resp, request, username)
+    resp.delete_cookie(OAUTH_COOKIE, path="/")
+    resp.delete_cookie(PENDING_COOKIE, path="/")
+    return resp
+
+
+def _oauth_fail(msg: str):
+    return RedirectResponse(f"/?door_err={msg.replace(' ', '+')}#door",
+                            status_code=303)
+
+
+@router.get("/auth/google/start")
+async def google_start(request: Request):
+    if not google_oauth.configured():
+        raise HTTPException(503, "Gmail sign-in is not configured")
+    verifier, challenge = google_oauth.make_pkce()
+    nonce = pysecrets.token_urlsafe(16)
+    # a signed-in caller → link Gmail to THIS account (profile's "connect")
+    link = session_user(request)
+    blob = _blob_sign({"nonce": nonce, "verifier": verifier, "link": link,
+                       "exp": int(time.time()) + OAUTH_MAX_AGE})
+    resp = RedirectResponse(google_oauth.auth_url(nonce, challenge),
+                            status_code=303)
+    _cookie(resp, request, OAUTH_COOKIE, blob, OAUTH_MAX_AGE)
+    return resp
+
+
+@router.get("/auth/google/callback")
+async def google_callback(request: Request):
+    if request.query_params.get("error"):
+        return _oauth_fail("Gmail sign-in was cancelled")
+    code = request.query_params.get("code", "")
+    state = request.query_params.get("state", "")
+    blob = _blob_read(request.cookies.get(OAUTH_COOKIE, ""))
+    if not code or not blob \
+            or not hmac.compare_digest(blob.get("nonce", ""), state):
+        return _oauth_fail("Gmail sign-in expired — try again")
+    try:
+        who = await google_oauth.exchange_code(code, blob["verifier"])
+    except google_oauth.OAuthError:
+        return _oauth_fail("Gmail sign-in failed — try again")
+
+    pool = await db.get_pool()
+    link_user = blob.get("link")
+    if link_user:
+        # linking Gmail to the already-signed-in account
+        async with pool.acquire() as conn:
+            await conn.execute(
+                "UPDATE ascent_accounts SET google_sub=$1, "
+                "auth_provider='google', email=coalesce(email,$2) "
+                "WHERE lower(username)=lower($3) AND "
+                "(google_sub IS NULL OR google_sub=$1)",
+                who["sub"], who["email"], link_user)
+        return _finish_session(request, link_user)
+
+    async with pool.acquire() as conn:
+        row = await conn.fetchrow(
+            "SELECT username FROM ascent_accounts WHERE google_sub=$1",
+            who["sub"])
+        if row:                                   # a known Google identity
+            return _finish_session(request, row["username"])
+        # an old account whose stored email IS this address → adopt it
+        row = await conn.fetchrow(
+            "SELECT username, google_sub FROM ascent_accounts "
+            "WHERE lower(email)=lower($1) ORDER BY id LIMIT 1", who["email"])
+        if row and not row["google_sub"]:
+            await conn.execute(
+                "UPDATE ascent_accounts SET google_sub=$1, "
+                "auth_provider='google' WHERE lower(username)=lower($2)",
+                who["sub"], row["username"])
+            return _finish_session(request, row["username"])
+
+    # brand new — hold the proven identity until they pick a name
+    pending = _blob_sign({"sub": who["sub"], "email": who["email"],
+                          "given": who.get("given_name") or who.get("name"),
+                          "exp": int(time.time()) + PENDING_MAX_AGE})
+    resp = RedirectResponse("/auth/google/name", status_code=303)
+    resp.delete_cookie(OAUTH_COOKIE, path="/")
+    _cookie(resp, request, PENDING_COOKIE, pending, PENDING_MAX_AGE)
+    return resp
+
+
+@router.get("/auth/google/name")
+async def google_name(request: Request):
+    from . import names
+    pending = _blob_read(request.cookies.get(PENDING_COOKIE, ""))
+    if not pending:
+        return RedirectResponse("/", status_code=303)
+    base = (pending.get("given") or "").strip() \
+        or pending.get("email", "").split("@")[0]
+    suggested = names.canonical(base) or ""
+    err = request.query_params.get("err", "")
+    return HTMLResponse(_name_page(pending.get("email", ""), suggested, err))
+
+
+@router.post("/auth/google/name")
+async def google_name_post(request: Request):
+    from . import names
+    pending = _blob_read(request.cookies.get(PENDING_COOKIE, ""))
+    ctype = request.headers.get("content-type", "")
+    if "application/json" in ctype:
+        body = await request.json()
+        raw_name, wants_json = str(body.get("username", "")), True
+    else:
+        form = await request.form()
+        raw_name, wants_json = str(form.get("username", "")), False
+    username = names.canonical(raw_name)
+    if not pending:
+        return _name_expired(wants_json)
+    if not names.is_legal(username):
+        return _name_retry(wants_json, "name: 2–24 letters, numbers, - or _")
+    pool = await db.get_pool()
+    try:
+        async with pool.acquire() as conn, conn.transaction():
+            if await names.claim(conn, username,
+                                 names.ACCOUNT) == names.TAKEN:
+                raise _NameTaken
+            await conn.execute(
+                "INSERT INTO ascent_accounts "
+                "(username, pw_hash, email, auth_provider, google_sub) "
+                "VALUES ($1, NULL, $2, 'google', $3)",
+                username, pending["email"], pending["sub"])
+    except (_NameTaken, asyncpg.UniqueViolationError):
+        # a racing double-submit may have already made THIS Google account
+        existing = await pool.fetchval(
+            "SELECT username FROM ascent_accounts WHERE google_sub=$1",
+            pending["sub"])
+        if existing:
+            return _finish_session(request, existing)
+        return _name_retry(wants_json, "that name is taken — try another")
+    log.info("account created via Gmail: %s", username)
+    return _finish_session(request, username)
+
+
+def _name_expired(wants_json: bool):
+    if wants_json:
+        raise HTTPException(400, "sign-in expired — start again")
+    return RedirectResponse("/", status_code=303)
+
+
+def _name_retry(wants_json: bool, msg: str):
+    if wants_json:
+        raise HTTPException(409, msg)
+    return RedirectResponse(f"/auth/google/name?err={msg.replace(' ', '+')}",
+                            status_code=303)
+
+
+_NAME_PAGE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LINEAR ASCENT — name your climber</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23060606'/%3E%3Crect x='6' y='2' width='4' height='12' fill='%23f2b632'/%3E%3Crect x='4' y='12' width='8' height='2' fill='%23f2b632'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/site/site.css?v=0.81.2">
+<style>
+  main.namestep { max-width: 60ch; margin: 3.5rem auto 4rem; padding: 0 1ch; }
+  .signedin { color: var(--dim); }
+  .signedin b { color: var(--gold); }
+  .nameerr { color: var(--hurt); }
+</style>
+</head>
+<body>
+<header id="bar">
+  <span id="bar-left">LINEAR ASCENT</span>
+  <span id="bar-right">NAME YOUR CLIMBER</span>
+</header>
+<main class="namestep">
+  <div class="card doorcard">
+    <div class="eyebrow">NAME YOUR CLIMBER</div>
+    <h2>Pick your name</h2>
+    <p class="signedin">Signed in as <b>{{EMAIL}}</b>. Choose the one word
+       the whole tower will know you by.</p>
+    <form method="post" action="/auth/google/name">
+      <label>CLIMBER NAME <span class="dim">— one word: letters, numbers,
+             - or _</span>
+             <input name="username" value="{{SUGG}}" maxlength="24"
+             minlength="2" autocomplete="off" autofocus
+             placeholder="one word" required></label>
+      {{ERR}}
+      <div class="options">
+        <button class="opt gold-opt" type="submit">[ ENTER THE TOWER ]</button>
+      </div>
+    </form>
+    <p class="dim" style="margin-top:.75rem">Permanent and unique across the
+       world. Google proves your email; we never post anything and never read
+       your mail.</p>
+  </div>
+</main>
+</body>
+</html>
+"""
+
+
+def _name_page(email: str, suggested: str, err: str) -> str:
+    err_html = (f'<p class="nameerr">{htmlmod.escape(err)}</p>'
+                if err else "")
+    return (_NAME_PAGE
+            .replace("{{EMAIL}}", htmlmod.escape(email))
+            .replace("{{SUGG}}", htmlmod.escape(suggested, quote=True))
+            .replace("{{ERR}}", err_html))
+
+
 @router.get("/me")
 async def me(request: Request) -> dict:
-    return {"username": session_user(request)}
+    username = session_user(request)
+    if not username:
+        return {"username": None}
+    out = {"username": username, "auth_provider": None, "gmail": False}
+    if db.ready():
+        row = await (await db.get_pool()).fetchrow(
+            "SELECT auth_provider, google_sub FROM ascent_accounts "
+            "WHERE lower(username)=lower($1)", username)
+        if row:
+            out["auth_provider"] = row["auth_provider"]
+            out["gmail"] = bool(row["google_sub"])
+    return out

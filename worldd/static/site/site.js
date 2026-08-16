@@ -336,13 +336,15 @@
   }
   if (!STILL && $("demo-card")) setTimeout(demoTick, 1200);
 
-  /* ── the door ───────────────────────────────────────────────────── */
+  /* ── the door (010: Gmail is the way in; password login for old
+     accounts) ───────────────────────────────────────────────────── */
   var form = $("door-form"), note = $("door-note");
 
   function doorKnown(name) {
-    form.style.display = "none";
-    var tabs = $("door-tabs");
-    if (tabs) tabs.style.display = "none";
+    /* signed in already — hide every way IN, offer the way ON */
+    if (form) form.style.display = "none";
+    document.querySelectorAll("#door .gbtn, #door .or, #door-form ~ .dim")
+      .forEach(function (el) { if (el !== note) el.style.display = "none"; });
     note.classList.remove("err");
     note.innerHTML = "You're in, <span class='bright'>" + name
       + "</span>. ";
@@ -383,85 +385,27 @@
     .catch(function () {});
 
   if (form) {
-    /* Two doors, one form: sign-up asks for the password twice, sign-in
-       once. With scripts off both submit buttons are in the markup with
-       their own formaction, so the page still opens either door. */
-    var setMode = function (m) {
-      var up = m === "signup";
-      form.setAttribute("action", up ? "/signup" : "/login");
-      var title = form.closest(".doorcard");
-      if (title) {
-        var h2 = title.querySelector("h2");
-        if (h2) h2.textContent = up ? "Sign up" : "Sign in";
-      }
-      $("label-pw").textContent = up ? "NEW PASSWORD" : "PASSWORD";
-      $("row-pw2").style.display = up ? "" : "none";
-      $("row-email").style.display = up ? "" : "none";
-      form.elements.password2.required = up;
-      form.elements.password.setAttribute(
-        "autocomplete", up ? "new-password" : "current-password");
-      $("door-signup").style.display = up ? "" : "none";
-      $("door-login").style.display = up ? "none" : "";
-      $("door-login").classList.toggle("gold-opt", !up);
-      $("door-login").classList.toggle("dim2", up);
-      $("tab-signup").classList.toggle("on", up);
-      $("tab-signup").classList.toggle("dim2", !up);
-      $("tab-signin").classList.toggle("on", !up);
-      $("tab-signin").classList.toggle("dim2", up);
-    };
-    $("tab-signup").addEventListener("click", function () {
-      setMode("signup");
-      if (window.ff) ff.door("signup");
-    });
-    $("tab-signin").addEventListener("click", function () {
-      setMode("signin");
-      if (window.ff) ff.door("signin");
-    });
-    setMode("signup");
-
-    /* #door-signin (top bar, gate card, /play's bounce) opens the door
-       with the SIGN-IN tab already up — scripts off it still anchors */
-    var hashMode = function () {
-      if (location.hash === "#door-signin") {
-        setMode("signin");
-        if (window.ff) ff.door("signin");
-      } else if (location.hash === "#door") {
-        setMode("signup");
-        if (window.ff) ff.door("signup");
-      }
-    };
-    hashMode();
-    addEventListener("hashchange", hashMode);
-
-    var doorPost = function (path) {
-      var body = {
-        username: form.elements.username.value,
-        password: form.elements.password.value
-      };
-      if (path === "/signup") {
-        body.password2 = form.elements.password2.value;
-        body.email = form.elements.email.value;
-      }
-      fetch(path, {
+    /* login only — the sole password path left on the page. Scripts off,
+       the form posts to /login and redirects; scripts on, we do it over
+       JSON so the note can speak the reason a knock was refused. */
+    var doorLogin = function () {
+      fetch("/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
+        body: JSON.stringify({
+          username: form.elements.username.value,
+          password: form.elements.password.value
+        })
       }).then(function (r) {
         return r.json().then(function (j) { return { ok: r.ok, j: j }; });
       }).then(function (res) {
-        /* 005: the door opens INTO the game */
         if (res.ok) {
-          if (window.ff) {
-            if (path === "/signup") ff.signup("ok"); else ff.signin();
-          }
-          /* a breath so the event leaves before the page does */
+          if (window.ff) ff.signin();
           setTimeout(function () { location.href = "/play"; }, 150);
           return;
         }
         note.classList.add("err");
-        note.textContent = "▮ " + (res.j.detail || "sign-up failed");
-        if (path === "/signup" && window.ff)
-          ff.signup("err", res.j.detail || "unknown");
+        note.textContent = "▮ " + (res.j.detail || "sign-in failed");
       }).catch(function () {
         note.classList.add("err");
         note.textContent = "▮ network error — try again";
@@ -469,22 +413,11 @@
     };
     form.addEventListener("submit", function (ev) {
       ev.preventDefault();
-      var path = form.getAttribute("action");
-      if (path === "/signup" && window.ff) ff.signup("try");
-      if (path === "/signup"
-          && form.elements.password2.value !== form.elements.password.value) {
-        note.classList.add("err");
-        note.textContent = "▮ the two passwords differ";
-        return;
-      }
-      doorPost(path);
-    });
-    $("door-login").addEventListener("click", function (ev) {
-      ev.preventDefault();
-      doorPost("/login");
+      doorLogin();
     });
 
-    /* a plain form POST landed us back with ?door_err=… — say it */
+    /* a plain form POST (or the Gmail door) landed us back with
+       ?door_err=… — say it */
     var err = new URLSearchParams(location.search).get("door_err");
     if (err) {
       note.classList.add("err");
