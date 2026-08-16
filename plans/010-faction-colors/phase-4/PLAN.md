@@ -71,4 +71,37 @@ rollback.
 
 ## Execution status
 
-_(appended after execution)_
+**Executed 2026-08-16. Complete — shipped, verified live, dojo PASS 14/14.**
+
+- Version 0.86.0 in plugin (`version.py` + `luna-plugin.toml`);
+  vendored into worldd via `tools/vendor_game.sh` (parent 8797f72,
+  final c556305 after absorbing upstream 0.85.1 Gmail portrait gate;
+  plugin f1641f8 / merge b53f02b).
+- Migration renumbered `020_faction_colors.sql` → **021** (upstream
+  merge brought `020_gmail_door.sql`; runner keys on filename, prod had
+  never applied mine). Applied by the boot-time migration runner on
+  deploy — deviation from the plan's "manual pre-migration" step:
+  worldd runs migrations before serving, so new SELECTs never race the
+  DDL; no separate step exists, and no DB snapshot access either
+  (Render managed).
+- Test suites: plugin 16/16 new + suite green except **3 pre-existing
+  failures** (test_022_001 pool payout, test_026 gate wound,
+  test_kill3d first-sighting — fail on stashed tree too; parallel
+  session's chest-card work, filed not fixed). worldd suite green
+  except pre-existing `test_site.py::test_promotion_log_is_there_but_
+  unlinked` (needs `static/site/promotion.md` never committed to
+  origin/main; /promotion.md already 404s in prod).
+- Marketplace publish: index 0.86.0, sha256 7960fa70… verified.
+- Render deploy dep-da10lglg1s2s73ckhpu0 (commit 9844c64) → live.
+  Post-deploy: prod `/health` → `{"ok":true,"game":"0.86.0"}` — BOTH
+  halves live.
+- **Dojo walkthrough: run 0034** (`luna/dojo/results/0034-010-faction-
+  colors-2026-08-16/`) — PASS 14/14. Hybrid run, declared in the
+  summary: visual walkthrough on local worldd at the shipped code
+  (prod grind to level 4 infeasible in-session: 217 XP vs 24 energy;
+  no admin creds), production verified via HMAC probes — legacy prod
+  faction "the agent labs" carries `warden-violet`, recolor refuses
+  non-stewards 403, founding gate holds, hover measured pixel-identical
+  with flat faction-ink background. One observation filed (not a
+  regression): the founding-response card itself lags one render behind
+  on `--fac`; next render correct.
