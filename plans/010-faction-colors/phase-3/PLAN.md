@@ -78,4 +78,24 @@ files are additive; reverting render.py alone restores today's strip.
 
 ## Execution status
 
-_(appended after execution)_
+**Done — 2026-08-16, plugin commit `28f87b1`.**
+
+- 30 sigils halved (the dir's 31st entry is `preview/`, not art);
+  combined payload 50,493 bytes vs 190,179 for the 320x112 set —
+  ratio 0.27, on the ~¼ target. All 30 verified pure
+  white/transparent 1-bit at exactly 160x56.
+- `_sigil_half_data_url` + masked-span `facsig` (width 171px from the
+  60px height), `--fac` custom property from `colors.faction_ink`,
+  flat `background:var(--fac)` hover with ink flipped `#000`, no
+  `scale(`/`drop-shadow` anywhere in `.facblk`; `.facsub` rules
+  untouched; `.facdoor.join` keeps the gold text-only hover.
+- Step 4 (cache-buster): not applicable — the card's CSS is inlined in
+  every rendered page (`render.py` f-strings), nothing cached to bust.
+- Verification: 6 new tests in `test_010_faction_colors.py` cover the
+  `--fac` hex for `ember-red` and the Warden-Violet fallback, the
+  half-res mask markup (and that `_banner_data_url` still resolves
+  320x112 for galleries), the no-scale/no-glow CSS, and the JOIN
+  door's gold hover; `test_059_faction_block.py` updated for the span.
+  Full plugin suite: 1193 passed; same 3 pre-existing failures as
+  phase 2 (chest-card work, reproduce at pre-phase HEAD).
+- Visual/computed-CSS pass lands with the phase-4 dojo walkthrough.
