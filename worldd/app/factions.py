@@ -1284,9 +1284,9 @@ async def faction_detail(conn, tenant: str, player: str,
     """The faction page: public roster + stats; the viewer's own flags;
     the request queue when the viewer is an admin of this faction."""
     fac = await conn.fetchrow(
-        "SELECT name, banner, founder_tenant, founder_player, join_fee,"
-        " weekly_dues, treasury, created_week FROM ascent_factions "
-        "WHERE name=$1", name)
+        "SELECT name, banner, color, founder_tenant, founder_player,"
+        " join_fee, weekly_dues, treasury, created_week "
+        "FROM ascent_factions WHERE name=$1", name)
     if fac is None:
         return None
     members = await members_of(conn, name)
@@ -1325,6 +1325,8 @@ async def faction_detail(conn, tenant: str, player: str,
     kind = week_kind(week)
     d = {
         "name": fac["name"], "banner": fac["banner"],
+        # 010: the banner's named ink — the desk's swatch row marks it
+        "color": str(fac["color"] or ""),
         "founder": founder_name,
         "founder_key": {"tenant": founder_key[0], "player": founder_key[1]},
         "join_fee": int(fac["join_fee"]), "dues": int(fac["weekly_dues"]),

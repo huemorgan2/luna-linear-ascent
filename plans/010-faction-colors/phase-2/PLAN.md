@@ -80,4 +80,23 @@ color.
 
 ## Execution status
 
-_(appended after execution)_
+**Done — 2026-08-16, plugin commit `e88ce2f`.**
+
+- All planned edits landed: `colors.py` (9-ink roster, single source of
+  truth), founding color step in `engine/social.py` (gated on
+  `w["faction_colors"]` — old servers skip it), `Meters.faction_color`
+  plumbing (`scene.py` + `combat.py`), hall desk recolor flow
+  (`engine/hall.py`), pane swatch rows for found form + admin desk
+  (`pane.py`), `/pane/faction/recolor` proxy (`routes.py`,
+  `backend/remote.py`). worldd `faction_detail` now also carries
+  `color` so the desk swatches can mark the current ink (rides the
+  parent-repo phase-2 commit).
+- Verification: 10 new tests in `tests/test_010_faction_colors.py`,
+  all pass. Full plugin suite: 1188 passed, 1 skipped, 1 xfailed,
+  3 failed — all 3 failures reproduce at submodule HEAD with every
+  phase-2 change stashed (`test_022_001` pool payout, `test_026` gate
+  wound, `test_kill3d` first-sighting line), i.e. pre-existing from the
+  parallel chest-card work (`18ca39c`/`985412c`), not phase 2. Filed in
+  the plan's operational notes, not fixed mid-run.
+- Note: `guild_found` effect key for the name is `guild`, not `name`
+  (test adjusted).
