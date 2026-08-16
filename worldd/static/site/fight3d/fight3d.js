@@ -102,6 +102,27 @@ const MONSTERS3D = {
                         gait: { stride: 1.4, bob: 0.04 } },
   // floor 1's Warden
   warden_001:         { h: 2.60, wide: 1.15, mx: 2.6, yaw: -Math.PI / 2 },
+  // floor 7 — the Rotting Orchard
+  orchard_wolfpack:   { h: 1.70, wide: 1.15, mx: 2.1, yaw: -Math.PI / 2 },
+  rabid_boar:         { h: 1.75, wide: 1.12, mx: 2.5, yaw: -Math.PI / 2 },
+  hornet_swarm:       { h: 0.90, wide: 1.25, mx: 2.2, yaw: -Math.PI / 2 },
+  windfall_crow:      { h: 1.20, wide: 1.15, mx: 1.9, yaw: -Math.PI / 2,
+                        gait: { stride: 1.3, bob: 0.06, rock: 0.10 } },
+  orchard_hare:       { h: 1.10, wide: 1.15, mx: 1.8, yaw: -Math.PI / 2,
+                        gait: { stride: 1.5, bob: 0.08, rock: 0.14 } },
+  windfall_wight:     { h: 1.90, wide: 1.15, mx: 2.2, yaw: -Math.PI / 2 + BIPED_YAW },
+  warden_007:         { h: 2.20, wide: 1.15, mx: 2.8 },
+  // floor 8 — the Ash Dunes
+  cinder_wolf:        { h: 1.60, wide: 1.15, mx: 2.1, yaw: Math.PI },
+  dune_hare:          { h: 1.10, wide: 1.15, mx: 1.8, yaw: Math.PI,
+                        gait: { stride: 1.5, bob: 0.08, rock: 0.14 } },
+  cinder_salamander:  { h: 0.90, wide: 1.20, mx: 2.2, yaw: Math.PI / 2,
+                        gait: { stride: 1.4, sway: 0.10 } },
+  cinder_vulture:     { h: 1.80, wide: 1.20, mx: 2.1, yaw: BIPED_YAW },
+  ash_adder:          { h: 0.35, wide: 1.20, mx: 2.4, yaw: Math.PI,
+                        gait: { stride: 1.6, sway: 0.12 } },
+  greywell_ogre:      { h: 2.50, wide: 1.15, mx: 2.5, yaw: -Math.PI / 2 + BIPED_YAW },
+  warden_008:         { h: 2.90, wide: 1.15, mx: 2.8, yaw: -Math.PI / 2 + BIPED_YAW },
 };
 
 const SPECIES = {

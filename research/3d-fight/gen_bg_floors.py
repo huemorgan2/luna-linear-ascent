@@ -55,6 +55,13 @@ FLOOR = {
     6: ("Setting: floor six — The Threshold Dark, a deep cave beyond "
         "the last lamps. Rough rock, hanging silk threads, guano "
         "mounds, a distant stair arch, one small lamp glow. "),
+    7: ("Setting: floor seven — The Rotting Orchard. Mile on mile of "
+        "planted apple rows gone to rot under tower floodlights, the "
+        "ground deep in windfall, cider presses, wasps hanging in a "
+        "sweet haze, bare pruned trunks in straight rows. "),
+    8: ("Setting: floor eight — The Ash Dunes, the burned frontier. "
+        "Grey ash dunes to the horizon, wind moving ash in slow sheets, "
+        "glass-crusted flats, hard floodlight glare, no water. "),
 }
 GATE = ("The floor's stair-gate: a riveted iron gate and stair-lift "
         "machinery behind the fighting floor, stairs rising into "
@@ -104,6 +111,22 @@ SCENES = {
     "lane_boar": sc(6, 0.3, False, "A narrow crawl passage behind the fighting floor, crusted rock walls, a lamp far back down the passage."),
     "wrapped_husk": sc(6, 0.8, False, "A silk-hung cave behind the fighting floor, cocoons shaped like men hanging, one lamp glow."),
     "warden_006": sc(6, 0.9, False, GATE + "The gate arch is webbed shut with steel silk, the roof above alive with threads."),
+    # floor 7
+    "orchard_wolfpack": sc(7, 1.4, False, "Straight rows of bare pruned apple trunks behind the fighting floor, windfall heaped between them, a floodlight cone through the haze."),
+    "rabid_boar": sc(7, 1.2, False, "Broken orchard trees and a smashed cider press behind the fighting floor, windfall churned to pulp, floodlight glare in the haze."),
+    "hornet_swarm": sc(7, 1.0, False, "A row of cider presses and barrels behind the fighting floor, windfall carpeting the ground, thin haze, one floodlight."),
+    "windfall_crow": sc(7, 1.3, False, "High forked orchard branches arching over the fighting floor, rotting fruit hanging, windfall below, floodlight glow beyond."),
+    "orchard_hare": sc(7, 1.5, False, "A long straight orchard row behind the fighting floor vanishing into haze, trunks either side, windfall on the ground."),
+    "windfall_wight": sc(7, 1.1, True, "A cider-shed doorway behind the fighting floor, barrels and a hanging lamp with a warm glow ramp, orchard rows beyond in haze."),
+    "warden_007": sc(7, 1.3, False, GATE + "The gate stands at the head of the orchard rows, windfall heaped against its foot, presses either side."),
+    # floor 8
+    "cinder_wolf": sc(8, 2.0, False, "Grey ash dunes rolling behind the fighting floor, wind lifting ash off the crests, hard floodlight glare from above."),
+    "dune_hare": sc(8, 2.2, False, "A flat glass-crusted ash pan behind the fighting floor, low dunes beyond, dust sheeting across in the wind."),
+    "cinder_salamander": sc(8, 1.2, True, "A warm ash hollow behind the fighting floor, ember glow ramps under the crust, thin smoke, dunes beyond."),
+    "cinder_vulture": sc(8, 1.8, False, "A high dune ridge behind the fighting floor, a dead blackened tree with bones at its foot, glare sky."),
+    "ash_adder": sc(8, 1.6, False, "Rippled ash dunes close behind the fighting floor, a track poured through the surface, glass shards catching floodlight."),
+    "greywell_ogre": sc(8, 1.4, False, "A stone spring-mouth in an ash bowl behind the fighting floor, a dry well ring, dunes and glare beyond."),
+    "warden_008": sc(8, 1.5, True, GATE + "The gate stands in an ash bowl before the lift, slag heaps either side, molten glow ramps in the ash."),
     # floor 1's warden — demo2 has a generic gate; give Brackjaw its meadow
     "warden_001": sc(1, 1.4, False, "Setting: floor one — The Fencerows, stolen meadowland under tower floodlights. " + GATE + "The gate stands at the edge of the stair-lift meadow, hedgerows behind."),
 }

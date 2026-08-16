@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-"""Floors 2–6 monsters + the six wardens (floors 1–6): the whole Tripo
+"""Floors 2–8 monsters + the wardens (floors 1–8): the whole Tripo
 pipeline per creature — text-to-model → texture → rig → walk clip —
 resumable, parallel.
 
@@ -271,6 +270,106 @@ m("warden_001", "quadruped",
   "at the shoulders and hips, thick legs. " + Q,
   "Light steel plate with mid-grey rivets, pale grey fur, near-white "
   "teeth and eyes.")
+
+# ── floor 7 · The Rotting Orchard (Men) ───────────────────────────────
+m("orchard_wolfpack", "quadruped",
+  "A lean grey orchard wolf, coat matted with rotting fruit pulp and "
+  "wasps, lips peeled back in a drunk snarl, ears flat, ribs showing, "
+  "tail low. " + Q,
+  "Pale grey fur with light-brown fruit-pulp stains, near-white teeth "
+  "and eyes, mid-grey nose.")
+m("rabid_boar", "quadruped",
+  "A huge boar the size of a hay-wain, soaked and dripping with black "
+  "rot-cider, foam at the jaws, tusks long and curled, broken branches "
+  "and leaves stuck in its bristles, small furious eyes. " + Q,
+  "Mid-grey bristled hide with darker dripping cider streaks, "
+  "near-white tusks, foam and eyes, light-brown leaves.")
+m("hornet_swarm", "none",
+  "A boiling carpet of hundreds of mice moving as one mound: a low "
+  "wide heap of tightly packed small mice, tails and pink noses "
+  "everywhere, the front edge rearing up like a wave, no single face. "
+  "Fantasy game monster, single creature, low wide creeping shape, "
+  "side readable silhouette.",
+  "Light grey-brown fur, near-white bellies and eyes, pale pink noses "
+  "and tails.")
+m("windfall_crow", "quadruped",
+  "A bloated giant dormouse, fat and round with rot-swollen belly, "
+  "sticky fur, big black eyes, long whiskers, small paws, thick furry "
+  "tail, mouth open showing front teeth. " + Q,
+  "Light sandy-brown fur, near-white belly and teeth, mid-grey eyes "
+  "and nose.")
+m("orchard_hare", "quadruped",
+  "A big fever-thin hare running flat out, ears pinned back, long "
+  "hind legs stretched, wild rolling eyes, foam at the mouth, coat "
+  "ragged. " + Q,
+  "Pale grey-brown fur, near-white belly, tail and eyes, mid-grey "
+  "ear tips.")
+m("windfall_wight", "biped",
+  "A reeling drowned-looking man-figure dripping black cider, sodden "
+  "orchard-worker's coat and hat, face hollow and slack, one hand "
+  "cupped open as if offering a drink, the other hand hidden behind "
+  "the back holding a pruning hook. Fantasy game monster, single "
+  "character, full body, standing upright, legs apart.",
+  "Mid-grey sodden coat and hat streaked with dark cider, pale "
+  "grey skin, near-white eyes, light-grey cup.")
+m("warden_007", "quadruped",
+  "A monstrous cider-mad boar armoured in cider-press iron: barrel "
+  "hoops banded round its body, press-plates riveted over the shoulders "
+  "and skull, iron screw-spike on the brow, black cider dripping from "
+  "every seam, huge tusks. " + Q,
+  "Light rust-brown iron hoops and plates with mid-grey rivets, dark "
+  "grey bristled hide, near-white tusks and eyes.")
+
+# ── floor 8 · The Ash Dunes (Ogres) ───────────────────────────────────
+m("cinder_wolf", "quadruped",
+  "A lean ash-line jackal, long-legged and big-eared, coat caked in "
+  "grey ash, ribs sharp, sly narrow muzzle, brush tail. " + Q,
+  "Pale ash-grey coat, near-white eyes and teeth, mid-grey ear tips "
+  "and muzzle.")
+m("dune_hare", "quadruped",
+  "A pale desert hare with long ears, running flat out over glass "
+  "dust, its coat spiked with fine shards of glass, hind legs "
+  "stretched, eyes wide. " + Q,
+  "Near-white fur with light-grey glass shards, pale eyes, mid-grey "
+  "ear tips.")
+m("cinder_salamander", "quadruped",
+  "A big ash salamander, low and long, blunt head, ember-veined skin "
+  "with glowing cracks, four splayed legs, a thick tail dragging "
+  "smoke, one orange eye open. " + Q,
+  "Mid-grey ash skin with near-white glowing crack veins, pale "
+  "belly, near-white eye.")
+m("cinder_vulture", "biped",
+  "A huge ash-caked vulture standing on the ground, bald wrinkled "
+  "head and neck, hooked beak, wings folded tight at the sides, ruff "
+  "of ragged feathers, thick scaly legs, hunched. Fantasy game "
+  "monster, single creature, full body, standing upright, side "
+  "readable silhouette.",
+  "Mid-grey ash-caked feathers, pale bald head and neck, near-white "
+  "beak and eyes, light-grey legs.")
+m("ash_adder", "serpentine",
+  "A thick sand adder, a long serpent with a broad flat head, "
+  "horn-scales above the eyes, keeled ash-grey scales with a pale "
+  "diamond pattern, tongue out, body straight and level. " + S,
+  "Pale ash-grey scales with near-white diamond pattern, light "
+  "belly, near-white eyes.")
+m("greywell_ogre", "biped",
+  "A huge sun-mad dune ogre, heavy hunched shoulders, tiny eyes, "
+  "underbite, a riveted iron slave collar, rag loincloth, cracked "
+  "ash-grey skin, a large rough glass boulder resting on one "
+  "shoulder held by one hand, other arm hanging. Fantasy game "
+  "monster, single character, full body, standing upright, legs "
+  "apart.",
+  "Light ash-grey cracked skin, mid-grey iron collar, pale rag "
+  "loincloth, near-white glass boulder, near-white eyes and teeth.")
+m("warden_008", "biped",
+  "A colossal dune ogre welded into slag-plate armour and ash-glass "
+  "shards, an iron collar fused into its skull, plates riveted over "
+  "chest and shoulders, one arm hydraulic, a glowing molten boulder "
+  "held in one hand at the side, hunched and massive. Fantasy game "
+  "monster, single character, full body, standing upright, legs "
+  "apart.",
+  "Light slag-grey plates with mid-grey rivets, pale ash skin, "
+  "near-white glass shards, near-white glowing boulder, eyes.")
 
 
 _lock = threading.Lock()
