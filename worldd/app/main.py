@@ -228,6 +228,7 @@ class FactionCreateIn(BaseModel):
     banner: str = Field(default="wolf_howl", max_length=32)
     join_fee: int = Field(default=0, ge=0, le=500)
     weekly_dues: int = Field(default=5, ge=1, le=50)
+    color: str = Field(default="", max_length=24)
 
 
 class FactionJoinIn(BaseModel):
@@ -254,6 +255,11 @@ class FactionListIn(BaseModel):
 class FactionNameIn(BaseModel):
     player: str = Field(min_length=1, max_length=128)
     name: str = Field(min_length=1, max_length=24)
+
+
+class FactionColorIn(BaseModel):
+    player: str = Field(min_length=1, max_length=128)
+    color: str = Field(min_length=1, max_length=24)
 
 
 class FactionTargetIn(BaseModel):
@@ -297,7 +303,7 @@ async def v1_faction_create(body: FactionCreateIn,
         async with conn.transaction():
             code, err = await factions.found_faction(
                 conn, tenant, body.player, body.name, body.banner,
-                body.join_fee, body.weekly_dues)
+                body.join_fee, body.weekly_dues, color=body.color)
             if err:
                 raise HTTPException(code, err)
     return {"ok": True, "faction": body.name.strip()}
@@ -465,6 +471,20 @@ async def v1_faction_rename(body: FactionNameIn,
             _desk_err(await factions.rename_faction(conn, tenant,
                                                     body.player, body.name))
     return {"ok": True, "name": body.name.strip()}
+
+
+@app.post("/v1/faction/recolor")
+async def v1_faction_recolor(body: FactionColorIn,
+                             tenant: str = Depends(auth.verify_tenant)
+                             ) -> dict:
+    from . import factions
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            _desk_err(await factions.recolor_faction(conn, tenant,
+                                                     body.player,
+                                                     body.color))
+    return {"ok": True, "color": body.color}
 
 
 @app.post("/v1/faction/promote")

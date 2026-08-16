@@ -93,6 +93,14 @@ def banner_slugs() -> list[str]:
         return ["wolf_howl"]
 
 
+# ── 010: the faction color roster — slugs only, the plugin's colors.py
+# owns the display names and the hexes. Mirror both when it changes.
+COLOR_SLUGS = ["mouse-grey", "rag-silver", "bone-white", "coin-gold",
+               "aether-teal", "warden-violet", "ember-red",
+               "orchard-green", "root-brown"]
+DEFAULT_COLOR = "warden-violet"
+
+
 def world_week(day: int | None = None) -> int:
     return (pstate.world_day() if day is None else day) // WEEK_DAYS
 
@@ -473,7 +481,8 @@ async def _bless(conn, members: list[dict], kind: str, pct: int,
 
 async def found_faction(conn, tenant: str, player: str, name: str,
                         banner: str, join_fee: int,
-                        weekly_dues: int) -> tuple[int, str]:
+                        weekly_dues: int,
+                        color: str = "") -> tuple[int, str]:
     """The whole founding transaction — the checks, the fee, the ledger
     line and the row — shared by the v1 API and the pane's desk (061).
     Returns (http_code, error) — (0, "") on success."""
@@ -482,6 +491,8 @@ async def found_faction(conn, tenant: str, player: str, name: str,
         return 422, "3–24 letters, numbers, spaces, - or '"
     if banner not in banner_slugs():
         return 422, "unknown banner"
+    if color and color not in COLOR_SLUGS:
+        return 422, "unknown color"
     if not 0 <= int(join_fee) <= JOIN_FEE_MAX:
         return 422, f"the join fee is ◈ 0 to {JOIN_FEE_MAX}"
     if not DUES_MIN <= int(weekly_dues) <= DUES_MAX:
@@ -516,24 +527,28 @@ async def found_faction(conn, tenant: str, player: str, name: str,
         tenant, player, -FOUND_FEE, name)
     await create_faction(conn, tenant, player, name, banner,
                          doc.get("name") or player,
-                         join_fee=int(join_fee), weekly_dues=int(weekly_dues))
+                         join_fee=int(join_fee), weekly_dues=int(weekly_dues),
+                         color=color)
     return 0, ""
 
 
 async def create_faction(conn, tenant: str, player: str, name: str,
                          banner: str, founder_name: str,
-                         join_fee: int = 0, weekly_dues: int = 5) -> None:
+                         join_fee: int = 0, weekly_dues: int = 5,
+                         color: str = "") -> None:
     """The founder pays no join fee (the ◈500 founding price is their
     buy-in) but pays dues like everyone else. Fee and dues are immutable
     after founding — the social contract stays readable."""
     week = world_week()
     join_fee = max(0, min(JOIN_FEE_MAX, int(join_fee)))
     weekly_dues = max(DUES_MIN, min(DUES_MAX, int(weekly_dues)))
+    if color not in COLOR_SLUGS:
+        color = DEFAULT_COLOR
     await conn.execute(
         "INSERT INTO ascent_factions (name, banner, founder_tenant,"
-        " founder_player, created_week, join_fee, weekly_dues) "
-        "VALUES ($1,$2,$3,$4,$5,$6,$7)",
-        name, banner, tenant, player, week, join_fee, weekly_dues)
+        " founder_player, created_week, join_fee, weekly_dues, color) "
+        "VALUES ($1,$2,$3,$4,$5,$6,$7,$8)",
+        name, banner, tenant, player, week, join_fee, weekly_dues, color)
     await conn.execute(
         "INSERT INTO ascent_faction_members (tenant, player, faction,"
         " role, joined_day) VALUES ($1,$2,$3,'steward',$4)",
@@ -1224,6 +1239,26 @@ async def rename_faction(conn, tenant: str, player: str,
     await social.add_happening(
         conn, kind="faction", faction=new_name,
         line=f"The {faction} banner flies new colors — it is {new_name} now")
+    return None
+
+
+async def recolor_faction(conn, tenant: str, player: str,
+                          color: str) -> str | None:
+    """010: admin picks a new ink for the banner — one of the 9 named
+    roster slugs. Every member's card strip follows on the next scene."""
+    faction = await is_admin(conn, tenant, player)
+    if faction is None:
+        return "only an admin changes the colors"
+    if color not in COLOR_SLUGS:
+        return "unknown color"
+    await conn.execute(
+        "UPDATE ascent_factions SET color=$2 WHERE name=$1",
+        faction, color)
+    from . import social
+    pretty = color.replace("-", " ")
+    await social.add_happening(
+        conn, kind="faction", faction=faction,
+        line=f"The {faction} banner flies {pretty} now")
     return None
 
 

@@ -67,4 +67,15 @@ safe.
 
 ## Execution status
 
-_(appended after execution)_
+Executed 2026-08-16. Migration `020_faction_colors.sql`,
+`COLOR_SLUGS`/`DEFAULT_COLOR` + `found_faction(color=)` +
+`create_faction(color=)` + `recolor_faction` in factions.py, panel
+payload + `w["faction_colors"]` + `faction_recolor`/founding-color
+effects in social.py, `/v1/faction/recolor` (main.py) and
+`/play/api/pane/faction/recolor` (webplay.py), `color` on both found
+inputs. Verified: new `tests/test_faction_colors.py` 7/7 passed
+(found-with-color, default, 422 unknown, steward-only 403/409 recolor,
+panel payload, legacy default, roster invariants); full worldd suite
+179 passed in 43s against clean `ascent_world_test`. Deviation from
+plan: none material — member refusal asserts 403 (desk_code maps
+"only…" to 403, not the plan's blanket 403/422 sketch).

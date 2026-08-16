@@ -59,6 +59,11 @@ class FactionFoundIn(BaseModel):
     banner: str = Field(default="wolf_howl", max_length=32)
     join_fee: int = Field(default=0, ge=0, le=500)
     weekly_dues: int = Field(default=5, ge=1, le=50)
+    color: str = Field(default="", max_length=24)
+
+
+class FactionColorIn(BaseModel):
+    color: str = Field(min_length=1, max_length=24)
 
 
 # ── The guard ────────────────────────────────────────────────────────────
@@ -267,7 +272,7 @@ async def faction_found(body: FactionFoundIn,
         async with conn.transaction():
             code, err = await factions.found_faction(
                 conn, WEB_TENANT, player, body.name, body.banner,
-                body.join_fee, body.weekly_dues)
+                body.join_fee, body.weekly_dues, color=body.color)
             if err:
                 raise HTTPException(code, err)
     return {"ok": True, "faction": body.name.strip()}
@@ -348,6 +353,21 @@ async def faction_rename(body: FactionNameIn,
             _desk_err(await factions.rename_faction(conn, WEB_TENANT,
                                                     player, body.name))
     return {"ok": True, "name": body.name.strip()}
+
+
+@router.post("/play/api/pane/faction/recolor")
+async def faction_recolor(body: FactionColorIn,
+                          ident: tuple = Depends(_identity)) -> dict:
+    """010: the admin desk's color row — a named 1-bit ink for the
+    banner, beside rename."""
+    player, _ = ident
+    from . import factions
+    pool = await db.get_pool()
+    async with pool.acquire() as conn:
+        async with conn.transaction():
+            _desk_err(await factions.recolor_faction(conn, WEB_TENANT,
+                                                     player, body.color))
+    return {"ok": True, "color": body.color}
 
 
 @router.post("/play/api/pane/faction/enter")

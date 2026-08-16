@@ -117,6 +117,8 @@ async def inject_world(conn, tenant: str, player: str, doc: dict,
         w["factions_total"] = await conn.fetchval(
             "SELECT count(*) FROM ascent_factions")
         w["faction_banners"] = factions.banner_slugs()
+        # 010: the founding flow's color step reads the roster
+        w["faction_colors"] = factions.COLOR_SLUGS
         # 015: the pending request, so the hall shows the asked state
         w["faction_requested"] = await factions.my_request(
             conn, tenant, player) or ""
@@ -231,7 +233,7 @@ async def _faction_panel(conn, tenant: str, player: str,
     pips + arrears, this week's world challenge, the store ledger."""
     from . import factions
     fac = await conn.fetchrow(
-        "SELECT banner, join_fee, weekly_dues, treasury,"
+        "SELECT banner, color, join_fee, weekly_dues, treasury,"
         " founder_tenant, founder_player, requirements "
         "FROM ascent_factions WHERE name=$1", name)
     if fac is None:
@@ -270,6 +272,8 @@ async def _faction_panel(conn, tenant: str, player: str,
         "WHERE faction=$1 AND resolved ORDER BY week DESC LIMIT 1", name)
     return {
         "name": name, "banner": fac["banner"],
+        # 010: the banner's own ink — the card strip's hover color
+        "color": str(fac["color"] or ""),
         "join_fee": int(fac["join_fee"]), "dues": int(fac["weekly_dues"]),
         "store": int(fac["treasury"]), "role": my_role,
         # 042: the door rules — the steward's card edits these
@@ -1074,6 +1078,10 @@ async def execute_effects(conn, tenant: str, player: str,
             from . import factions
             await factions.rename_faction(conn, tenant, player,
                                           str(e.get("name", "")))
+        elif kind == "faction_recolor":
+            from . import factions
+            await factions.recolor_faction(conn, tenant, player,
+                                           str(e.get("color", "")))
         elif kind == "faction_request_cancel":
             from . import factions
             await factions.cancel_request(conn, tenant, player)
@@ -1148,7 +1156,8 @@ async def _fx_faction_found(conn, tenant: str, player: str, doc: dict,
     await factions.create_faction(
         conn, tenant, player, name, banner, doc.get("name") or player,
         join_fee=int(e.get("join_fee", 0)),
-        weekly_dues=int(e.get("weekly_dues", 5)))
+        weekly_dues=int(e.get("weekly_dues", 5)),
+        color=str(e.get("color", "")))
     await add_happening(
         conn, kind="faction",
         line=f"{doc.get('name') or player} founded the {name} faction",
