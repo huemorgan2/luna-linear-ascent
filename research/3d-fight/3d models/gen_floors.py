@@ -1,4 +1,4 @@
-"""Floors 2–8 monsters + the wardens (floors 1–8): the whole Tripo
+"""Floors 2–20 monsters + the wardens (floors 1–20): the whole Tripo
 pipeline per creature — text-to-model → texture → rig → walk clip —
 resumable, parallel.
 
@@ -370,6 +370,435 @@ m("warden_008", "biped",
   "apart.",
   "Light slag-grey plates with mid-grey rivets, pale ash skin, "
   "near-white glass shards, near-white glowing boulder, eyes.")
+
+
+# ── floor 9 · The Signal Heath (Men) ──────────────────────────────────
+m("beacon_moth", "quadruped",
+  "A vole as broad as a plate, blinding-pale, fat round body, tiny ears, "
+  "short legs, whiskers, small black eyes, blunt muzzle. " + Q,
+  "Near-white fur, light-grey paws and nose, mid-grey eyes.")
+m("moor_hare", "quadruped",
+  "A wild-eyed moorland hare mid-bolt, tall ears back, tufts of bog "
+  "cotton caught in the fur, ragged coat, long hind legs. " + Q,
+  "Pale grey-brown fur with near-white cotton tufts, near-white belly "
+  "and eyes.")
+m("night_hawk", "quadruped",
+  "A shrew grown huge and wrong, long pointed twitching snout, tiny "
+  "eyes, mouth open showing needle teeth, velvet coat, short legs, "
+  "thin tail. " + Q,
+  "Mid-grey velvet fur, pale belly, near-white teeth, pale pink snout.")
+m("shadow_wolf", "quadruped",
+  "A lean black wolf built for cover, low head, narrow muzzle, pale "
+  "eyes, coat blending to smoke at the edges, ears flat. " + Q,
+  "Dark grey to near-black fur, near-white eyes and teeth, mid-grey "
+  "smoke edges.")
+m("pylon_adder", "serpentine",
+  "A charged adder, a long serpent with a flat head, scales edged with "
+  "blue-white sparks, small arcs of lightning along the back, tongue "
+  "out, body straight and level. " + S,
+  "Mid-grey scales with near-white spark edges, near-white belly and "
+  "eyes.")
+m("flicker_wight", "biped",
+  "A man-shape of dark and static: a lineman's figure in a long coat "
+  "and hood, face a blank of grey noise, hands empty and open, "
+  "outline flickering. Fantasy game monster, single character, full "
+  "body, standing upright, legs apart, arms slightly away from body.",
+  "Dark grey coat and hood, near-white static face, pale grey hands.")
+m("warden_009", "quadruped",
+  "A huge shadow-line wolf maned in pylon lamps: a black wolf body with "
+  "a mane of glass lamp bulbs and wire down the neck and shoulders, "
+  "cable trailing from the haunches, blazing white eyes. " + Q,
+  "Near-black fur, near-white glowing lamp bulbs and eyes, mid-grey "
+  "wire and cable.")
+
+# ── floor 10 · The Muster Field (Men) ─────────────────────────────────
+m("kings_guard", "biped",
+  "A goblin of the honor-watch in overlapped tower plate armour, iron "
+  "collar, closed visor helm with a plume, snapped arrows stuck in "
+  "the plate, sword sheathed at the hip, empty hands. " + B,
+  "Light steel plate with mid-grey rivets, pale green skin, near-white "
+  "plume, mid-grey collar.")
+m("banner_wolf", "quadruped",
+  "A half-starved wolf dragging six feet of rotted banner tangled at "
+  "its neck, ribs showing, matted coat, torn cloth trailing behind "
+  "along the ground. " + Q,
+  "Mid-grey ragged fur, pale tattered banner cloth, near-white teeth "
+  "and eyes.")
+m("courier_hound", "quadruped",
+  "A lean long-legged courier hound at a dead run, deep chest, rotted "
+  "leather harness straps hanging from its shoulders, ears back, "
+  "mouth open. " + Q,
+  "Pale tan short coat, mid-grey harness straps, near-white teeth and "
+  "eyes.")
+m("parade_horse", "quadruped",
+  "A tall gaunt war-horse, riderless, tack rotted to hanging straps, "
+  "eyes white and blind, ribs showing, mane ragged, head low. " + Q,
+  "Pale grey coat, near-white eyes and mane, mid-grey rotted straps.")
+m("bunting_kite", "biped",
+  "A king-sized kite bird standing on the ground, hooked beak, forked "
+  "tail, wings folded, ragged banner scraps tangled in its feathers, "
+  "sharp eyes. Fantasy game monster, single creature, full body, "
+  "standing upright, side readable silhouette.",
+  "Light brown feathers, pale grey banner scraps, near-white beak and "
+  "eyes.")
+m("muster_wight", "biped",
+  "A half-there soldier of mist and mire in a rusted breastplate and "
+  "kettle helm, face hollow, holding a rotted standard pole upright "
+  "against its shoulder, other hand empty. Fantasy game monster, "
+  "single character, full body, standing upright, legs apart.",
+  "Pale grey mist body, light rust breastplate and helm, mid-grey "
+  "pole, near-white hollow eyes.")
+m("warden_010", "biped",
+  "Gnarl the Goblin King: a fat scarred goblin in a crooked tin crown "
+  "and a moth-eaten fur robe over dented plate, a notched sword too "
+  "big for him sheathed on his back, empty hands, sneering. " + B,
+  "Light green skin, mid-grey dented plate, pale fur robe, near-white "
+  "crown, teeth and eyes.")
+
+# ── floor 11 · The Adit (Dwarves) ─────────────────────────────────────
+m("kobold_scavenger", "biped",
+  "A wiry kobold scavenger, dog-like snout, big ears, a sack of "
+  "stripped copper wire slung over one shoulder, a pry-bar hung on "
+  "the belt, rag tunic, empty hands. " + B,
+  "Light sandy-grey scaly skin, mid-grey pry-bar, pale rag tunic, "
+  "light copper wire in the sack.")
+m("rust_hound", "quadruped",
+  "A hound of wire and hide, ribs of iron wire showing through torn "
+  "hide, joints weeping orange rust, nose down, iron collar, teeth "
+  "bared. " + Q,
+  "Mid-grey hide, light-grey wire, light rust-orange joints, near-white "
+  "teeth and eyes.")
+m("orc_outrider", "biped",
+  "A red orc outrider in half a warframe: one arm bare and muscled, "
+  "the other a heavy hydraulic steel arm, chest plate on one side, "
+  "tusked underbite, cropped ears, empty hands. " + B,
+  "Light brick-red skin, light steel warframe arm and plate with "
+  "mid-grey pistons, near-white tusks.")
+m("adit_bat", "none",
+  "A giant bat as broad as a cloak in flight, wings fully spread wide "
+  "and level, ears large, mouth open with small fangs, body small "
+  "between the wings, seen side-on. Fantasy game monster, single "
+  "creature, wings spread flat, side readable silhouette.",
+  "Mid-grey wing membrane, dark grey fur body, near-white fangs and "
+  "eyes.")
+m("warden_011", "none",
+  "A tunneling engine grown teeth: a long riveted iron drill-machine "
+  "on tracks, its bore-head become a set of ore-crusher jaws lined "
+  "with steel teeth, red water dripping, pipes and rivets along the "
+  "body. Fantasy game monster, single machine, low long shape, side "
+  "readable silhouette.",
+  "Light steel plates with mid-grey rivets and rust streaks, near-white "
+  "teeth, light rust-red drips.")
+
+# ── floor 12 · The Drowned Galleries (Dwarves) ────────────────────────
+m("bilge_kobold", "biped",
+  "A kobold fisher in a wet oilskin coat and hood, dog-like snout, a "
+  "barbed fishing spear strapped across the back, coils of line at "
+  "the belt, empty hands. " + B,
+  "Light sandy-grey scaly skin, mid-grey oilskin, pale spear shaft, "
+  "near-white eyes.")
+m("drowned_hauler", "hexapod",
+  "An ore-hauler machine wading on six rusted iron legs, a flatbed "
+  "body of riveted plate, unlit lamps on the front, silt and river-moss "
+  "hanging from it, water dripping. " + X,
+  "Light steel plates with mid-grey rivets and rust, pale grey silt, "
+  "near-white lamp glass.")
+m("orc_diver", "biped",
+  "A red orc in a sealed diving warframe, round brass helmet with a "
+  "porthole, riveted plate suit, hoses on the back, water sheeting "
+  "off, empty gauntlets. " + B,
+  "Light brass helmet, mid-grey plate suit with light rivets, pale "
+  "hoses, near-white porthole glass.")
+m("sump_eel", "serpentine",
+  "A pale-bellied eel thick as a hawser, long body straight and "
+  "level, broad toothed mouth open, small eyes, dorsal fin along the "
+  "back. " + S,
+  "Dark grey back, near-white belly, near-white teeth and eyes.")
+m("warden_012", "biped",
+  "Sumplock: a tall standing figure of pump-iron and pale river-moss, pipe "
+  "segments for limbs, a valve wheel in the chest, moss hanging like "
+  "a cloak, water streaming, empty hands. "
+  "Fantasy game monster, single character, full body, standing "
+  "upright, legs apart, arms slightly away from body.",
+  "Mid-grey iron pipes with light rust, near-white bone, pale moss "
+  "strands, near-white eyes.")
+
+# ── floor 13 · The Counting Halls (Dwarves) ───────────────────────────
+m("coin_sifter", "biped",
+  "A kobold coin-sifter in a clerk's vest and eyeshade, dog-like "
+  "snout, a small weighing hammer hung on the belt, coloured scrip "
+  "stuffed in every pocket, empty hands. " + B,
+  "Light sandy-grey scaly skin, mid-grey vest, pale paper scrip, "
+  "near-white eyes.")
+m("tally_engine", "biped",
+  "A brass counting-engine walking upright: a humanoid automaton of "
+  "brass rods and abacus frames, bead-rails across the chest, two "
+  "jointed arms with bead-flicking fingers, two piston legs, a dial "
+  "for a face. " + B,
+  "Light brass with mid-grey joints, near-white dial face, pale beads.")
+m("debt_collector", "biped",
+  "A red orc in a full warframe painted with white tally-marks, heavy "
+  "plate shoulders, tusked underbite, a ledger chained to the belt, "
+  "empty gauntlets. " + B,
+  "Mid-grey plate with near-white tally-marks, light brick-red skin, "
+  "near-white tusks.")
+m("ledger_wisp", "none",
+  "A tall floating flame of dust and lamplight, a drifting teardrop "
+  "of glowing motes with torn paper ledger pages caught in the haze, "
+  "no limbs, no face, tapering to a point at the bottom. Fantasy "
+  "game spirit, single object, floating, side readable silhouette.",
+  "Near-white glowing motes, pale grey haze, light-grey numerals.")
+m("scrip_rat", "quadruped",
+  "A big rat with cheeks packed full of paper, scraps of coloured "
+  "scrip stuck in its fur, long naked tail, beady eyes, whiskers. "
+  + Q,
+  "Mid-grey fur with pale paper scraps, near-white eyes and teeth, "
+  "pale pink tail.")
+m("warden_013", "biped",
+  "Brassbone: a tall skeleton built of brass counting-rods and iron "
+  "weight-plates, ribs of rods, a skull with dial eyes, weight-plate "
+  "shoulders and feet, empty hands. " + B,
+  "Light brass rods, mid-grey iron weight-plates, near-white dial "
+  "eyes.")
+
+# ── floor 14 · The Gear Halls (Dwarves) ───────────────────────────────
+m("gear_kobold", "biped",
+  "A kobold gear-thief in a tool harness, dog-like snout, big ears, a "
+  "large wrench hung on the belt, small cogs strung on a cord round "
+  "the neck, empty hands. " + B,
+  "Light sandy-grey scaly skin, mid-grey wrench and cogs, pale "
+  "harness, near-white eyes.")
+m("loose_flywheel", "none",
+  "A runaway iron flywheel the size of a millstone standing on its "
+  "rim, thick spoked wheel with a heavy rim, a broken stub of axle at "
+  "the hub, worn and scarred, seen side-on. Fantasy game monster, "
+  "single object, upright wheel, side readable silhouette.",
+  "Mid-grey iron rim and spokes with light worn edges, light rust "
+  "streaks.")
+m("pit_fighter", "biped",
+  "A red orc pit-fighter in a battered warframe stripped to the arms "
+  "and shoulders, bare scarred chest, tusked underbite, chalk on the "
+  "knuckles, empty hands. " + B,
+  "Light brick-red skin, mid-grey warframe arms with light dents, "
+  "near-white tusks and chalk.")
+m("belt_runner", "quadruped",
+  "A sleek long weasel-like creature built for speed, low body, short "
+  "legs, long neck, small ears, claws out, glossy coat. " + Q,
+  "Dark grey glossy fur, pale throat, near-white eyes and claws.")
+m("warden_014", "quadruped",
+  "Gearhide: a huge beast walking on four legs of stacked cogs, a hide "
+  "of clutch-iron plates, a gear-toothed spine, a heavy blunt head of "
+  "meshed wheels, pistons at the joints. " + Q,
+  "Mid-grey iron plates and cogs with light worn teeth, light rust "
+  "streaks, near-white eyes.")
+
+# ── floor 15 · The Core Vaults (Dwarves) ──────────────────────────────
+m("glow_sick_kobold", "biped",
+  "A sick kobold shedding faint light, fur out in patches, skin "
+  "cracked and glowing at the seams, eyes wrong and wide, ragged "
+  "tunic, empty hands, hunched. " + B,
+  "Pale grey skin with near-white glowing cracks, mid-grey ragged "
+  "tunic, near-white eyes.")
+m("fuel_thief", "biped",
+  "A red orc in a straining warframe with a heavy lead-lined pannier "
+  "of glowing core-rods strapped on its back, tusked underbite, "
+  "empty gauntlets. " + B,
+  "Mid-grey plate, light brick-red skin, mid-grey lead pannier with "
+  "near-white glowing rods, near-white tusks.")
+m("forge_remnant", "biped",
+  "A headless dwarven vault-tender automaton walking on heavy "
+  "magnetic feet, a squat riveted iron body, no head, gauge dials on "
+  "the chest, thick arms, empty hands. " + B,
+  "Mid-grey riveted iron, light steel dials, light rust streaks, "
+  "near-white gauge faces.")
+m("rod_wisp", "none",
+  "A tall upright spindle of white glow, a floating rod of light "
+  "wrapped in drifting rings of haze, no limbs, no face, edges hazing "
+  "into the air, tapering at both ends. Fantasy game spirit, single "
+  "object, floating, side readable silhouette.",
+  "Near-white glow, pale grey haze at the edges.")
+m("warden_015", "quadruped",
+  "Coreburn: a furnace-beast, a heavy four-legged body of black iron "
+  "plates with a cracked glowing core in the chest, seams glowing "
+  "bright, a blunt furnace-door head with glowing eyes, smoke from "
+  "the shoulders. " + Q,
+  "Dark grey iron plates, near-white glowing core and seams, "
+  "near-white eyes.")
+
+# ── floor 16 · The Forge Commons (Dwarves) ────────────────────────────
+m("orc_armorer", "biped",
+  "A red orc armorer in a leather smith's apron over warframe legs, "
+  "bare scarred arms, tusked underbite, tongs and a hammer hung on "
+  "the belt, empty hands. " + B,
+  "Light brick-red skin, mid-grey leather apron, mid-grey warframe "
+  "legs, near-white tusks.")
+m("hammer_kobold", "biped",
+  "A small kobold apprentice with a smith's hammer twice its height "
+  "strapped across its back, leather apron, dog-like snout, big ears, "
+  "empty hands. " + B,
+  "Light sandy-grey scaly skin, mid-grey hammer head, pale apron, "
+  "near-white eyes.")
+m("half_forged", "biped",
+  "A half-forged thing off the great anvil, a roughly man-shaped lump "
+  "of hammered iron still glowing cherry-hot down one side, walking on "
+  "two long blacksmith's-tong legs, stubby arms, no face. Fantasy game "
+  "monster, single character, full body, standing upright, legs "
+  "apart, arms slightly away from body.",
+  "Dark grey hammered iron, near-white glowing hot side, mid-grey tong "
+  "legs.")
+m("bellows_hound", "quadruped",
+  "A hound at a flat sprint, coat singed to wire, ribs sharp, ears "
+  "back, mouth open, singed patches, thin whip tail. " + Q,
+  "Mid-grey wiry singed coat, near-white teeth and eyes, dark grey "
+  "burnt patches.")
+m("warden_016", "quadruped",
+  "Anvilback: a massive four-legged iron beast with an old blacksmith's "
+  "anvil fused into its spine, hammer-scarred plates, a heavy blunt "
+  "head, thick legs. " + Q,
+  "Mid-grey iron plates with light hammer scars, near-white anvil "
+  "face, near-white eyes.")
+
+# ── floor 17 · The Smelters (Dwarves) ─────────────────────────────────
+m("slag_rat", "quadruped",
+  "A rat the size of a hound, coat shingled with flakes of black glass "
+  "slag, long naked tail, beady eyes, whiskers, bared teeth. " + Q,
+  "Dark grey glassy slag flakes over mid-grey fur, near-white teeth "
+  "and eyes.")
+m("ladle_crew", "none",
+  "A wheeled iron ladle-carriage: a big smelting ladle on a hand-crank "
+  "cart, three small kobolds clinging to it working the crank, sparks "
+  "and slag at the ladle lip. Fantasy game monster, single object "
+  "with riders, side readable silhouette.",
+  "Mid-grey iron ladle and cart, light sandy-grey kobolds, near-white "
+  "sparks and glow at the lip.")
+m("smelter_boss", "biped",
+  "A red orc smelter-boss in a warframe caked in metal spatter, heavy "
+  "shoulders, tusked underbite, a long tapping-rod strapped across "
+  "the back, empty gauntlets. " + B,
+  "Mid-grey plate with near-white spatter, light brick-red skin, "
+  "near-white tusks.")
+m("heat_haunt", "biped",
+  "A man-shaped standing shimmer of heat, a translucent figure of "
+  "warped air with a faint glowing core, no face, arms slightly out. "
+  "Fantasy game monster, single character, full body, standing "
+  "upright, legs apart.",
+  "Pale grey translucent body, near-white glowing core.")
+m("warden_017", "quadruped",
+  "Smeltjaw: a beast of half-set black slag on four thick legs, a seam "
+  "of live molten metal for a throat and mouth, cracked glassy hide "
+  "glowing in the cracks, smoke rising. " + Q,
+  "Dark grey glassy slag, near-white glowing throat and cracks, "
+  "near-white eyes.")
+
+# ── floor 18 · The Deep Drifts (Dwarves) ──────────────────────────────
+m("blind_digger", "biped",
+  "A blind kobold digger pale as candle-wax, eyes milky and sunken, "
+  "dog-like snout, big ears, a pick strapped across the back, rag "
+  "wrappings, empty hands. " + B,
+  "Near-white waxy skin, pale milky eyes, mid-grey pick, pale rags.")
+m("winch_crawler", "none",
+  "A winch head torn off its mounts, a heavy iron cable drum with two "
+  "grabbing iron arms reaching forward, a loop of steel cable trailing "
+  "behind, rivets and gears. Fantasy game monster, single machine, low "
+  "shape, side readable silhouette.",
+  "Mid-grey iron drum and arms with light rust, light steel cable.")
+m("pit_hound", "quadruped",
+  "A long low quiet hound, eyes milky, ears huge like a bat's, hairless "
+  "pale hide, long neck, nose to the ground. " + Q,
+  "Near-white hairless hide, pale milky eyes, mid-grey ear membranes.")
+m("drift_moth", "none",
+  "A giant grey moth the span of two hands, wings spread wide and "
+  "level, powdery, feathered antennae, furry body, seen side-on in "
+  "flight. Fantasy game monster, single creature, wings spread flat, "
+  "side readable silhouette.",
+  "Pale grey powdery wings with mid-grey markings, near-white fur "
+  "body, near-white eyes.")
+m("warden_018", "biped",
+  "Deepwinch: a winch drum grown a body, a tall standing figure of "
+  "iron cable wound over a drum torso, cable arms and legs, a hook "
+  "for a head, cables singing taut, empty hands. Fantasy game "
+  "monster, single character, full body, standing upright, legs "
+  "apart, arms slightly away from body.",
+  "Mid-grey iron drum, light steel cable, near-white hook, light rust.")
+
+# ── floor 19 · The Breach (Dwarves) ───────────────────────────────────
+m("door_breaker", "biped",
+  "A red orc veteran in a warframe scarred black by dwarf-fire, one "
+  "shoulder plate half melted, tusked underbite, a war-maul strapped "
+  "on the back, empty gauntlets. " + B,
+  "Mid-grey scorched plate with dark burn marks, light brick-red skin, "
+  "near-white tusks.")
+m("powder_kobold", "biped",
+  "A kobold powder-boy in a scorched leather apron, fuse-cord looped "
+  "round its neck like a scarf, a small powder keg strapped to its "
+  "back, dog-like snout, grinning, empty hands. " + B,
+  "Light sandy-grey scaly skin, mid-grey scorched apron, pale fuse "
+  "cord, mid-grey keg.")
+m("doorward_remnant", "biped",
+  "A dwarven door-engine, a squat heavy iron automaton with a broad "
+  "riveted chest, a slot visor for a face, two halberd-blade arms "
+  "held down at the sides, thick piston legs. Fantasy game monster, "
+  "single character, full body, standing upright, legs apart.",
+  "Mid-grey riveted iron with light rust, near-white blade edges, "
+  "near-white visor glow.")
+m("breach_crow", "biped",
+  "A crow the size of a dog standing on the ground, glossy feathers, "
+  "heavy beak, wings folded, one eye scarred, scorch marks on the "
+  "wingtips. Fantasy game monster, single creature, full body, "
+  "standing upright, side readable silhouette.",
+  "Dark grey glossy feathers, near-white beak and eye, mid-grey legs.")
+m("scorch_rat", "quadruped",
+  "A big rat with burn-bald patches on its hide, scarred pink skin "
+  "showing through grey fur, long naked tail, flat calm eyes. " + Q,
+  "Mid-grey fur with pale pink bald patches, near-white eyes and "
+  "teeth.")
+m("warden_019", "biped",
+  "Gatebone: a giant built from breach wreckage, hinge-plates for "
+  "shoulders, a slab of blown vault door held as a shield on one arm, "
+  "riveted iron body, a helm of door-lock, empty other hand. Fantasy "
+  "game monster, single character, full body, standing upright, legs "
+  "apart.",
+  "Mid-grey riveted iron with light scorch marks, light steel hinges, "
+  "near-white eye slits.")
+
+# ── floor 20 · The Warcamp (Dwarves) ──────────────────────────────────
+m("honor_guard", "biped",
+  "A red orc of the honor guard in a warframe polished to a dull red "
+  "shine, tall crested helm, a glaive strapped upright on the back, "
+  "tusked underbite, empty gauntlets. " + B,
+  "Light red-tinted plate with near-white highlights, light brick-red "
+  "skin, near-white tusks, mid-grey glaive shaft.")
+m("warframe_champion", "biped",
+  "A pit champion in a full salvaged warframe, mismatched heavy "
+  "plates, huge shoulders, spiked knuckles, a grilled helm, tusks "
+  "under the grille, empty gauntlets. " + B,
+  "Mid-grey mismatched plates with light scratches, near-white spikes "
+  "and tusks, light brick-red skin at the joints.")
+m("camp_hound", "quadruped",
+  "A starved rust hound with a short broken chain hanging from an "
+  "iron collar, ribs sharp, wire showing through the hide, teeth "
+  "bared. " + Q,
+  "Mid-grey hide, light-grey wire, mid-grey collar and chain, "
+  "near-white teeth and eyes.")
+m("drum_kobold", "biped",
+  "A small kobold with a great war-drum bigger than itself strapped "
+  "to its front, drumsticks tucked in the belt, dog-like snout, big "
+  "ears, empty hands. " + B,
+  "Light sandy-grey scaly skin, mid-grey drum with near-white skin "
+  "head, pale straps.")
+m("camp_looter", "biped",
+  "A scarred lean goblin looter, a bulging sack of buckles slung on "
+  "the back, patched leather jerkin, knife sheathed at the hip, "
+  "empty hands. " + B,
+  "Light green skin, mid-grey jerkin, pale sack, near-white eyes and "
+  "teeth.")
+m("warden_020", "biped",
+  "Warlord Skarn: a huge red orc in a magnificent warframe of "
+  "dwarf-steel over orc muscle, layered plates, a horned helm, a "
+  "great axe strapped across the back, cloak of three clan banners, "
+  "empty gauntlets. " + B,
+  "Light steel plates with mid-grey rivets, light brick-red skin, "
+  "near-white tusks and horns, dark grey cloak.")
 
 
 _lock = threading.Lock()

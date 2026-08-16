@@ -10,7 +10,7 @@ for d in "$HERE"/models/monsters/*/; do
   case "$id" in *_v[0-9]*|*_rig_v*) continue;; esac   # old floor-1 experiments
   src=""
   [ -f "$d/50_walk.glb" ] && src="$d/50_walk.glb"
-  case "$id" in rust_seep|windfall_haunt|lamp_eater|hornet_swarm)   # plan none: unrigged, the scene slides them
+  case "$id" in rust_seep|windfall_haunt|lamp_eater|hornet_swarm|adit_bat|warden_011|ledger_wisp|loose_flywheel|rod_wisp|ladle_crew|winch_crawler|drift_moth)   # plan none: unrigged, the scene slides them
     [ -z "$src" ] && [ -f "$d/10_textured.glb" ] && src="$d/10_textured.glb";; esac
   [ -z "$src" ] && continue
   if [ ! -f "$DST/$id.glb" ] || [ "$src" -nt "$DST/$id.glb" ] || [ "${1:-}" = "-f" ]; then
