@@ -86,13 +86,28 @@ def _identity(request: Request) -> tuple[str, str]:
     return username.lower(), username
 
 
-def _card(scene_dict: dict) -> dict:
+async def _web_gmail(player: str) -> bool:
+    """010: the website account is Gmail-connected iff it carries a
+    google_sub. New accounts always are (signup is Gmail); only legacy
+    password accounts come back False — and lose the portrait until linked."""
+    pool = await db.get_pool()
+    sub = await pool.fetchval(
+        "SELECT google_sub FROM ascent_accounts "
+        "WHERE lower(username)=lower($1)", player)
+    return sub is not None
+
+
+def _card(scene_dict: dict, portrait_locked: bool = False) -> dict:
     """The pane's contract for scene answers — same shape routes.py
     returns to Luna, fragment rendered by the same renderer."""
     ensure_game_importable()
     from plugin_linear_ascent.engine.scene import Scene
     from plugin_linear_ascent.render import render_scene_fragment
     scene = Scene.from_dict(scene_dict)
+    # 010: gate the player portrait behind a Gmail link (web-only). Set as a
+    # runtime attribute the renderer reads via getattr — never serialized.
+    if portrait_locked:
+        scene.portrait_locked = True
     return {"ok": True, "scene_id": scene.scene_id,
             "event_kind": scene.event_kind, "headline": scene.headline,
             "fragment": render_scene_fragment(scene),
@@ -142,8 +157,9 @@ async def play_page(request: Request):
 async def pane_scene(ident: tuple = Depends(_identity)) -> dict:
     player, display = ident
     from . import game
+    locked = not await _web_gmail(player)
     scene = await game.run_scene(WEB_TENANT, player, display_name=display)
-    return _card(scene)
+    return _card(scene, portrait_locked=locked)
 
 
 @router.post("/play/api/act")
@@ -152,10 +168,11 @@ async def act(body: ActIn, ident: tuple = Depends(_identity)) -> dict:
     # engine's stale-option answer already make double-clicks harmless
     player, display = ident
     from . import game
+    locked = not await _web_gmail(player)
     scene = await game.run_act(WEB_TENANT, player, body.option.strip(),
                                body.text.strip(), "",
                                display_name=display)
-    return _card(scene)
+    return _card(scene, portrait_locked=locked)
 
 
 @router.get("/play/api/pane/peek")

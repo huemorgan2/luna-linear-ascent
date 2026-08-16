@@ -18,6 +18,14 @@ class Config:
     # PvP allotments, presents eligibility).
     world_day_utc_hour: int = field(
         default_factory=lambda: int(os.environ.get("ASCENT_WORLD_DAY_HOUR", "6")))
+    # 010: Google OAuth — the Gmail door. Empty in dev/tests disables the
+    # door (the button 503s rather than 500s). Set on Render + local .env.
+    google_client_id: str = field(
+        default_factory=lambda: os.environ.get("GOOGLE_CLIENT_ID", ""))
+    google_client_secret: str = field(
+        default_factory=lambda: os.environ.get("GOOGLE_CLIENT_SECRET", ""))
+    google_redirect_uri: str = field(
+        default_factory=lambda: os.environ.get("GOOGLE_REDIRECT_URI", ""))
 
 
 _config: Config | None = None

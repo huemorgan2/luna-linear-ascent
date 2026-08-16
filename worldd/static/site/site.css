@@ -278,6 +278,27 @@ img.px { image-rendering: pixelated; width: min(640px, 100%); height: auto; }
 #door-form .options { justify-content: flex-start; }
 #door-note.err { color: var(--gold); }
 
+/* 010: the Gmail door — the primary way in (sign up + sign in). A
+   bracketless bordered row; the one flourish is the 4-ink 16×16 G glyph
+   riding in front of the label. It is an <a>, so it works scripts-off. */
+.gbtn {
+  display: inline-flex; align-items: center; gap: 1ch;
+  padding: .35rem 1.25ch; margin-top: 1rem;
+  color: var(--bright); text-decoration: none;
+  border: 1px solid var(--line); background: none; cursor: pointer;
+  text-transform: uppercase; width: min(34ch, 100%);
+  justify-content: center;
+}
+.gbtn:hover { border-color: var(--gold); }
+.gbtn:hover .gname { color: var(--gold); }
+.gicon-svg { width: 16px; height: 16px; display: inline-block;
+  vertical-align: -3px; image-rendering: pixelated; }
+/* the OR rail between the Gmail door and the returning-password sign-in */
+.or { display: flex; align-items: center; gap: 1ch; color: var(--dim);
+  margin: 1.1rem 0 .25rem; text-transform: uppercase; }
+.or::before, .or::after { content: ""; flex: 1;
+  border-top: 1px solid var(--line); }
+
 footer { max-width: 84ch; margin: 0 auto; padding: 2rem 1ch 3rem;
          border-top: 1px solid var(--line); text-align: center; }
 footer p { margin-bottom: .5rem; }

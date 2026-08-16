@@ -24,11 +24,16 @@ async def test_homepage_serves_the_terminal(client):
     body = r.text
     assert "LINEAR ASCENT" in body
     assert "FREE" in body                      # ours is free — play on that
-    assert 'action="/signup"' in body          # the door posts without JS
-    # 004: two doors, named the way everyone names them
-    assert "SIGN-UP" in body and "SIGN-IN" in body
-    assert "NEW PASSWORD" in body and "RETYPE PASSWORD" in body
-    assert 'formaction="/login"' in body       # sign-in works scripts off too
+    # 010: the Gmail door is the way in (sign up + sign in)
+    assert "/auth/google/start" in body
+    assert "Continue with Gmail" in body
+    # password login stays for pre-Gmail accounts — scripts-off form + button
+    assert 'action="/login"' in body
+    assert 'formaction="/login"' in body
+    assert "SIGN-IN" in body
+    # signup is Gmail-only now: no password sign-up form on the page
+    assert 'action="/signup"' not in body
+    assert "RETYPE PASSWORD" not in body
     # top fold: title reel fills the viewport; CTA sits in a card
     assert "ascent_title_640x400.gif" in body and "gatecard" in body
     # the terminal law: the one vendored font, no external requests
@@ -84,6 +89,26 @@ async def test_mechanics_ledger_is_there_but_unlinked(client):
     assert '"killLevel":' in data
     # unlinked: the front door does not know the back room
     assert "mechanics" not in (await client.get("/")).text.lower()
+
+
+async def test_promotion_log_is_there_but_unlinked(client):
+    """The promotion log: markdown at /promotion.md, terminal wrap at
+    /promotion. Homepage never mentions it."""
+    md = await client.get("/promotion.md")
+    assert md.status_code == 200
+    assert md.headers["content-type"].startswith("text/plain")
+    body = md.text
+    assert "Looks simple. Takes thousands." in body
+    assert "GamHub" in body and "MMORPG100" in body
+    assert "linearascent.net/play" in body
+    html = await client.get("/promotion")
+    assert html.status_code == 200
+    assert html.headers["content-type"].startswith("text/html")
+    assert "Looks simple. Takes thousands." in html.text
+    assert 'name="robots" content="noindex"' in html.text
+    assert "googleapis" not in html.text and "cdn." not in html.text
+    home = (await client.get("/")).text.lower()
+    assert "promotion" not in home
 
 
 async def test_health_is_untouched_by_the_site(client):
