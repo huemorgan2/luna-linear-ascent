@@ -30,3 +30,17 @@ new failures elsewhere.
 ## Rollback
 `git revert` the phase-2 commit; `pack_slots` keys left in player docs
 are inert (unknown key).
+
+## Execution status
+
+**Executed 2026-08-17. Complete.** Plugin commit `a984f50` (economy,
+state, core, tips, unlocks). `PACK_TIERS` 9/12/15/18 at level 3/6/9/12 for
+◈ 40/120/300/600; `p["pack_slots"]` healed to 6 in `ensure_current`;
+`pack_cap/pack_used/pack_can_take/_pack_full` in core; refusals in
+`_gear_purchase` (spare + old-piece paths), `_relic_buy`, `_medlab_buy`
+(inventory items only), `_basic_buy` (pack fallback); Forge `buy_pack`
+row (`🔒 level N · ◈ G` when locked — the 019 locked-row contract) and
+`_forge_pack`; four `packN` unlocks with plain lines; `_buy_tip("pack")`.
+Tests: 16/16 new; full plugin suite 1215 passed, 3 pre-existing failures
+from the parallel 063 session (test_017 flyer, test_017 oil flask, test_026
+gate wound — fail on the tree before this change too).

@@ -27,3 +27,13 @@ edit lands in both.
 
 ## Rollback
 `git revert` the phase-1 commit in plugin-linear-ascent.
+
+## Execution status
+
+**Executed 2026-08-17. Complete.** Plugin commit `a984f50` (render.py,
+scene.py). Measured in Chromium on the shipped card: `.slot` 60 px,
+`.hcell .slot` 75, `.picon` 42; narrow 48/66/36; `.slotgrid` flex-wrap —
+7 per row at 474 px, 10 at 875 px; label `pack used/cap`, surplus cells
+`.slot.over` in RED. Text sizes unchanged (16 px). Worn armor/shoes stay in
+the grid but do not count against capacity (found and fixed during the
+first render pass). `tests/test_012_pack.py` render checks green.
