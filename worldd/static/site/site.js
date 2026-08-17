@@ -340,6 +340,22 @@
      accounts) ───────────────────────────────────────────────────── */
   var form = $("door-form"), note = $("door-note");
 
+  /* funnel: door_view once when the door scrolls into view; door_click
+     on the Gmail button and the login form (funnel.js owns the tracker) */
+  var doorEl = $("door");
+  if (doorEl && window.IntersectionObserver) {
+    var dob = new IntersectionObserver(function (entries) {
+      if (entries.some(function (e) { return e.isIntersecting; })) {
+        if (window.ff) ff.door("gmail");
+        dob.disconnect();
+      }
+    }, { threshold: 0.3 });
+    dob.observe(doorEl);
+  }
+  document.querySelectorAll("#door .gbtn").forEach(function (b) {
+    b.addEventListener("click", function () { if (window.ff) ff.knock("gmail"); });
+  });
+
   function doorKnown(name) {
     /* signed in already — hide every way IN, offer the way ON */
     if (form) form.style.display = "none";
@@ -413,6 +429,7 @@
     };
     form.addEventListener("submit", function (ev) {
       ev.preventDefault();
+      if (window.ff) ff.knock("password");
       doorLogin();
     });
 

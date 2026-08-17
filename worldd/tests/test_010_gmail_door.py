@@ -69,7 +69,7 @@ async def test_new_gmail_signup_names_then_plays(client, monkeypatch):
     # choose the name → account is written, session set, into the game
     name = f"Climb{uuid.uuid4().hex[:6]}"
     r = await client.post("/auth/google/name", data={"username": name})
-    assert r.status_code == 303 and r.headers["location"] == "/play"
+    assert r.status_code == 303 and r.headers["location"] == "/play?door=signup"
     assert site.SESSION_COOKIE in client.cookies
 
     row = await pool.fetchrow(
@@ -103,7 +103,7 @@ async def test_returning_gmail_logs_in_without_name_step(client, monkeypatch):
     # fresh browser, same Google account → straight to /play, no name step
     client.cookies.clear()
     r = await _google_return(client, monkeypatch, who)
-    assert r.status_code == 303 and r.headers["location"] == "/play"
+    assert r.status_code == 303 and r.headers["location"] == "/play?door=signin"
     assert site.SESSION_COOKIE in client.cookies
     pool = await db.get_pool()
     assert await pool.fetchval(
@@ -125,7 +125,7 @@ async def test_gmail_adopts_matching_password_account(client, monkeypatch):
     who = _identity(email=email)
     r = await _google_return(client, monkeypatch, who)
     # linked + logged in, no name step, no duplicate
-    assert r.status_code == 303 and r.headers["location"] == "/play"
+    assert r.status_code == 303 and r.headers["location"] == "/play?door=signin"
     row = await pool.fetchrow(
         "SELECT google_sub, auth_provider FROM ascent_accounts "
         "WHERE lower(username)=lower($1)", name)
@@ -192,7 +192,7 @@ async def test_signed_in_account_links_gmail(client, monkeypatch):
     # from the profile, "connect Gmail" runs the same round-trip
     who = _identity()
     r = await _google_return(client, monkeypatch, who)
-    assert r.status_code == 303 and r.headers["location"] == "/play"
+    assert r.status_code == 303 and r.headers["location"] == "/play?door=signin"
     me = (await client.get("/me")).json()
     assert me["username"] == name          # still the same account
     assert me["gmail"] is True

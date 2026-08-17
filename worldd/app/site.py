@@ -424,9 +424,11 @@ def _cookie(resp, request: Request, name: str, value: str,
                     samesite="lax", secure=(proto == "https"), path="/")
 
 
-def _finish_session(request: Request, username: str):
-    """Land a signed-in climber in the game, clearing the round-trip crumbs."""
-    resp = RedirectResponse("/play", status_code=303)
+def _finish_session(request: Request, username: str, door: str = "signin"):
+    """Land a signed-in climber in the game, clearing the round-trip crumbs.
+    ?door=signup|signin tells /play (funnel.js) which event this arrival is;
+    the game ignores it."""
+    resp = RedirectResponse(f"/play?door={door}", status_code=303)
     _set_session_cookie(resp, request, username)
     resp.delete_cookie(OAUTH_COOKIE, path="/")
     resp.delete_cookie(PENDING_COOKIE, path="/")
@@ -558,7 +560,7 @@ async def google_name_post(request: Request):
             return _finish_session(request, existing)
         return _name_retry(wants_json, "that name is taken — try another")
     log.info("account created via Gmail: %s", username)
-    return _finish_session(request, username)
+    return _finish_session(request, username, door="signup")
 
 
 def _name_expired(wants_json: bool):

@@ -25,9 +25,26 @@ async def test_the_one_file_serves_with_the_config_inside(client):
     assert "4a62eb26-43d4-464e-835e-b11481d24645" in js
     assert "funnelfighters.io" in js
     assert "window.ff" in js
-    for ev in ("page_view", "door_view", "signup_", "signin_ok",
-               "enter_game", "identify"):
+    for ev in ("page_view", "door_view", "door_click", '"signup"',
+               "signin_ok", "enter_game", "identify"):
         assert ev in js, f"funnel.js lost the {ev} wrapper"
+    # the vendor SDK drops its pre-load queue (drainQueue's `root` is out
+    # of scope) — funnel.js must keep its own and flush on the SDK's onload
+    assert "t.onload = flush" in js and "pending.push" in js
+    assert "m[e].q" not in js, "back on the vendor queue — it is silently dropped"
+
+
+async def test_gmail_door_lands_on_play_with_the_door_named(client):
+    name = f"Funl{uuid.uuid4().hex[:10]}"
+    await _signup(client, name)
+    r = await client.get("/play?door=signup")
+    assert 'data-door="signup"' in r.text
+    r = await client.get("/play?door=signin")
+    assert 'data-door="signin"' in r.text
+    r = await client.get("/play?door=bogus")
+    assert "data-door" not in r.text
+    r = await client.get("/play")
+    assert "data-door" not in r.text
 
 
 async def test_home_and_mechanics_carry_the_tag(client):

@@ -138,8 +138,12 @@ async def play_page(request: Request):
     # the plugin (and every Luna chat surface) stays tracker-free. The
     # tag's data-user lets funnel.js identify without an extra fetch;
     # usernames are names.is_legal (letters, digits, - _), safe to embed.
-    tag = (f'<script src="/static/site/funnel.js?v=1" '
-           f'data-user="{html_escape(user)}" defer></script>')
+    # data-door=signup|signin: the Gmail door lands here with ?door=…, and
+    # funnel.js turns it into the signup / signin_ok event.
+    door = request.query_params.get("door", "")
+    door_attr = f' data-door="{door}"' if door in ("signup", "signin") else ""
+    tag = (f'<script src="/static/site/funnel.js?v=2" '
+           f'data-user="{html_escape(user)}"{door_attr} defer></script>')
     # PLAN3: the live 3D kill finisher — website-only, like funnel. The
     # importmap must land in the initial HTML, before the module loads;
     # fight3d.js watches #game for data-kill3d cards and degrades to the

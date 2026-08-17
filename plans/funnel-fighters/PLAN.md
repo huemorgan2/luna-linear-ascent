@@ -8,8 +8,11 @@ Fighters code; the rest of the site only calls its functions.
 
 `worldd/static/site/funnel.js` — the ONLY place the vendor exists:
 
-- the async loader snippet (queue shim + script insert), verbatim from
-  the vendor, wrapped in our function
+- the async script insert — with OUR OWN pre-load queue, flushed on the
+  SDK tag's `onload`. Not the vendor's `m[e].q` shim: the SDK's
+  `drainQueue()` reads a `root` that is out of scope in its factory and
+  silently drops the whole queue, `init` included (found 2026-08-17 —
+  three days of zero events)
 - config at the top, one block:
   ```js
   var FF_SITE = "4a62eb26-43d4-464e-835e-b11481d24645";
@@ -23,9 +26,10 @@ Fighters code; the rest of the site only calls its functions.
   | function            | what it sends                                   |
   |---------------------|--------------------------------------------------|
   | `ff.page()`         | `page_view {page}` — called automatically on load, page name from `PAGES[location.pathname]` |
-  | `ff.door(tab)`      | `door_view {tab}` — signup/signin tab reached    |
-  | `ff.signup(step, reason)` | `signup_try` / `signup_ok` / `signup_err {reason}` |
-  | `ff.signin()`       | `signin_ok` — a player came back through the door |
+  | `ff.door(tab)`      | `door_view {tab}` — the door scrolled into view (tab=gmail) |
+  | `ff.knock(button)`  | `door_click {button}` — gmail button / password form submitted |
+  | `ff.signup(method)` | `signup {method}` — the canonical FF milestone; fired on the first `/play` after the Gmail door (`?door=signup` → `data-door`) |
+  | `ff.signin(method)` | `signin_ok {method}` — password login (site.js) or Gmail return (`?door=signin`) |
   | `ff.enter()`        | `enter_game` — called automatically when pathname is `/play` |
   | `ff.who(username)`  | `identify(username)` — ties return visits to the account |
 
