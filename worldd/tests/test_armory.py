@@ -211,3 +211,26 @@ async def test_take_keeps_the_worse_wear_never_launders(
     d = await _doc(pool, "tenant-b", pb)
     assert d["inventory"]["scrap_dagger"] == 2
     assert d["durability_pack"]["scrap_dagger"] == 10    # the worse survives
+
+
+async def test_an_outgrown_pack_shelves_and_lists(
+        client, tenant_a, tenant_b, clean_armory):  # noqa: F811
+    """064: the pack is a thing — the chest takes an old pack, the
+    shelf names it, and a take hands it back as the same slug."""
+    pool = await db.get_pool()
+    pa, pb, name = await _crew(client, pool, tenant_a, tenant_b)
+    da = await _patch_doc(pool, "tenant-a", pa, inventory={"pack_6": 1})
+    async with pool.acquire() as conn:
+        err = await armory.deposit(conn, "tenant-a", pa, da, "pack_6", None)
+        assert err is None
+        rows = await armory.shelf(conn, name)
+        assert [r["slug"] for r in rows] == ["pack_6"]
+        assert rows[0]["name"] == economy.PACKS["pack_6"].name
+        assert rows[0]["slot"] == "pack" and rows[0]["frac"] == 1.0
+        db_ = await _doc(pool, "tenant-b", pb)
+        err = await armory.take(conn, "tenant-b", pb, db_, rows[0]["id"])
+        assert err is None
+        assert db_["inventory"].get("pack_6") == 1
+        # junk slugs are still refused
+        err = await armory.deposit(conn, "tenant-a", pa, da, "pack_7", None)
+        assert err and "steel only" in err

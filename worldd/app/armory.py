@@ -34,6 +34,11 @@ def _gear(slug: str):
     return g if (g is not None and g.price > 0) else None
 
 
+def _pack(slug: str):
+    """064: an outgrown pack is chest-worthy too."""
+    return getattr(economy, "PACKS", {}).get(slug)
+
+
 async def shelf(conn, faction: str) -> list[dict]:
     """The rack, oldest first — what inject_world hands the engine."""
     rows = await conn.fetch(
@@ -41,6 +46,12 @@ async def shelf(conn, faction: str) -> list[dict]:
         "WHERE faction=$1 ORDER BY id", faction)
     out = []
     for r in rows:
+        pk = _pack(r["slug"])
+        if pk is not None:
+            out.append({"id": r["id"], "slug": r["slug"], "name": pk.name,
+                        "slot": "pack", "bonus": pk.slots, "frac": 1.0,
+                        "donor": r["donor_name"] or "a member"})
+            continue
         g = _gear(r["slug"])
         if g is None:
             continue
@@ -59,7 +70,7 @@ async def deposit(conn, tenant: str, player: str, doc: dict,
     already lifted the item (and its wear stash) out of the doc; this
     validates and shelves it, or returns an error so the caller can
     hand the piece back."""
-    if _gear(slug) is None:
+    if _gear(slug) is None and _pack(slug) is None:
         return "the armory racks paid steel only"
     mine = await factions.member_row(conn, tenant, player)
     if not mine:
