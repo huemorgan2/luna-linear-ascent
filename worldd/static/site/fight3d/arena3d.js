@@ -661,30 +661,53 @@ async function mountArena(card) {
       .then(() => stage());
     return;
   }
-  const same = F && !F.ended && F.key === fightKey(spec) && F.player;
-  if (!same) {
-    const ok = await build(card, spec);
-    if (!ok || !card.isConnected) return;
-  } else {
-    F.card = card;
-    if (F.line !== (spec.me || {}).line && (spec.me || {}).line) {
-      await rearm(spec.me.line);
+  // hold the tiles from the moment the card lands — build() may await
+  // rigs and sheets; a click in that gap would double-act. Whatever
+  // happens next (dead GL, a swapped card, a broken rig) the finally
+  // hands the tiles back and shows the log in full.
+  holdTiles(card, (spec.events || []).length > 0);
+  try {
+    const same = F && !F.ended && F.key === fightKey(spec) && F.player;
+    if (!same) {
+      const ok = await build(card, spec);
+      if (!ok || !card.isConnected) return;
+    } else {
+      F.card = card;
+      if (F.line !== (spec.me || {}).line && (spec.me || {}).line) {
+        await rearm(spec.me.line);
+      }
     }
+    if (!F || !card.isConnected) return;
+    F.card = card;
+    F.gen = ++genCounter;
+    if (!attach(card)) return;
+    GL.canvas.style.opacity = "";
+    startLoop();
+    // one rendered frame first, then the beats
+    await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 120)));
+    if (!card.isConnected || !F) return;
+    await play(card, spec);
+    if (spec.phase === "victory" || spec.phase === "death" || spec.phase === "fled") {
+      // the fight is over — the next card tears the stage down
+      F.ended = true;
+    }
+  } finally {
+    releaseTiles(card);
   }
-  if (!F || !card.isConnected) return;
-  F.card = card;
-  F.gen = ++genCounter;
-  if (!attach(card)) return;
-  GL.canvas.style.opacity = "";
-  startLoop();
-  // one rendered frame first, then the beats
-  await new Promise((r) => requestAnimationFrame(() => setTimeout(r, 120)));
-  if (!card.isConnected || !F) return;
-  await play(card, spec);
-  if (spec.phase === "victory" || spec.phase === "death" || spec.phase === "fled") {
-    // the fight is over — the next card tears the stage down
-    F.ended = true;
-  }
+}
+
+function holdTiles(card, on) {
+  const opts = card.querySelector(".arena-opts");
+  if (!on || !opts) return;
+  opts.classList.add("busy");
+  card.querySelectorAll(".arena-opts button.opt").forEach((b) => { b.disabled = true; });
+}
+
+function releaseTiles(card) {
+  if (!card.isConnected) return;
+  card.querySelector(".arena-opts")?.classList.remove("busy");
+  card.querySelectorAll(".arena-opts button.opt").forEach((b) => { b.disabled = false; });
+  card.querySelectorAll(".alog .aline.pending").forEach((l) => l.classList.remove("pending"));
 }
 
 const game = document.getElementById("game");

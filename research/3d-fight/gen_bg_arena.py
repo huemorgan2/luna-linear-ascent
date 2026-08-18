@@ -50,7 +50,11 @@ STAGE300 = (
     "it. All scenery sits BEHIND that open ground in the middle band; "
     "the UPPER THIRD is quiet — dark sky, roof or haze with soft "
     "gradients only, no busy detail (a heads-up display will sit over "
-    "it). The ground line is strictly horizontal. "
+    "it). The ground line is strictly horizontal. The picture FILLS the "
+    "whole square canvas edge to edge and top to bottom — one continuous "
+    "scene, NO letterbox, NO black bars, NO blank bands, NO frame or "
+    "border, NO cinematic strip: sky/roof at the very top of the canvas, "
+    "ground at the very bottom. "
 )
 
 
