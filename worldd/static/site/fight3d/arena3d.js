@@ -196,7 +196,9 @@ function setBar(which, hp) {
   // 10 cells) — rewrite the blocks and the number, recolour the slab
   const blocks = bar.querySelector(".blocks");
   const num = bar.querySelector(".anum");
-  const cells = 10, filled = Math.round(cells * v / cap);
+  // 067 phase 7: the cell count is whatever the server drew (20 now)
+  const drawn = blocks ? blocks.textContent.length : 0;
+  const cells = drawn >= 5 ? drawn : 20, filled = Math.round(cells * v / cap);
   if (blocks) {
     blocks.textContent = "";
     blocks.append("▓".repeat(filled));

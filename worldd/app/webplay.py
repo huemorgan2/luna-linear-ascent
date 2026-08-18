@@ -37,7 +37,7 @@ router = APIRouter()
 
 # 067: the two 3D modules on /play — kill finisher and the Labs arena
 FIGHT3D_URL = "/static/site/fight3d/fight3d.js?v=13"
-ARENA3D_URL = "/static/site/fight3d/arena3d.js?v=2"
+ARENA3D_URL = "/static/site/fight3d/arena3d.js?v=3"
 
 
 # ── Bodies (mirror the plugin's routes.py, minus the chat-bridge ids) ────
