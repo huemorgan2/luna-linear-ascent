@@ -243,10 +243,26 @@ _TIPS: dict[str, str] = {
                         "the monster may rake you once as you pull "
                         "away; faster legs shrink that chance. Costs "
                         "the round."),
-    "drink_tonic": ("Trollblood tonic — the ONLY heal that works "
-                    "mid-fight: full HP, the round keeps going. Carried "
-                    "for exactly the moment a Warden has you at the "
-                    "edge."),
+    "drink_tonic": ("Trollblood tonic — from the charm pouch: full HP, "
+                    "the round keeps going. Worn for exactly the "
+                    "moment a Warden has you at the edge."),
+    "buy_charm_slot": ("The charm pouch — the seventh slot, at your "
+                       "belt. It holds ONE thing: a luck charm (fatter "
+                       "rare drops while worn), a healing potion or a "
+                       "relic — and only what sits in the pouch acts in "
+                       "a fight; the pack is inert. School, level 9, "
+                       "bought once."),
+    "drink_medgel": ("A Medgel from the charm pouch — +25 HP mid-fight. "
+                     "The monster still answers this round. Only what "
+                     "sits in the pouch acts; the pack is inert."),
+    "drink_trauma_kit": ("A Trauma kit from the charm pouch — +50 HP "
+                         "mid-fight. The monster still answers this "
+                         "round. Only what sits in the pouch acts; the "
+                         "pack is inert."),
+    "use_weapon_oil": ("Slick the blade that leads — +25% damage for the "
+                       "next 10 strikes, applied on the road, never in "
+                       "a fight. The oil rides that weapon; swap hands "
+                       "and the other blade is dry."),
     "shield_wall": ("Blade craft, rank 4 — a shield on the arm: plant it "
                     "and take the round "
                     "on it. You deal nothing, you take nothing — resets "
@@ -542,7 +558,8 @@ def option_tip(oid: str) -> str:
                 "where Warden glory waits.")
     if oid.startswith("nock_"):
         return item_tip(oid.removeprefix("nock_")) + \
-            " Nocking is free — the switch doesn't spend your round."
+            (" Bound to your bow before the fight; in the fight the "
+             "switch is free — it doesn't spend your round.")
     if oid.startswith("use_") or oid == "throw_net":
         # 006 fight options carry short ids; map back to the relic.
         slug = _FIGHT_RELIC.get(oid, oid.removeprefix("use_"))
@@ -604,23 +621,27 @@ def option_tip(oid: str) -> str:
 _ITEM_TIPS: dict[str, str] = {
     # 027: where a thing COMES FROM belongs in its tip — a pack that keeps
     # filling up with something is a question the game should answer.
-    "medgel": ("Medgel — +25 HP. Click it here to use it, anywhere out of "
-               "a fight. They pile up because nine alpha kills in ten "
-               "leave one behind (and presents carry them too): the pack "
-               "is your health bar between fights, so spend them."),
-    "trauma_kit": ("Trauma kit — +80 HP, used from the pack out of a "
-                   "fight. The deep patch for deep floors, where one bad "
-                   "round costs more than the kit did."),
+    "medgel": ("Medgel — +25 HP. Click it here to use it out of a fight; "
+               "set ONE in the charm pouch and it can be drunk mid-fight. "
+               "They pile up because nine alpha kills in ten leave one "
+               "behind (and presents carry them too): the pack is your "
+               "health bar between fights, so spend them."),
+    "trauma_kit": ("Trauma kit — +80 HP, from the pack out of a fight; "
+                   "set in the charm pouch it can be drunk mid-fight. The "
+                   "deep patch for deep floors, where one bad round costs "
+                   "more than the kit did."),
     "trollblood_tonic": ("Trollblood tonic — full heal, drinkable "
-                         "MID-fight, the only one that is. Carried for "
-                         "the round a Warden has you at the edge."),
+                         "MID-fight from the charm pouch only; in the "
+                         "pack it does nothing. Carried for the round a "
+                         "Warden has you at the edge."),
     "energy_cell": ("Energy cell — +5 energy on the spot, one a day. Energy "
                     "is the day's clock: a cell is five extra hunts' "
                     "worth of climbing."),
-    "luck_charm": ("Luck charm — fortune leans your way until tomorrow: "
-                   "better loot and present rolls. Click it to crack one "
-                   "(once a day is all it does); alphas and Wardens drop "
-                   "them about one time in ten."),
+    "luck_charm": ("Luck charm — fortune leans your way while it sits in "
+                   "the charm pouch: the rare drop comes 25 points more "
+                   "often, for 20 victories, then it is spent. In the "
+                   "pack it does nothing; alphas and Wardens drop them "
+                   "about one time in ten."),
     "arrows": ("Bought arrows from the old armory ledger — bows no "
                "longer burn them; a trained hand's quiver looks after "
                "itself. A keepsake of a stricter era."),

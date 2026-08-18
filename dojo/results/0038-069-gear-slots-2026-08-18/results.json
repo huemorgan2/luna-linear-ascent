@@ -1,0 +1,216 @@
+{
+  "user": "dojo796672",
+  "base": "http://127.0.0.1:8779",
+  "results": [
+    {
+      "name": "S1 signup",
+      "ok": true,
+      "detail": "200 dojo796672"
+    },
+    {
+      "name": "S1 seed fresh warrior",
+      "ok": true,
+      "detail": "{\"seeded\":\"web:dojo796672\",\"profile\":\"fresh\",\"level\":1,\"slots\":1,\"charm_slot\":false,\"gear\":{\"weapon\":\"rusted_sword\",\"shield\":\"gate_buckler\",\"armor\":\"gate_jerkin\",\"shoes\":null,\"charm\":null},\"held\":[\"ru"
+    },
+    {
+      "name": "S2 seven slots drawn",
+      "ok": true,
+      "detail": "charm,armor,shoes,shield,weapon,weapon2,weapon3"
+    },
+    {
+      "name": "S2 left = charm/armour/boots, right = shield/w1/w2/w3",
+      "ok": true,
+      "detail": "charm,armor,shoes | shield,weapon,weapon2,weapon3"
+    },
+    {
+      "name": "S2 charm pouch locked, hover names level 9",
+      "ok": true,
+      "detail": "Locked — the charm pouch. School, level 9: 400 XP and a fee. Holds one charm or potion."
+    },
+    {
+      "name": "S2 weapon 2 locked with its unlock text",
+      "ok": true,
+      "detail": "Locked — the second grip. School: 60 XP and ◈ 30."
+    },
+    {
+      "name": "S2 boots slot empty (dotted) with a hover",
+      "ok": true,
+      "detail": "boots — none worn. Wear a pair from the pack; speed comes only from worn boots."
+    },
+    {
+      "name": "S2 armour filled, carries \"Move to the pack\"",
+      "ok": true,
+      "detail": "[{\"opt\": \"unequip_armor\", \"label\": \"Move to the pack\", \"hint\": \"the Gate-Issue Jerkin rides in the pack \\u2014 it does n"
+    },
+    {
+      "name": "S2 locked = dark grey box + lock glyph",
+      "ok": true,
+      "detail": "{\"bg\":\"rgb(34, 34, 34)\",\"border\":\"solid 2px rgb(85, 85, 85)\",\"mask\":true}"
+    },
+    {
+      "name": "S2 empty = dotted",
+      "ok": true,
+      "detail": "dotted"
+    },
+    {
+      "name": "S2 portrait stands between the columns at the column height",
+      "ok": true,
+      "detail": "{\"portrait\":{\"h\":266,\"w\":133},\"colH\":266}"
+    },
+    {
+      "name": "S2 no hand row / hcell left on the card",
+      "ok": true,
+      "detail": "handrow=false"
+    },
+    {
+      "name": "S2 hovering the locked pouch shows the unlock text",
+      "ok": true,
+      "detail": "block|Locked — the charm pouch. School, level 9: 400 XP and a fee. Holds one charm or potion."
+    },
+    {
+      "name": "S3 pack boots offer \"Wear\"",
+      "ok": true,
+      "detail": "COBBLED BOOTS | Wear | from your pack"
+    },
+    {
+      "name": "S3 boots slot fills (left, third)",
+      "ok": true,
+      "detail": "slot gm item act eq cobbled_boots"
+    },
+    {
+      "name": "S3 SPD pips rise once worn",
+      "ok": true,
+      "detail": "{\"spd0\":{\"txt\":\"SPD 5\"},\"spd1\":{\"txt\":\"SPD 6\"}}"
+    },
+    {
+      "name": "S3 the boots left the pack grid",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "S3 worn boots offer \"Move to the pack\"",
+      "ok": true,
+      "detail": "COBBLED BOOTS | Move to the pack | the Cobbled Boots rides in the pack — it does nothing there"
+    },
+    {
+      "name": "S3 boots back in the pack, slot empty again, SPD back",
+      "ok": true,
+      "detail": "SPD 5"
+    },
+    {
+      "name": "S3 the card says the pack piece does nothing",
+      "ok": true,
+      "detail": "he Cobbled Boots goes to your pack — it does nothing there"
+    },
+    {
+      "name": "S4 pack reads 6/6",
+      "ok": true,
+      "detail": "PACK 6/6"
+    },
+    {
+      "name": "S4 armour row still offered, hint says pack full",
+      "ok": true,
+      "detail": "GATE-ISSUE JERKIN | Move to the pack | Pack full (6/6). Sell or drop something, or buy a bigger pack at the forge."
+    },
+    {
+      "name": "S4 refused in red with the count",
+      "ok": true,
+      "detail": "toast=Can't move it — pack full (6/6) | shard="
+    },
+    {
+      "name": "S4 armour still worn, pack still 6/6",
+      "ok": true,
+      "detail": "slot gm item act eq"
+    },
+    {
+      "name": "S5 level 8: charm pouch row present and locked (level 9)",
+      "ok": true,
+      "detail": "{\"opt\":\"buy_charm_slot\",\"txt\":\"5 Unlock the charm pouch locked — level 9 (you: 8)\",\"dis\":true}"
+    },
+    {
+      "name": "S5 clicking it under 9 refuses and names the level",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "S5 level 9: row open with the price",
+      "ok": true,
+      "detail": "{\"opt\":\"buy_charm_slot\",\"txt\":\"5 Unlock the charm pouch 400 XP + 250\",\"dis\":false}"
+    },
+    {
+      "name": "S5 bought: the card says so, pouch slot now dotted/empty",
+      "ok": true,
+      "detail": "+ POUCH — one charm or potion rides at your belt now. Set it from t | slot gm empty"
+    },
+    {
+      "name": "S5 the row is gone once owned",
+      "ok": true,
+      "detail": "train_blade,train_bow,train_staff,buy_carry2,back"
+    },
+    {
+      "name": "S6 tonic in the PACK only: no drink row in the fight",
+      "ok": true,
+      "detail": "close_in,stand,run,shield_wall"
+    },
+    {
+      "name": "S6 mid-fight the pack tonic offers nothing (pouch-only, set before)",
+      "ok": true,
+      "detail": "TROLLBLOOD TONIC | Nothing works from the pack — set it in your charm pouch and it will offer itself in the fight."
+    },
+    {
+      "name": "S6 out of the fight the pack tonic offers \"Set in pouch\"",
+      "ok": true,
+      "detail": "TROLLBLOOD TONIC | Set in pouch | into the charm pouch"
+    },
+    {
+      "name": "S6 tonic sits in the pouch, one left in the pack",
+      "ok": true,
+      "detail": "trollblood_tonic"
+    },
+    {
+      "name": "S6 with the tonic in the pouch the fight offers \"Drink trollblood tonic\"",
+      "ok": true,
+      "detail": "close_in,stand,run,shield_wall,drink_tonic"
+    },
+    {
+      "name": "S6 drunk: the pouch empties (the pack copy untouched)",
+      "ok": true,
+      "detail": "slot gm empty"
+    },
+    {
+      "name": "S7 two weapons in hand, lead marked gold, luck charm in the pouch",
+      "ok": true,
+      "detail": "charm:luck_charm armor:gate_jerkin shoes: shield:gate_buckler weapon:rusted_sword weapon2:basic_bow weapon3:"
+    },
+    {
+      "name": "S7 pouch tip names the charm pool",
+      "ok": true,
+      "detail": "Luck charm — Luck charm — fortune leans your way while it sits in the charm pouch: the rare drop comes 25 points more often, for 20 victorie"
+    },
+    {
+      "name": "S7 floor 6 with labs on: arena card",
+      "ok": true,
+      "detail": "arena=true"
+    },
+    {
+      "name": "S7 HUD shows the pouch under the climber HP",
+      "ok": true,
+      "detail": "HP ▓▓▓▓▓▓▓░░░ 393/579 | ATK 37   DEF 33   SPEED 5 |  Luck charm  | ×12"
+    },
+    {
+      "name": "S7 attack tiles carry their own ATK",
+      "ok": true,
+      "detail": "[{\"opt\":\"attack\",\"atk\":\"ATK 37\"},{\"opt\":\"attack_basic_bow\",\"atk\":\"ATK 40\"},{\"opt\":\"stand\",\"atk\":\"\"},{\"opt\":\"run\",\"atk\":\"\"},{\"opt\":\"shield_wall\",\"atk\":\"\"}]"
+    },
+    {
+      "name": "S8 390px: gear map fits, 48px slots, no horizontal overflow",
+      "ok": true,
+      "detail": "{\"gmW\":227,\"prW\":332,\"slot\":48,\"portraitH\":214,\"overflow\":false,\"cols\":2}"
+    },
+    {
+      "name": "V no console errors / page errors",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}
