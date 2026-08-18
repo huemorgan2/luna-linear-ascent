@@ -45,4 +45,8 @@
 
 ## Captures
 07-stage-settled.png / 08-stage-settled-1440.png — round card: named slabs one row at the top, gear line, foe kind icon, tiles inside the stage.
-10-fight-end.png / 11-fight-end-1440.png — end card: HUD kept, the gate-town menu as tiles inside the stage, nothing under it but the log.
+09-fight-end.png / 10-fight-end-1440.png — end card: HUD kept, the gate-town menu as tiles inside the stage, nothing under it but the log.
+
+## Release
+- Plugin 039616f (0.94.0) → vendored ebf2006 → Render live 0.94.0 (deploy.sh, `/health` game=0.94.0) → marketplace official/plugin-linear-ascent 0.94.0 sha256 033d258c…
+- worldd suite (minus DB-bound presence/social/multiplayer): 177 pass / 1 fail `test_web_play.py::test_leaderboard_marks_only_you` — fails identically on the 0.92.0 vendor tree (local DB state), not this change.
