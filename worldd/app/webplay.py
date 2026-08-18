@@ -35,6 +35,10 @@ log = logging.getLogger("worldd.webplay")
 
 router = APIRouter()
 
+# 067: the two 3D modules on /play — kill finisher and the Labs arena
+FIGHT3D_URL = "/static/site/fight3d/fight3d.js?v=13"
+ARENA3D_URL = "/static/site/fight3d/arena3d.js?v=1"
+
 
 # ── Bodies (mirror the plugin's routes.py, minus the chat-bridge ids) ────
 
@@ -148,10 +152,15 @@ async def play_page(request: Request):
     # importmap must land in the initial HTML, before the module loads;
     # fight3d.js watches #game for data-kill3d cards and degrades to the
     # GIF when WebGL or a model is missing.
+    # 067: arena3d.js (the Labs turn-based stage) imports fight3d's
+    # primitives through the "fight3d" map entry — the SAME URL as the
+    # script tag, so the browser holds one module instance (one kill
+    # observer, one asset cache). Bump both together via FIGHT3D_URL.
     tag += ('<script type="importmap">{"imports":{"three":'
-            '"/static/site/fight3d/vendor/three.module.js"}}</script>'
-            '<script type="module" '
-            'src="/static/site/fight3d/fight3d.js?v=12"></script>')
+            '"/static/site/fight3d/vendor/three.module.js",'
+            f'"fight3d":"{FIGHT3D_URL}"}}}}</script>'
+            f'<script type="module" src="{FIGHT3D_URL}"></script>'
+            f'<script type="module" src="{ARENA3D_URL}"></script>')
     return HTMLResponse(page.replace("</head>", tag + "</head>", 1))
 
 

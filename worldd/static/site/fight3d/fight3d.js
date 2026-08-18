@@ -279,10 +279,14 @@ let curStrike = "overhead";
 // but never the canvas or the context.
 let GL = null, glBroken = false;
 
-function initGL() {
-  if (GL) return GL;
-  if (glBroken) return null;
-  try {
+// 067: the stage is parametric — the kill scene keeps 320x112 (initGL
+// below); the arena builds its own 320x300 stage with the SAME pixel
+// scale (px per world unit), so the figures keep their kill-scene size
+// and only the frame grows. Throws on a dead WebGL; initGL catches.
+function createStage({ W: w = W, H: h = H, floorFrac = FLOOR_FRAC,
+                       pxPerUnit = H / 2.8 } = {}) {
+  {
+    const W = w, H = h;
     const canvas = document.createElement("canvas");
     const renderer = new THREE.WebGLRenderer(
       { canvas, antialias: false, alpha: true });
@@ -401,7 +405,7 @@ function initGL() {
     postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMat));
 
     const scene = new THREE.Scene();
-    const VH = 2.8;
+    const VH = H / pxPerUnit;
     const camera = new THREE.OrthographicCamera(
       -VH * (W / H) / 2, VH * (W / H) / 2, VH / 2, -VH / 2, 0.1, 120);
     const camTarget = new THREE.Vector3(0, 1.0, 0);
@@ -411,7 +415,7 @@ function initGL() {
     for (let i = 0; i < 4; i++) {
       camera.updateMatrixWorld(true);
       const p = new THREE.Vector3(0, 0, 0).project(camera);
-      const want = 1 - 2 * FLOOR_FRAC;
+      const want = 1 - 2 * floorFrac;
       const dy = (p.y - want) * VH / 2;
       camera.position.y += dy; camTarget.y += dy;
       camera.lookAt(camTarget);
@@ -439,17 +443,45 @@ function initGL() {
     catcher.receiveShadow = true;
     scene.add(catcher);
 
-    GL = { canvas, renderer, rtColor, rtNormal, normalMat, postScene,
-           postCam, postMat, scene, camera, clock: new THREE.Clock() };
+    const gl = { canvas, renderer, rtColor, rtNormal, normalMat, postScene,
+                 postCam, postMat, scene, camera, clock: new THREE.Clock(),
+                 W, H };
     Object.assign(canvas.style, {
       position: "absolute", inset: "0", width: "100%", height: "100%",
       imageRendering: "pixelated", zIndex: "1",
     });
+    return gl;
+  }
+}
+
+function initGL() {
+  if (GL) return GL;
+  if (glBroken) return null;
+  try {
+    GL = createStage();
     return GL;
   } catch {
     glBroken = true;
     return null;
   }
+}
+
+// one full frame: colour pass, normal pass, the 1-bit post over both
+function renderFrame(gl) {
+  const { renderer, scene, camera, rtColor, rtNormal, normalMat,
+          postScene, postCam } = gl;
+  renderer.setRenderTarget(rtColor);
+  renderer.setClearColor(0x000000, 0);
+  renderer.clear();
+  renderer.render(scene, camera);
+  renderer.setRenderTarget(rtNormal);
+  renderer.clear();
+  scene.overrideMaterial = normalMat;
+  renderer.render(scene, camera);
+  scene.overrideMaterial = null;
+  renderer.setRenderTarget(null);
+  renderer.clear();
+  renderer.render(postScene, postCam);
 }
 
 // ── asset loading (on demand, cached, 404 → null) ─────────────────────────
@@ -467,10 +499,11 @@ function load(rel) {
   return cache[rel];
 }
 
-function loadBG(id) {
-  if (!(id in bgCache)) {
-    bgCache[id] = texLoader
-      .loadAsync(new URL(`backgrounds/${id}.png`, BASE).href)
+function loadBG(id, dir = "backgrounds") {
+  const k = `${dir}/${id}`;
+  if (!(k in bgCache)) {
+    bgCache[k] = texLoader
+      .loadAsync(new URL(`${dir}/${id}.png`, BASE).href)
       .then((tex) => {
         tex.minFilter = tex.magFilter = THREE.NearestFilter;
         tex.generateMipmaps = false;
@@ -478,11 +511,11 @@ function loadBG(id) {
       })
       .catch(() => null);
   }
-  return bgCache[id];
+  return bgCache[k];
 }
 
 // resolve the spec against what actually exists; null = degrade to GIF
-async function ensureFor(spec) {
+async function ensureFor(spec, { bgDir = "backgrounds" } = {}) {
   const race = SPECIES[spec.race] ? spec.race : "human";
   const line = WEAPONS[spec.line] ? spec.line : "blade";
   const kind = KIND_OF[line];
@@ -490,7 +523,7 @@ async function ensureFor(spec) {
   // (STRIKES), so a blade kill never fetches it
   const [pg, wg, mg, bg, cg] = await Promise.all([
     load(`players/${race}.glb`), load(`players/${line}.glb`),
-    load(`monsters/${spec.id}.glb`), loadBG(spec.id),
+    load(`monsters/${spec.id}.glb`), loadBG(spec.id, bgDir),
     kind === "slash" ? null : load(`players/${race}_${kind}.glb`),
   ]);
   if (!pg || !wg || !mg) return null;
@@ -525,15 +558,7 @@ function warmGL() {
     const gl = initGL();
     if (!gl) return;
     // one offscreen frame: context + compiled shaders before the kill
-    gl.renderer.setRenderTarget(gl.rtColor);
-    gl.renderer.clear();
-    gl.renderer.render(gl.scene, gl.camera);
-    gl.renderer.setRenderTarget(gl.rtNormal);
-    gl.scene.overrideMaterial = gl.normalMat;
-    gl.renderer.render(gl.scene, gl.camera);
-    gl.scene.overrideMaterial = null;
-    gl.renderer.setRenderTarget(null);
-    gl.renderer.render(gl.postScene, gl.postCam);
+    renderFrame(gl);
   });
 }
 function warmFor(card) {
@@ -1000,8 +1025,7 @@ function tripoMonster(gltf, { h = 1.6, wide = 1.1, yaw = 0, gait = null,
 const WHITE = new THREE.MeshBasicMaterial({ color: 0xffffff });
 let effects = [];                       // transient fx; update(dt) -> alive?
 
-function burst(center) {
-  const scene = GL.scene;
+function burst(center, scene = GL.scene) {
   const n = 80;
   const posA = new Float32Array(n * 3);
   const vel = [];
@@ -1049,8 +1073,7 @@ function burst(center) {
   } };
 }
 
-function banishFx(c, h, getX) {
-  const scene = GL.scene;
+function banishFx(c, h, getX, scene = GL.scene) {
   const g = new THREE.Group();
   const beam = new THREE.Mesh(
     new THREE.PlaneGeometry(0.2 * h, 1),
@@ -1110,8 +1133,7 @@ function banishFx(c, h, getX) {
   } };
 }
 
-function arrowFx(from, to, dur, onHit) {
-  const scene = GL.scene;
+function arrowFx(from, to, dur, onHit, scene = GL.scene) {
   const m = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.07, 0.07), WHITE);
   m.position.copy(from);
   scene.add(m);
@@ -1126,8 +1148,7 @@ function arrowFx(from, to, dur, onHit) {
   } };
 }
 
-function magicFx(from, to, dur, onHit) {
-  const scene = GL.scene;
+function magicFx(from, to, dur, onHit, scene = GL.scene) {
   const N = 90;
   const posA = new Float32Array(N * 3);
   const meta = [];
@@ -1360,8 +1381,7 @@ let raf = 0;
 
 function frame() {
   raf = requestAnimationFrame(frame);
-  const { renderer, scene, camera, clock,
-          rtColor, rtNormal, normalMat, postScene, postCam } = GL;
+  const { clock } = GL;
   const dt = Math.min(clock.getDelta(), 0.1);
   const t = clock.elapsedTime;
   // the scenery loop: 24 frames x 100 ms, same cadence as the demo2 GIFs
@@ -1375,20 +1395,7 @@ function frame() {
   effects = running.filter((e) => {
     try { return e.update(dt); } catch (err) { console.warn(err); return false; }
   }).concat(effects);
-
-  renderer.setRenderTarget(rtColor);
-  renderer.setClearColor(0x000000, 0);
-  renderer.clear();
-  renderer.render(scene, camera);
-  renderer.setRenderTarget(rtNormal);
-  renderer.clear();
-  scene.overrideMaterial = normalMat;
-  renderer.render(scene, camera);
-  scene.overrideMaterial = null;
-  renderer.setRenderTarget(null);
-  renderer.clear();
-  renderer.render(postScene, postCam);
-
+  renderFrame(GL);
 }
 
 function startLoop() {
@@ -1502,3 +1509,11 @@ if (game) {
   new MutationObserver(scan).observe(game, { childList: true, subtree: true });
   scan();
 }
+
+// ── 067: primitives for arena3d.js (the turn-based stage). The kill
+// scene above is untouched by these; arena3d builds its OWN stage and
+// only borrows the loaders, rigs, effects and registries.
+export { createStage, renderFrame, load, loadBG, ensureFor, buildPlayer,
+         tripoMonster, burst, banishFx, arrowFx, magicFx, warmFor, warmRel,
+         MONSTERS3D, SPECIES, WEAPONS, KIND_OF, STRIKES, PLAYER_YAW,
+         FLOOR_FRAC };
