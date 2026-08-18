@@ -169,11 +169,22 @@ function floatText(who, text, cls = "") {
   const s = screenOf(headOf(who));
   const el = document.createElement("div");
   el.className = "afloat " + cls;
+  el.dataset.who = who;
   el.textContent = text;
   el.style.left = clamp(s.x, 8, 92) + "%";
   el.style.top = clamp(s.y, 12, 90) + "%";
+  // 067 phase 5 (roy): a second float over the same head — BLOCKED next
+  // to the damage — sits BESIDE the live one, never on top of it
+  const live = [...layer.querySelectorAll(`.afloat[data-who="${who}"]`)];
   layer.appendChild(el);
-  setTimeout(() => el.remove(), 1400);
+  if (live.length) {
+    const last = live[live.length - 1];
+    const dx = (+last.dataset.dx || 0) + last.offsetWidth / 2 + el.offsetWidth / 2 + 6;
+    el.dataset.dx = String(dx);
+    el.style.setProperty("--dx", `${dx}px`);
+  }
+  // 3 s travel (render.py @keyframes afloat / ajitter) + a margin
+  setTimeout(() => el.remove(), 3200);
 }
 function setBar(which, hp) {
   const bar = F?.card?.querySelector(`.abar.${which}`);
@@ -181,14 +192,21 @@ function setBar(which, hp) {
   const cap = Math.max(1, +bar.dataset.max || 1);
   const v = clamp(Math.round(hp), 0, cap);
   bar.dataset.hp = String(v);
-  const fill = bar.querySelector(".afill");
+  // 067 phase 5: the bar is the regular fight's ▓░ line (render._blocks,
+  // 10 cells) — rewrite the blocks and the number, recolour the slab
+  const blocks = bar.querySelector(".blocks");
   const num = bar.querySelector(".anum");
-  if (fill) {
-    fill.style.width = Math.round(100 * v / cap) + "%";
-    // the card's own palette (render.py OK / GOLD / RED)
-    fill.style.background = v >= cap ? "#8ed24a"
-      : (v * 3 > cap ? "#f5b825" : "#f26541");
+  const cells = 10, filled = Math.round(cells * v / cap);
+  if (blocks) {
+    blocks.textContent = "";
+    blocks.append("▓".repeat(filled));
+    const off = document.createElement("span");
+    off.className = "off";
+    off.textContent = "░".repeat(cells - filled);
+    blocks.appendChild(off);
   }
+  // the card's own palette (render.py OK / GOLD / RED)
+  bar.style.color = v >= cap ? "#8ed24a" : (v * 3 > cap ? "#f5b825" : "#f26541");
   if (num) num.textContent = `${v}/${cap}`;
 }
 async function typeLine(el) {
