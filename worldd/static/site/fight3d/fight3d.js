@@ -1199,9 +1199,12 @@ function resetStage() {
   const scene = GL.scene;
   if (player) { scene.remove(player.group); player = null; }
   if (monster) { scene.remove(monster.group); monster = null; }
-  for (const e of effects) e.update(1e3);   // let each fx tear itself down
+  for (const e of effects) {
+    try { e.update(1e3); } catch { /* 065: tear-down never throws */ }
+  }
   effects = [];
   seq = null;
+  mCenterLast = new THREE.Vector3(2.0, 0.6, 0);
   state = "infected";
 }
 
@@ -1240,9 +1243,17 @@ function liberate() {
   if (dur) seq.end = Math.max(seq.end, dur + 0.2);
 }
 
+// 065: the last known centre survives the monster — magicFx keeps
+// steering its trail for ~1 s after the hit, by which time a non-native
+// foe has been removed (monster = null); throwing here killed the whole
+// frame and froze the canvas mid-burst on every staff kill.
+let mCenterLast = new THREE.Vector3(2.0, 0.6, 0);
 function mCenterNow() {
-  return new THREE.Box3().setFromObject(monster.group)
-    .getCenter(new THREE.Vector3());
+  if (monster) {
+    mCenterLast = new THREE.Box3().setFromObject(monster.group)
+      .getCenter(new THREE.Vector3());
+  }
+  return mCenterLast.clone();
 }
 
 function impact() {
@@ -1360,7 +1371,10 @@ function frame() {
   if (seq) stepSeq(dt);
   const running = effects;
   effects = [];
-  effects = running.filter((e) => e.update(dt)).concat(effects);
+  // 065: one broken effect drops itself — never the frame
+  effects = running.filter((e) => {
+    try { return e.update(dt); } catch (err) { console.warn(err); return false; }
+  }).concat(effects);
 
   renderer.setRenderTarget(rtColor);
   renderer.setClearColor(0x000000, 0);
