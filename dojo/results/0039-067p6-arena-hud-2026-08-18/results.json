@@ -1,0 +1,179 @@
+{
+  "user": "dojo992313",
+  "base": "http://127.0.0.1:8778",
+  "results": [
+    {
+      "name": "S1 signup",
+      "ok": true,
+      "detail": "200 dojo992313"
+    },
+    {
+      "name": "S1 seed floor 6",
+      "ok": true,
+      "detail": "seeded web:dojo992313 floor=6 class=warrior level=8 hp=400 held=['rusted_sword']"
+    },
+    {
+      "name": "S2 flask on the bar, reads \"labs\", off",
+      "ok": true,
+      "detail": "{\"labsTxt\":\"labs\",\"on\":false}"
+    },
+    {
+      "name": "S2 floor 6 town shows hunt",
+      "ok": true,
+      "detail": "hunt,hunt_deep,keep,talk,gate,town"
+    },
+    {
+      "name": "S3 floor 6, labs off: regular encounter (no data-arena, no tiles)",
+      "ok": true,
+      "detail": "{\"arena\":false,\"tiles\":0,\"opts\":[\"close_in\",\"stand\",\"run\",\"shield_wall\"]}"
+    },
+    {
+      "name": "S4 Labs card opens",
+      "ok": true,
+      "detail": "LABSThe LabsThings being tried. Turn one on to test it.Experiments. Each one is off until you switch it on, and off again the moment you switch it off — nothing"
+    },
+    {
+      "name": "S4 arena row off → ON",
+      "ok": true,
+      "detail": "1Arena — turn-based 3D fights — offswitch on · flo → 1Arena — turn-based 3D fights — ONswitch off · flo"
+    },
+    {
+      "name": "S4 flask reads \"labs on\"",
+      "ok": true,
+      "detail": "{\"on\":true,\"txt\":\"labs on\",\"dataLabs\":\"arena\"}"
+    },
+    {
+      "name": "V DB labs.arena = true",
+      "ok": true,
+      "detail": "\"{\\\"arena\\\": true}\""
+    },
+    {
+      "name": "S5 opener: data-arena, close-up kept, no 3D yet",
+      "ok": true,
+      "detail": "{\"arena\":true,\"a3d\":false,\"img\":false}"
+    },
+    {
+      "name": "S5 opener tiles: icon + [n] LABEL + [i]",
+      "ok": true,
+      "detail": "[{\"opt\":\"close_in\",\"txt\":\"1 CLOSE IN\",\"dis\":false,\"ico\":true,\"info\":true},{\"opt\":\"stand\",\"txt\":\"2 STAND\",\"dis\":false,\"ico\":true,\"info\":true},{\"opt\":\"run\",\"txt\":\"3 RUN\",\"dis\":false,\"ico\":true,\"info\":true},{\"opt\":\"shield_wall\",\"txt\":\"4 WALL\",\"dis\":false,\"ico\":true,\"info\":true}]"
+    },
+    {
+      "name": "S6 3D stage 320x300 canvas in the arena banner",
+      "ok": true,
+      "detail": "[320,300,394,369]"
+    },
+    {
+      "name": "S6 tiles held while beats play, then released",
+      "ok": true,
+      "detail": "{\"busyEarly\":true,\"settled\":152,\"tiles\":[false,false,false,false]}"
+    },
+    {
+      "name": "S6 first round settles < 8 s",
+      "ok": true,
+      "detail": "5411 ms"
+    },
+    {
+      "name": "S6 HP bars both sides",
+      "ok": true,
+      "detail": "me:354/354 foe:21/21"
+    },
+    {
+      "name": "S6 log lines revealed (none pending) after beats",
+      "ok": true,
+      "detail": "[\"dojo992313 closes the gap.\",\"Guano vole hits dojo992313 for 20 damage — 33 blocked by DEF.\"]"
+    },
+    {
+      "name": "S11 HUD: two named slabs, both top-aligned a half line down, left/right",
+      "ok": true,
+      "detail": "{\"names\":[\"DOJO992313\",\"GUANO VOLE\"],\"slabs\":[{\"cls\":\"astat me\",\"top\":8,\"left\":0,\"right\":218},{\"cls\":\"astat foe\",\"top\":8,\"left\":206,\"right\":0}]}"
+    },
+    {
+      "name": "S11 HUD: climber gear line (weapon + guard glyphs)",
+      "ok": true,
+      "detail": "gear=3"
+    },
+    {
+      "name": "S11 HUD: foe kind icons match the foe (flying/armoured/MR/bulwark)",
+      "ok": true,
+      "detail": "{\"foe\":{\"flying\":false,\"armoured\":true,\"resist_pct\":0,\"bulwark\":false},\"kinds\":[\"Armoured — the DEF is plate; blades glance, arrows bite less, magic passes.\"]}"
+    },
+    {
+      "name": "S11 tiles inside the stage, visible, art as <img>",
+      "ok": true,
+      "detail": "[{\"opt\":\"attack\",\"img\":true,\"inside\":true,\"h\":88,\"op\":\"1\"},{\"opt\":\"stand\",\"img\":true,\"inside\":true,\"h\":88,\"op\":\"1\"},{\"opt\":\"run\",\"img\":true,\"inside\":true,\"h\":88,\"op\":\"1\"},{\"opt\":\"shield_wall\",\"img\":true,\"inside\":true,\"h\":88,\"op\":\"1\"}]"
+    },
+    {
+      "name": "S11 nothing renders under the stage but the log",
+      "ok": true,
+      "detail": "below=0"
+    },
+    {
+      "name": "S11 desktop 1440: slabs still one row, tiles still inside",
+      "ok": true,
+      "detail": "{\"slabs\":[{\"cls\":\"astat me\",\"top\":8,\"left\":0,\"right\":582},{\"cls\":\"astat foe\",\"top\":8,\"left\":570,\"right\":0}],\"inside\":[true,true,true,true]}"
+    },
+    {
+      "name": "S7 floats seen: MISS / -N HP / BLOCKED",
+      "ok": true,
+      "detail": "foe|-20 HP  ||  blocked|BLOCKED 33  ||  |-11 HP  ||  foe|-39 HP  ||  blocked|BLOCKED 12  ||  |-16 HP"
+    },
+    {
+      "name": "S7 canvas persisted across turns (not rebuilt)",
+      "ok": true,
+      "detail": "rounds=3"
+    },
+    {
+      "name": "S7 fight reached an end",
+      "ok": true,
+      "detail": "phase=victory rounds=3"
+    },
+    {
+      "name": "S8 log accumulates",
+      "ok": true,
+      "detail": "2 lines"
+    },
+    {
+      "name": "S12 end card: tiles inside the stage, HUD named, nothing under",
+      "ok": true,
+      "detail": "{\"phase\":\"victory\",\"tiles\":[[\"hunt\",true],[\"hunt_deep\",true],[\"stew\",true],[\"heal\",true],[\"keep\",true],[\"talk\",true],[\"gate\",true],[\"town\",true]],\"names\":[\"DOJO992313\",\"GUANO VOLE\"],\"below\":0}"
+    },
+    {
+      "name": "S9 labs on, floor 5 hunt offered",
+      "ok": true,
+      "detail": "{\"on\":true,\"opts\":[\"hunt\",\"hunt_deep\",\"keep\",\"talk\",\"gate\",\"town\"]}"
+    },
+    {
+      "name": "S9 floor 5 with labs on: regular encounter",
+      "ok": true,
+      "detail": "{\"arena\":false,\"tiles\":0,\"opts\":[\"close_in\",\"stand\",\"run\",\"shield_wall\"]}"
+    },
+    {
+      "name": "S10 seed resets flag: flask off",
+      "ok": true,
+      "detail": "labs"
+    },
+    {
+      "name": "S10 floor 6 with arena off: regular encounter",
+      "ok": true,
+      "detail": "{\"arena\":false,\"tiles\":0,\"opts\":[\"close_in\",\"stand\",\"run\",\"shield_wall\"]}"
+    },
+    {
+      "name": "V no console errors / page errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "V no 4xx/5xx from /play/api",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "floats": [
+    "foe|-20 HP",
+    "blocked|BLOCKED 33",
+    "|-11 HP",
+    "foe|-39 HP",
+    "blocked|BLOCKED 12",
+    "|-16 HP"
+  ]
+}
