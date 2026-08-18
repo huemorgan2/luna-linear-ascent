@@ -1,0 +1,14 @@
+{
+  "user": "dojo691888",
+  "cls": "sorcerer",
+  "rounds": 1,
+  "phase": "victory",
+  "picks": [
+    "attack"
+  ],
+  "floats": [
+    "0:|-38 HP"
+  ],
+  "canvasAtEnd": true,
+  "errors": []
+}

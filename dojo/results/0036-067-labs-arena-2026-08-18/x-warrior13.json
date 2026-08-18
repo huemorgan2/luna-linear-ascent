@@ -1,0 +1,18 @@
+{
+  "user": "dojo588620",
+  "cls": "warrior",
+  "rounds": 2,
+  "phase": "victory",
+  "picks": [
+    "close_in",
+    "attack"
+  ],
+  "floats": [
+    "0:foe|-22 HP",
+    "0:blocked|BLOCKED 51",
+    "1:blocked|BLOCKED 51",
+    "1:|-67 HP"
+  ],
+  "canvasAtEnd": true,
+  "errors": []
+}

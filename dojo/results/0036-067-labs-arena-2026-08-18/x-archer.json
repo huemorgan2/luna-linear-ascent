@@ -1,0 +1,16 @@
+{
+  "user": "dojo614529",
+  "cls": "archer",
+  "rounds": 2,
+  "phase": "victory",
+  "picks": [
+    "attack",
+    "attack"
+  ],
+  "floats": [
+    "0:miss|MISS",
+    "1:|-359 HP"
+  ],
+  "canvasAtEnd": true,
+  "errors": []
+}
