@@ -36,8 +36,10 @@ log = logging.getLogger("worldd.webplay")
 router = APIRouter()
 
 # 067: the two 3D modules on /play — kill finisher and the Labs arena
+# 071: figure3d is its own folder (Labs isolation — drop = delete it)
 FIGHT3D_URL = "/static/site/fight3d/fight3d.js?v=13"
-ARENA3D_URL = "/static/site/fight3d/arena3d.js?v=3"
+ARENA3D_URL = "/static/site/fight3d/arena3d.js?v=4"
+FIGURE3D_URL = "/static/site/figure3d/figure3d.js?v=1"
 
 
 # ── Bodies (mirror the plugin's routes.py, minus the chat-bridge ids) ────
@@ -160,7 +162,8 @@ async def play_page(request: Request):
             '"/static/site/fight3d/vendor/three.module.js",'
             f'"fight3d":"{FIGHT3D_URL}"}}}}</script>'
             f'<script type="module" src="{FIGHT3D_URL}"></script>'
-            f'<script type="module" src="{ARENA3D_URL}"></script>')
+            f'<script type="module" src="{ARENA3D_URL}"></script>'
+            f'<script type="module" src="{FIGURE3D_URL}"></script>')
     return HTMLResponse(page.replace("</head>", tag + "</head>", 1))
 
 

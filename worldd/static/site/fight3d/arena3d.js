@@ -665,6 +665,19 @@ function attach(card) {
   slot.style.position = "relative";
   slot.style.backgroundColor = "#000";
   if (GL.canvas.parentNode !== slot) slot.insertBefore(GL.canvas, slot.firstChild);
+  // 067 phase 8: the card shows a 320x160 band of the 320x300 frame.
+  // The window lives in the card's CSS as --awin-top/--awin-h on the
+  // slot; createStage ships inline inset:0/height:100% (which would
+  // squash the frame into the band), so the vars are copied onto the
+  // canvas inline here, where they win. No vars -> full frame as before.
+  const cs = getComputedStyle(slot);
+  const wt = cs.getPropertyValue("--awin-top").trim();
+  const wh = cs.getPropertyValue("--awin-h").trim();
+  if (wt && wh) {
+    GL.canvas.style.top = wt;
+    GL.canvas.style.height = wh;
+    GL.canvas.style.bottom = "auto";
+  }
   return true;
 }
 
