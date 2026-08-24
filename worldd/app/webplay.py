@@ -39,7 +39,7 @@ router = APIRouter()
 # 071: figure3d is its own folder (Labs isolation — drop = delete it)
 FIGHT3D_URL = "/static/site/fight3d/fight3d.js?v=13"
 ARENA3D_URL = "/static/site/fight3d/arena3d.js?v=4"
-FIGURE3D_URL = "/static/site/figure3d/figure3d.js?v=2"
+FIGURE3D_URL = "/static/site/figure3d/figure3d.js?v=3"
 
 
 # ── Bodies (mirror the plugin's routes.py, minus the chat-bridge ids) ────

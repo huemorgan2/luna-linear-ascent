@@ -430,6 +430,11 @@ async function buildFigure(gl, spec) {
 }
 
 const lives = new Map();   // canvas -> { gl, specKey, figure, raf }
+// mount() replaces the declarative canvas with its WebGL canvas before its
+// models finish loading. The game's MutationObserver sees that replacement;
+// keep the replacement marked until the async build completes so it does not
+// recursively mount itself and monopolise the browser event loop.
+const mounting = new WeakSet();
 
 function degrade(host) {
   const fb = host.parentElement
@@ -492,6 +497,7 @@ function drop(canvas) {
 }
 
 async function mount(host) {
+  if (mounting.has(host)) return;
   let spec;
   try { spec = JSON.parse(host.dataset.figure3d || "{}"); }
   catch { spec = {}; }
@@ -501,20 +507,36 @@ async function mount(host) {
   if (existing) drop(host);
   const W = spec.px ? spec.px[0] : (parseInt(host.width, 10) || 100);
   const H = spec.px ? spec.px[1] : (parseInt(host.height, 10) || 200);
+  mounting.add(host);
   let gl;
   try { gl = createStage(W, H); }
-  catch (e) { degrade(host); return; }
+  catch (e) {
+    mounting.delete(host);
+    degrade(host);
+    return;
+  }
   host.replaceWith(gl.canvas);
+  mounting.add(gl.canvas);
   gl.canvas.className = host.className;
   gl.canvas.dataset.figure3d = key;
   gl.canvas.width = W;
   gl.canvas.height = H;
-  const figure = await buildFigure(gl, spec);
-  if (!figure) { degrade(gl.canvas); return; }
-  const L = { gl, specKey: key, figure, raf: 0, dead: false };
-  lives.set(gl.canvas, L);
-  renderFrame(gl);
-  L.raf = requestAnimationFrame(() => tick(L));
+  try {
+    const figure = await buildFigure(gl, spec);
+    if (!figure || !gl.canvas.isConnected) {
+      degrade(gl.canvas);
+      return;
+    }
+    const L = { gl, specKey: key, figure, raf: 0, dead: false };
+    lives.set(gl.canvas, L);
+    renderFrame(gl);
+    L.raf = requestAnimationFrame(() => tick(L));
+  } catch (e) {
+    degrade(gl.canvas);
+  } finally {
+    mounting.delete(host);
+    mounting.delete(gl.canvas);
+  }
 }
 
 function scan(root) {
