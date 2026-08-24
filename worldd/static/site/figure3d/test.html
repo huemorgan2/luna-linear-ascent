@@ -1,0 +1,51 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>figure3d harness</title>
+<style>
+  html,body{background:#0d0d0d;color:#c8cdd6;font:14px/1.4 monospace;margin:16px}
+  .row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+  .figure{width:160px}
+  .figure.giant{width:200px}
+  h2{font-size:14px;margin:0 0 8px}
+  .pwrap{background:#000;padding:8px}
+  canvas.portrait, img.portrait{height:258px;image-rendering:pixelated;display:block}
+  .gearmap{display:flex;gap:8px;margin-top:8px}
+  .slot{width:48px;height:48px;border:1px solid #555;color:#aaa;display:flex;
+        align-items:center;justify-content:center;cursor:pointer}
+  .slot:hover{border-color:#f5b825;color:#f5b825}
+</style>
+<h1>figure3d — 071 Labs portrait</h1>
+<p>same module as /play. 1-bit, 100×200 / 140×260. Hover a slot.</p>
+<div class="row" id="game"></div>
+<script type="importmap">{"imports":{"three":"../fight3d/vendor/three.module.js"}}</script>
+<script type="module">
+import "./figure3d.js";
+
+const gear = {armor:"gate_jerkin",shoes:"cobbled_boots",charm:"luck_charm",
+  shield:"gate_buckler"};
+const paths = {gate_jerkin:"armor",cobbled_boots:"shoes",luck_charm:"charm",
+  gate_buckler:"shield",rusted_sword:"blade",basic_bow:"bow",worn_staff:"staff"};
+const specs = [
+  ["human", "sword, shield, armour, boots, luck charm",
+   {weapon:"rusted_sword",...gear}, [100, 200]],
+  ["elf", "bow on back, sword on hip",
+   {weapon:"basic_bow",weapon2:"rusted_sword",...gear}, [100, 200]],
+  ["giant", "staff in hand, taller native grid",
+   {weapon:"worn_staff",...gear}, [140, 260]],
+];
+const slots = ["charm", "armor", "shoes", "shield", "weapon", "weapon2"];
+const game = document.getElementById("game");
+game.innerHTML = specs.map(([race, label, worn, px]) => {
+  const lead = worn.weapon || null;
+  const spec = {v:1,race,lead,worn,paths,px};
+  return `<section class="figure ${race}">
+    <h2>${race} — ${label}</h2>
+    <div class="pwrap"><canvas class="portrait later figure3d"
+      width="${px[0]}" height="${px[1]}"
+      data-figure3d='${JSON.stringify(spec)}'></canvas></div>
+    <div class="gearmap">${slots.filter((key) => worn[key]).map((key) =>
+      `<div class="slot" data-key="${key}">${key}</div>`).join("")}</div>
+  </section>`;
+}).join("");
+// boot() in figure3d.js mounts every canvas.figure3d on #game
+</script>

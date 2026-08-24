@@ -1,0 +1,610 @@
+{
+  "scrap_dagger": {
+    "hold": "blade",
+    "slot": "weapon",
+    "line": "warrior",
+    "name": "Scrap Dagger",
+    "file": "items/scrap_dagger.glb",
+    "fallback": "items/blade.glb"
+  },
+  "scrapwood_buckler": {
+    "hold": "shield",
+    "slot": "shield",
+    "line": "",
+    "name": "Scrapwood Buckler",
+    "file": "items/scrapwood_buckler.glb",
+    "fallback": "items/shield.glb"
+  },
+  "padded_jerkin": {
+    "hold": "armor",
+    "slot": "armor",
+    "line": "",
+    "name": "Padded Jerkin",
+    "file": "items/padded_jerkin.glb",
+    "fallback": "items/armor.glb"
+  },
+  "notched_cleaver": {
+    "hold": "blade",
+    "slot": "weapon",
+    "line": "warrior",
+    "name": "Notched Cleaver",
+    "file": "items/notched_cleaver.glb",
+    "fallback": "items/blade.glb"
+  },
+  "plank_shield": {
+    "hold": "shield",
+    "slot": "shield",
+    "line": "",
+    "name": "Plank Shield",
+    "file": "items/plank_shield.glb",
+    "fallback": "items/shield.glb"
+  },
+  "ratskin_vest": {
+    "hold": "armor",
+    "slot": "armor",
+    "line": "",
+    "name": "Ratskin Vest",
+    "file": "items/ratskin_vest.glb",
+    "fallback": "items/armor.glb"
+  },
+  "chipped_lens": {
+    "hold": "focus",
+    "slot": "shield",
+    "line": "sorcerer",
+    "name": "Chipped Lens",
+    "file": "items/chipped_lens.glb",
+    "fallback": "items/focus.glb"
+  },
+  "ratcatchers_dirk": {
+    "hold": "blade",
+    "slot": "weapon",
+    "line": "warrior",
+    "name": "Ratcatcher's Dirk",
+    "file": "items/ratcatchers_dirk.glb",
+    "fallback": "items/blade.glb"
+  },
+  "ratskin_round": {
+    "hold": "shield",
+    "slot": "shield",
+    "line": "",
+    "name": "Ratskin Round",
+    "file": "items/ratskin_round.glb",
+    "fallback": "items/shield.glb"
+  },
+  "quilted_rags": {
+    "hold": "armor",
+    "slot": "armor",
+    "line": "",
+    "name": "Quilted Rags",
+    "file": "items/quilted_rags.glb",
+    "fallback": "items/armor.glb"
+  },
+  "ratbone_charm": {
+    "hold": "focus",
+    "slot": "shield",
+    "line": "sorcerer",
+    "name": "Ratbone Charm",
+    "file": "items/ratbone_charm.glb",
+    "fallback": "items/focus.glb"
+  },
+  "boarspine_shortsword": {
+    "hold": "blade",
+    "slot": "weapon",
+    "line": "warrior",
+    "name": "Boarspine Shortsword",
+    "file": "items/boarspine_shortsword.glb",
+    "fallback": "items/blade.glb"
+  },
+  "boarhide_buckler": {
+    "hold": "shield",
+    "slot": "shield",
+    "line": "",
+    "name": "Boarhide Buckler",
+    "file": "items/boarhide_buckler.glb",
+    "fallback": "items/shield.glb"
+  },
+  "boarhide_jack": {
+    "hold": "armor",
+    "slot": "armor",
+    "line": "",
+    "name": "Boarhide Jack",
+    "file": "items/boarhide_jack.glb",
+    "fallback": "items/armor.glb"
+  },
+  "boartooth_fetish": {
+    "hold": "focus",
+    "slot": "shield",
+    "line": "sorcerer",
+    "name": "Boartooth Fetish",
+    "file": "items/boartooth_fetish.glb",
+    "fallback": "items/focus.glb"
+  },
+  "gatewatch_gladius": {
+    "hold": "blade",
+    "slot": "weapon",
+    "line": "warrior",
+    "name": "Gatewatch Gladius",
+    "file": "items/gatewatch_gladius.glb",
+    "fallback": "items/blade.glb"
+  },
+  "gatewatch_round": {
+    "hold": "shield",
+    "slot": "shield",
+    "line": "",
+    "name": "Gatewatch Round",
+    "file": "items/gatewatch_round.glb",
+    "fallback": "items/shield.glb"
+  },
+  "gatewatch_surplus": {
+    "hold": "armor",
+    "slot": "armor",
+    "line": "",
+    "name": "Gatewatch Surplus",
+    "file": "items/gatewatch_surplus.glb",
+    "fallback": "items/armor.glb"
+  },
+  "gatewatch_signet": {
+    "hold": "focus",
+    "slot": "shield",
+    "line": "sorcerer",
+    "name": "Gatewatch Signet",
+    "file": "items/gatewatch_signet.glb",
+    "fallback": "items/focus.glb"
+  },
+  "iron_sword": {
+    "hold": "blade",
+    "slot": "weapon",
+    "line": "warrior",
+    "name": "Iron Sword",
+    "file": "items/iron_sword.glb",
+    "fallback": "items/blade.glb"
+  },
+  "banded_kite": {
+    "hold": "shield",
+    "slot": "shield",
+    "line": "",
+    "name": "Banded Kite",
+    "file": "items/banded_kite.glb",
+    "fallback": "items/shield.glb"
+  },
+  "studded_jack": {
+    "hold": "armor",
+    "slot": "armor",
+    "line": "",
+    "name": "Studded Jack",
+    "file": "items/studded_jack.glb",
+    "fallback": "items/armor.glb"
+  },
+  "sootglass_bead": {
+    "hold": "focus",
+    "slot": "shield",
+    "line": "sorcerer",
+    "name": "Sootglass Bead",
+    "file": "items/sootglass_bead.glb",
+    "fallback": "items/focus.glb"
+  },
+  "wolfsteel_broadsword": {
+    "hold": "blade",
+    "slot": "weapon",
+    "line": "warrior",
+    "name": "Wolfsteel Broadsword",
+    "file": "items/wolfsteel_broadsword.glb",
+    "fallback": "items/blade.glb"
+  },
+  "wolfhide_targe": {
+    "hold": "shield",
+    "slot": "shield",
+    "line": "",
+    "name": "Wolfhide Targe",
+    "file": "items/wolfhide_targe.glb",
+    "fallback": "items/shield.glb"
+  },
+  "wolfpelt_coat": {
+    "hold": "armor",
+    "slot": "armor",
+    "line": "",
+    "name": "Wolfpelt Coat",
+    "file": "items/wolfpelt_coat.glb",
+    "fallback": "items/armor.glb"
+  },
+  "wolfeye_stone": {
+    "hold": "focus",
+    "slot": "shield",
+    "line": "sorcerer",
+    "name": "Wolfeye Stone",
+    "file": "items/wolfeye_stone.glb",
+    "fallback": "items/focus.glb"
+  },
+  "goblin_iron_falchion": {
+    "hold": "blade",
+    "slot": "weapon",
+    "line": "warrior",
+    "name": "Goblin-Iron Falchion",
+    "file": "items/goblin_iron_falchion.glb",
+    "fallback": "items/blade.glb"
+  },
+  "goblin_plate_buckler": {
+    "hold": "shield",
+    "slot": "shield",
+    "line": "",
+    "name": "Goblin-Plate Buckler",
+    "file": "items/goblin_plate_buckler.glb",
+    "fallback": "items/shield.glb"
+  },
+  "goblin_scrap_brigandine": {
+    "hold": "armor",
+    "slot": "armor",
+    "line": "",
+    "name": "Goblin-Scrap Brigandine",
+    "file": "items/goblin_scrap_brigandine.glb",
+    "fallback": "items/armor.glb"
+  },
+  "goblin_idol_shard": {
+    "hold": "focus",
+    "slot": "shield",
+    "line": "sorcerer",
+    "name": "Goblin Idol-Shard",
+    "file": "items/goblin_idol_shard.glb",
+    "fallback": "items/focus.glb"
+  },
+  "wardens_cast_off": {
+    "hold": "blade",
+    "slot": "weapon",
+    "line": "warrior",
+    "name": "Warden's Cast-Off",
+    "file": "items/wardens_cast_off.glb",
+    "fallback": "items/blade.glb"
+  },
+  "wardens_cast_off_guard": {
+    "hold": "shield",
+    "slot": "shield",
+    "line": "",
+    "name": "Warden's Cast-Off Guard",
+    "file": "items/wardens_cast_off_guard.glb",
+    "fallback": "items/shield.glb"
+  },
+  "wardens_cast_mail": {
+    "hold": "armor",
+    "slot": "armor",
+    "line": "",
+    "name": "Warden's Cast Mail",
+    "file": "items/wardens_cast_mail.glb",
+    "fallback": "items/armor.glb"
+  },
+  "wardens_cracked_prism": {
+    "hold": "focus",
+    "slot": "shield",
+    "line": "sorcerer",
+    "name": "Warden's Cracked Prism",
+    "file": "items/wardens_cracked_prism.glb",
+    "fallback": "items/focus.glb"
+  },
+  "emberquench_blade": {
+    "hold": "blade",
+    "slot": "weapon",
+    "line": "warrior",
+    "name": "Emberquench Blade",
+    "file": "items/emberquench_blade.glb",
+    "fallback": "items/blade.glb"
+  },
+  "emberband_round": {
+    "hold": "shield",
+    "slot": "shield",
+    "line": "",
+    "name": "Emberband Round",
+    "file": "items/emberband_round.glb",
+    "fallback": "items/shield.glb"
+  },
+  "emberforge_scale": {
+    "hold": "armor",
+    "slot": "armor",
+    "line": "",
+    "name": "Emberforge Scale",
+    "file": "items/emberforge_scale.glb",
+    "fallback": "items/armor.glb"
+  },
+  "emberglass_lens": {
+    "hold": "focus",
+    "slot": "shield",
+    "line": "sorcerer",
+    "name": "Emberglass Lens",
+    "file": "items/emberglass_lens.glb",
+    "fallback": "items/focus.glb"
+  },
+  "ashwood_bow": {
+    "hold": "bow",
+    "slot": "weapon",
+    "line": "archer",
+    "name": "Ashwood Bow",
+    "file": "items/ashwood_bow.glb",
+    "fallback": "items/bow.glb"
+  },
+  "green_hazel_bow": {
+    "hold": "bow",
+    "slot": "weapon",
+    "line": "archer",
+    "name": "Green Hazel Bow",
+    "file": "items/green_hazel_bow.glb",
+    "fallback": "items/bow.glb"
+  },
+  "ratgut_shortbow": {
+    "hold": "bow",
+    "slot": "weapon",
+    "line": "archer",
+    "name": "Ratgut Shortbow",
+    "file": "items/ratgut_shortbow.glb",
+    "fallback": "items/bow.glb"
+  },
+  "boarhorn_shortbow": {
+    "hold": "bow",
+    "slot": "weapon",
+    "line": "archer",
+    "name": "Boarhorn Shortbow",
+    "file": "items/boarhorn_shortbow.glb",
+    "fallback": "items/bow.glb"
+  },
+  "gatewatch_shortbow": {
+    "hold": "bow",
+    "slot": "weapon",
+    "line": "archer",
+    "name": "Gatewatch Shortbow",
+    "file": "items/gatewatch_shortbow.glb",
+    "fallback": "items/bow.glb"
+  },
+  "sinew_backed_bow": {
+    "hold": "bow",
+    "slot": "weapon",
+    "line": "archer",
+    "name": "Sinew-Backed Bow",
+    "file": "items/sinew_backed_bow.glb",
+    "fallback": "items/bow.glb"
+  },
+  "wolfsinew_bow": {
+    "hold": "bow",
+    "slot": "weapon",
+    "line": "archer",
+    "name": "Wolfsinew Bow",
+    "file": "items/wolfsinew_bow.glb",
+    "fallback": "items/bow.glb"
+  },
+  "goblin_notch_bow": {
+    "hold": "bow",
+    "slot": "weapon",
+    "line": "archer",
+    "name": "Goblin-Notch Bow",
+    "file": "items/goblin_notch_bow.glb",
+    "fallback": "items/bow.glb"
+  },
+  "wardens_castbow": {
+    "hold": "bow",
+    "slot": "weapon",
+    "line": "archer",
+    "name": "Warden's Castbow",
+    "file": "items/wardens_castbow.glb",
+    "fallback": "items/bow.glb"
+  },
+  "emberflight_shortbow": {
+    "hold": "bow",
+    "slot": "weapon",
+    "line": "archer",
+    "name": "Emberflight Shortbow",
+    "file": "items/emberflight_shortbow.glb",
+    "fallback": "items/bow.glb"
+  },
+  "tallowwood_staff": {
+    "hold": "staff",
+    "slot": "weapon",
+    "line": "sorcerer",
+    "name": "Tallowwood Staff",
+    "file": "items/tallowwood_staff.glb",
+    "fallback": "items/staff.glb"
+  },
+  "kindling_rod": {
+    "hold": "staff",
+    "slot": "weapon",
+    "line": "sorcerer",
+    "name": "Kindling Rod",
+    "file": "items/kindling_rod.glb",
+    "fallback": "items/staff.glb"
+  },
+  "ratbone_wand": {
+    "hold": "staff",
+    "slot": "weapon",
+    "line": "sorcerer",
+    "name": "Ratbone Wand",
+    "file": "items/ratbone_wand.glb",
+    "fallback": "items/staff.glb"
+  },
+  "boarhide_stave": {
+    "hold": "staff",
+    "slot": "weapon",
+    "line": "sorcerer",
+    "name": "Boarhide Stave",
+    "file": "items/boarhide_stave.glb",
+    "fallback": "items/staff.glb"
+  },
+  "gatewatch_baton": {
+    "hold": "staff",
+    "slot": "weapon",
+    "line": "sorcerer",
+    "name": "Gatewatch Baton",
+    "file": "items/gatewatch_baton.glb",
+    "fallback": "items/staff.glb"
+  },
+  "coalglass_staff": {
+    "hold": "staff",
+    "slot": "weapon",
+    "line": "sorcerer",
+    "name": "Coalglass Staff",
+    "file": "items/coalglass_staff.glb",
+    "fallback": "items/staff.glb"
+  },
+  "wolfsong_staff": {
+    "hold": "staff",
+    "slot": "weapon",
+    "line": "sorcerer",
+    "name": "Wolfsong Staff",
+    "file": "items/wolfsong_staff.glb",
+    "fallback": "items/staff.glb"
+  },
+  "goblin_fetish_staff": {
+    "hold": "staff",
+    "slot": "weapon",
+    "line": "sorcerer",
+    "name": "Goblin-Fetish Staff",
+    "file": "items/goblin_fetish_staff.glb",
+    "fallback": "items/staff.glb"
+  },
+  "wardens_broken_rod": {
+    "hold": "staff",
+    "slot": "weapon",
+    "line": "sorcerer",
+    "name": "Warden's Broken Rod",
+    "file": "items/wardens_broken_rod.glb",
+    "fallback": "items/staff.glb"
+  },
+  "emberquench_staff": {
+    "hold": "staff",
+    "slot": "weapon",
+    "line": "sorcerer",
+    "name": "Emberquench Staff",
+    "file": "items/emberquench_staff.glb",
+    "fallback": "items/staff.glb"
+  },
+  "glass_bead_focus": {
+    "hold": "focus",
+    "slot": "shield",
+    "line": "sorcerer",
+    "name": "Glass Bead Focus",
+    "file": "items/glass_bead_focus.glb",
+    "fallback": "items/focus.glb"
+  },
+  "cobbled_boots": {
+    "hold": "shoes",
+    "slot": "shoes",
+    "line": "",
+    "name": "Cobbled Boots",
+    "file": "items/cobbled_boots.glb",
+    "fallback": "items/boots.glb"
+  },
+  "rusted_shiv": {
+    "hold": "blade",
+    "slot": "weapon",
+    "line": "",
+    "name": "Rusted Shiv",
+    "file": "items/rusted_shiv.glb",
+    "fallback": "items/blade.glb"
+  },
+  "rusted_sword": {
+    "hold": "blade",
+    "slot": "weapon",
+    "line": "warrior",
+    "name": "Rusted Sword",
+    "file": "items/rusted_sword.glb",
+    "fallback": "items/blade.glb"
+  },
+  "basic_bow": {
+    "hold": "bow",
+    "slot": "weapon",
+    "line": "archer",
+    "name": "Basic Bow",
+    "file": "items/basic_bow.glb",
+    "fallback": "items/bow.glb"
+  },
+  "worn_staff": {
+    "hold": "staff",
+    "slot": "weapon",
+    "line": "sorcerer",
+    "name": "Worn Wooden Staff",
+    "file": "items/worn_staff.glb",
+    "fallback": "items/staff.glb"
+  },
+  "gate_buckler": {
+    "hold": "shield",
+    "slot": "shield",
+    "line": "",
+    "name": "Gate-Issue Buckler",
+    "file": "items/gate_buckler.glb",
+    "fallback": "items/shield.glb"
+  },
+  "gate_jerkin": {
+    "hold": "armor",
+    "slot": "armor",
+    "line": "",
+    "name": "Gate-Issue Jerkin",
+    "file": "items/gate_jerkin.glb",
+    "fallback": "items/armor.glb"
+  },
+  "luck_charm": {
+    "hold": "charm",
+    "slot": "charm",
+    "line": "",
+    "name": "Luck charm",
+    "file": "items/luck_charm.glb",
+    "fallback": "items/charm.glb"
+  },
+  "_blade": {
+    "hold": "blade",
+    "slot": "blade",
+    "line": "",
+    "name": "blade",
+    "file": "items/blade.glb",
+    "fallback": null
+  },
+  "_bow": {
+    "hold": "bow",
+    "slot": "bow",
+    "line": "",
+    "name": "bow",
+    "file": "items/bow.glb",
+    "fallback": null
+  },
+  "_staff": {
+    "hold": "staff",
+    "slot": "staff",
+    "line": "",
+    "name": "staff",
+    "file": "items/staff.glb",
+    "fallback": null
+  },
+  "_shield": {
+    "hold": "shield",
+    "slot": "shield",
+    "line": "",
+    "name": "shield",
+    "file": "items/shield.glb",
+    "fallback": null
+  },
+  "_focus": {
+    "hold": "focus",
+    "slot": "focus",
+    "line": "",
+    "name": "focus",
+    "file": "items/focus.glb",
+    "fallback": null
+  },
+  "_armor": {
+    "hold": "armor",
+    "slot": "armor",
+    "line": "",
+    "name": "armor",
+    "file": "items/armor.glb",
+    "fallback": null
+  },
+  "_boots": {
+    "hold": "shoes",
+    "slot": "shoes",
+    "line": "",
+    "name": "boots",
+    "file": "items/boots.glb",
+    "fallback": null
+  },
+  "_charm": {
+    "hold": "charm",
+    "slot": "charm",
+    "line": "",
+    "name": "charm",
+    "file": "items/charm.glb",
+    "fallback": null
+  }
+}

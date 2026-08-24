@@ -1,0 +1,914 @@
+{
+  "blade": {
+    "gen": {
+      "task": "705d95bc-dc17-4c3f-88ed-45e9abe8bbf3",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "fed1cfed-2dad-40bd-865b-9d8f15c2c833",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "bow": {
+    "gen": {
+      "task": "6392ba1a-afa1-450a-acfb-874f02468261",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "b83aadf6-04b5-4ca3-86d0-23fda36a8b35",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "staff": {
+    "gen": {
+      "task": "c0ea39bc-a12e-4978-84f5-01079a3b09e7",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "fe040db9-2521-4ee0-a446-560aa3182c37",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "shield": {
+    "gen": {
+      "task": "e5045676-4979-4b19-8575-1fca210b73c8",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "fa938075-01a0-42b8-b11c-b61982383920",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "focus": {
+    "gen": {
+      "task": "9cdcad94-b79c-4b34-9152-97c3548979cc",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "6ec0557e-fe98-49ed-a00d-75b381ece7a6",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "armor": {
+    "gen": {
+      "task": "3ebde1bf-12f7-4e6a-bf63-c450b1d111a1",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "6056fe6f-5234-46c3-b60a-3bc71c362e8d",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "boots": {
+    "gen": {
+      "task": "6557147a-9997-45f9-b7b5-cbf7fb3d6b11",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "e9771c4e-e2f3-4f4a-b2b0-978bf93e6b5c",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "charm": {
+    "gen": {
+      "task": "0b45189d-9a35-4713-ae5c-a8817fe5653a",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "2b58c015-6d93-4b3f-b6fb-bad9ca0fa6d9",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "scrap_dagger": {
+    "gen": {
+      "task": "cd56260b-f99a-4db3-a83a-ec36d683578c",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "c730818a-4136-4f03-a0d5-144a169fe462",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "scrapwood_buckler": {
+    "gen": {
+      "task": "17c95f0a-5c51-4410-bff8-49adaf3225cd",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "0b877f2f-55ba-486b-8fd4-6e467e9067fe",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "padded_jerkin": {
+    "gen": {
+      "task": "38f5bb96-cbb2-4ebc-9a78-a06b3ab3b11e",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "c6f8de17-f22e-40d0-aa39-11c12bce543d",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "notched_cleaver": {
+    "gen": {
+      "task": "2d1b359f-a994-49ee-9ada-88202be22914",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "5dc49188-17cb-439b-b51b-16a296b699ab",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "plank_shield": {
+    "gen": {
+      "task": "a9b161e8-8593-47bd-aefd-74e70c8fb5f6",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "517b7f14-1c35-4f7e-952c-270d7d1b66e5",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "ratskin_vest": {
+    "gen": {
+      "task": "9ef73f4b-32e9-4cfa-8855-e4caa906757c",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "4b7c76ef-a176-42cb-9671-1da990f80670",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "chipped_lens": {
+    "gen": {
+      "task": "9d9c5615-257f-4411-9a83-397437c3671b",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "87cd3834-38a4-43aa-8e23-9d0ece3a870b",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "ratcatchers_dirk": {
+    "gen": {
+      "task": "84599dcb-9b3d-4388-bc9b-47b2b8976c0e",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "63185bdb-b82c-4a52-bd18-791201fea357",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "ratskin_round": {
+    "gen": {
+      "task": "4640e28f-49ee-4bea-a040-d9adbdd48da8",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "204f3515-b647-4d5f-80c1-71c67b46ec37",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "quilted_rags": {
+    "gen": {
+      "task": "71586b40-74b0-46bf-8b38-1479125c6db9",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "d979fcef-2024-4830-8a38-41c53240858e",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "ratbone_charm": {
+    "gen": {
+      "task": "f9bd83c1-4e52-4b3e-aa63-7ea1c51ffbb1",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "2003f0c4-3c54-472c-ab27-ca545f623141",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "boarspine_shortsword": {
+    "gen": {
+      "task": "1f6cc6f6-f417-4575-9718-f0116e68e0eb",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "b17c5a0e-ab69-4e2c-8c2a-ed7c2624e9f8",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "boarhide_buckler": {
+    "gen": {
+      "task": "8e0db202-b6b6-4239-9ee0-cc60a936de74",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "ec32147d-5500-4933-997a-6db8ab19553b",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "boarhide_jack": {
+    "gen": {
+      "task": "051b4e81-7987-48ed-9542-d0adbb097117",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "bf17c123-e063-464a-8d29-f86cf66b4b28",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "boartooth_fetish": {
+    "gen": {
+      "task": "d4c500f3-ef51-4444-bae7-0f794c2e17a9",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "5583d35e-a8f4-4a91-ae70-e349e924a680",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "gatewatch_gladius": {
+    "gen": {
+      "task": "82ffdb8b-22dd-4cfa-9b1b-27a8f65d8bd0",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "0e7da05c-60b7-4253-bd41-d8188cb98b81",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "gatewatch_round": {
+    "gen": {
+      "task": "ca573bce-861a-4539-adb7-30ec4b0cef67",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "7df531b1-bf34-48ab-b470-4616d11530d8",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "gatewatch_surplus": {
+    "gen": {
+      "task": "6bd1a98f-0381-4adb-92f3-10d856ac4e12",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "3dc711e7-d35d-436f-b677-c0ce5029a4be",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "gatewatch_signet": {
+    "gen": {
+      "task": "44f0a2f4-f0fb-47e9-b291-33a36b641b08",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "d84b94ea-9b77-4055-8717-4edbae18f564",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "iron_sword": {
+    "gen": {
+      "task": "ab4f3c58-1e40-4cf3-8f44-05a082a97482",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "551db4e5-a64c-40b3-b64b-6a3000876870",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "banded_kite": {
+    "gen": {
+      "task": "1d3b425a-2610-41ce-aceb-e1f1f5cf978b",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "ada8bb5d-f31c-4709-890a-094207e6ede8",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "studded_jack": {
+    "gen": {
+      "task": "5a13e318-0110-4190-9c1b-6a5df50fac03",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "1966de3b-ca8d-4810-a8fd-6b606dbb67ee",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "sootglass_bead": {
+    "gen": {
+      "task": "1cc2996d-2731-4e7a-8bb6-1422c0b3670c",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "8cf14a77-41d5-4006-a05a-81bdeb9c5708",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "wolfsteel_broadsword": {
+    "gen": {
+      "task": "5798c55f-05c5-4e3c-a245-a13ecabef592",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "5874f86c-b30a-4ab7-82cf-6c395796879b",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "wolfhide_targe": {
+    "gen": {
+      "task": "1abe7077-d73d-48cf-b8d5-f6f0b5ec8226",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "82ccb33e-fd67-484c-b702-b1359b8b9b09",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "wolfpelt_coat": {
+    "gen": {
+      "task": "0e398cb8-eebc-4563-a5d3-1da8754ada83",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "6f955e7a-e4ae-4667-b327-457a9a7eb0af",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "wolfeye_stone": {
+    "gen": {
+      "task": "737d7567-f73a-4fb8-a1eb-2ba9cc6cb90b",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "110cc33f-8e48-49ad-92a1-024bd31f29a3",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "goblin_iron_falchion": {
+    "gen": {
+      "task": "ce4a6a6f-cc14-40c0-a0b0-f512701b5896",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "f25f38cd-7016-4704-8e59-763b15c49c05",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "goblin_plate_buckler": {
+    "gen": {
+      "task": "0effeacb-962e-4592-99e1-56dd006c0caa",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "ae6de589-012f-4f4a-8ce4-125f6796830e",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "goblin_scrap_brigandine": {
+    "gen": {
+      "task": "81e85349-0a23-4170-9525-c41669749837",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "67c7d6df-0768-46a4-9c16-924d9864c61b",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "goblin_idol_shard": {
+    "gen": {
+      "task": "4437d787-9ffb-4136-91c9-a23e9f7364df",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "b89dfae6-f48d-42d4-8cb6-6d4fb1d47213",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "wardens_cast_off": {
+    "gen": {
+      "task": "f179e361-33b6-47b1-88c6-a26fafff5716",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "af0a877b-d6dc-4c61-b28e-9ee48d16e78d",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "wardens_cast_off_guard": {
+    "gen": {
+      "task": "26f0d209-2570-4b3a-ad37-93006be70e8f",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "e6b02a70-f6be-4458-a8a7-3bbe1c90e883",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "wardens_cast_mail": {
+    "gen": {
+      "task": "b2209ef5-190c-445f-95d5-0bba25032e88",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "93c7620a-6d8b-4f09-a319-dcbec236172e",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "wardens_cracked_prism": {
+    "gen": {
+      "task": "20d6fc90-4701-4638-86a2-21847909a617",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "046c0a10-0c76-4b4a-baa6-bd2494d864e8",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "emberquench_blade": {
+    "gen": {
+      "task": "e3480c37-edc1-46be-b971-089706d75e29",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "8bfcd502-8ddf-4752-83e5-edd2a36a0854",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "emberband_round": {
+    "gen": {
+      "task": "1aba4482-2768-4f7d-9edd-d0afccbc8510",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "c43521e6-4110-447f-858b-ea599e4af195",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "emberforge_scale": {
+    "gen": {
+      "task": "61f4f948-04ad-4778-b18a-44e44b4dbe87",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "9ad49c6d-2a2e-406a-a83b-cc11775cd322",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "emberglass_lens": {
+    "gen": {
+      "task": "0da00ace-845b-4971-8a7d-aa6f15f9a3d4",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "883648aa-9178-4186-9d5a-4c0eedb2d006",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "ashwood_bow": {
+    "gen": {
+      "task": "dae36ffa-de59-470e-be29-6775d44f43f5",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "15b4a6ab-6e03-495d-bad6-6928fec67dbe",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "green_hazel_bow": {
+    "gen": {
+      "task": "bd57c3ae-bc1e-4f21-bb32-de1bd7543f02",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "e664d18f-a085-4974-aab9-e958bb7fc006",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "ratgut_shortbow": {
+    "gen": {
+      "task": "4dbab38d-187f-41d2-860d-470068171256",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "c9e0f11b-bab7-46ca-ae7f-b42b3e50e1f6",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "boarhorn_shortbow": {
+    "gen": {
+      "task": "59460714-d45c-4639-bd48-c9e94d6964f5",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "c18cf133-b94e-4ef0-8fc9-54aadceb4547",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "gatewatch_shortbow": {
+    "gen": {
+      "task": "553f3aac-9c05-49a5-9041-55c0c2018d97",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "888a9224-9a1e-41c6-9028-8764b530d9ff",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "sinew_backed_bow": {
+    "gen": {
+      "task": "28124fc6-3a9e-4ff2-beef-13bf7f1cbd5d",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "8410fdb5-f048-49e0-9ca4-e38ffc31b495",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "wolfsinew_bow": {
+    "gen": {
+      "task": "3fbc7c59-c6d1-4a5f-9b8b-2c3c67a467da",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "9917b2f9-d818-4904-8eeb-1d4e1d047222",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "goblin_notch_bow": {
+    "gen": {
+      "task": "f7ef80ac-4452-40ab-9445-ade0645486d8",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "dd0a0380-91f6-48af-b53d-f9ee7502c375",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "wardens_castbow": {
+    "gen": {
+      "task": "2779c84b-7e11-4e76-bb21-bbd0319e0779",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "20592eed-ac8d-4c98-9bde-163cb3a3ad89",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "emberflight_shortbow": {
+    "gen": {
+      "task": "29235b71-3080-4e5f-870f-b40d06917458",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "01057ddd-9ef9-4013-9304-5928b17015e6",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "tallowwood_staff": {
+    "gen": {
+      "task": "9d49f9f9-8c11-4a42-96f9-037d187ec9d8",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "8d416d28-c41f-4614-aa3d-2de04305ed07",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "kindling_rod": {
+    "gen": {
+      "task": "c57bceb6-a804-4b3e-af35-7e7806594e7f",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "510b23ef-eb57-4349-acc1-5ab00a5277d8",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "ratbone_wand": {
+    "gen": {
+      "task": "02d4df05-ac0e-4918-b48f-31f7ca158794",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "f5dc53bb-4196-4c4c-b748-4bcff5e2a333",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "boarhide_stave": {
+    "gen": {
+      "task": "92cb5336-9e65-4e01-b47c-22357de56bb7",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "be058358-69c7-44ff-b9da-b079b19c29a7",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "gatewatch_baton": {
+    "gen": {
+      "task": "22600426-7d2a-4f3b-a772-7e4c549e9cca",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "52cddc2e-0d65-40ca-b6c3-b32039056fe9",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "coalglass_staff": {
+    "gen": {
+      "task": "7650efce-c02b-4262-9b70-34ebaeb3d8cc",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "0448e93b-da6b-40e8-83d6-d7f654fcb429",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "wolfsong_staff": {
+    "gen": {
+      "task": "34ceed0c-133b-4578-bd26-df7024b8cbfe",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "0a440fee-0cfe-48d6-ae1f-07b99bbe4b50",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "goblin_fetish_staff": {
+    "gen": {
+      "task": "4ae4c93e-b71e-45c0-bd4a-610235da3701",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "d76eb911-92f1-4786-a9e8-2d4402458be2",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "wardens_broken_rod": {
+    "gen": {
+      "task": "cf39b809-4c0e-4668-8e5f-fdf6331ff827",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "a5c36846-2eb1-404b-a31b-4411c7107114",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "emberquench_staff": {
+    "gen": {
+      "task": "376cb24c-c5b5-472b-8786-de78df0da8be",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "83072aeb-654f-4292-8ae8-51e94a6dc86e",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "glass_bead_focus": {
+    "gen": {
+      "task": "aa8da7fa-e76c-492c-9489-a11ee7f97281",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "4951d6e4-8722-4e13-8aaf-36df4fe10f8f",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "cobbled_boots": {
+    "gen": {
+      "task": "0274a52c-8eec-4cfc-bdfd-858504bc6f26",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "a069116a-df9f-45aa-8a91-962cff585574",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "rusted_shiv": {
+    "gen": {
+      "task": "5b927e13-3750-469e-bc89-a9a02649fbab",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "e82d9a6c-65d1-49c2-a80e-73b3c837c11a",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "rusted_sword": {
+    "gen": {
+      "task": "08298659-a42e-496f-b743-62ca36f9fe10",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "18177812-7ad6-4db0-9216-865b156720b3",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "basic_bow": {
+    "gen": {
+      "task": "680a9359-2c82-4fa4-9a63-7c9d66cb342a",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "e7874793-430c-4a0e-9a96-da0e4bc6d149",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "worn_staff": {
+    "gen": {
+      "task": "337298ba-e97c-4efd-b678-4d2fc99e0fb7",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "6b3b2077-f72c-454c-a1e6-076e8fb73bd4",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "gate_buckler": {
+    "gen": {
+      "task": "53110761-1649-4d54-b508-7d901660cd36",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "81b0b012-4138-48b4-931e-054fc5ce0b61",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "gate_jerkin": {
+    "gen": {
+      "task": "27646673-6cd8-485a-b8e0-e88e8119dfda",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "142efa90-f4f7-4523-a122-6687890a53ca",
+      "done": true,
+      "credits": 10.0
+    }
+  },
+  "luck_charm": {
+    "gen": {
+      "task": "89b97946-fadd-4b8b-b30c-04b2be27c026",
+      "done": true,
+      "credits": 20.0
+    },
+    "texture": {
+      "task": "c7724cbd-276c-4ed9-a901-71f8de5c16fd",
+      "done": true,
+      "credits": 10.0
+    }
+  }
+}
