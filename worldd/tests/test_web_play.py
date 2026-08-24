@@ -181,3 +181,41 @@ async def test_email_stored_optionally(client):
     assert await pool.fetchval(
         "SELECT email FROM ascent_accounts WHERE username=$1",
         without) is None
+
+
+# ── 076: floor changes ride the lift ─────────────────────────────────────
+
+async def test_076_floor_change_carries_the_lift(client):
+    await _signup(client, _uname("Lift"))
+    await _walk_to_town(client)
+    r = await client.post("/play/api/act",
+                          json={"option": "gate", "mode": "pane"})
+    assert r.status_code == 200, r.text
+    r = await client.post("/play/api/act",
+                          json={"option": "floor_1", "mode": "pane"})
+    assert r.status_code == 200, r.text
+    card = r.json()
+    assert 'data-lift="up"' in card["fragment"]
+    # step off the movie if the floor introduces itself, then ride down
+    if 'data-opt="skip"' in card["fragment"]:
+        r = await client.post("/play/api/act",
+                              json={"option": "skip", "mode": "pane"})
+        assert r.status_code == 200, r.text
+        card = r.json()
+        assert "data-lift" not in card["fragment"]   # the reel exit is quiet
+    r = await client.post("/play/api/act",
+                          json={"option": "town", "mode": "pane"})
+    assert r.status_code == 200, r.text
+    assert 'data-lift="down"' in r.json()["fragment"]
+
+
+async def test_076_pane_ships_the_lift_overlay_and_the_gifs_serve(client):
+    await _signup(client, _uname("Liftp"))
+    r = await client.get("/play")
+    assert r.status_code == 200
+    assert "liftlay" in r.text and "playLift" in r.text
+    for slug in ("lift_ascent", "lift_descent"):
+        assert f"/static/fxart/{slug}_320x112.gif" in r.text
+        g = await client.get(f"/static/fxart/{slug}_320x112.gif")
+        assert g.status_code == 200, slug
+        assert g.headers["content-type"] == "image/gif"
