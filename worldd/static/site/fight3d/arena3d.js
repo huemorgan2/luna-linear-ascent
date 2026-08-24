@@ -1,5 +1,7 @@
-// arena3d — 067: the Labs "Arena": a PERSISTENT, turn-based 3D stage
-// for floors 6–7 (feature flag on the player doc, see engine/labs.py).
+// arena3d — 067: the Arena: a PERSISTENT, turn-based 3D stage. Promoted
+// out of Labs (plans/100floors-attack3dscene) — on for everyone on the
+// floors in engine/arena.py READY_FLOORS; the card simply carries no
+// data-arena elsewhere.
 //
 // The engine records every fight beat as an ordered script and the card
 // carries it in data-arena='{"v":1,"phase","foe","me","start","range",
