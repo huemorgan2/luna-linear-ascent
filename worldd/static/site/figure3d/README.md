@@ -9,4 +9,6 @@ Isolated. Delete this folder to drop the experiment.
 - `catalog.json` — slug → file / fallback / hold
 - `test.html` — harness (serve `worldd/static/site`, open `/figure3d/test.html`)
 
-Does not import `fight3d`. Flag: `p["labs"]["figure3d"]`.
+Does not import `fight3d`. Item placement comes from the shared
+`../lib/sockets.js` (plan 079 — named sockets + grip table used by both 3D
+scenes). Flag: `p["labs"]["figure3d"]`.

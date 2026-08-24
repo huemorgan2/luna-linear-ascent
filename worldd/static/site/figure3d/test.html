@@ -3,13 +3,16 @@
 <title>figure3d harness</title>
 <style>
   html,body{background:#0d0d0d;color:#c8cdd6;font:14px/1.4 monospace;margin:16px}
-  .row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+  /* bottom-align so all feet share one ground line */
+  .row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-end}
   .figure{width:160px}
   .figure.giant{width:200px}
   h2{font-size:14px;margin:0 0 8px}
   .pwrap{background:#000;padding:8px}
-  canvas.portrait, img.portrait{height:258px;image-rendering:pixelated;display:block}
-  .gearmap{display:flex;gap:8px;margin-top:8px}
+  /* native scale ×1.25 so the giant's taller grid actually towers */
+  canvas.portrait, img.portrait{height:250px;image-rendering:pixelated;display:block}
+  .giant canvas.portrait, .giant img.portrait{height:325px}
+  .gearmap{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
   .slot{width:48px;height:48px;border:1px solid #555;color:#aaa;display:flex;
         align-items:center;justify-content:center;cursor:pointer}
   .slot:hover{border-color:#f5b825;color:#f5b825}

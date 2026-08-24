@@ -1,5 +1,6 @@
 // figure3d — 071 Labs: the 3D climber in the profile portrait slot.
-// Isolated folder. Does not import fight3d. Drop = delete this directory.
+// Own folder; imports only ../lib/sockets.js (plan 079) — never fight3d.
+// Drop = delete this directory (lib/sockets.js stays for fight3d).
 //
 // A card arrives with <canvas.portrait.figure3d data-figure3d='…'>.
 // This module mounts a 100×200 (giant 140×260) 1-bit stage, plays a
@@ -9,9 +10,15 @@
 // exception). No WebGL → unhide the fallback <img>.
 import * as THREE from "three";
 import { GLTFLoader } from "./vendor/GLTFLoader.js";
+import { GRIPS, gripFor, boneMap, attachToSocket } from "../lib/sockets.js";
 
 const BASE = new URL(".", import.meta.url);
-const INK = new THREE.Color(0xdfe4ee);
+// pure white, same ink as the drawn portrait_*.png files (255,255,255)
+const INK = new THREE.Color(0xffffff);
+// render buffer scale relative to the portrait's px spec (100×200,
+// giant 140×260). 1 = native portrait resolution; lower for chunkier
+// pixels — CSS upscales either way (image-rendering: pixelated).
+const RES = 1;
 const SLOT_INK = {
   weapon: 0xf5b825, weapon2: 0xf5b825, weapon3: 0xf5b825,
   charm: 0x45d0c0, armor: 0xdfe4ee, shoes: 0xf26541, shield: 0xa78bfa,
@@ -33,32 +40,43 @@ function load(rel) {
   return cache[rel];
 }
 
-function boneMap(root) {
-  const B = {};
-  root.traverse((o) => {
-    if (!o.isBone) return;
-    B[o.name] = o;
-  });
-  return B;
-}
-
-function pickBone(B, names) {
-  for (const n of names) {
-    if (B[n]) return B[n];
-    const k = Object.keys(B).find((x) => x.toLowerCase() === n.toLowerCase());
-    if (k) return B[k];
-  }
-  return null;
-}
-
 function shadowify(o) {
   o.traverse((c) => { if (c.isMesh) c.castShadow = true; });
+}
+
+// The 1-bit shader keeps saturated fragments coloured — that exception
+// exists ONLY for the hover tint. Tripo textures carry skin/wood colour
+// that leaked through it, so every material is forced to greyscale at
+// load; the only saturation left in the scene is the hover ink.
+const greyTexCache = new Map();
+
+function greyscaleTexture(tex) {
+  const img = tex && tex.image;
+  if (!img || !img.width || tex.isCompressedTexture) return tex;
+  if (greyTexCache.has(tex.uuid)) return greyTexCache.get(tex.uuid);
+  const c = document.createElement("canvas");
+  c.width = img.width;
+  c.height = img.height;
+  const ctx = c.getContext("2d");
+  ctx.filter = "grayscale(1)";
+  ctx.drawImage(img, 0, 0);
+  const out = tex.clone();
+  out.image = c;
+  out.needsUpdate = true;
+  greyTexCache.set(tex.uuid, out);
+  return out;
 }
 
 function liftMesh(o, amt = 0.08) {
   o.traverse((m) => {
     if (!m.isMesh || !m.material) return;
     m.material = m.material.clone();
+    if (m.material.map) m.material.map = greyscaleTexture(m.material.map);
+    if (m.material.color) {
+      const c = m.material.color;
+      const l = 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+      c.setRGB(l, l, l);
+    }
     if (m.material.emissive) {
       m.material.emissive.set(0xffffff);
       m.material.emissiveIntensity = amt;
@@ -66,6 +84,8 @@ function liftMesh(o, amt = 0.08) {
     m.userData.baseEmissive = m.material.emissive
       ? m.material.emissive.clone() : new THREE.Color(0x000000);
     m.userData.baseEmissiveInt = m.material.emissiveIntensity || 0;
+    m.userData.baseColor = m.material.color
+      ? m.material.color.clone() : null;
   });
 }
 
@@ -106,106 +126,9 @@ function makePlaceholder(hold) {
   return g;
 }
 
-// long-axis normalize + grip, same idea as fight3d.equipTripo
-function wrapProp(src, { len = 0.8, grip = 0.5, rot = [0, 0, 0],
-                         pos = [0, 0, 0] } = {}, bone) {
-  const model = src.clone ? src.clone(true) : src;
-  shadowify(model);
-  liftMesh(model, 0.10);
-  model.updateMatrixWorld(true);
-  const pts = [];
-  model.traverse((m) => {
-    if (!m.isMesh || !m.geometry?.attributes?.position) return;
-    const posA = m.geometry.attributes.position;
-    for (let i = 0; i < posA.count; i += 5) {
-      pts.push(new THREE.Vector3().fromBufferAttribute(posA, i)
-        .applyMatrix4(m.matrixWorld));
-    }
-  });
-  const inner = new THREE.Group();
-  if (pts.length >= 2) {
-    const centroid = pts.reduce((a, p) => a.add(p), new THREE.Vector3())
-      .divideScalar(pts.length);
-    let A = pts[0], best = -1;
-    for (const p of pts) {
-      const d = p.distanceToSquared(centroid);
-      if (d > best) { best = d; A = p; }
-    }
-    let B = pts[0]; best = -1;
-    for (const p of pts) {
-      const d = p.distanceToSquared(A);
-      if (d > best) { best = d; B = p; }
-    }
-    const axis = B.clone().sub(A).normalize();
-    if (axis.y < 0) axis.negate();
-    inner.quaternion.setFromUnitVectors(axis, new THREE.Vector3(0, 1, 0));
-  }
-  inner.add(model);
-  const nbox = new THREE.Box3().setFromObject(inner);
-  const nlen = Math.max(0.01, nbox.max.y - nbox.min.y);
-  const boneScale = bone ? (bone.getWorldScale(new THREE.Vector3()).y || 1) : 1;
-  const s = len / nlen / boneScale;
-  inner.position.y = -(nbox.min.y + grip * nlen);
-  const gripG = new THREE.Group();
-  gripG.add(inner);
-  gripG.scale.setScalar(s);
-  const wrap = new THREE.Group();
-  wrap.quaternion.setFromEuler(new THREE.Euler(...rot));
-  wrap.position.set(...pos);
-  wrap.add(gripG);
-  return wrap;
-}
-
-const HOLD = {
-  blade: {
-    bones: ["L_Thigh", "LeftUpLeg", "Hips"],
-    len: 0.90, grip: 0.12, rot: [0.15, 0.2, 1.55], pos: [0.11, 0.04, 0.07],
-  },
-  bladeR: {
-    bones: ["R_Thigh", "RightUpLeg", "Hips"],
-    len: 0.90, grip: 0.12, rot: [0.15, -0.2, -1.55], pos: [-0.11, 0.04, 0.07],
-  },
-  bow: {
-    bones: ["Spine02", "Spine01", "Spine"],
-    len: 1.20, grip: 0.50, rot: [0.15, 1.15, 0.35], pos: [0.02, 0.06, -0.14],
-  },
-  staff: {
-    bones: ["R_Hand", "RightHand"],
-    len: 1.40, grip: 0.42, rot: [0.05, 0, -0.1], pos: [0.06, 0.02, 0.08],
-  },
-  staffBack: {
-    bones: ["Spine02", "Spine01"],
-    len: 1.35, grip: 0.50, rot: [0.1, 0.4, 0.2], pos: [-0.08, 0.04, -0.12],
-  },
-  shield: {
-    bones: ["L_Forearm", "LeftForeArm", "L_Hand"],
-    len: 0.50, grip: 0.50, rot: [1.15, 0.2, 0.1], pos: [0.02, 0.06, 0.05],
-  },
-  focus: {
-    bones: ["L_Hand", "LeftHand"],
-    len: 0.16, grip: 0.50, rot: [0, 0, 0], pos: [0.03, 0.03, 0.05],
-  },
-  armor: {
-    bones: ["Spine02", "Spine01", "Spine"],
-    len: 0.48, grip: 0.50, rot: [0, 0, 0], pos: [0, 0.02, 0.07],
-  },
-  shoes: {
-    bones: ["L_Foot", "LeftFoot"],
-    len: 0.18, grip: 0.30, rot: [0.2, 0, 0], pos: [0, 0.02, 0.04],
-  },
-  shoesR: {
-    bones: ["R_Foot", "RightFoot"],
-    len: 0.18, grip: 0.30, rot: [0.2, 0, 0], pos: [0, 0.02, 0.04],
-  },
-  charm: {
-    bones: ["Neck", "Head", "Spine02"],
-    len: 0.11, grip: 0.50, rot: [0, 0, 0], pos: [0, -0.03, 0.07],
-  },
-  potion: {
-    bones: ["Hips", "Spine"],
-    len: 0.15, grip: 0.50, rot: [0.2, 0, 0.25], pos: [0.12, 0.02, 0.05],
-  },
-};
+// All placement lives in lib/sockets.js (plan 079). This scene only
+// prepares the prop for its 1-bit look (clone, shadows, greyscale +
+// emissive lift) and tags it for the hover map.
 
 function bayerTex() {
   const BAYER8 = [
@@ -224,6 +147,14 @@ function bayerTex() {
 }
 
 function createStage(W, H) {
+  // One world scale for every frame: the giant (2.15 units tall) fills
+  // his 260px box top to bottom; a 200px box shows the same px-per-unit,
+  // so the shorter races stand proportionally smaller, feet on the same
+  // baseline. 2.20 leaves ~2% breathing room around the giant.
+  const VH = 2.20 * H / 260;
+  // W×H is the portrait's display size; the actual buffer is RES× smaller
+  W = Math.max(1, Math.round(W * RES));
+  H = Math.max(1, Math.round(H * RES));
   const canvas = document.createElement("canvas");
   const renderer = new THREE.WebGLRenderer(
     { canvas, antialias: false, alpha: true });
@@ -280,7 +211,11 @@ function createStage(W, H) {
         float edge = step(0.010, behind);
         float lum = pow(clamp(dot(s.rgb, vec3(0.2126, 0.7152, 0.0722)),
                               0.0, 1.0), 0.4545);
-        float shade = floor(smoothstep(0.03, 0.95, lum) * 6.0 + 0.5) / 6.0;
+        // continuous ramp, like the drawn portraits: the Bayer matrix
+        // itself draws the gradient. The steep S-curve is the look —
+        // lit surfaces saturate to solid white, the shadow side thins
+        // to sparse dots, and the midtones roll between them
+        float shade = smoothstep(0.28, 0.75, lum);
         float fill = step(t, shade);
         vec3 n = texture2D(tNormal, vUv).xyz * 2.0 - 1.0;
         float rimlit = edge * step(0.25, n.x);
@@ -293,28 +228,30 @@ function createStage(W, H) {
   postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMat));
 
   const scene = new THREE.Scene();
-  const pxPerUnit = H / 2.55;
-  const VH = H / pxPerUnit;
   const camera = new THREE.OrthographicCamera(
     -VH * (W / H) / 2, VH * (W / H) / 2, VH / 2, -VH / 2, 0.1, 80);
-  const target = new THREE.Vector3(0, 1.05, 0);
-  camera.position.set(0.55, 1.45, 8.5);
+  const target = new THREE.Vector3(0, VH / 2, 0);
+  // dead-on, like the drawn portraits — no side offset
+  camera.position.set(0, VH / 2 + 0.4, 8.5);
   camera.lookAt(target);
-  // plant feet near the bottom of the frame
+  // plant feet on the bottom edge of the frame
   for (let i = 0; i < 4; i++) {
     camera.updateMatrixWorld(true);
     const p = new THREE.Vector3(0, 0, 0).project(camera);
-    const want = 1 - 2 * 0.93;
+    const want = 1 - 2 * 0.985;
     camera.position.y += (p.y - want) * VH / 2;
     target.y += (p.y - want) * VH / 2;
     camera.lookAt(target);
   }
-  scene.add(new THREE.AmbientLight(0xffffff, 0.22));
-  const key = new THREE.DirectionalLight(0xffffff, 5.4);
-  key.position.set(-4, 7, 6);
+  // ONE strong directional key models the volume (1bit-images.md); the
+  // fill is just bright enough that the shadow side thins to sparse
+  // dither instead of solid black — the drawn-portrait look.
+  scene.add(new THREE.AmbientLight(0xffffff, 0.15));
+  const key = new THREE.DirectionalLight(0xffffff, 6.0);
+  key.position.set(-6, 8, 4);
   key.castShadow = true;
   scene.add(key);
-  const fill = new THREE.DirectionalLight(0xffffff, 1.1);
+  const fill = new THREE.DirectionalLight(0xffffff, 0.7);
   fill.position.set(5, 2, 3);
   scene.add(fill);
 
@@ -344,15 +281,18 @@ async function loadProp(slug, hold) {
   return makePlaceholder(hold);
 }
 
-function attach(B, src, holdKey, slot) {
-  const spec = HOLD[holdKey];
-  if (!spec) return null;
-  const bone = pickBone(B, spec.bones);
-  if (!bone) return null;
-  const wrap = wrapProp(src, spec, bone);
-  tagSlot(wrap, slot);
-  bone.add(wrap);
-  return wrap;
+// fig = { B, wrap, h } from buildFigure. Prepares the prop for the 1-bit
+// look, then delegates ALL placement to the sockets module.
+function equip(fig, src, family, slot) {
+  const grip = gripFor(family);
+  if (!grip) return null;
+  const model = src.clone ? src.clone(true) : src;
+  shadowify(model);
+  liftMesh(model, grip.lift ?? 0.10);
+  const w = attachToSocket({ charRoot: fig.wrap, charHeight: fig.h,
+                             boneIndex: fig.B, prop: model, grip });
+  if (w) tagSlot(w, slot);
+  return w;
 }
 
 async function buildFigure(gl, spec) {
@@ -372,7 +312,9 @@ async function buildFigure(gl, spec) {
   model.position.set(0, 0, 0);
   model.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(model);
-  const wantH = race === "giant" ? 2.15 : race === "elf" ? 1.95 : 1.78;
+  // the giant fills his frame; human and elf stand the same height,
+  // two (human) head-sizes — 0.5 world units — shorter than him
+  const wantH = race === "giant" ? 2.15 : 1.65;
   const k = wantH / Math.max(0.1, box.max.y - box.min.y);
   model.scale.setScalar(k);
   model.position.set(
@@ -380,13 +322,45 @@ async function buildFigure(gl, spec) {
     -(box.min.z + box.max.z) / 2 * k);
   const wrap = new THREE.Group();
   wrap.add(model);
-  wrap.rotation.y = 0.38;
+  // the rigs' animated idle faces +x; -90° turns them to the camera,
+  // full face like the drawn portraits
+  wrap.rotation.y = -Math.PI / 2;
   wrap.updateMatrixWorld(true);
-  const B = boneMap(model);
+  // centre the faced BODY and keep it inside the frame (gear hangs on
+  // bones later — a staff may kiss the edge, like the drawn portraits;
+  // fitting the body keeps the giant tall instead of shrinking him to
+  // make room for his weapon)
+  const rbox = new THREE.Box3().setFromObject(wrap);
+  wrap.position.x = -(rbox.min.x + rbox.max.x) / 2;
+  wrap.position.z = -(rbox.min.z + rbox.max.z) / 2;
+  const frameW = gl.camera.right - gl.camera.left;
+  const rw = rbox.max.x - rbox.min.x;
+  let rwFinal = rw;
+  if (rw > frameW * 0.96) {
+    // the giant rig is far wider than his 140×260 frame allows at full
+    // height. Slim him (screen-width only; wrap-local z maps to screen x
+    // after the -90° turn) up to 25% before uniform-shrinking, so he
+    // keeps towering over the human instead of shrinking to fit his arms.
+    const need = (frameW * 0.96) / rw;
+    const squash = Math.max(need, 0.75);
+    wrap.scale.z *= squash;
+    wrap.position.x *= squash;
+    const fit = Math.min(1, need / squash);
+    wrap.scale.multiplyScalar(fit);
+    wrap.position.x *= fit;
+    wrap.position.z *= fit;
+    rwFinal = rw * squash * fit;
+  }
+  // stand the figure right of centre by 1/8 frame width, but never push
+  // the body past the frame edge: a width-fit figure has no slack and
+  // stays put
+  const slack = Math.max(0, (frameW - rwFinal) / 2 - frameW * 0.02);
+  wrap.position.x += Math.min(frameW / 8, slack);
+  wrap.updateMatrixWorld(true);
+  const fig = { B: boneMap(model), wrap, h: wantH };
 
   const worn = spec.worn || {};
   const paths = spec.paths || {};
-  const lead = spec.lead || worn.weapon;
   const blades = [];
   const staffs = [];
   for (const key of ["weapon", "weapon2", "weapon3"]) {
@@ -397,41 +371,49 @@ async function buildFigure(gl, spec) {
     else if (hold === "staff") staffs.push({ slug, key });
     else {
       const src = await loadProp(slug, hold);
-      attach(B, src, hold === "bow" ? "bow" : hold, key);
+      equip(fig, src, hold === "bow" ? "bow" : hold, key);
     }
   }
   for (let i = 0; i < blades.length; i++) {
     const src = await loadProp(blades[i].slug, "blade");
-    attach(B, src, i === 0 ? "blade" : "bladeR", blades[i].key);
+    equip(fig, src, i === 0 ? "blade" : "blade_l", blades[i].key);
   }
   for (let i = 0; i < staffs.length; i++) {
     const src = await loadProp(staffs[i].slug, "staff");
-    attach(B, src, i === 0 ? "staff" : "staffBack", staffs[i].key);
+    equip(fig, src, i === 0 ? "staff" : "staff_back", staffs[i].key);
   }
   if (worn.shield) {
     const h = paths[worn.shield] || "shield";
-    attach(B, await loadProp(worn.shield, h), h === "focus" ? "focus" : "shield",
-           "shield");
+    equip(fig, await loadProp(worn.shield, h),
+          h === "focus" ? "focus" : "shield", "shield");
   }
   if (worn.armor) {
-    attach(B, await loadProp(worn.armor, "armor"), "armor", "armor");
+    equip(fig, await loadProp(worn.armor, "armor"), "armor", "armor");
   }
   if (worn.shoes) {
     const boot = await loadProp(worn.shoes, "shoes");
-    attach(B, boot, "shoes", "shoes");
-    attach(B, boot, "shoesR", "shoes");
+    equip(fig, boot, "boots_l", "shoes");
+    equip(fig, boot, "boots_r", "shoes");
   }
   if (worn.charm) {
     const h = paths[worn.charm] || "charm";
-    attach(B, await loadProp(worn.charm, h),
-           h === "charm" ? "charm" : "potion", "charm");
+    equip(fig, await loadProp(worn.charm, h),
+          h === "charm" ? "charm" : "potion", "charm");
   }
 
   gl.scene.add(wrap);
-  return { wrap, mixer, B, model };
+  return { wrap, mixer, B: fig.B, model };
 }
 
 const lives = new Map();   // canvas -> { gl, specKey, figure, raf }
+// harness-only introspection: ?fig3ddebug exposes the live stages so hold
+// transforms can be tuned in the console; /play never passes the flag
+if (typeof location !== "undefined"
+    && location.search.includes("fig3ddebug")) {
+  window.fig3dLives = lives;
+  window.fig3dTHREE = THREE;
+  window.fig3dGRIPS = GRIPS;
+}
 const FRAME_MS = 1000 / 15; // pixel-art idle does not need display-rate redraws
 // mount() replaces the declarative canvas with its WebGL canvas before its
 // models finish loading. The game's MutationObserver sees that replacement;
@@ -462,6 +444,9 @@ function setHighlight(slot, root) {
       } else if (m.userData.baseEmissive) {
         m.material.emissive.copy(m.userData.baseEmissive);
         m.material.emissiveIntensity = m.userData.baseEmissiveInt || 0.07;
+        if (m.userData.baseColor && m.material.color) {
+          m.material.color.copy(m.userData.baseColor);
+        }
       }
     });
   }
@@ -569,8 +554,7 @@ async function mount(host) {
   mounting.add(gl.canvas);
   gl.canvas.className = host.className;
   gl.canvas.dataset.figure3d = key;
-  gl.canvas.width = W;
-  gl.canvas.height = H;
+  // buffer stays at the RES-scaled size createStage picked; CSS upscales
   let figure = null;
   try {
     figure = await buildFigure(gl, spec);

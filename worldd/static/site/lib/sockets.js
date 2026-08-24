@@ -8,10 +8,12 @@
 //   normalizeProp  gives a prop the missing pivot convention (grip point
 //                  at origin, long axis up / flat face out)
 //   attachToSocket snaps a prepared prop onto a socket, oriented and
-//                  offset in CHARACTER space (x = character's screen-right
-//                  when facing you, y = up, z = facing) — never bone-local,
-//                  bone axes twist unpredictably joint to joint; never
-//                  world, the fight scene faces sideways.
+//                  offset in GRIP SPACE — the character's own frame:
+//                  +x facing, +y up, +z out the character's RIGHT hand
+//                  (our Tripo rigs animate facing +x; each scene yaws the
+//                  charRoot wrap afterwards and the grips ride along).
+//                  Never bone-local — bone axes twist unpredictably joint
+//                  to joint; never world — the fight scene faces sideways.
 //   GRIPS          per item family: which socket, how to normalize, how
 //                  big (fractions of character height, so a giant's staff
 //                  towers with the giant), how to orient.
@@ -38,40 +40,53 @@ export const SOCKETS = {
 
 // Grip specs per item family. Units are FRACTIONS OF CHARACTER HEIGHT
 // (len and offset), so every body size wears the same table. orient is a
-// character-space euler; grip is the pivot's fraction along the prop's
-// normalized axis (0 = bottom); mode: "long" (Tripo long-axis up),
-// "flat" (thin axis faces +z — shields), "none".
+// GRIP-SPACE euler (+x facing, +y up, +z character's right); offset the
+// same frame; grip is the pivot's fraction along the prop's normalized
+// axis (0 = bottom); mode: "long" (Tripo long-axis up), "flat" (thin axis
+// faces the character's facing — shields), "none".
 // lift is the emissive floor scenes apply so dark props survive their
 // tone curves. Per-item overrides shallow-merge over the family entry.
 export const GRIPS = {
+  // scabbard hang down the outer thigh, hilt at palm height; the lead
+  // blade rides the RIGHT hip so the shield arm never hides it
   blade:   { socket: "hip_r", mode: "long", len: 0.55, grip: 0.15,
-             orient: [0.10, 0, -2.95], offset: [-0.085, 0.012, 0.073],
+             orient: [2.95, 0, -0.10], offset: [0.073, 0.012, 0.085],
              lift: 0.24 },
   blade_l: { socket: "hip_l", mode: "long", len: 0.55, grip: 0.15,
-             orient: [0.10, 0, 2.95], offset: [0.085, 0.012, 0.073],
+             orient: [-2.95, 0, -0.10], offset: [0.073, 0.012, -0.085],
              lift: 0.24 },
+  // slung diagonally across the back, limbs past shoulder and hip
   bow:     { socket: "back", mode: "long", len: 0.73, grip: 0.50,
-             orient: [0.15, 0, 0.55], offset: [0, 0.04, -0.085],
+             orient: [0.55, 0, -0.15], offset: [-0.085, 0.040, 0],
              lift: 0.24 },
+  // vertical walking-staff planted through the right fist, held clearly
+  // in FRONT of the body so it never reads as lying on the torso
   staff:   { socket: "hand_r", mode: "long", len: 0.66, grip: 0.40,
-             orient: [0, 0, -0.10], offset: [0.056, 0.010, 0.056],
+             orient: [-0.10, 0, 0], offset: [0.100, 0.010, -0.120],
              lift: 0.24 },
+  staff_back: { socket: "back", mode: "long", len: 0.63, grip: 0.50,
+             orient: [0.35, 0, -0.10], offset: [-0.085, 0.030, 0.050],
+             lift: 0.24 },
+  // buckler face-out on the left forearm, pushed OUTSIDE the arm line.
+  // flat mode leaves the face on +z (character's right); the ~π/2 yaw
+  // turns it to the facing, backed off 0.45 so it reads as a shield and
+  // not a perfect circle
   shield:  { socket: "forearm_l", mode: "flat", len: 0.19, grip: 0.50,
-             orient: [0.15, 0.45, 0], offset: [0.075, -0.065, 0.060],
+             orient: [0, 1.12, -0.15], offset: [0.060, -0.065, -0.085],
              lift: 0.24 },
   focus:   { socket: "hand_l", mode: "long", len: 0.10, grip: 0.50,
-             orient: [0, 0, 0], offset: [0.025, 0.018, 0.030],
+             orient: [0, 0, 0], offset: [0.030, 0.018, -0.025],
              lift: 0.24 },
   armor:   { socket: "chest", mode: "long", len: 0.29, grip: 0.50,
-             orient: [0, 0, 0], offset: [0, 0.012, 0.042], lift: 0.10 },
+             orient: [0, 0, 0], offset: [0.042, 0.012, 0], lift: 0.10 },
   boots_l: { socket: "foot_l", mode: "long", len: 0.11, grip: 0.30,
-             orient: [0.2, 0, 0], offset: [0, 0.012, 0.024], lift: 0.10 },
+             orient: [0, 0, -0.20], offset: [0.024, 0.012, 0], lift: 0.10 },
   boots_r: { socket: "foot_r", mode: "long", len: 0.11, grip: 0.30,
-             orient: [0.2, 0, 0], offset: [0, 0.012, 0.024], lift: 0.10 },
+             orient: [0, 0, -0.20], offset: [0.024, 0.012, 0], lift: 0.10 },
   charm:   { socket: "neck", mode: "long", len: 0.067, grip: 0.50,
-             orient: [0, 0, 0], offset: [0, -0.018, 0.042], lift: 0.10 },
+             orient: [0, 0, 0], offset: [0.042, -0.018, 0], lift: 0.10 },
   potion:  { socket: "waist", mode: "long", len: 0.091, grip: 0.50,
-             orient: [0.2, 0, 0.25], offset: [0.073, 0.012, 0.030],
+             orient: [0.25, 0, -0.20], offset: [0.030, 0.012, -0.073],
              lift: 0.10 },
 };
 
