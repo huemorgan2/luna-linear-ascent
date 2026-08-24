@@ -1,0 +1,86 @@
+{
+  "user": "dojo668471",
+  "base": "http://127.0.0.1:8778",
+  "results": [
+    {
+      "name": "S1 signup",
+      "ok": true,
+      "detail": "200 dojo668471"
+    },
+    {
+      "name": "S1 seed pending 3",
+      "ok": true,
+      "detail": "{\"seeded\": \"web:dojo668471\", \"level\": 6, \"pending\": {\"week\": 32, \"slots\": 3}, \"rested\": 0}"
+    },
+    {
+      "name": "S2 waiting for you is on the town card",
+      "ok": true,
+      "detail": "WAITING FOR YOU\nYou have a reward from last week. Choose one. You only get one.\n1\nGold — About as much as half a day's h"
+    },
+    {
+      "name": "S2 one nested week box",
+      "ok": true,
+      "detail": "box=true rails=1"
+    },
+    {
+      "name": "S2 header is plain English",
+      "ok": true,
+      "detail": "You have a reward from last week. Choose one. You only get one."
+    },
+    {
+      "name": "S2 four rows, gold / extra XP / repair / luck",
+      "ok": true,
+      "detail": "[{\"opt\":\"pick_gold\",\"txt\":\"1Gold — About as much as half a day's hunting. It is added to the gold you are carrying. 285\"},{\"opt\":\"pick_aether\",\"txt\":\"2Extra XP — Your next fights will give extra experience, until this bonus runs out. 35\"},{\"opt\":\"pick_token\",\"txt\":\"3Free repair — The Forge will fully repair one piece of gear you are wearing, for free.\"},{\"opt\":\"pick_relic\",\"txt\":\"4Luck charm — You will find better loot while you wear it. It goes into your pack. Put it in the charm slot on your profile to use it.\"}]"
+    },
+    {
+      "name": "S2 copy has no engine slang",
+      "ok": true,
+      "detail": "[{\"opt\":\"pick_gold\",\"txt\":\"1Gold — About as much as half a day's hunting. It is added to the gold you are carrying. 285\"},{\"opt\":\"pick_aether\",\"txt\":\"2Extra XP — Your next fights will give extra experience, until this bonus runs out. 35\"},{\"opt\":\"pick_token\",\"txt\":\"3Free repair — The Forge will fully repair one piece of gear you are wearing, for free.\"},{\"opt\":\"pick_relic\",\"txt\":\"4Luck charm — You will find better loot while you wear it. It goes into your pack. Put it in the charm slot on your profile to use it.\"}]"
+    },
+    {
+      "name": "S2 one complete square (solid border, no radius)",
+      "ok": true,
+      "detail": "{\"w\":35,\"h\":238,\"border\":\"solid 1px rgb(69, 208, 192)\",\"radius\":\"0px\"}"
+    },
+    {
+      "name": "S3 Vault has no prize rows",
+      "ok": true,
+      "detail": "deposit_all,deposit_half,grants,back"
+    },
+    {
+      "name": "S3 Vault still has deposit or back",
+      "ok": true,
+      "detail": "deposit_all,deposit_half,grants,back"
+    },
+    {
+      "name": "S4 Extra XP row is clickable on town",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "S5 box gone after the pick",
+      "ok": true,
+      "detail": "WAITING FOR YOU\nPLAN\nThe Lodge — tonight is unplanned. One action a night: rest it to bank aether, work it for coin. Dawn settles it either way.\n→\nROOTHOLLOW · THE SQUARE\nRoothollow — floor 6 is the f"
+    },
+    {
+      "name": "S5 receipt names extra experience",
+      "ok": true,
+      "detail": "WAITING FOR YOU\nPLAN\nThe Lodge — tonight is unplanned. One action a night: rest it to bank aether, work it for coin. Dawn settles it either way.\n→\nROOTHOLLOW · THE SQUARE\nRoothollow — floor 6 is the frontier\nThe last free settlement. Everyt"
+    },
+    {
+      "name": "S1 seed pending 3 again",
+      "ok": true,
+      "detail": "{\"seeded\": \"web:dojo668471\", \"level\": 6, \"pending\": {\"week\": 32, \"slots\": 3}, \"rested\": 0}"
+    },
+    {
+      "name": "S6 390px: one complete square, four rows",
+      "ok": true,
+      "detail": "{\"rail\":{\"w\":35,\"h\":430,\"border\":\"solid 1px rgb(69, 208, 192)\",\"radius\":\"0px\"},\"n\":4}"
+    },
+    {
+      "name": "V no console errors",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}
