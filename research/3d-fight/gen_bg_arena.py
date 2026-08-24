@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""067 — Arena backgrounds at 320x300 for the Labs turn-based stage.
+"""Arena backgrounds at 320x300 for the turn-based stage.
 
 Same pipeline as gen_bg_floors.py (Gemini designed 1-bit still → density
 master → perfect-loop frames → GL sheet), re-parametrized for the taller
@@ -7,11 +7,17 @@ arena frame: stills at 1:1 (closest supported aspect), center-cropped to
 16:15, the STAGE prompt asks for open ground across the lower third and
 a quiet upper third (the HUD sits there). Output: 24 frames of 320x300
 baked straight into worldd/static/site/fight3d/backgrounds300/<id>.png
-(320x7200, 1-bit) — the sheet arena3d.js samples. Floors 6–7 only.
+(320x7200, 1-bit) — the sheet arena3d.js samples.
+
+100floors-attack3dscene: the id list is DERIVED — every encounter id in
+the floor YAMLs for FLOORS, plus each floor's warden_NNN. Widen FLOORS
+one phase at a time. Floor-1 prompts ride demo2/gen_backgrounds.py's
+SCENES (captured before gen_bg_floors rebinds them); floors 2+ ride
+gen_bg_floors.SCENES. Default worklists skip what already shipped.
 
 Usage:
   python3 gen_bg_arena.py stills [id ...]   # Gemini, skips existing jpgs
-  python3 gen_bg_arena.py sheets [id ...]   # local, rebuilds sheets
+  python3 gen_bg_arena.py sheets [id ...]   # local, builds missing sheets
 """
 from __future__ import annotations
 
@@ -20,10 +26,18 @@ import os
 import sys
 
 import numpy as np
+import yaml
 from PIL import Image
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _HERE)
+sys.path.insert(0, os.path.join(_HERE, "demo2"))
+# demo2's floor-1 scene table, captured BEFORE gen_bg_floors rebinds
+# g1.SCENES to its own floors-2+ table (its FLOOR setting text too)
+import gen_backgrounds as _g1_early  # noqa: E402
+_SCENES1 = {("warden_001" if k == "warden" else k): dict(v, floor=1)
+            for k, v in _g1_early.SCENES.items()}
+_FLOOR1_TEXT = _g1_early.FLOOR
 import gen_bg_floors as gf          # noqa: E402  (loads demo2 + providers)
 
 g1 = gf.g1
@@ -34,11 +48,26 @@ FLOOR_FRAC = 0.80
 OUT = os.path.join(_HERE, "backgrounds_arena")
 DST = os.path.join(_HERE, "..", "..", "worldd", "static", "site",
                    "fight3d", "backgrounds300")
+_YAMLS = os.path.join(_HERE, "..", "..", "plugin-linear-ascent",
+                      "plugin_linear_ascent", "content", "floors")
 
-IDS = ["grave_moth", "guano_vole", "silk_broodling", "vault_weaver",
-       "lane_boar", "wrapped_husk", "warden_006",
-       "orchard_wolfpack", "rabid_boar", "hornet_swarm", "windfall_crow",
-       "orchard_hare", "windfall_wight", "warden_007"]
+FLOORS = range(1, 11)               # phase 1: floors 1–10
+SCENES = {**gf.SCENES, **_SCENES1}
+FLOOR_TEXT = {1: _FLOOR1_TEXT, **gf.FLOOR}
+
+
+def _ids() -> list[str]:
+    """Every encounter id + warden_NNN for FLOORS, in floor order."""
+    out = []
+    for fl in FLOORS:
+        y = yaml.safe_load(open(os.path.join(_YAMLS,
+                                             f"floor_{fl:03d}.yaml")))
+        out += [e["id"] for e in y.get("encounters", [])]
+        out.append(f"warden_{fl:03d}")
+    return out
+
+
+IDS = _ids()
 
 STAGE300 = (
     "EMPTY STAGE — absolutely no creatures, no people, no animals, no "
@@ -63,8 +92,8 @@ def _retarget():
 
 
 async def gen_still(sid: str, key: str) -> str:
-    cfg = gf.SCENES[sid]
-    floor = gf.FLOOR.get(cfg["floor"], "")
+    cfg = SCENES[sid]
+    floor = FLOOR_TEXT.get(cfg["floor"], "")
     prompt = (gf.STYLE + floor + STAGE300 + cfg["prompt"] +
               " Side-on shot, tall frame.")
     res = await providers.generate(
@@ -78,7 +107,7 @@ async def gen_still(sid: str, key: str) -> str:
 
 def build_sheet(sid: str) -> str:
     _retarget()
-    cfg = gf.SCENES[sid]
+    cfg = SCENES[sid]
     grey = g1.density_master(sid)              # 320x300 via g1.W/H
     mask = g1.glow_mask(grey)
     noises = g1.noise_fields()
@@ -116,18 +145,22 @@ async def main() -> None:
     bad = [n for n in names if n not in IDS]
     if bad:
         sys.exit(f"unknown ids: {bad}")
+    shipped = {s for s in IDS if os.path.exists(
+        os.path.join(DST, f"{s}.png"))}
     if mode == "stills":
         key = g1.api_key()
-        todo = names or [s for s in IDS if not os.path.exists(
-            os.path.join(OUT, f"{s}.jpg"))]
+        todo = names or [s for s in IDS if s not in shipped
+                         and not os.path.exists(
+                             os.path.join(OUT, f"{s}.jpg"))]
         print(f"{len(todo)} stills -> {OUT}")
         for i in range(0, len(todo), 4):
             for line in await asyncio.gather(
                     *(gen_still(n, key) for n in todo[i:i + 4])):
                 print(line, flush=True)
     else:
-        todo = names or [s for s in IDS if os.path.exists(
-            os.path.join(OUT, f"{s}.jpg"))]
+        todo = names or [s for s in IDS if s not in shipped
+                         and os.path.exists(
+                             os.path.join(OUT, f"{s}.jpg"))]
         for n in todo:
             print(build_sheet(n), flush=True)
     print("done")
