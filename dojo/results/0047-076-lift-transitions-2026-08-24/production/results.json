@@ -1,0 +1,107 @@
+[
+  {
+    "name": "S1 signup",
+    "ok": true,
+    "detail": "200 dojolift832909"
+  },
+  {
+    "name": "S1 no overlay on the boot load",
+    "ok": true,
+    "detail": "null"
+  },
+  {
+    "name": "S1 reached Roothollow",
+    "ok": true,
+    "detail": "ROOTHOLLOW · THE SQUAREWelcome to Roothollow, dojolift832909TarWe carry  50 and "
+  },
+  {
+    "name": "S2 gate row clicked",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "S2 floor_1 clicked",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "S2 overlay is up and masked with the ASCENT gif",
+    "ok": true,
+    "detail": "{\"on\":true,\"opacity\":\"1\",\"mask\":\"url(\\\"https://ascent-worldd.onrender.com/static/fxart/lift_ascent_320x112.gif?t=1787593503624\\\")\"}"
+  },
+  {
+    "name": "S2 the place is dimly visible behind (translucent black)",
+    "ok": true,
+    "detail": "rgba(0, 0, 0, 0.8)"
+  },
+  {
+    "name": "S2 overlay gone within 7s of the click",
+    "ok": true,
+    "detail": "3436ms after wait start"
+  },
+  {
+    "name": "S3 reel exit is quiet (no overlay)",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "S4 town row clicked",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "S4 overlay masked with the DESCENT gif",
+    "ok": true,
+    "detail": "{\"on\":true,\"opacity\":\"1\",\"mask\":\"url(\\\"https://ascent-worldd.onrender.com/static/fxart/lift_descent_320x112.gif?t=1787593511063\\\")\"}"
+  },
+  {
+    "name": "S4 overlay gone, square behind",
+    "ok": true,
+    "detail": "ROOTHOLLOW · THE SQUARERoothollow — floor 7 is the frontierThe last free settlem"
+  },
+  {
+    "name": "S4 play not blocked after the ride",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "S5 no overlay on reload",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "S6 sealed floor refuses (refusal, no data-lift)",
+    "ok": true,
+    "detail": "{\"refusal\":\"That isn't one of the paths — pick a numbered row on the card\",\"hasFrag\":true}"
+  },
+  {
+    "name": "S6 no overlay after the refusal",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "V1 an act answer carried data-lift=\"up\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "V2 an act answer carried data-lift=\"down\"",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "V3 lift_ascent gif serves",
+    "ok": true,
+    "detail": "200 image/gif"
+  },
+  {
+    "name": "V3 lift_descent gif serves",
+    "ok": true,
+    "detail": "200 image/gif"
+  },
+  {
+    "name": "V4 console free of errors",
+    "ok": true,
+    "detail": ""
+  }
+]

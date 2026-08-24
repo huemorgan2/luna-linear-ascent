@@ -44,3 +44,11 @@ stashed — none touch 076 surface:
 - plugin `test_kill3d.py::test_kill3d_card_ships_no_ending_gif` and
   `::test_kill3d_line_follows_the_class`
 - worldd `test_web_play.py::test_leaderboard_marks_only_you`
+
+## Production re-run (post-deploy, 2026-08-24)
+
+Same walkthrough against `https://ascent-worldd.onrender.com` after deploy
+dep-da681pojo6nc73c5dnvg went live (0.97.3 → 0.99.1): **21/21 PASS**.
+Ascent overlay up 3.4s after the click with the ascent GIF mask, descent
+ride down to the square, reload quiet, sealed-floor refusal rideless, both
+GIFs 200 image/gif, console clean. Evidence in `production/`.
