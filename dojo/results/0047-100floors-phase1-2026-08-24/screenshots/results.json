@@ -1,0 +1,137 @@
+{
+  "A": "dojoa299515",
+  "B": "dojob579527",
+  "base": "http://127.0.0.1:8600",
+  "results": [
+    {
+      "name": "A signup",
+      "ok": true,
+      "detail": "dojoa299515"
+    },
+    {
+      "name": "A seed floor 1",
+      "ok": true,
+      "detail": "seeded web:dojoa299515 floor=1 class=warrior level=8 hp=400 held=['rusted_sword']"
+    },
+    {
+      "name": "A1 floor-1 town offers hunt",
+      "ok": true,
+      "detail": "hunt,keep,talk,gate,town"
+    },
+    {
+      "name": "A2 floor-1 opener carries data-arena with NO labs flag",
+      "ok": true,
+      "detail": "{\"arena\":true,\"a3d\":false}"
+    },
+    {
+      "name": "A3 first strike mounts the 3D stage (320x300 canvas)",
+      "ok": true,
+      "detail": "[320,300]"
+    },
+    {
+      "name": "A3 HP bars both sides + log lines",
+      "ok": true,
+      "detail": "{\"bars\":[\"me:354/354\",\"foe:14/14\"],\"lines\":2}"
+    },
+    {
+      "name": "A4 backdrop behind the fighters, not a black void",
+      "ok": true,
+      "detail": "{\"foe\":\"lane_wolf\",\"status\":200,\"canvasPng\":10307}"
+    },
+    {
+      "name": "A3 steady-state round settles < 12 s",
+      "ok": true,
+      "detail": "round1 7154 ms, round2 570 ms"
+    },
+    {
+      "name": "A5 fight continues on the stage or ends cleanly",
+      "ok": true,
+      "detail": "{\"lines\":2,\"a3d\":true,\"arena\":true,\"opts\":[\"hunt\",\"keep\",\"talk\",\"gate\",\"town\"]}"
+    },
+    {
+      "name": "A re-seed floor 1 (clean town)",
+      "ok": true,
+      "detail": "seeded web:dojoa299515 floor=1 class=warrior level=8 hp=400 held=['rusted_sword']"
+    },
+    {
+      "name": "A6 Labs lists figure3d only — no arena row",
+      "ok": true,
+      "detail": "{\"arenaRow\":false,\"figRow\":true}"
+    },
+    {
+      "name": "A seed floor 8",
+      "ok": true,
+      "detail": "seeded web:dojoa299515 floor=8 class=warrior level=8 hp=400 held=['rusted_sword']"
+    },
+    {
+      "name": "A7 floor-8 opener carries data-arena",
+      "ok": true,
+      "detail": "{\"arena\":true,\"foe\":\"ash_adder\"}"
+    },
+    {
+      "name": "A8 floor-8 stage up with its backdrop",
+      "ok": true,
+      "detail": "{\"foe\":\"ash_adder\",\"status\":200,\"canvasPng\":11632}"
+    },
+    {
+      "name": "A9 DB: labs doc holds no arena key after all fights",
+      "ok": true,
+      "detail": "{}"
+    },
+    {
+      "name": "B signup",
+      "ok": true,
+      "detail": "dojob579527"
+    },
+    {
+      "name": "B seed floor 11",
+      "ok": true,
+      "detail": "seeded web:dojob579527 floor=11 class=warrior level=8 hp=400 held=['rusted_sword']"
+    },
+    {
+      "name": "B1 floor-11 town offers hunt",
+      "ok": true,
+      "detail": "hunt,hunt_deep,keep,gate,town"
+    },
+    {
+      "name": "B2 floor-11 fight is the classic card: no data-arena, no .a3d",
+      "ok": true,
+      "detail": "{\"arena\":false,\"a3d\":false,\"opts\":[\"close_in\",\"stand\",\"run\",\"shield_wall\"]}"
+    },
+    {
+      "name": "B3 round resolved on the classic card (still no arena)",
+      "ok": true,
+      "detail": "{\"arena\":false,\"a3d\":false}"
+    },
+    {
+      "name": "B4 DB: labs doc holds no arena key",
+      "ok": true,
+      "detail": "{}"
+    },
+    {
+      "name": "V all backgrounds300 fetches returned 200",
+      "ok": true,
+      "detail": "[[\"lane_wolf\",200],[\"ash_adder\",200]]"
+    },
+    {
+      "name": "V no console/page errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "V no 4xx/5xx from /play/api",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "backgrounds": [
+    [
+      "lane_wolf",
+      200
+    ],
+    [
+      "ash_adder",
+      200
+    ]
+  ]
+}
