@@ -1,0 +1,41 @@
+PASS  S1 signup — 200 dojo090046
+PASS  S1 seed floor 6 — seeded web:dojo090046 floor=6 class=warrior level=8 hp=400 held=['rusted_sword']
+PASS  S2 flask on the bar, reads "labs", off — {"labsTxt":"labs","on":false}
+PASS  S2 floor 6 town shows hunt — hunt,hunt_deep,keep,talk,gate,town
+PASS  S3 floor 6, labs off: regular encounter (no data-arena, no tiles) — {"arena":false,"tiles":0,"opts":["close_in","stand","run","shield_wall"]}
+PASS  S4 Labs card opens — LABSThe LabsThings being tried. Turn one on to test it.Experiments. Each one is off until you switch it on, and off again the moment you switch it off — nothing
+PASS  S4 arena row off → ON — 1Arena — turn-based 3D fights — offswitch on · flo → 1Arena — turn-based 3D fights — ONswitch off · flo
+PASS  S4 flask reads "labs on" — {"on":true,"txt":"labs on","dataLabs":"arena"}
+PASS  V DB labs.arena = true — "{\"arena\": true}"
+PASS  S5 opener: data-arena, close-up kept, no 3D yet — {"arena":true,"a3d":false,"img":false}
+PASS  S5 opener menu: regular rows, no tiles (phase 8) — {"tiles":0,"opts":["close_in","stand","run","shield_wall"]}
+PASS  S6 3D stage 320x300 canvas in the arena banner — [320,300,394,369]
+PASS  S6 tiles held while beats play, then released — {"busyEarly":true,"settled":153,"tiles":[false,false,false,false]}
+PASS  S6 first round settles < 8 s — 3013 ms
+PASS  S6 HP bars both sides — me:354/354 foe:21/21
+PASS  S6 log lines revealed (none pending) after beats — ["dojo090046 closes the gap.","Guano vole hits dojo090046 for 17 damage — 29 blocked by DEF."]
+PASS  S11 HUD: two named slabs, both top-aligned a half line down, left/right — {"names":["DOJO090046","GUANO VOLEi"],"slabs":[{"cls":"astat me","top":8,"left":8,"right":226},{"cls":"astat foe","top":8,"left":236,"right":8}]}
+PASS  S11 HUD: climber gear line (weapon + guard glyphs) — gear=3
+PASS  S11 HUD: foe kind icons match the foe (flying/armoured/MR/bulwark) — {"foe":{"flying":false,"armoured":true,"resist_pct":0,"bulwark":false},"kinds":["Armoured — the DEF is plate; blades glance, arrows bite less, magic passes."]}
+PASS  S11 tiles: a toolbar UNDER the stage, 76px boxes + text column, visible (phase 8 v2) — {"inBanner":false,"tiles":[{"opt":"attack","img":true,"under":true,"gap":6,"h":76,"box":76,"op":"1"},{"opt":"stand","img":true,"under":true,"gap":6,"h":76,"box":76,"op":"1"},{"opt":"run","img":true,"under":true,"gap":90,"h":76,"box":76,"op":"1"},{"opt":"shield_wall","img":true,"under":true,"gap":90,"h":76,"box":76,"op":"1"}]}
+PASS  S11 stage is a 160 band (w:h ≈ 2:1); no rows under but toolbar+log — {"rect":{"w":394,"h":198},"below":0}
+PASS  S11 canvas WINDOWED not squashed: h≈1.875×band, top≈−0.719×band (0.96.0 bug) — {"top":-142,"h":369,"bh":198}
+PASS  S11 desktop 1440: slabs still one row, toolbar still under the stage — {"slabs":[{"cls":"astat me","top":8,"left":8,"right":494},{"cls":"astat foe","top":8,"left":510,"right":8}],"under":[true,true,true,true]}
+PASS  S13 [i] rides the foe nameplate; NO name headline under the scene in a live round (0.97.1) — {"infoOnName":true,"tiph":true,"headline":0,"fold":0,"word":false}
+PASS  S13 hover on the [i] opens the dossier panel as the tip (the sheet look, unframed inside the box) — {"shown":"block","panel":true,"rows":4,"dhead":true,"unframed":true}
+PASS  S7 floats seen: MISS / -N HP / BLOCKED — foe|-17 HP  ||  blocked|BLOCKED 29  ||  |-18 HP  ||  foe|-40 HP  ||  blocked|BLOCKED 12  ||  |-10 HP
+PASS  S7 canvas persisted across turns (not rebuilt) — rounds=3
+PASS  S7 fight reached an end — phase=victory rounds=3
+PASS  S8 log accumulates — 2 lines
+PASS  S12 end card: regular menu rows, no tiles, HUD named (phase 8) — {"phase":"victory","below":8,"tiles":0,"names":["DOJO090046","GUANO VOLE"]}
+PASS  S12 victory tally over the scene, said once — {"phase":"victory","awin":"1","tallies":1}
+PASS  S12 victory tally is LEAN — no slab, no mark heaps, no note (0.96.1) — {"phase":"victory","lean":true,"marks":0}
+PASS  S14 win amounts: crisp black shadow on text + icons, 150% icons, + after the number (0.97.1) — {"shadow":"rgb(0, 0, 0) 4.5px 4.5px 0px","plus":true,"egw":"24px","filter":"drop-shadow(rgb(0, 0, 0) 1.5px 1.5px 0px)"}
+PASS  S9 labs on, floor 5 hunt offered — {"on":true,"opts":["hunt","hunt_deep","keep","talk","gate","town"]}
+PASS  S9 floor 5 with labs on: regular encounter — {"arena":false,"tiles":0,"opts":["close_in","stand","run","shield_wall"]}
+PASS  S10 seed resets flag: flask off — labs
+PASS  S10 floor 6 with arena off: regular encounter — {"arena":false,"tiles":0,"opts":["close_in","stand","run","shield_wall"]}
+PASS  V no console errors / page errors
+PASS  V no 4xx/5xx from /play/api
+
+39/39 passed

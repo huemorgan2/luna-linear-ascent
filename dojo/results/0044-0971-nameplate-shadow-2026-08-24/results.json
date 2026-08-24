@@ -1,0 +1,209 @@
+{
+  "user": "dojo090046",
+  "base": "http://127.0.0.1:8778",
+  "results": [
+    {
+      "name": "S1 signup",
+      "ok": true,
+      "detail": "200 dojo090046"
+    },
+    {
+      "name": "S1 seed floor 6",
+      "ok": true,
+      "detail": "seeded web:dojo090046 floor=6 class=warrior level=8 hp=400 held=['rusted_sword']"
+    },
+    {
+      "name": "S2 flask on the bar, reads \"labs\", off",
+      "ok": true,
+      "detail": "{\"labsTxt\":\"labs\",\"on\":false}"
+    },
+    {
+      "name": "S2 floor 6 town shows hunt",
+      "ok": true,
+      "detail": "hunt,hunt_deep,keep,talk,gate,town"
+    },
+    {
+      "name": "S3 floor 6, labs off: regular encounter (no data-arena, no tiles)",
+      "ok": true,
+      "detail": "{\"arena\":false,\"tiles\":0,\"opts\":[\"close_in\",\"stand\",\"run\",\"shield_wall\"]}"
+    },
+    {
+      "name": "S4 Labs card opens",
+      "ok": true,
+      "detail": "LABSThe LabsThings being tried. Turn one on to test it.Experiments. Each one is off until you switch it on, and off again the moment you switch it off — nothing"
+    },
+    {
+      "name": "S4 arena row off → ON",
+      "ok": true,
+      "detail": "1Arena — turn-based 3D fights — offswitch on · flo → 1Arena — turn-based 3D fights — ONswitch off · flo"
+    },
+    {
+      "name": "S4 flask reads \"labs on\"",
+      "ok": true,
+      "detail": "{\"on\":true,\"txt\":\"labs on\",\"dataLabs\":\"arena\"}"
+    },
+    {
+      "name": "V DB labs.arena = true",
+      "ok": true,
+      "detail": "\"{\\\"arena\\\": true}\""
+    },
+    {
+      "name": "S5 opener: data-arena, close-up kept, no 3D yet",
+      "ok": true,
+      "detail": "{\"arena\":true,\"a3d\":false,\"img\":false}"
+    },
+    {
+      "name": "S5 opener menu: regular rows, no tiles (phase 8)",
+      "ok": true,
+      "detail": "{\"tiles\":0,\"opts\":[\"close_in\",\"stand\",\"run\",\"shield_wall\"]}"
+    },
+    {
+      "name": "S6 3D stage 320x300 canvas in the arena banner",
+      "ok": true,
+      "detail": "[320,300,394,369]"
+    },
+    {
+      "name": "S6 tiles held while beats play, then released",
+      "ok": true,
+      "detail": "{\"busyEarly\":true,\"settled\":153,\"tiles\":[false,false,false,false]}"
+    },
+    {
+      "name": "S6 first round settles < 8 s",
+      "ok": true,
+      "detail": "3013 ms"
+    },
+    {
+      "name": "S6 HP bars both sides",
+      "ok": true,
+      "detail": "me:354/354 foe:21/21"
+    },
+    {
+      "name": "S6 log lines revealed (none pending) after beats",
+      "ok": true,
+      "detail": "[\"dojo090046 closes the gap.\",\"Guano vole hits dojo090046 for 17 damage — 29 blocked by DEF.\"]"
+    },
+    {
+      "name": "S11 HUD: two named slabs, both top-aligned a half line down, left/right",
+      "ok": true,
+      "detail": "{\"names\":[\"DOJO090046\",\"GUANO VOLEi\"],\"slabs\":[{\"cls\":\"astat me\",\"top\":8,\"left\":8,\"right\":226},{\"cls\":\"astat foe\",\"top\":8,\"left\":236,\"right\":8}]}"
+    },
+    {
+      "name": "S11 HUD: climber gear line (weapon + guard glyphs)",
+      "ok": true,
+      "detail": "gear=3"
+    },
+    {
+      "name": "S11 HUD: foe kind icons match the foe (flying/armoured/MR/bulwark)",
+      "ok": true,
+      "detail": "{\"foe\":{\"flying\":false,\"armoured\":true,\"resist_pct\":0,\"bulwark\":false},\"kinds\":[\"Armoured — the DEF is plate; blades glance, arrows bite less, magic passes.\"]}"
+    },
+    {
+      "name": "S11 tiles: a toolbar UNDER the stage, 76px boxes + text column, visible (phase 8 v2)",
+      "ok": true,
+      "detail": "{\"inBanner\":false,\"tiles\":[{\"opt\":\"attack\",\"img\":true,\"under\":true,\"gap\":6,\"h\":76,\"box\":76,\"op\":\"1\"},{\"opt\":\"stand\",\"img\":true,\"under\":true,\"gap\":6,\"h\":76,\"box\":76,\"op\":\"1\"},{\"opt\":\"run\",\"img\":true,\"under\":true,\"gap\":90,\"h\":76,\"box\":76,\"op\":\"1\"},{\"opt\":\"shield_wall\",\"img\":true,\"under\":true,\"gap\":90,\"h\":76,\"box\":76,\"op\":\"1\"}]}"
+    },
+    {
+      "name": "S11 stage is a 160 band (w:h ≈ 2:1); no rows under but toolbar+log",
+      "ok": true,
+      "detail": "{\"rect\":{\"w\":394,\"h\":198},\"below\":0}"
+    },
+    {
+      "name": "S11 canvas WINDOWED not squashed: h≈1.875×band, top≈−0.719×band (0.96.0 bug)",
+      "ok": true,
+      "detail": "{\"top\":-142,\"h\":369,\"bh\":198}"
+    },
+    {
+      "name": "S11 desktop 1440: slabs still one row, toolbar still under the stage",
+      "ok": true,
+      "detail": "{\"slabs\":[{\"cls\":\"astat me\",\"top\":8,\"left\":8,\"right\":494},{\"cls\":\"astat foe\",\"top\":8,\"left\":510,\"right\":8}],\"under\":[true,true,true,true]}"
+    },
+    {
+      "name": "S13 [i] rides the foe nameplate; NO name headline under the scene in a live round (0.97.1)",
+      "ok": true,
+      "detail": "{\"infoOnName\":true,\"tiph\":true,\"headline\":0,\"fold\":0,\"word\":false}"
+    },
+    {
+      "name": "S13 hover on the [i] opens the dossier panel as the tip (the sheet look, unframed inside the box)",
+      "ok": true,
+      "detail": "{\"shown\":\"block\",\"panel\":true,\"rows\":4,\"dhead\":true,\"unframed\":true}"
+    },
+    {
+      "name": "S7 floats seen: MISS / -N HP / BLOCKED",
+      "ok": true,
+      "detail": "foe|-17 HP  ||  blocked|BLOCKED 29  ||  |-18 HP  ||  foe|-40 HP  ||  blocked|BLOCKED 12  ||  |-10 HP"
+    },
+    {
+      "name": "S7 canvas persisted across turns (not rebuilt)",
+      "ok": true,
+      "detail": "rounds=3"
+    },
+    {
+      "name": "S7 fight reached an end",
+      "ok": true,
+      "detail": "phase=victory rounds=3"
+    },
+    {
+      "name": "S8 log accumulates",
+      "ok": true,
+      "detail": "2 lines"
+    },
+    {
+      "name": "S12 end card: regular menu rows, no tiles, HUD named (phase 8)",
+      "ok": true,
+      "detail": "{\"phase\":\"victory\",\"below\":8,\"tiles\":0,\"names\":[\"DOJO090046\",\"GUANO VOLE\"]}"
+    },
+    {
+      "name": "S12 victory tally over the scene, said once",
+      "ok": true,
+      "detail": "{\"phase\":\"victory\",\"awin\":\"1\",\"tallies\":1}"
+    },
+    {
+      "name": "S12 victory tally is LEAN — no slab, no mark heaps, no note (0.96.1)",
+      "ok": true,
+      "detail": "{\"phase\":\"victory\",\"lean\":true,\"marks\":0}"
+    },
+    {
+      "name": "S14 win amounts: crisp black shadow on text + icons, 150% icons, + after the number (0.97.1)",
+      "ok": true,
+      "detail": "{\"shadow\":\"rgb(0, 0, 0) 4.5px 4.5px 0px\",\"plus\":true,\"egw\":\"24px\",\"filter\":\"drop-shadow(rgb(0, 0, 0) 1.5px 1.5px 0px)\"}"
+    },
+    {
+      "name": "S9 labs on, floor 5 hunt offered",
+      "ok": true,
+      "detail": "{\"on\":true,\"opts\":[\"hunt\",\"hunt_deep\",\"keep\",\"talk\",\"gate\",\"town\"]}"
+    },
+    {
+      "name": "S9 floor 5 with labs on: regular encounter",
+      "ok": true,
+      "detail": "{\"arena\":false,\"tiles\":0,\"opts\":[\"close_in\",\"stand\",\"run\",\"shield_wall\"]}"
+    },
+    {
+      "name": "S10 seed resets flag: flask off",
+      "ok": true,
+      "detail": "labs"
+    },
+    {
+      "name": "S10 floor 6 with arena off: regular encounter",
+      "ok": true,
+      "detail": "{\"arena\":false,\"tiles\":0,\"opts\":[\"close_in\",\"stand\",\"run\",\"shield_wall\"]}"
+    },
+    {
+      "name": "V no console errors / page errors",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "V no 4xx/5xx from /play/api",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "floats": [
+    "foe|-17 HP",
+    "blocked|BLOCKED 29",
+    "|-18 HP",
+    "foe|-40 HP",
+    "blocked|BLOCKED 12",
+    "|-10 HP"
+  ]
+}
