@@ -1,0 +1,42 @@
+{
+  "user": "dojoprod091323",
+  "base": "https://ascent-worldd.onrender.com",
+  "results": [
+    {
+      "name": "P signup on production",
+      "ok": true,
+      "detail": "dojoprod091323 -> 200"
+    },
+    {
+      "name": "P1 intro walks to a town card offering hunt",
+      "ok": true,
+      "detail": "15 steps — opts hunt,keep,talk,gate,town"
+    },
+    {
+      "name": "P2 floor-1 fight opener carries data-arena",
+      "ok": true,
+      "detail": "{\"arena\":true,\"foe\":\"grey_wolf\"}"
+    },
+    {
+      "name": "P3 3D stage mounts, 320x300 canvas",
+      "ok": true,
+      "detail": "[320,300]"
+    },
+    {
+      "name": "P4 backdrop live from production, not a black void",
+      "ok": true,
+      "detail": "{\"foe\":\"grey_wolf\",\"status\":200,\"canvasPng\":11581}"
+    },
+    {
+      "name": "V no console/page errors",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "backgrounds": [
+    [
+      "grey_wolf",
+      200
+    ]
+  ]
+}

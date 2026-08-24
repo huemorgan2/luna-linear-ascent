@@ -35,6 +35,12 @@
 
 Screenshots in `screenshots/` (01 f11 opener, 02 f11 stage, 03 f11 mid-fight, 04 labs card, 05 f20 stage, 06 f21 classic); raw verdicts in `screenshots/results.json`.
 
+## Production verification (post-deploy, 0.101.0)
+
+Deploy dep-da6amhvqj5pc73f4hmag reached live at 2026-08-24 20:43 UTC; `/health` game 0.101.0. `production.mjs` against https://ascent-worldd.onrender.com — **6/6 PASS**: fresh signup, intro walks to town in 15 steps, floor-1 opener carries data-arena (foe grey_wolf), 3D stage mounts 320×300, backdrop HTTP 200 with canvas PNG 11581 bytes, no console errors. Screenshots in `production/`.
+
+Floor-11 live evidence: production accounts start at floor 1 and the production DB is not reachable for seeding, so (as in phase 1) the floor-11-specific fight was proven in the local dojo (24/24 above, same code paths) and the live check verifies the deployed floor-11–20 assets directly — `backgrounds300/warden_011.png` 200 (29857 B), `kobold_scavenger.png` 200 (27136 B), `warden_020.png` 200 (30965 B), byte-identical sizes to the built sheets.
+
 ## Regressions
 
 None.
