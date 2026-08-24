@@ -301,8 +301,7 @@ textarea.ti{{background:{INK};color:{TEXT};border:1px solid {BORDER};
  opacity:0;transition:opacity .35s;pointer-events:none;}}
 #liftlay.on{{opacity:1;}}
 #liftlay .car{{width:min(92vw,640px);aspect-ratio:320/112;
- background:#000;position:relative;overflow:hidden;}}
-#liftlay .car .ink{{position:absolute;inset:0;background-color:#8b93a7;
+ background-color:#8b93a7;
  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
  -webkit-mask-size:contain;mask-size:contain;
  -webkit-mask-position:center;mask-position:center;}}
@@ -496,14 +495,11 @@ function playLift() {
   lay.id = 'liftlay';
   const car = document.createElement('div');
   car.className = 'car';
-  const ink = document.createElement('div');
-  ink.className = 'ink';
   const u = "url('" + (dir === 'up'
     ? '/static/fxart/lift_ascent_320x112.gif'
     : '/static/fxart/lift_descent_320x112.gif')
     + '?t=' + Date.now() + "')";   // full filename — bare slugs 404
-  ink.style.webkitMaskImage = u; ink.style.maskImage = u;
-  car.appendChild(ink);
+  car.style.webkitMaskImage = u; car.style.maskImage = u;
   lay.appendChild(car);
   document.body.appendChild(lay);
   requestAnimationFrame(() => lay.classList.add('on'));
