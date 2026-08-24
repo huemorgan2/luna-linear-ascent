@@ -109,3 +109,40 @@ All engine edits happen in
 - Assets: none needed — `backgrounds300/` files are additive and unread
   while the gate excludes their floors; delete the 55 new PNGs only if a
   sheet is actually bad (`git rm` the file, redeploy).
+
+## Execution status (2026-08-24)
+
+**Complete. Live in production at 0.100.0.**
+
+- **Code:** plugin `f4d7dca` — `READY_FLOORS = frozenset(range(1, 11))`
+  gate in `engine/arena.py`, labs "arena" Feature deleted, `_foe`
+  hardened against key-less fight docs; workspace `8de20cf` (vendor +
+  plugin pointer + arena3d.js header), `5e263ec` (assets). Vendored by
+  surgical file copy — the plugin tree held in-flight 075 edits, so
+  `vendor_game.sh` was not used. Shipped inside the 0.99.1→0.100.0
+  vendor rolls (`588b712`, `87e6a9f`).
+- **Assets:** 55 new arena sheets generated (Gemini nano-banana-pro
+  stills → density master → 24-frame 1-bit sheets). Census after:
+  **69/69** floor-1–10 ids present in `backgrounds300/`, every sheet
+  320×7200 mode-1, 1939 KB total. Generator reworked to derive its id
+  list from the floor YAMLs (`research/3d-fight/gen_bg_arena.py`,
+  `FLOORS = range(1, 11)` — widen per phase).
+- **Suites:** plugin 1343 passed, 5 failed — 4 pre-existing
+  (test_048_no_classes, 3× test_kill3d), test_059 a concurrent-edit
+  artifact that passes standalone. worldd 201 passed, 1 failed —
+  test_leaderboard_marks_only_you: local dev DB holds 512 'playing'
+  docs and the score endpoint windows to top 200, so the fresh level-1
+  account falls outside; environment artifact, not a regression.
+- **Dojo:** local run 0047 **24/24 PASS** (floors 1 and 8 on the stage
+  with backdrops, Labs card arena-free, floor 11 classic, DB labs docs
+  clean; steady-state round 570 ms). Production re-check after deploy
+  **6/6 PASS** at 0.100.0 (fresh signup, floor-1 hunt → stage +
+  backdrop 200). `dojo/results/0047-100floors-phase1-2026-08-24/`.
+- **Deploy:** `worldd/tools/deploy.sh` → deploy
+  `dep-da686161egvs739o2dsg` live, `/health` reports 0.100.0. The build
+  also carried the concurrently released 075 pursuit model and 076 lift
+  transitions (released in parallel this session by the other driver).
+- **Operational note:** the luna submodule's git object store depended
+  on a deleted Google Drive clone via `objects/info/alternates`; removed
+  the dead alternate (backup: `alternates.bak-dead-drive`), dropped two
+  stale remote refs, `git fetch --refetch` — fsck clean.

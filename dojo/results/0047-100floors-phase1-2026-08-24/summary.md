@@ -45,6 +45,17 @@
   the labs click). Runner now accepts a clean fight end and re-seeds to
   town before the Labs check.
 
+## Production check (post-deploy)
+
+Live at **0.100.0** (deploy `dep-da686161egvs739o2dsg`, includes the
+concurrently released 075 pursuit model). Fresh signup on
+ascent-worldd.onrender.com, intro walked in 15 cards, hunt on floor 1 —
+**6/6 PASS** (`production/results.json`): opener carries `data-arena`
+(foe `grey_wolf`), 3D stage mounts at 320×300, backdrop fetched 200 from
+production, canvas PNG 11323 bytes, no console errors. Floors 11+ are
+unreachable for a fresh production account, so the classic-card half of
+the scenario stays a local check.
+
 ## Regressions
 
 None.
