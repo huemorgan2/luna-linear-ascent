@@ -22,6 +22,8 @@
 // into a 24-frame spritesheet, sampled in the post shader.
 import * as THREE from "three";
 import { GLTFLoader } from "./vendor/GLTFLoader.js";
+import { normalizeProp, boneMap as socketBoneMap, resolveBone }
+  from "../lib/sockets.js";
 
 const W = 320, H = 112;
 const FLOOR_FRAC = 0.91;              // combatants' feet, fraction of H
@@ -584,10 +586,10 @@ function shadowify(o) {
   o.traverse((c) => { if (c.isMesh) { c.castShadow = true; } });
 }
 
-// attach a Tripo weapon prop to the hand bone. Tripo props often lie
-// DIAGONALLY in their bbox, so the true long axis comes from the farthest
-// vertex pair, rotated onto +Y; origin moves to the grip point; scale is
-// sized in world metres and cancels the bone's world scale.
+// attach a Tripo weapon prop to the hand bone. Long-axis + grip-pivot
+// normalization is lib/sockets.js (plan 079, shared with figure3d); the
+// per-frame world-orientation `want` mechanics stay here — the strike
+// keyframes were tuned against them (PLAN3/PLAN4).
 function equipTripo(handBone, neutralQ, wp) {
   const model = assets[wp.key].scene.clone(true);
   shadowify(model);
@@ -597,44 +599,17 @@ function equipTripo(handBone, neutralQ, wp) {
     m.material.emissive.set(0xffffff);
     m.material.emissiveIntensity = wp.lift;
   });
-  model.updateMatrixWorld(true);
-  const pts = [];
-  model.traverse((m) => {
-    if (!m.isMesh) return;
-    const pos = m.geometry.attributes.position;
-    for (let i = 0; i < pos.count; i += 7)
-      pts.push(new THREE.Vector3().fromBufferAttribute(pos, i)
-        .applyMatrix4(m.matrixWorld));
-  });
-  const centroid = pts.reduce((a, p) => a.add(p), new THREE.Vector3())
-    .divideScalar(pts.length);
-  let A = pts[0], best = -1;
-  for (const p of pts) { const d = p.distanceToSquared(centroid);
-    if (d > best) { best = d; A = p; } }
-  let B = pts[0]; best = -1;
-  for (const p of pts) { const d = p.distanceToSquared(A);
-    if (d > best) { best = d; B = p; } }
-  const axis = B.clone().sub(A).normalize();
-  if (axis.y < 0) axis.negate();
-  const inner = new THREE.Group();
-  inner.quaternion.setFromUnitVectors(axis, new THREE.Vector3(0, 1, 0));
-  inner.add(model);
-  const nbox = new THREE.Box3().setFromObject(inner);
-  const nlen = nbox.max.y - nbox.min.y;
+  const { pivot, nlen } = normalizeProp(model, { mode: "long",
+                                                 grip: wp.grip });
   const boneScale = handBone.getWorldScale(new THREE.Vector3()).y || 1;
-  const s = wp.len / nlen / boneScale;
-  const gripY = nbox.min.y + wp.grip * nlen;
-  const grip = new THREE.Group();                // origin at the grip point
-  inner.position.y = -gripY;
-  grip.add(inner);
-  grip.scale.setScalar(s);
+  pivot.scale.setScalar(wp.len / nlen / boneScale);
   const invBone = neutralQ.clone().invert();
   const want = new THREE.Quaternion().setFromEuler(new THREE.Euler(...wp.rot));
   const wrap = new THREE.Group();
   wrap.quaternion.copy(invBone).multiply(want);
   if (wp.pos) wrap.position.copy(new THREE.Vector3(...wp.pos)
     .applyQuaternion(invBone).divideScalar(boneScale));
-  wrap.add(grip);
+  wrap.add(pivot);
   handBone.add(wrap);
   return { wrap, want };
 }
@@ -677,13 +652,8 @@ function buildPlayer(speciesId, weaponId) {
   wrap.rotation.y = PLAYER_YAW;
   wrap.updateMatrixWorld(true);
 
-  let hand = null;
-  const B = {};
-  model.traverse((o) => {
-    if (!o.isBone) return;
-    B[o.name] = o;
-    if (!hand && /righthand$|hand[._]?r$|r[._]?hand$/i.test(o.name)) hand = o;
-  });
+  const B = socketBoneMap(model);
+  const hand = resolveBone(B, "hand_r");
   let weapon = null;
   if (hand) {
     const neutralQ = hand.getWorldQuaternion(new THREE.Quaternion());
