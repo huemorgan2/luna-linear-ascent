@@ -51,7 +51,7 @@ DST = os.path.join(_HERE, "..", "..", "worldd", "static", "site",
 _YAMLS = os.path.join(_HERE, "..", "..", "plugin-linear-ascent",
                       "plugin_linear_ascent", "content", "floors")
 
-FLOORS = range(1, 11)               # phase 1: floors 1–10
+FLOORS = range(1, 21)               # phase 2: floors 1–20
 SCENES = {**gf.SCENES, **_SCENES1}
 FLOOR_TEXT = {1: _FLOOR1_TEXT, **gf.FLOOR}
 
