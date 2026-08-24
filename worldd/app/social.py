@@ -34,6 +34,22 @@ from plugin_linear_ascent.engine.scene import Scene  # noqa: E402
 _WAR_PCT = re.compile(r"cut to (\d+)%")
 
 
+# ── 078: the narrow doc ──────────────────────────────────────────────────
+# Tiles, torches and roster rows need a dozen doc fields, not the whole
+# ~9 KB doc. This jsonb_build_object ships exactly what the engine helpers
+# (atk/dfs/max_hp/energy_now) and the tile/room-key builders read;
+# jsonb_strip_nulls keeps .get() semantics for absent keys. Full docs are
+# fetched only for bounded sets (the viewer's row, profiles ≤ 80).
+_MINI_KEYS = (
+    "stage", "name", "race", "clazz", "level", "floor", "unlocked_floor",
+    "location", "guild", "gold", "bank", "sleeping", "profile_back",
+    "gear", "training", "mastery", "prestige", "faction_buff",
+    "energy_val", "energy_ts", "hp", "encounter", "lodged_until_day",
+)
+_MINI_SQL = ("jsonb_strip_nulls(jsonb_build_object("
+             + ",".join(f"'{k}', doc->'{k}'" for k in _MINI_KEYS) + "))")
+
+
 def _condense_war(rows: list[dict]) -> list[str]:
     """Rows arrive newest-first. A 'boss' (fell) line for a floor
     silences every 'war' threshold line for that floor in the window;
@@ -65,14 +81,38 @@ def _condense_war(rows: list[dict]) -> list[str]:
 
 # ── Injection ────────────────────────────────────────────────────────────
 
+# 078: fight rounds are the hottest clicks and land back on a fight (or
+# after-fight) card — a surface that renders no relay, no pvp list, no
+# Stone of Names. Skipping those viewer-dependent reads for exactly these
+# options is safe by construction; anything unrecognized gets the full
+# injection (correctness first). Mirrors combat._ROUND_ACTIONS; the
+# "attack_<slug>" prefix (a held side-arm's row) counts only INSIDE an
+# encounter — outside one, "attack_<Name>" is a PvP initiation and needs
+# the full pvp_targets read.
+_FIGHT_OPTIONS = frozenset({
+    "attack", "close_in", "open_distance", "create_distance", "run",
+    "stand", "shield_wall", "sleep_spell", "treeline_shot", "drink_tonic",
+    "drink_medgel", "drink_trauma_kit",
+    "throw_net", "use_hook", "use_strip", "use_curse",
+    "use_veil", "use_apple"})
+
+
+def _is_fight_round(doc: dict, option: str) -> bool:
+    if not doc.get("encounter"):
+        return False
+    return option in _FIGHT_OPTIONS or option.startswith("attack")
+
+
 async def inject_world(conn, tenant: str, player: str, doc: dict,
                        option: str = "") -> None:
+    from . import worldcache
     w: dict = {"social": True}
     day = pstate.world_day()
 
-    row = await conn.fetchrow(
-        "SELECT value FROM ascent_world WHERE key='frontier'")
-    w["frontier"] = int(json.loads(row["value"])) if row else 1
+    # 078: everything viewer-independent rides the process-wide snapshot
+    # (≤ WORLD_TTL_S old, stale-while-revalidate — see worldcache.py).
+    snap = await worldcache.snapshot(conn)
+    w["frontier"] = snap["frontier"]
 
     # 010: factions are authoritative — the doc's guild string follows the
     # membership table (kicks land on the next load). Runs before the
@@ -112,60 +152,49 @@ async def inject_world(conn, tenant: str, player: str, doc: dict,
         w["armory_took_today"] = bool(prior is not None
                                       and int(prior) >= day)
     else:
-        w["factions"] = await _faction_hall(conn)
+        w["factions"] = snap["factions_hall"]
         # 019: the hall's "Join a banner" row carries the true count,
         # not the top-10 window
-        w["factions_total"] = await conn.fetchval(
-            "SELECT count(*) FROM ascent_factions")
-        w["faction_banners"] = factions.banner_slugs()
+        w["factions_total"] = snap["factions_total"]
+        w["faction_banners"] = snap["faction_banners"]
         # 010: the founding flow's color step reads the roster
         w["faction_colors"] = factions.COLOR_SLUGS
         # 015: the pending request, so the hall shows the asked state
         w["faction_requested"] = await factions.my_request(
             conn, tenant, player) or ""
         # 042: the Guild Hall wall — every banner, joinable on the spot
-        w["guild_dir"] = await factions.directory(conn)
+        w["guild_dir"] = snap["guild_dir"]
 
     # 032: the Guildhall's civic wall — this week's standings and the
     # hall of banners — hangs for everyone, member or not.
-    w["hall_board"] = await factions.hall_board(conn)
+    w["hall_board"] = snap["hall_board"]
 
     w["inbox_count"] = await conn.fetchval(
         "SELECT count(*) FROM ascent_letters "
         "WHERE to_tenant=$1 AND to_player=$2 AND NOT read", tenant, player)
 
-    happ = await conn.fetch(
-        "SELECT kind, line, floor FROM ascent_happenings "
-        "WHERE world_day >= $1 ORDER BY id DESC LIMIT 20", day - 1)
-    w["happenings"] = _condense_war([dict(r) for r in happ])[:5]
+    w["happenings"] = snap["happenings"]
+    w["stone"] = snap["stone"]
+    w["eras"] = snap["eras"]
 
-    stone = await conn.fetch(
-        "SELECT line FROM ascent_stone ORDER BY id DESC LIMIT 8")
-    w["stone"] = [r["line"] for r in stone]
-    # 022/007: the Stone of Eras — permanent, readable in every era.
-    eras = await conn.fetch(
-        "SELECT era, data FROM ascent_eras ORDER BY era DESC LIMIT 5")
-    w["eras"] = [
-        (lambda d: f"ERA {r['era']} — fell on day {d.get('world_day', '?')}"
-                   f" to {d.get('finisher', '?')} and "
-                   f"{max(0, len(d.get('war_party', [])) - 1)} blades")
-        (json.loads(r["data"])) for r in eras]
-
-    # loaded unconditionally: the upcoming action may move the player into
-    # any social scene, and injection happens before the engine runs.
-    rows = await conn.fetch(
+    fight = _is_fight_round(doc, option)
+    # the upcoming action may move the player into any social scene —
+    # except a fight round, whose destination is the fight/after-fight
+    # card and renders none of these.
+    rows = [] if fight else await conn.fetch(
         "SELECT id, from_name, body, gold FROM ascent_letters "
         "WHERE to_tenant=$1 AND to_player=$2 AND NOT read "
         "ORDER BY id DESC LIMIT 8", tenant, player)
     w["letters"] = [dict(r) for r in rows]
-    w["names"] = await _known_names(conn, doc)
-    w["pvp_targets"] = await _pvp_targets(conn, tenant, player, doc, day)
-    w["grant_targets"] = await _grant_targets(conn, doc)
+    w["names"] = [] if fight else await _known_names(conn, doc)
+    w["pvp_targets"] = ([] if fight else
+                        await _pvp_targets(conn, tenant, player, doc, day))
+    w["grant_targets"] = [] if fight else await _grant_targets(conn, doc)
 
-    w["roster"], w["roster_count"] = await _roster(conn)
+    w["roster"], w["roster_count"] = snap["roster"], snap["roster_count"]
 
     # 007 §4 / 022: the census also sizes the warden pool and quorums
-    w["census"] = await _census(conn)
+    w["census"] = snap["census"]
     active = int(w["census"].get("total", 0))
 
     floor = max(1, doc.get("floor", 1))
@@ -186,18 +215,21 @@ async def inject_world(conn, tenant: str, player: str, doc: dict,
             "quorum": economy.milestone_quorum(floor, active),
         }
 
-    # 007 §3: the ONE live Warden at the world frontier
-    w["warden"] = await _world_warden(conn, w["frontier"], active)
+    # 007 §3: the ONE live Warden at the world frontier. Shallow copy —
+    # game code patches scene state around this dict and the snapshot's
+    # copy must stay pristine for the next act.
+    w["warden"] = dict(snap["warden"]) if snap["warden"] else None
     # 034 §3: every keep already broken, and when. The memorial standing
     # in each of them reads this; it sits at the top of the payload
     # because `warden` is None at a milestone frontier.
-    w["fallen"] = await _fallen_map(conn)
+    w["fallen"] = snap["fallen"]
 
     # 022/008: the floor's open flare, the assist kill-log, and the
-    # lodge's long fire — all world rows, all reads.
+    # lodge's long fire — the first two are per-floor point reads and
+    # carry viewer flags; the fire rides the snapshot.
     w["flare"] = await _floor_flare(conn, tenant, player, floor)
     w["recent_kills"] = await _floor_kills(conn, floor)
-    w["fire"] = await _long_fire(conn)
+    w["fire"] = snap["fire"]
     news_floor = doc.get("floor", 0) or w["frontier"]
     # rows written without a floor (pvp, faction lines) are world-wide
     # news — they read on every floor's paper, not just the frontier's.
@@ -210,8 +242,9 @@ async def inject_world(conn, tenant: str, player: str, doc: dict,
 
     # 042: who stands where — every room's tiles, and a Stone of Names
     # payload for everyone the viewer could click this act.
-    w["rooms"], w["rooms_n"] = await _rooms(conn)
-    w["profiles"] = await _profiles(conn, doc, w, option)
+    w["rooms"], w["rooms_n"] = snap["rooms"], snap["rooms_n"]
+    w["profiles"] = ({} if fight else
+                     await _profiles(conn, doc, w, option))
 
     doc["_world"] = w
 
@@ -316,9 +349,8 @@ async def _census(conn) -> dict:
     all actives, active in the last week". Without the window every
     account that ever played kept inflating the top-floor quorums."""
     rows = await conn.fetch(
-        "SELECT greatest(coalesce((doc->>'floor')::int, 0), 1) AS fl, "
-        "count(*) AS n FROM ascent_players "
-        "WHERE doc->>'stage'='playing' "
+        "SELECT floor AS fl, count(*) AS n FROM ascent_players "
+        "WHERE stage='playing' "
         "AND updated_at > now() - interval '7 days' GROUP BY 1")
     by_floor = {int(r["fl"]): int(r["n"]) for r in rows}
     return {"total": sum(by_floor.values()), "by_floor": by_floor}
@@ -339,6 +371,11 @@ _TORCH_LIMIT = 6
 _FIELD_LOCATIONS = ("gate_town", "warden_keep", "boss_keep")
 
 _presence_cache: dict = {"at": None, "data": None}
+
+# Python truthiness for doc["encounter"]: a finished fight leaves
+# `"encounter": null` (or {}) in the doc — neither puts a body on a floor.
+_ENCOUNTER_SQL = ("(doc->'encounter' IS NOT NULL "
+                  "AND doc->'encounter' NOT IN ('null'::jsonb, '{}'::jsonb))")
 
 
 def _torch_status(d: dict) -> str:
@@ -365,29 +402,35 @@ async def _presence(conn) -> dict:
     if _presence_cache["data"] is not None and cached_at is not None \
             and (now - cached_at).total_seconds() < PRESENCE_TTL_S:
         return _presence_cache["data"]
+    # 078: counts are a grouped aggregate; only the HOT window (3 min of
+    # activity) fetches narrow docs — the torches need names and status.
     rows = await conn.fetch(
-        "SELECT doc, updated_at FROM ascent_players "
-        "WHERE doc->>'stage'='playing' "
-        "AND updated_at > now() - make_interval(mins => $1)",
-        PRESENCE_CAMP_MIN)
+        "SELECT floor AS fl, "
+        "(updated_at > now() - make_interval(mins => $1)) AS hot, "
+        "count(*) AS n FROM ascent_players "
+        "WHERE stage='playing' "
+        "AND updated_at > now() - make_interval(mins => $2) "
+        f"AND (location = ANY($3::text[]) OR {_ENCOUNTER_SQL}) "
+        "GROUP BY 1, 2",
+        PRESENCE_HOT_MIN, PRESENCE_CAMP_MIN, list(_FIELD_LOCATIONS))
     by_floor: dict[int, dict] = {}
-    torches: dict[int, list] = {}
     for r in rows:
-        d = json.loads(r["doc"])
-        if d.get("location") not in _FIELD_LOCATIONS \
-                and not d.get("encounter"):
-            continue
-        fl = max(1, int(d.get("floor") or 1))
-        age_min = (now - r["updated_at"]).total_seconds() / 60
-        slot = by_floor.setdefault(fl, {"hot": 0, "camped": 0})
-        if age_min <= PRESENCE_HOT_MIN:
-            slot["hot"] += 1
-            t = torches.setdefault(fl, [])
-            if len(t) < _TORCH_LIMIT:
-                t.append({"name": d.get("name") or "a climber",
-                          "status": _torch_status(d)})
-        else:
-            slot["camped"] += 1
+        slot = by_floor.setdefault(int(r["fl"]), {"hot": 0, "camped": 0})
+        slot["hot" if r["hot"] else "camped"] += int(r["n"])
+    torches: dict[int, list] = {}
+    hot_rows = await conn.fetch(
+        f"SELECT floor AS fl, {_MINI_SQL} AS mini FROM ascent_players "
+        "WHERE stage='playing' "
+        "AND updated_at > now() - make_interval(mins => $1) "
+        f"AND (location = ANY($2::text[]) OR {_ENCOUNTER_SQL}) "
+        "ORDER BY updated_at DESC",
+        PRESENCE_HOT_MIN, list(_FIELD_LOCATIONS))
+    for r in hot_rows:
+        d = json.loads(r["mini"])
+        t = torches.setdefault(int(r["fl"]), [])
+        if len(t) < _TORCH_LIMIT:
+            t.append({"name": d.get("name") or "a climber",
+                      "status": _torch_status(d)})
     data = {"by_floor": by_floor, "torches": torches}
     _presence_cache.update(at=now, data=data)
     return data
@@ -507,14 +550,22 @@ async def _world_warden(conn, frontier: int,
 
 async def _roster(conn) -> tuple[list[dict], int]:
     """The Muster Roll: every playing climber, strongest floors first.
-    Banked-wealth rank is over the whole roster; the board shows 12."""
+    Banked-wealth rank is over the whole roster; the board shows 12.
+
+    078: the rank and the board order are windows in SQL — Postgres never
+    ships a doc for anyone off the board, and the 12 winners ship the
+    narrow doc (power needs gear, the glyph needs prestige)."""
     rows = await conn.fetch(
-        "SELECT doc, updated_at FROM ascent_players "
-        "WHERE doc->>'stage'='playing'")
+        f"SELECT updated_at, {_MINI_SQL} AS mini, "
+        "row_number() OVER (ORDER BY bank DESC) AS bank_rank "
+        "FROM ascent_players WHERE stage='playing' "
+        "ORDER BY unlocked_floor DESC, level DESC LIMIT 12")
+    total = int(await conn.fetchval(
+        "SELECT count(*) FROM ascent_players WHERE stage='playing'") or 0)
     now = pstate.now()
     entries = []
     for r in rows:
-        d = json.loads(r["doc"])
+        d = json.loads(r["mini"])
         # 022/007: reincarnation glyphs ride every social surface
         pts = int((d.get("prestige") or {}).get("points", 0))
         glyph = " " + "✦" * min(pts, 3) if pts else ""
@@ -525,50 +576,41 @@ async def _roster(conn) -> tuple[list[dict], int]:
             "level": d.get("level", 1),
             "power": pstate.atk(d) + pstate.dfs(d),
             "floor": d.get("unlocked_floor", 1),
-            "bank": d.get("bank", 0),
+            "bank_rank": int(r["bank_rank"]),
             "last_seen_days": max(0, (now - r["updated_at"]).days),
         })
-    by_bank = sorted(entries, key=lambda e: -e["bank"])
-    for rank, e in enumerate(by_bank, 1):
-        e["bank_rank"] = rank
-        del e["bank"]                      # rank is public, balance is not
-    entries.sort(key=lambda e: (-e["floor"], -e["level"]))
-    return entries[:12], len(entries)
+    return entries, total
 
 
 async def _known_names(conn, doc: dict) -> list[str]:
     rows = await conn.fetch(
-        "SELECT doc->>'name' AS name FROM ascent_players "
-        "WHERE doc->>'stage'='playing' ORDER BY updated_at DESC LIMIT 12")
+        "SELECT name FROM ascent_players "
+        "WHERE stage='playing' ORDER BY updated_at DESC LIMIT 12")
     me = doc.get("name")
     return [r["name"] for r in rows if r["name"] and r["name"] != me]
 
 
 async def _pvp_targets(conn, tenant: str, player: str, doc: dict,
                        day: int) -> list[dict]:
+    # 078: same law, no docs — the 30-newest window and the lodge/level
+    # filters are all projected columns.
     rows = await conn.fetch(
-        "SELECT tenant, player, doc FROM ascent_players "
-        "WHERE doc->>'stage'='playing' AND NOT (tenant=$1 AND player=$2) "
-        "ORDER BY updated_at DESC LIMIT 30", tenant, player)
-    out = []
-    for r in rows:
-        d = json.loads(r["doc"])
-        if d.get("lodged_until_day", -1) >= day + 1:
-            continue                     # paid the Lodge — safe tonight
-        if d.get("level", 1) <= economy.BEGINNER_PROTECTION_MAX_LEVEL:
-            continue
-        out.append({"tenant": r["tenant"], "player": r["player"],
-                    "name": d.get("name") or r["player"],
-                    "level": d.get("level", 1)})
-        if len(out) >= 6:
-            break
-    return out
+        "SELECT tenant, player, name, level FROM ("
+        "  SELECT tenant, player, name, level, lodged_until_day, updated_at"
+        "  FROM ascent_players"
+        "  WHERE stage='playing' AND NOT (tenant=$1 AND player=$2)"
+        "  ORDER BY updated_at DESC LIMIT 30) w "
+        "WHERE lodged_until_day < $3 AND level > $4 "
+        "ORDER BY updated_at DESC LIMIT 6",
+        tenant, player, day + 1, economy.BEGINNER_PROTECTION_MAX_LEVEL)
+    return [{"tenant": r["tenant"], "player": r["player"],
+             "name": r["name"] or r["player"],
+             "level": int(r["level"] or 1)} for r in rows]
 
 
 async def _grant_targets(conn, doc: dict) -> list[str]:
     rows = await conn.fetch(
-        "SELECT doc->>'name' AS name, (doc->>'level')::int AS level "
-        "FROM ascent_players WHERE doc->>'stage'='playing' "
+        "SELECT name FROM ascent_players WHERE stage='playing' "
         "ORDER BY updated_at DESC LIMIT 20")
     me = doc.get("name")
     # 036: any level can receive — the burn and daily cap do the policing.
@@ -646,13 +688,13 @@ async def _rooms(conn) -> tuple[dict, dict]:
     Ships only the first _ROOM_TILE_CAP per room; the second dict is the
     TRUE count per room, so the card can say MORE N PLAYERS."""
     rows = await conn.fetch(
-        "SELECT doc FROM ascent_players WHERE doc->>'stage'='playing' "
-        "AND (updated_at > now() - interval '24 hours' "
-        "     OR doc->'sleeping' IS NOT NULL)")
+        f"SELECT {_MINI_SQL} AS mini FROM ascent_players "
+        "WHERE stage='playing' "
+        "AND (updated_at > now() - interval '24 hours' OR sleeping)")
     rooms: dict[str, list] = {}
     counts: dict[str, int] = {}
     for r in rows:
-        d = json.loads(r["doc"])
+        d = json.loads(r["mini"])
         if not d.get("name"):
             continue
         key = _room_key_of(d)
@@ -674,13 +716,13 @@ async def room_more_tiles(conn, doc: dict) -> tuple[list, int]:
     if not key:
         return [], 0
     rows = await conn.fetch(
-        "SELECT doc FROM ascent_players WHERE doc->>'stage'='playing' "
-        "AND (updated_at > now() - interval '24 hours' "
-        "     OR doc->'sleeping' IS NOT NULL)")
+        f"SELECT {_MINI_SQL} AS mini FROM ascent_players "
+        "WHERE stage='playing' "
+        "AND (updated_at > now() - interval '24 hours' OR sleeping)")
     tiles = []
     me = doc.get("name")
     for r in rows:
-        d = json.loads(r["doc"])
+        d = json.loads(r["mini"])
         if not d.get("name") or d["name"] == me:
             continue
         if _room_key_of(d) != key:
@@ -738,19 +780,25 @@ async def _profiles(conn, doc: dict, w: dict, option: str = "") -> dict:
         return {}
     rows = await conn.fetch(
         "SELECT tenant, player, doc, updated_at FROM ascent_players "
-        "WHERE doc->>'stage'='playing' AND doc->>'name' = ANY($1::text[]) "
+        "WHERE stage='playing' AND name = ANY($1::text[]) "
         "ORDER BY updated_at", sorted(names)[:_PROFILE_CAP])
-    # what each climber gave their banner — three cheap grouped reads
+    # what each climber gave their banner — grouped reads scoped to the
+    # profiled players (078: these used to group their whole tables)
+    tenants = [r["tenant"] for r in rows]
+    players = [r["player"] for r in rows]
     coins = {(r["tenant"], r["player"]): int(r["n"]) for r in await conn.fetch(
         "SELECT tenant, player, sum(amount) AS n FROM ascent_faction_ledger "
         "WHERE amount > 0 AND kind IN ('join_fee','dues','donation') "
-        "GROUP BY tenant, player")}
+        "AND tenant = ANY($1::text[]) AND player = ANY($2::text[]) "
+        "GROUP BY tenant, player", tenants, players)}
     racked = {(r["tenant"], r["player"]): int(r["n"]) for r in await conn.fetch(
         "SELECT tenant, player, count(*) AS n FROM ascent_armory "
-        "GROUP BY tenant, player")}
+        "WHERE tenant = ANY($1::text[]) AND player = ANY($2::text[]) "
+        "GROUP BY tenant, player", tenants, players)}
     cut = {(r["tenant"], r["player"]): int(r["n"]) for r in await conn.fetch(
         "SELECT tenant, player, sum(dmg) AS n FROM ascent_warden_damage "
-        "GROUP BY tenant, player")}
+        "WHERE tenant = ANY($1::text[]) AND player = ANY($2::text[]) "
+        "GROUP BY tenant, player", tenants, players)}
     now = pstate.now()
     day = pstate.world_day()
     out: dict[str, dict] = {}
@@ -834,7 +882,7 @@ async def online_count(conn) -> int:
         return _online_cache["n"]
     n = await conn.fetchval(
         "SELECT count(*) FROM ascent_players "
-        "WHERE doc->>'stage'='playing' "
+        "WHERE stage='playing' "
         "AND updated_at > now() - make_interval(mins => $1)",
         ONLINE_WINDOW_MIN)
     _online_cache["at"] = now
@@ -1198,7 +1246,7 @@ async def _fx_faction_promote(conn, tenant: str, player: str,
 async def _find_player_by_name(conn, name: str):
     return await conn.fetchrow(
         "SELECT tenant, player, doc FROM ascent_players "
-        "WHERE doc->>'name' = $1 AND doc->>'stage'='playing' "
+        "WHERE name = $1 AND stage='playing' "
         "ORDER BY updated_at DESC LIMIT 1", name)
 
 
@@ -1384,7 +1432,7 @@ async def _fx_loot(conn, tenant: str, player: str, doc: dict,
     a_name = doc.get("name") or player
     row = await conn.fetchrow(
         "SELECT tenant, player, doc, updated_at FROM ascent_players "
-        "WHERE doc->>'name' = $1 AND doc->>'stage'='playing' "
+        "WHERE name = $1 AND stage='playing' "
         "ORDER BY updated_at DESC LIMIT 1", target)
     day = pstate.world_day()
 
@@ -1536,7 +1584,7 @@ async def _fx_warden_strike(conn, tenant: str, player: str, doc: dict,
     row = await conn.fetchrow(
         "SELECT value FROM ascent_world WHERE key=$1 FOR UPDATE", key)
     active = await conn.fetchval(
-        "SELECT count(*) FROM ascent_players WHERE doc->>'stage'='playing'")
+        "SELECT count(*) FROM ascent_players WHERE stage='playing'")
     active = int(active or 0)
     warden_name = schema.get_floor(floor).warden_name
     name = doc.get("name") or player
@@ -1670,7 +1718,7 @@ async def _fx_horn(conn, tenant: str, player: str, doc: dict,
         floor=floor, actor=doc.get("name") or player, faction=guild)
     rows = await conn.fetch(
         "SELECT tenant, player FROM ascent_players "
-        "WHERE doc->>'guild' = $1 AND doc->>'stage' = 'playing'", guild)
+        "WHERE guild = $1 AND stage = 'playing'", guild)
     sounder = doc.get("name") or player
     for r in rows:
         if r["tenant"] == tenant and r["player"] == player:
@@ -1864,6 +1912,10 @@ async def _warden_fall(conn, tenant: str, player: str, doc: dict,
         "UPDATE ascent_world SET value=$1::jsonb "
         "WHERE key='frontier' AND (value)::int < $2",
         json.dumps(floor + 1), floor + 1)
+    # 078: the keep fell — every player's next click must see the open
+    # floor and the memorial, not a ≤10s-stale warden.
+    from . import worldcache
+    worldcache.invalidate()
 
     if floor + 1 == 100:
         # 022/007: the last floor just opened — the siege is DECLARED,
@@ -1998,7 +2050,7 @@ async def _fx_boss_commit(conn, tenant: str, player: str, doc: dict,
         "SELECT tenant, player, name FROM ascent_boss_commits "
         "WHERE floor=$1 AND world_day >= $2", floor, day - 2)
     active = await conn.fetchval(
-        "SELECT count(*) FROM ascent_players WHERE doc->>'stage'='playing'")
+        "SELECT count(*) FROM ascent_players WHERE stage='playing'")
     if len(commits) < economy.milestone_quorum(floor, int(active or 0)
                                                or None):
         return
@@ -2077,6 +2129,8 @@ async def _resolve_boss(conn, tenant: str, player: str, doc: dict,
             "UPDATE ascent_world SET value=$1::jsonb "
             "WHERE key='frontier' AND (value)::int < $2",
             json.dumps(ms.floor + 1), ms.floor + 1)
+        from . import worldcache
+        worldcache.invalidate()
         await add_happening(
             conn, kind="boss", floor=ms.floor,
             line=f"{ms.name} fell to {names} — floor {ms.floor + 1} is open")
@@ -2097,33 +2151,45 @@ async def _resolve_boss(conn, tenant: str, player: str, doc: dict,
 
 async def leaderboard(conn, tenant: str, player: str) -> dict:
     """Every playing climber — level and gold visible (010 widened this
-    deliberately; Muster kept bank as rank-only, the Score tab shows it)."""
+    deliberately; Muster kept bank as rank-only, the Score tab shows it).
+
+    078: the board is projected columns end to end — the 200 shown rows
+    are ordered and cut inside Postgres, no doc ever ships. You are on
+    your own board even below the cut — your row rides along at the end."""
+    _cols = ("p.tenant, p.player, p.name, p.race, p.clazz, p.level,"
+             " p.gold, p.bank, p.unlocked_floor, p.updated_at, m.faction")
+    _from = ("FROM ascent_players p "
+             "LEFT JOIN ascent_faction_members m "
+             "  ON m.tenant=p.tenant AND m.player=p.player ")
     rows = await conn.fetch(
-        "SELECT p.tenant, p.player, p.doc, p.updated_at, m.faction "
-        "FROM ascent_players p "
-        "LEFT JOIN ascent_faction_members m "
-        "  ON m.tenant=p.tenant AND m.player=p.player "
-        "WHERE p.doc->>'stage'='playing'")
+        f"SELECT {_cols} {_from} WHERE p.stage='playing' "
+        "ORDER BY p.level DESC, (p.gold + p.bank) DESC LIMIT 200")
+    if not any(r["tenant"] == tenant and r["player"] == player
+               for r in rows):
+        mine = await conn.fetchrow(
+            f"SELECT {_cols} {_from} "
+            "WHERE p.tenant=$1 AND p.player=$2 AND p.stage='playing'",
+            tenant, player)
+        if mine:
+            rows = list(rows) + [mine]
+    total = int(await conn.fetchval(
+        "SELECT count(*) FROM ascent_players WHERE stage='playing'") or 0)
     now = pstate.now()
-    out = []
-    for r in rows:
-        d = json.loads(r["doc"])
-        out.append({
-            "name": d.get("name") or "a climber",
-            "race": d.get("race") or "?",
-            "clazz": d.get("clazz") or "?",
-            "level": d.get("level", 1),
-            "gold": d.get("gold", 0),
-            "bank": d.get("bank", 0),
-            "floor": d.get("unlocked_floor", 1),
-            "faction": r["faction"] or "",
-            # 005: (tenant, player), not tenant alone — the shared web
-            # tenant holds every browser climber and they are not all you
-            "you": r["tenant"] == tenant and r["player"] == player,
-            "last_seen_days": max(0, (now - r["updated_at"]).days),
-        })
-    out.sort(key=lambda e: (-e["level"], -(e["gold"] + e["bank"])))
-    return {"players": out[:200], "total": len(out)}
+    out = [{
+        "name": r["name"] or "a climber",
+        "race": r["race"] or "?",
+        "clazz": r["clazz"] or "?",
+        "level": int(r["level"] or 1),
+        "gold": int(r["gold"] or 0),
+        "bank": int(r["bank"] or 0),
+        "floor": int(r["unlocked_floor"] or 1),
+        "faction": r["faction"] or "",
+        # 005: (tenant, player), not tenant alone — the shared web
+        # tenant holds every browser climber and they are not all you
+        "you": r["tenant"] == tenant and r["player"] == player,
+        "last_seen_days": max(0, (now - r["updated_at"]).days),
+    } for r in rows]
+    return {"players": out, "total": total}
 
 
 async def floor_presence(conn, tenant: str, player: str) -> dict:

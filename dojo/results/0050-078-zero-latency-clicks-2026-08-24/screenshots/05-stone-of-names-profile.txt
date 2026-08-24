@@ -1,0 +1,4 @@
+The Stone of Names page for seeded player Seed1827 (orc rogue, level 23).
+1-bit portrait figure, gear sockets (locked), HP/energy/XP/ATK/DEF/SPD
+meters, pack contents, social actions (letter, money, gift, loot with the
+odds line). Odd HP scale 320/16702 is a synthetic-seed-doc artifact.

@@ -1,0 +1,4 @@
+Roothollow square card after returning from a floor. Full-bleed 1-bit town
+banner (eclipse over rooftops) loaded from /static/laart. WAITING FOR YOU
+box with COLLECT (contract board, 80 coins) and PLAN (lodge night) tiles.
+Headline "Roothollow — floor 4 is the frontier". No missing art, no raw JSON.

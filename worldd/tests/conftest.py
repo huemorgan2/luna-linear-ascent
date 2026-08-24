@@ -17,6 +17,10 @@ os.environ.setdefault("ASCENT_ADMIN_KEY", "test-admin-key")
 os.environ.setdefault("ASCENT_RATE_CAPACITY", "100000")
 os.environ.setdefault("ASCENT_ENROLL_PER_HOUR", "100000")
 os.environ.setdefault("ASCENT_SIGNUP_PER_HOUR", "100000")
+# 078: multi-actor contracts (A acts, B looks) need to see each other's
+# writes in the same breath — run with the world snapshot cache off. The
+# cache's own laws are pinned in test_078_worldcache, which sets a real TTL.
+os.environ.setdefault("ASCENT_WORLD_TTL_S", "0")
 
 
 @pytest_asyncio.fixture

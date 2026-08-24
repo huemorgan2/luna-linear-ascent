@@ -75,12 +75,10 @@ async def players(q: str = "", limit: int = 100) -> dict:
     pool = await db.get_pool()
     rows = await pool.fetch(
         "SELECT tenant, player, doc, updated_at FROM ascent_players "
-        "WHERE $1 = '' OR doc->>'name' ILIKE '%'||$1||'%' "
+        "WHERE $1 = '' OR name ILIKE '%'||$1||'%' "
         "   OR player ILIKE '%'||$1||'%' "
         "   OR doc->>'luna_user' ILIKE '%'||$1||'%' "
-        "ORDER BY coalesce((doc->>'level')::int, 1) DESC, "
-        "  coalesce((doc->>'gold')::numeric, 0)"
-        "   + coalesce((doc->>'bank')::numeric, 0) DESC "
+        "ORDER BY level DESC, (gold + bank) DESC "
         "LIMIT $2", q.strip(), min(max(limit, 1), 200))
     total = await pool.fetchval("SELECT count(*) FROM ascent_players")
     return {"players": [
@@ -282,7 +280,7 @@ async def world_overview() -> dict:
         census = await social._census(conn)
         pop = await conn.fetchrow(
             "SELECT count(*) AS total, "
-            "count(*) FILTER (WHERE doc->>'stage'='playing') AS playing, "
+            "count(*) FILTER (WHERE stage='playing') AS playing, "
             "count(*) FILTER (WHERE updated_at > now() - interval '1 day')"
             " AS seen_today FROM ascent_players")
         ledger = await conn.fetchrow(

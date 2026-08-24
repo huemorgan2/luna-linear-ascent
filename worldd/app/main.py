@@ -48,6 +48,18 @@ app = FastAPI(title="ascent-worldd", version="0.3.0", lifespan=lifespan)
 # GIF left them; text responses stay compressible either way.
 app.add_middleware(GZipMiddleware, minimum_size=1024)
 
+class ImmutableStaticFiles(StaticFiles):
+    """078: every /static/laart URL carries ?v={plugin version} — the
+    content behind a URL never changes, so the browser may keep it for a
+    year and never revalidate. Three menu clicks = one art download."""
+
+    def file_response(self, *args, **kwargs):
+        resp = super().file_response(*args, **kwargs)
+        resp.headers["Cache-Control"] = ("public, max-age=31536000, "
+                                         "immutable")
+        return resp
+
+
 # PLAN4: the vendored event reels, by slug — fight3d's degrade path only
 # (a kill card ships no GIF; when WebGL/model fails the client repaints
 # the reel from here, tinted like a banner). Mounted BEFORE /static:
@@ -57,6 +69,22 @@ app.mount("/static/fxart",
                       / "vendor" / "plugin_linear_ascent" / "content"
                       / "art" / "events"),
           name="fxart")
+
+# 078: the WHOLE art tree (banners, creatures, events, portraits, gear,
+# weapons, faction sigils) as versioned immutable URLs. render.py stops
+# inlining ~50–650 KB of base64 into every fragment; set_art_base() below
+# is what flips it.
+_LAART_DIR = (Path(__file__).resolve().parent.parent
+              / "vendor" / "plugin_linear_ascent" / "content" / "art")
+app.mount("/static/laart", ImmutableStaticFiles(directory=_LAART_DIR),
+          name="laart")
+
+from .gamepath import ensure_game_importable  # noqa: E402
+
+ensure_game_importable()
+from plugin_linear_ascent import render as _render  # noqa: E402
+
+_render.set_art_base("/static/laart")
 
 # Static shareables (e.g. /static/intro-movie/ — the 016 intro movie mock)
 app.mount("/static",

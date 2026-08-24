@@ -1,0 +1,3 @@
+The Forge card. 1-bit smithy banner, tier line "Tier 1 steel, scrap to
+plasma", item grid with weapon art (Scrap Dagger, Notched Cleaver, Keen
+Notched Cleaver in gold tint) — all art from static URLs, no broken masks.

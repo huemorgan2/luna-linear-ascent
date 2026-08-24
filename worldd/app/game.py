@@ -34,6 +34,9 @@ async def _raise_frontier(conn, floor: int) -> None:
         "UPDATE ascent_world SET value=$1::jsonb "
         "WHERE key='frontier' AND (value)::int < $2",
         json.dumps(floor), floor)
+    # 078: an open floor must show on the very next click, not in TTL
+    from . import worldcache
+    worldcache.invalidate()
 
 
 async def _load_doc(conn, tenant: str, player: str,
@@ -66,12 +69,15 @@ async def _save_doc(conn, tenant: str, player: str, doc: dict,
         "UPDATE ascent_players SET doc=$3, updated_at=now() "
         "WHERE tenant=$1 AND player=$2",
         tenant, player, json.dumps(doc))
-    for e in ledger:
-        await conn.execute(
-            "INSERT INTO ascent_ledger (tenant, player, kind, gold, xp, note)"
-            " VALUES ($1,$2,$3,$4,$5,$6)",
-            tenant, player, e.get("kind", ""), int(e.get("gold", 0)),
-            int(e.get("xp", 0)), str(e.get("note", ""))[:256])
+    if ledger:
+        # 078: one round trip for the whole receipt — executemany keeps
+        # insertion (and therefore id) order.
+        await conn.executemany(
+            "INSERT INTO ascent_ledger (tenant, player, kind, gold, xp,"
+            " note) VALUES ($1,$2,$3,$4,$5,$6)",
+            [(tenant, player, e.get("kind", ""), int(e.get("gold", 0)),
+              int(e.get("xp", 0)), str(e.get("note", ""))[:256])
+             for e in ledger])
 
 
 def _sync_frontier_into_doc(doc: dict, frontier: int) -> None:
@@ -214,7 +220,13 @@ async def run_act(tenant: str, player: str, option: str, text: str,
                     "INSERT INTO ascent_idempotency (tenant, idem, response)"
                     " VALUES ($1,$2,$3) ON CONFLICT DO NOTHING",
                     tenant, idem, json.dumps(out))
-            return out
+        if after > before:
+            # 078: invalidate AGAIN outside the transaction — a snapshot
+            # rebuilt between the in-txn invalidate and this commit read
+            # the old frontier and must not live out its TTL.
+            from . import worldcache
+            worldcache.invalidate()
+        return out
 
 
 _IMPORT_STAGES = {"intro", "creation_race", "creation_class",

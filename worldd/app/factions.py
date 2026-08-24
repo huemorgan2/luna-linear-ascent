@@ -213,13 +213,12 @@ async def member_row(conn, tenant: str, player: str):
 async def members_of(conn, faction: str) -> list[dict]:
     rows = await conn.fetch(
         "SELECT m.tenant, m.player, m.role, m.joined_day, m.arrears,"
-        "       p.doc->>'name' AS name,"
-        "       coalesce((p.doc->>'level')::int, 1) AS level,"
+        "       p.name, coalesce(p.level, 1) AS level,"
         "       p.doc->>'training' AS training,"
         "       p.doc->>'mastery' AS mastery,"
         # 059: online = acted inside the presence window while playing —
         # the same rule as social.online_count, per member
-        "       (p.doc->>'stage'='playing' AND p.updated_at >"
+        "       (p.stage='playing' AND p.updated_at >"
         "        now() - make_interval(mins => $2)) AS online "
         "FROM ascent_faction_members m "
         "LEFT JOIN ascent_players p ON p.tenant=m.tenant "

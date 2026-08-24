@@ -154,7 +154,7 @@ async def declare_last_siege(conn, active: int | None) -> None:
         "Floor 100 stands open — the era enters its last siege")
     rows = await conn.fetch(
         "SELECT tenant, player FROM ascent_players "
-        "WHERE doc->>'stage'='playing'")
+        "WHERE stage='playing'")
     for r in rows:
         await conn.execute(
             "INSERT INTO ascent_letters (to_tenant, to_player, from_name,"

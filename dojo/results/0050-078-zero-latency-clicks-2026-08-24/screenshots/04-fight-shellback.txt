@@ -1,0 +1,3 @@
+Fight card vs Shellback tortoise (first sighting, study box). Top meter bar
+HP 47/47 ATK 35 DEF 5 SPEED 3; range state "at range — it CANNOT reach you";
+full in-world stat explanation; options Close in / Stand your ground / Run.
