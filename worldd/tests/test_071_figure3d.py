@@ -34,6 +34,28 @@ def test_module_parses_and_stays_decoupled():
     assert 'from "three"' in js
     assert "from \"fight3d\"" not in js and "from 'fight3d'" not in js
     assert "tBayer" in js
+    # The pane reveal timer holds the original declarative canvas. Once
+    # figure3d replaces it, the live canvas must clear that stale opacity:0
+    # state itself.
+    assert 'classList.remove("waiting")' in js
+    assert 'classList.add("shown")' in js
+    # Object3D.add() returns the scene. Chaining position.set() onto it moves
+    # every model out of this portrait's narrow orthographic camera.
+    assert "const fill = new THREE.DirectionalLight" in js
+    assert "scene.add(fill)" in js
+    # Every card swap detaches the old portrait. It must release the RAF,
+    # render targets, and WebGL context instead of accumulating one complete
+    # renderer per selection.
+    assert "if (!gl.canvas.isConnected)" in js
+    assert "function dropGone()" in js
+    assert "dropGone();" in js
+    assert "gl.rtColor.dispose()" in js
+    assert "gl.rtNormal.dispose()" in js
+    assert "gl.renderer.forceContextLoss()" in js
+    assert "const reusable = [...lives.entries()]" in js
+    assert "scan(game);\n    dropGone();" in js
+    assert "const FRAME_MS = 1000 / 15" in js
+    assert "document.hidden || rect.bottom <= 0" in js
     node = shutil.which("node")
     if not node:
         return

@@ -314,7 +314,9 @@ function createStage(W, H) {
   key.position.set(-4, 7, 6);
   key.castShadow = true;
   scene.add(key);
-  scene.add(new THREE.DirectionalLight(0xffffff, 1.1)).position.set(5, 2, 3);
+  const fill = new THREE.DirectionalLight(0xffffff, 1.1);
+  fill.position.set(5, 2, 3);
+  scene.add(fill);
 
   return { canvas, renderer, rtColor, rtNormal, normalMat, postScene,
            postCam, postMat, scene, camera, clock: new THREE.Clock() };
@@ -430,6 +432,7 @@ async function buildFigure(gl, spec) {
 }
 
 const lives = new Map();   // canvas -> { gl, specKey, figure, raf }
+const FRAME_MS = 1000 / 15; // pixel-art idle does not need display-rate redraws
 // mount() replaces the declarative canvas with its WebGL canvas before its
 // models finish loading. The game's MutationObserver sees that replacement;
 // keep the replacement marked until the async build completes so it does not
@@ -464,9 +467,19 @@ function setHighlight(slot, root) {
   }
 }
 
-function tick(L) {
+function tick(L, now) {
   if (!L || L.dead) return;
   const { gl, figure } = L;
+  if (!gl.canvas.isConnected) {
+    drop(gl.canvas);
+    return;
+  }
+  L.raf = requestAnimationFrame((next) => tick(L, next));
+  if (now - L.lastFrame < FRAME_MS) return;
+  L.lastFrame = now;
+  const rect = gl.canvas.getBoundingClientRect();
+  if (document.hidden || rect.bottom <= 0 || rect.top >= innerHeight
+      || rect.right <= 0 || rect.left >= innerWidth) return;
   const dt = Math.min(gl.clock.getDelta(), 0.05);
   const tt = gl.clock.elapsedTime;
   if (figure) {
@@ -485,7 +498,23 @@ function tick(L) {
     }
   }
   renderFrame(gl);
-  L.raf = requestAnimationFrame(() => tick(L));
+}
+
+function disposeStage(gl, figure) {
+  if (!gl) return;
+  figure?.mixer?.stopAllAction();
+  gl.postScene.traverse((o) => {
+    if (o.isMesh) o.geometry?.dispose();
+  });
+  gl.postMat.uniforms.tBayer.value?.dispose();
+  gl.postMat.dispose();
+  gl.normalMat.dispose();
+  gl.rtColor.dispose();
+  gl.rtNormal.dispose();
+  gl.scene.clear();
+  gl.postScene.clear();
+  gl.renderer.dispose();
+  gl.renderer.forceContextLoss();
 }
 
 function drop(canvas) {
@@ -494,6 +523,13 @@ function drop(canvas) {
   L.dead = true;
   cancelAnimationFrame(L.raf);
   lives.delete(canvas);
+  disposeStage(L.gl, L.figure);
+}
+
+function dropGone() {
+  for (const canvas of [...lives.keys()]) {
+    if (!canvas.isConnected) drop(canvas);
+  }
 }
 
 async function mount(host) {
@@ -507,6 +543,20 @@ async function mount(host) {
   if (existing) drop(host);
   const W = spec.px ? spec.px[0] : (parseInt(host.width, 10) || 100);
   const H = spec.px ? spec.px[1] : (parseInt(host.height, 10) || 200);
+  // Most game acts replace the whole card but leave race and worn gear
+  // unchanged. Rebind that live stage during this mutation microtask instead
+  // of compiling a fresh WebGL renderer for every selection.
+  const reusable = [...lives.entries()].find(([canvas, L]) =>
+    !canvas.isConnected && !L.dead && L.specKey === key);
+  if (reusable) {
+    const [canvas] = reusable;
+    host.replaceWith(canvas);
+    canvas.className = host.className;
+    canvas.dataset.figure3d = key;
+    canvas.classList.remove("waiting");
+    canvas.classList.add("shown");
+    return;
+  }
   mounting.add(host);
   let gl;
   try { gl = createStage(W, H); }
@@ -521,18 +571,29 @@ async function mount(host) {
   gl.canvas.dataset.figure3d = key;
   gl.canvas.width = W;
   gl.canvas.height = H;
+  let figure = null;
   try {
-    const figure = await buildFigure(gl, spec);
+    figure = await buildFigure(gl, spec);
     if (!figure || !gl.canvas.isConnected) {
       degrade(gl.canvas);
+      disposeStage(gl, figure);
       return;
     }
-    const L = { gl, specKey: key, figure, raf: 0, dead: false };
+    const L = {
+      gl, specKey: key, figure, raf: 0, dead: false, lastFrame: 0,
+    };
     lives.set(gl.canvas, L);
+    // pane.runFX captured the declarative canvas before mount replaced it.
+    // Its delayed reveal therefore targets the detached node; carrying the
+    // transient `waiting` class onto this canvas would leave it opacity:0
+    // forever. The loaded WebGL figure is the completion of that reveal.
+    gl.canvas.classList.remove("waiting");
+    gl.canvas.classList.add("shown");
     renderFrame(gl);
-    L.raf = requestAnimationFrame(() => tick(L));
+    L.raf = requestAnimationFrame((now) => tick(L, now));
   } catch (e) {
     degrade(gl.canvas);
+    disposeStage(gl, figure);
   } finally {
     mounting.delete(host);
     mounting.delete(gl.canvas);
@@ -562,7 +623,12 @@ function boot() {
   const game = document.getElementById("game") || document.body;
   scan(game);
   bindHover(game);
-  const obs = new MutationObserver(() => scan(game));
+  const obs = new MutationObserver(() => {
+    // scan first: mount() can rebind a compatible stage detached by the same
+    // card replacement. Anything still disconnected afterwards is obsolete.
+    scan(game);
+    dropGone();
+  });
   obs.observe(game, { childList: true, subtree: true });
 }
 
@@ -572,4 +638,11 @@ if (document.readyState === "loading") {
   boot();
 }
 
-export { createStage, renderFrame, buildFigure, mount };
+function diagnostics() {
+  return {
+    live: lives.size,
+    connected: [...lives.keys()].filter((canvas) => canvas.isConnected).length,
+  };
+}
+
+export { createStage, renderFrame, buildFigure, mount, diagnostics };
