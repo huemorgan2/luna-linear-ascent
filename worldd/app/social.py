@@ -23,6 +23,7 @@ ensure_game_importable()
 
 from plugin_linear_ascent import economy  # noqa: E402
 from plugin_linear_ascent.content import schema  # noqa: E402
+from plugin_linear_ascent.engine import profile as pprofile  # noqa: E402
 from plugin_linear_ascent.engine import state as pstate  # noqa: E402
 from plugin_linear_ascent.engine.scene import Scene  # noqa: E402
 
@@ -761,22 +762,15 @@ async def _profiles(conn, doc: dict, w: dict, option: str = "") -> dict:
         key = (r["tenant"], r["player"])
         age_s = max(0.0, (now - r["updated_at"]).total_seconds())
         inv = d.get("inventory") or {}
+        sheet = pprofile.public_sheet(d, energy=int(pstate.energy_now(d)))
         out[nm] = {
-            "name": nm,
-            "level": int(d.get("level", 1)),
-            "race": str(d.get("race") or ""),
-            "clazz": str(d.get("clazz") or ""),
+            **sheet,
+            "guild": d.get("guild") or "",
             # 048: the trained hands are public — rank 10 is the
             # banner-hall toast, mastery the master's mark.
             "training": d.get("training") or {},
             "mastery": d.get("mastery") or {},
             "armor": _armor_slug(d),
-            "sleeping": bool(d.get("sleeping")),
-            "gold": int(d.get("gold", 0)),
-            "energy": int(pstate.energy_now(d)),
-            "atk": pstate.atk(d), "dfs": pstate.dfs(d),
-            "hp": int(d.get("hp", 1)), "hp_max": pstate.max_hp(d),
-            "guild": d.get("guild") or "",
             "contribution": {"coins": coins.get(key, 0),
                              "items": racked.get(key, 0),
                              "warden": cut.get(key, 0)},
@@ -1413,7 +1407,7 @@ async def _fx_loot(conn, tenant: str, player: str, doc: dict,
 
     if row is None:
         pstate.gain_energy(doc, economy.COST_PVP_ATTACK)
-        report(f"{target}'s camp is gone",
+        report(f"{target} is gone from the Stone",
                "The Stone shows no such name tonight.",
                ["Your energy comes back — there was nothing to case."])
         await log("blocked")
@@ -1464,17 +1458,17 @@ async def _fx_loot(conn, tenant: str, player: str, doc: dict,
                          "lifted from the bedroll"]
         victim.setdefault("pending_events", []).append(Scene(
             eyebrow="ROOTHOLLOW · A BAD MORNING",
-            headline=f"{a_name} went through your camp",
+            headline=f"{a_name} looted you",
             support="An hour of silence is an open door.",
             body_lines=[f"− ◈ {haul:,} carried gold, taken"]
             + ([f"− the {_item_label(item_slug)}"] if item_slug else [])
             + ["Banked gold untouched. The Vault keeps its word."],
             event_kind="death", banner="death",
         ).to_dict())
-        report("You cleaned out their camp",
+        report("You looted them",
                f"{v_name} never stirred.",
                [f"+ ◈ {haul:,} carried gold seized"] + item_line)
-        line = f"{a_name} looted {v_name}'s camp (◈ {haul:,} taken)"
+        line = f"{a_name} looted {v_name} (◈ {haul:,} taken)"
         await conn.execute(
             "INSERT INTO ascent_ledger (tenant, player, kind, gold, note)"
             " VALUES ($1,$2,'loot_win',$3,$4)",
@@ -1493,20 +1487,20 @@ async def _fx_loot(conn, tenant: str, player: str, doc: dict,
             victim["gold"] = int(victim.get("gold", 0)) + tithe
         victim.setdefault("pending_events", []).append(Scene(
             eyebrow="ROOTHOLLOW · WORD FROM THE FIELDS",
-            headline=f"{a_name} tried your camp — and lost",
+            headline=f"{a_name} tried to loot you — and lost",
             support=("You answered at twice your strength."
                      if active else
-                     "Your camp defended itself in your absence."),
+                     "You defended yourself in your absence."),
             body_lines=([f"+ ◈ {tithe:,} pried from their pack"]
                         if tithe else []),
             event_kind="loot",
         ).to_dict())
-        report("The camp answered", f"{v_name}'s defense threw you back.",
+        report("They threw you back", f"{v_name}'s defense threw you back.",
                ([f"− ◈ {tithe:,} carried gold lost"] if tithe else
                 ["You crawled home with your pockets intact."])
                + [f"− beaten down to {doc['hp']}/{pstate.max_hp(doc)} hp"],
                kind="death")
-        line = f"{a_name} tried {v_name}'s camp and crawled home"
+        line = f"{a_name} tried to loot {v_name} and crawled home"
         await conn.execute(
             "INSERT INTO ascent_ledger (tenant, player, kind, gold, note)"
             " VALUES ($1,$2,'loot_fail',$3,$4)",

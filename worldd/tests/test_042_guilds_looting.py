@@ -87,9 +87,14 @@ async def test_tile_click_opens_the_profile_with_no_bank_anywhere(
     s = await act(client, tenant_a, "tenant-a", pa, option="pv:Brai")
     assert "BRAI" in s["headline"].upper()
     text = json.dumps(s, ensure_ascii=False)
-    assert "◈ 77" in text                  # carried coin is public
+    av = s.get("avatar") or {}
+    assert av.get("name") == "Brai"
+    assert av.get("gold") == 77            # carried coin is public
+    assert av.get("slots")                 # worn gear map
     assert "9999" not in text              # the bank never rides the wire
     assert "9,999" not in text
+    loot = next(o for o in s["options"] if o["id"] == "pf_loot")
+    assert loot["label"] == "Loot them"
 
 
 # ── gifts ───────────────────────────────────────────────────────────────
@@ -132,7 +137,7 @@ async def test_cold_camp_loses_carried_gold_never_the_bank(
     verdict = await act(client, tenant_a, "tenant-a", pa,
                         option="pf_loot_go")
     # the verdict rides THIS response — not the next act's card
-    assert verdict["headline"] == "You cleaned out their camp"
+    assert verdict["headline"] == "You looted them"
     assert any("carried gold seized" in ln
                for ln in verdict["body_lines"])
     s_after = await scene(client, tenant_a, "tenant-a", pa)
