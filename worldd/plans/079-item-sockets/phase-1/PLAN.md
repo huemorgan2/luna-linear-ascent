@@ -44,3 +44,12 @@ their current attachments through it with no behavior code of their own.
 
 Delete `worldd/static/site/lib/` — nothing imports it yet in this phase.
 `git revert` of the phase commit.
+
+## Execution status (2026-08-24)
+
+DONE — commit `df01205`. Module verified in-browser through the harness
+import map: all 12 sockets, 12 grip families, 4 functions resolve.
+`node --check` clean. One deviation from plan: grip-space frame was
+defined as the RIG's frame (+x facing, +y up, +z right hand) rather than
+screen frame — the rigs animate facing +x and every scene yaws them, so
+screen-frame tunings would break per stage.

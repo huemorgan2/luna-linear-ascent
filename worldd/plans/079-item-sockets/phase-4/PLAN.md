@@ -27,3 +27,11 @@ PLAN.md carries its execution status; final commit pushed to `origin main`.
 ## Rollback
 
 Documentation-only phase — `git revert` of its commit.
+
+## Execution status (2026-08-24)
+
+DONE — dojo run `dojo/results/0049-079-item-sockets-2026-08-24/`
+(9 screenshots, per-check PASS tables for both scenarios). Learnings
+appended to `plugin-linear-ascent/vision/1bit-images.md` ("Item
+placement — sockets, not offsets"). Pre-existing regression filed in the
+run summary: test_leaderboard_marks_only_you fails at clean HEAD.

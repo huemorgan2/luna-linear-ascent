@@ -38,3 +38,16 @@ races at zoom, judged on the four defects, screenshots saved. `node --check`
 
 `git revert` the phase commit — figure3d returns to the pre-socket ad-hoc
 `HOLD` table (which renders, with the known defects).
+
+## Execution status (2026-08-24)
+
+DONE — commit `af70fcc`. HOLD/wrapProp/attach/pickBone deleted (−179
+lines), placement is GRIPS table rows. All four defects verified fixed at
+4× zoom (dojo run 0049): staff vertical through the giant's fist inside
+the frame, buckler face-on outside the forearm, swords hilt-at-palm on
+the right hip, bow diagonal on the back. Hover tint + restore intact.
+FIGURE3D_URL bumped v=8→9 (landed with phase-3 commit). Iterations
+during tuning: flat-mode shields need +π/2 yaw in grip space; blade
+lean sign flipped to hang outward; staff tucked z −0.045→−0.120.
+Pre-existing failure filed: test_leaderboard_marks_only_you (fails at
+clean HEAD, unrelated).

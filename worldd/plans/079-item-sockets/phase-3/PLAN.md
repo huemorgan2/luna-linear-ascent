@@ -29,3 +29,15 @@ pytest suite green (`test_web_play.py` covers the injection).
 
 `git revert` the phase commit — fight3d returns to its self-contained
 `equipTripo`. The module keeps serving figure3d unaffected.
+
+## Execution status (2026-08-24)
+
+DONE — commit `5280347`. equipTripo now calls normalizeProp + resolveBone
+(hand_r socket with regex fallback); duplicated vertex-pair code deleted
+(−44 lines net). `want` world-orientation strike mechanics untouched.
+Verified in the fight3d harness: blade (human), bow (elf), staff (giant)
+all ride the striking hand; canvases mount, sequences play. WEAPONS
+len/grip/lift stayed local to fight3d rather than merging into GRIPS —
+its values are finisher-specific (bigger silhouettes at 320×112) and the
+per-frame cancel consumes them differently; folding them in added
+indirection without removing a source of truth. FIGHT3D_URL v=13→14.
