@@ -83,3 +83,32 @@ portrait per page).
 - No branches; commit to `main`, push, deploy via `worldd/tools/deploy.sh`.
 - Client-only (JS + webplay version params) — no plugin/vendor sync.
 - Repo carries other agents' WIP — stage only this plan's files.
+
+## Execution status
+
+Executed 2026-08-25, commit 4ea13bd (plan committed first at 14e0418 as
+081, renumbered — another agent's 081-early-game-smoothing landed
+between).
+
+- **Width cap evolved during execution.** The planned bbox-width `maxw`
+  shrank `rusted_sword` to a dagger: its bbox is squat only because of a
+  wide crossguard + diagonal authoring. Replaced with `girth` — an RMS
+  cross-section radius cap, mass-weighted so thin crossguards don't
+  register. Measured separation: slender swords/staves 0.035–0.061
+  rms/len, notched_cleaver 0.113, ratcatchers_dirk 0.143. `girth: 0.035`
+  on blades, `0.040` on staves; charm/potion/focus caps dropped as
+  unneeded.
+- **Shield `maxd` evolved into `squashd`.** A depth CAP shrank the whole
+  buckler; and single-frame tuning was misleading — the idle twists the
+  forearm, so a domed buckler flip-flops between ball (face-on) and
+  sliver (edge-on). `squashd: 0.30` non-uniformly crushes the dome to a
+  disc; retuned `len 0.16, orient [0, 0.90, −0.15], offset
+  [0.030, −0.055, −0.030]` straps it flush. Verified across four
+  animation phases.
+- **Body clones (as planned):** `lib/vendor/SkeletonUtils.js` vendored;
+  `buildRig` clones per stage; fight3d `buildPlayer` consumes the
+  returned clone (dead `weaponWrap` bookkeeping removed). The fight's
+  lead-weapon path `equipTripo` got the same girth cap (charH passed in).
+- **Verification:** dojo run 0052 (all PASS, screenshots);
+  `test_web_play.py` + `test_071_figure3d.py` 16 passed; `node --check`
+  on all touched JS. URLs bumped: fight3d v18, arena3d v8, figure3d v11.
