@@ -166,6 +166,11 @@ async def run_scene(tenant: str, player: str,
             return scene.to_dict()
 
 
+# 081: effects that move gold/letters mid-act — the card apply_choice
+# built predates them and must be rebuilt from the settled doc.
+_REFRESH_KINDS = {"collect_letter_gold"}
+
+
 async def run_act(tenant: str, player: str, option: str, text: str,
                   idem: str, display_name: str = "") -> dict:
     pool = await db.get_pool()
@@ -204,10 +209,27 @@ async def run_act(tenant: str, player: str, option: str, text: str,
                 from . import names
                 await names.release(conn, reserved, tenant, player)
             ledger = doc.pop("_ledger", [])
+            fx = {e.get("kind") for e in doc.get("_effects") or ()}
             await social.execute_effects(conn, tenant, player, doc)
             _patch_kill_receipt(doc, scene)
             if option == "pf_loot_go":
                 _patch_loot_receipt(doc, scene)
+            if fx & _REFRESH_KINDS:
+                # 081: these effects move gold/letters the already-built
+                # card can't see — rebuild it on post-effect truth,
+                # keeping the act's own note. Effects the rebuild emits
+                # (letters_seen) run in a second pass, same transaction.
+                got = doc.pop("_collected_gold", 0)
+                await social.inject_world(conn, tenant, player, doc,
+                                          option=option)
+                fresh = core.current_scene(doc)
+                if scene.shard_note and not fresh.shard_note:
+                    fresh.shard_note = scene.shard_note
+                if got and not fresh.shard_note:
+                    fresh.shard_note = (f"The clerk counts out ◈ {got:,} "
+                                        "— yours now.")
+                scene = fresh
+                await social.execute_effects(conn, tenant, player, doc)
             doc.pop("_world", None)
             doc["scene"] = scene.to_dict()
             await _save_doc(conn, tenant, player, doc, ledger)

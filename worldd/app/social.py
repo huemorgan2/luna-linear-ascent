@@ -172,6 +172,12 @@ async def inject_world(conn, tenant: str, player: str, doc: dict,
     w["inbox_count"] = await conn.fetchval(
         "SELECT count(*) FROM ascent_letters "
         "WHERE to_tenant=$1 AND to_player=$2 AND NOT read", tenant, player)
+    # 081: letters below is a LIMIT 8 window — this is the unbounded
+    # "any gold waiting?" flag the Relay's Collect row gates on.
+    w["gold_held"] = await conn.fetchval(
+        "SELECT count(*) FROM ascent_letters "
+        "WHERE to_tenant=$1 AND to_player=$2 AND NOT read AND gold > 0",
+        tenant, player)
 
     w["happenings"] = snap["happenings"]
     w["stone"] = snap["stone"]
@@ -1270,6 +1276,8 @@ async def _fx_collect_gold(conn, tenant: str, player: str,
     total = sum(r["gold"] for r in rows)
     if total:
         doc["gold"] += total
+        # 081: run_act pops this to print the receipt on the rebuilt card
+        doc["_collected_gold"] = total
         await conn.execute(
             "UPDATE ascent_letters SET read=TRUE, gold=0 "
             "WHERE id = ANY($1::bigint[])", [r["id"] for r in rows])

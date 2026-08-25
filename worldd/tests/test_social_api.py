@@ -124,6 +124,90 @@ async def test_letter_and_grant_flow(client, tenants):
     assert gold_after - gold_before == 90
 
 
+async def test_level1_collect_updates_card(client, tenants):
+    # 081 phase-1: the huemorgan4 reproduction. The receiver stays level
+    # 1; the card RETURNED by the collect act must be post-effect truth
+    # (gold moved, Collect row gone), and a second click on the stale
+    # card answers calmly — no red refusal.
+    a, b = tenants
+    pa, pb = f"a-{uuid.uuid4().hex[:6]}", f"b-{uuid.uuid4().hex[:6]}"
+    na, nb = f"Hue{pa[-4:]}", f"Morgan{pb[-4:]}"
+    await create(client, a, "tenant-a", pa, na)
+    await create(client, b, "tenant-b", pb, nb)
+
+    doca = await get_doc("tenant-a", pa)
+    doca.update({"gold": 1000, "level": 6})
+    await set_doc("tenant-a", pa, doca)
+    assert (await get_doc("tenant-b", pb))["level"] == 1
+
+    # grant A → B (100 gross, 90 net)
+    await act(client, a, "tenant-a", pa, option="town")
+    await act(client, a, "tenant-a", pa, option="vault")
+    await act(client, a, "tenant-a", pa, option="grants")
+    await act(client, a, "tenant-a", pa, option=f"grantto_{nb}")
+    await act(client, a, "tenant-a", pa, option="grantamt_100")
+
+    gold_before = (await get_doc("tenant-b", pb))["gold"]
+    await act(client, b, "tenant-b", pb, option="town")
+    s = await act(client, b, "tenant-b", pb, option="relay")
+    assert any("enclosed" in l for l in s["body_lines"])
+
+    s = await act(client, b, "tenant-b", pb, option="collect")
+    # the doc settled...
+    assert (await get_doc("tenant-b", pb))["gold"] - gold_before == 90
+    # ...and the RETURNED card knows it: receipt note, no gold line,
+    # no stale Collect row, no refusal
+    assert "counts out" in (s.get("shard_note") or ""), s
+    assert not any("enclosed" in l for l in s["body_lines"]), s
+    assert "collect" not in [o["id"] for o in s["options"]], s
+    assert not s.get("refusal")
+
+    # the stale card's Collect clicked again — friendly swap, not the
+    # "not one of the paths" banner
+    s2 = await act(client, b, "tenant-b", pb, option="collect")
+    assert not s2.get("refusal"), s2
+    assert "already in your purse" in (s2.get("shard_note") or ""), s2
+
+    # credited exactly once
+    pool = await db.get_pool()
+    n = await pool.fetchval(
+        "SELECT count(*) FROM ascent_ledger WHERE tenant=$1 AND player=$2"
+        " AND kind='letter_gold'", "tenant-b", pb)
+    assert n == 1
+
+
+async def test_collect_row_survives_deep_inbox(client, tenants):
+    # 081 phase-1: the relay card shows the 8 newest letters — a gold
+    # letter buried 9th must still get its Collect row (gold_held is
+    # unbounded) and pay out in full.
+    _, b = tenants
+    pb = f"b-{uuid.uuid4().hex[:6]}"
+    nb = f"Pili{pb[-4:]}"
+    await create(client, b, "tenant-b", pb, nb)
+
+    pool = await db.get_pool()
+    await pool.execute(
+        "INSERT INTO ascent_letters (to_tenant, to_player, from_name,"
+        " body, gold) VALUES ($1,$2,'the vault','a grant',70)",
+        "tenant-b", pb)
+    for i in range(8):
+        await pool.execute(
+            "INSERT INTO ascent_letters (to_tenant, to_player, from_name,"
+            " body) VALUES ($1,$2,'a crier',$3)",
+            "tenant-b", pb, f"notice {i}")
+
+    gold_before = (await get_doc("tenant-b", pb))["gold"]
+    await act(client, b, "tenant-b", pb, option="town")
+    s = await act(client, b, "tenant-b", pb, option="relay")
+    # the gold letter is off-window yet the row is there
+    assert not any("enclosed" in l for l in s["body_lines"]), s
+    assert "collect" in [o["id"] for o in s["options"]], s
+
+    s = await act(client, b, "tenant-b", pb, option="collect")
+    assert (await get_doc("tenant-b", pb))["gold"] - gold_before == 70
+    assert "collect" not in [o["id"] for o in s["options"]], s
+
+
 async def test_gnarl_quorum_two_players(client, tenants):
     a, b = tenants
     pa, pb = f"a-{uuid.uuid4().hex[:6]}", f"b-{uuid.uuid4().hex[:6]}"
