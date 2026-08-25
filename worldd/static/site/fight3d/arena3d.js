@@ -587,11 +587,13 @@ async function play(card, spec) {
 
 async function rearm(line) {
   if (!F || !GL) return;
-  const got = await ensureFor({ id: F.foeId, race: F.race, line }, { bgDir: BG_DIR });
+  const got = await ensureFor(
+    { id: F.foeId, race: F.race, line,
+      worn: F.worn, paths: F.paths, lead: F.lead }, { bgDir: BG_DIR });
   if (!got || !F) return;
   const x = F.player ? F.player.group.position.x : F.pMark;
   if (F.player) GL.scene.remove(F.player.group);
-  F.player = buildPlayer(got.race, got.line);
+  F.player = await buildPlayer(got.race, got.line, got);
   F.player.group.position.set(x, 0, 0);
   F.player.group.rotation.y = PLAYER_YAW;
   GL.scene.add(F.player.group);
@@ -615,8 +617,9 @@ async function build(card, spec) {
   const foe = spec.foe || {}, me = spec.me || {};
   const reg = MONSTERS3D[foe.id];
   if (!reg) return false;
-  const got = await ensureFor({ id: foe.id, race: me.race, line: me.line },
-                              { bgDir: BG_DIR });
+  const got = await ensureFor(
+    { id: foe.id, race: me.race, line: me.line,
+      worn: me.worn, paths: me.paths, lead: me.lead }, { bgDir: BG_DIR });
   if (!got || !card.isConnected) return false;
   const gl = stage();
   if (!gl) return false;
@@ -626,10 +629,11 @@ async function build(card, spec) {
   gl.postMat.uniforms.uBGOn.value = got.bg ? 1 : 0;
   F = { key: fightKey(spec), gen: 0, card, foeId: foe.id, race: got.race,
         line: got.line, player: null, monster: null, freed: null,
+        worn: got.worn, paths: got.paths, lead: got.lead,
         pHeight: (SPECIES[got.race] || SPECIES.human).h, sep: 1.4,
         pMark: P_MARK0, mMark: P_MARK0 + 1.4, freedMaker: null };
   try {
-    F.player = buildPlayer(got.race, got.line);
+    F.player = await buildPlayer(got.race, got.line, got);
     F.player.group.rotation.y = PLAYER_YAW;
     gl.scene.add(F.player.group);
     F.monster = tripoMonster(got.mg, reg);
@@ -692,7 +696,9 @@ async function mountArena(card) {
     // the close-up shows; warm the rigs, the sheet and the shaders so
     // the first strike lands on a ready stage
     ensureFor({ id: spec.foe.id, race: (spec.me || {}).race,
-                line: (spec.me || {}).line }, { bgDir: BG_DIR })
+                line: (spec.me || {}).line,
+                worn: (spec.me || {}).worn, paths: (spec.me || {}).paths,
+                lead: (spec.me || {}).lead }, { bgDir: BG_DIR })
       .then(() => stage());
     return;
   }

@@ -23,7 +23,8 @@
 import * as THREE from "three";
 import { GLTFLoader } from "../lib/vendor/GLTFLoader.js";
 import { normalizeProp, resolveBone, gripFor } from "../lib/sockets.js";
-import { loadModel, buildRig, shadowify } from "../lib/character.js";
+import { loadModel, buildRig, shadowify, dressFigure }
+  from "../lib/character.js";
 
 const W = 320, H = 112;
 const FLOOR_FRAC = 0.91;              // combatants' feet, fraction of H
@@ -528,21 +529,30 @@ async function ensureFor(spec, { bgDir = "backgrounds" } = {}) {
   const race = SPECIES[spec.race] ? spec.race : "human";
   const line = WEAPONS[spec.line] ? spec.line : "blade";
   const kind = KIND_OF[line];
-  // the slash clip is dead weight — the sword swing is fully hand-keyed
-  // (STRIKES), so a blade kill never fetches it. Bodies + strike clips
-  // come from the shared lib (plan 080); the generic weapons and the
-  // monsters stay this scene's own.
-  const [pg, wg, mg, bg, cg] = await Promise.all([
-    loadModel(`players/${race}.glb`), load(`players/${line}.glb`),
+  // 080: the REAL weapon in hand — the climber's lead item GLB when its
+  // hold matches the killing line; the family GLB from the shared item
+  // catalog is the fallback. Bodies + strike clips come from the shared
+  // lib too; only the monsters stay this scene's own.
+  // The slash clip is dead weight — the sword swing is fully hand-keyed
+  // (STRIKES), so a blade kill never fetches it.
+  const lead = (spec.lead && (spec.paths || {})[spec.lead] === line)
+    ? spec.lead : null;
+  const [pg, wgOwn, wgFam, mg, bg, cg] = await Promise.all([
+    loadModel(`players/${race}.glb`),
+    lead ? loadModel(`items/${lead}.glb`) : null,
+    loadModel(`items/${line}.glb`),
     load(`monsters/${spec.id}.glb`), loadBG(spec.id, bgDir),
     kind === "slash" ? null : loadModel(`players/${race}_${kind}.glb`),
   ]);
+  const wg = wgOwn || wgFam;
   if (!pg || !wg || !mg) return null;
   assets[`t_${race}`] = pg;
   assets[`w_${line}`] = wg;
   const clips = assets[`t_${race}_clips`] || (assets[`t_${race}_clips`] = {});
   if (!(kind in clips)) clips[kind] = cg ? (cg.animations[0] || null) : null;
-  return { race, line, mg, bg };
+  return { race, line, mg, bg,
+           worn: spec.worn || null, paths: spec.paths || {},
+           lead: wgOwn ? lead : null };
 }
 
 // Warming — on demand, never everything. The blanket preload of every
@@ -575,12 +585,16 @@ function warmGL() {
 function warmFor(card) {
   const rig = card.dataset.rig3d || "";
   if (rig) {
-    const [r, l] = rig.split(":");
+    const [r, l, g] = rig.split(":");
     const race = SPECIES[r] ? r : "human";
     const line = WEAPONS[l] ? l : "blade";
     const kind = KIND_OF[line];
     warmRel(`players/${race}.glb`, loadModel);
-    warmRel(`players/${line}.glb`);
+    warmRel(`items/${line}.glb`, loadModel);
+    // 080: the worn item GLBs — the finisher dresses without a wait
+    for (const slug of g ? g.split("+") : []) {
+      if (slug) warmRel(`items/${slug}.glb`, loadModel);
+    }
     if (kind !== "slash") warmRel(`players/${race}_${kind}.glb`, loadModel);
   }
   const foe = card.dataset.foe3d || "";
@@ -620,7 +634,7 @@ function equipTripo(handBone, neutralQ, wp) {
   return { wrap, want };
 }
 
-function buildPlayer(speciesId, weaponId) {
+async function buildPlayer(speciesId, weaponId, dress = null) {
   const sp = SPECIES[speciesId], wp = WEAPONS[weaponId];
   const src = assets[sp.key];
   const model = src.scene;                       // shared scene, not cloned
@@ -650,6 +664,30 @@ function buildPlayer(speciesId, weaponId) {
     const neutralQ = hand.getWorldQuaternion(new THREE.Quaternion());
     weapon = equipTripo(hand, neutralQ, wp);
     model.userData.weaponWrap = weapon.wrap;
+  }
+  // 080: the climber fights in their own gear — shield, armor, boots,
+  // spare blades hang by the same GRIPS placements the portrait wears.
+  // Charms/potions skip (unreadable at 320×112); the lead weapon's slot
+  // skips too (equipTripo owns the hand). buildRig stripped the previous
+  // kill's gear.
+  if (dress && dress.worn) {
+    const leadSlot = dress.lead
+      ? Object.keys(dress.worn).find((k) => dress.worn[k] === dress.lead)
+      : null;
+    await dressFigure({
+      fig: { B, wrap, h: sp.h },
+      worn: dress.worn, paths: dress.paths || {},
+      skip: ["charm", "potion", "item"],
+      exclude: leadSlot ? [leadSlot] : [],
+      prep: (m, grip) => m.traverse((x) => {
+        if (!x.isMesh || !x.material) return;
+        x.material = x.material.clone();
+        if (x.material.emissive) {
+          x.material.emissive.set(0xffffff);
+          x.material.emissiveIntensity = grip.lift ?? 0.10;
+        }
+      }),
+    });
   }
   const clips = assets[sp.key + "_clips"] || {};
   const idleClip = src.animations[0] || null;
@@ -1421,7 +1459,7 @@ async function mountKill(card) {
   gl.postMat.uniforms.uBGOn.value = got.bg ? 1 : 0;
   try {
     curWeapon = got.line;
-    player = buildPlayer(got.race, got.line);
+    player = await buildPlayer(got.race, got.line, got);
     player.group.position.set(player.x, 0, 0);
     player.group.rotation.y = PLAYER_YAW;
     gl.scene.add(player.group);

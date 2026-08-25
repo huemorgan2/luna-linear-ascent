@@ -24,6 +24,14 @@
     specimen: q.get("specimen") || "common",
     tint: q.get("tint") || "#9ae6b4",
   };
+  // 080: worn gear rides the spec — ?worn={"weapon":"iron_sword",…}
+  // &paths={"iron_sword":"blade",…}&lead=iron_sword (JSON-encoded), same
+  // shape combat.py stamps on data-kill3d
+  try { if (q.get("worn")) spec.worn = JSON.parse(q.get("worn")); }
+  catch { /* bad JSON: run undressed */ }
+  try { if (q.get("paths")) spec.paths = JSON.parse(q.get("paths")); }
+  catch { /* bad JSON: family fallbacks */ }
+  if (q.get("lead")) spec.lead = q.get("lead");
   // swap the card in AFTER load, like the pane does
   setTimeout(() => {
     const card = document.createElement("div");
