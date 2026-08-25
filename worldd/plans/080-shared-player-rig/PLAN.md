@@ -85,3 +85,77 @@ None needed — this is drift, not an outage.
   reel). Acceptable for the 60 s cache window.
 - Rollback for every phase: `git revert` of that phase's commit(s); the
   model move in phase 1 is a pure `git mv` and reverts cleanly.
+
+## Execution summary
+
+**All four phases executed and verified 2026-08-24 → 2026-08-25.** Commits:
+plan 928f5a5 → phase-1 fa1ecec → phase-2 89b14d3 → phase-3 a4ca959 (plugin
+ca65155) → phase-4 8dee30c (plugin aea5afa). All on `main`, all pushed.
+Per-phase detail lives in each phase's PLAN.md "Execution status".
+
+### What was made
+
+- **One player pipeline** — `static/site/lib/character.js`: cached GLB
+  loader, `buildRig` (settle idle → normalize height → boneMap),
+  `dressFigure` (data-driven equip loop through the `sockets.js` grip
+  table), `unequipAll` teardown. Both scenes (figure3d portrait, fight3d
+  finisher + arena) now build the climber through it; the two per-scene
+  copies of that logic are deleted.
+- **One set of models** — `static/site/lib/models/` holds the three player
+  rigs, the 76-item catalog and the vendor GLTFLoader. The byte-identical
+  duplicates in `figure3d/` and `fight3d/` are gone (`git mv`, ~56 MB
+  deduped); the three generic placeholder weapons in `fight3d/players/`
+  are retired to fallbacks in `lib/models/items/`.
+- **One look** — fight3d's 6-step posterize replaced by the portrait's
+  continuous `smoothstep(0.28, 0.75)` crushed-black ramp; prop emissive
+  lifts now come from the GRIPS table (`gripFor(fam).lift`) instead of
+  per-scene constants.
+- **Real gear in the fight** — `Meters.gear` + a third `data-rig3d` field
+  (`human:blade:gate_jerkin+gate_buckler+rusted_sword`) pre-warm the item
+  GLBs; `kill3d` and arena `me` payloads carry `worn`/`paths`/`lead` from
+  `figure3d.sheet()`; the finisher and arena dress the climber in what they
+  actually wear, real lead-weapon GLB included.
+- **Docs** — `vision/1bit-images.md` gained "One rig pipeline, two stages
+  (080)"; `fight3d/README.md` written; `figure3d/README.md` updated; dojo
+  scenarios in `worldd/tests/080-shared-player-rig/`.
+
+### Verification
+
+- Dojo run 0051 (`dojo/results/0051-080-shared-player-rig-2026-08-25/`):
+  all four scenarios PASS with screenshots — portrait pixel-stable after
+  the port; finisher un-banded in the card tint; live kill as fresh account
+  DojoEighty with the rig attr verified in the DOM.
+- Suites: worldd `215 passed, 0 failed`; plugin `8 failed, 1369 passed` —
+  all 8 fail identically at pre-080 `dc0742e` (checked in a detached
+  worktree), so the failure set is a subset of baseline. The 3 stale
+  kill3d tests are filed in the plugin's `MUST_BE_DONE_LATER.md` §8.
+
+### What was learned
+
+Full write-up in `plugin-linear-ascent/vision/1bit-images.md` ("One rig
+pipeline, two stages"); the short form:
+
+- **The tone curve is colour-blind.** The portrait's crushed-black ramp
+  dropped into the tinted fight scene unchanged, because tint applies
+  after the ramp. One curve is now the house style for every live 3D
+  surface — never re-tune it per scene.
+- **Emissive lift and tone curve are one coupled system.** Lifts were
+  tuned against the crushed curve; adopting the curve without the lifts
+  re-created the invisible-sword bug. Lift lives with the grip spec in
+  `sockets.js`; scenes inherit, never keep local constants.
+- **A shared skinned gltf.scene is never cloned — so gear must be torn
+  down.** Cloning severs skinned meshes from skeletons; sharing means last
+  fight's gear is still bolted to the bones. Every dress starts with
+  `unequipAll`; every attach tags `rigGear`.
+- **The wire carries the wardrobe.** A scene can only be as truthful as
+  its payload — the finisher showed placeholders for a year simply because
+  the server never shipped the sheet. Generic GLBs demoted to fallbacks.
+- **Copies are where learnings go to die** (the root cause, confirmed):
+  every portrait improvement since 071 missed fight3d because the pipeline
+  was copied, not shared. The lib split is the fix, not the screenshots.
+- **Suite baselines must be pinned per commit, not per memory.** Overnight
+  failures came from two suites sharing one Postgres (plus a stuck
+  idle-in-transaction backend), and four plugin tests drifted between runs
+  of the SAME commit via the shared `luna/.venv`. The detached-worktree
+  re-run against the pre-plan commit is what separated "pre-existing" from
+  "regression" — worth keeping as standard practice.
