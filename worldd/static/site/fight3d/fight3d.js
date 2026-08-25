@@ -609,7 +609,7 @@ function warmFor(card) {
 // normalization is lib/sockets.js (plan 079, shared with figure3d); the
 // per-frame world-orientation `want` mechanics stay here — the strike
 // keyframes were tuned against them (PLAN3/PLAN4).
-function equipTripo(handBone, neutralQ, wp) {
+function equipTripo(handBone, neutralQ, wp, charH = 1.6) {
   const model = assets[wp.key].scene.clone(true);
   shadowify(model);
   const lift = wp.lift ?? gripFor(wp.fam)?.lift ?? 0;
@@ -619,10 +619,15 @@ function equipTripo(handBone, neutralQ, wp) {
     m.material.emissive.set(0xffffff);
     m.material.emissiveIntensity = lift;
   });
-  const { pivot, nlen } = normalizeProp(model, { mode: "long",
-                                                 grip: wp.grip });
+  const { pivot, nlen, nrms } = normalizeProp(model, { mode: "long",
+                                                       grip: wp.grip });
   const boneScale = handBone.getWorldScale(new THREE.Vector3()).y || 1;
-  pivot.scale.setScalar(wp.len / nlen / boneScale);
+  // squat real-gear GLBs (cleavers, dirks) must not balloon to sword
+  // length — same girth cap as the portrait (083)
+  let s = wp.len / nlen;
+  const girth = gripFor(wp.fam)?.girth;
+  if (girth && nrms) s = Math.min(s, (girth * charH) / nrms);
+  pivot.scale.setScalar(s / boneScale);
   const invBone = neutralQ.clone().invert();
   const want = new THREE.Quaternion().setFromEuler(new THREE.Euler(...wp.rot));
   const wrap = new THREE.Group();
@@ -637,11 +642,10 @@ function equipTripo(handBone, neutralQ, wp) {
 async function buildPlayer(speciesId, weaponId, dress = null) {
   const sp = SPECIES[speciesId], wp = WEAPONS[weaponId];
   const src = assets[sp.key];
-  const model = src.scene;                       // shared scene, not cloned
-  if (model.userData.weaponWrap) {
-    model.userData.weaponWrap.removeFromParent();
-    model.userData.weaponWrap = null;
-  }
+  // the shared body pipeline (plan 080): buildRig hands back a
+  // skinned-safe CLONE (083), settled, normalized, bone-mapped — no more
+  // stale-gear cleanup, the source scene never wears anything
+  const { model, mixer, B } = buildRig({ gltf: src, height: sp.h });
   // Tripo bakes dark tones; a flat lift keeps the body out of solid black
   // at 320x112 without killing the key-light falloff
   model.traverse((m) => {
@@ -650,9 +654,6 @@ async function buildPlayer(speciesId, weaponId, dress = null) {
       m.material.emissiveIntensity = 0.06;
     }
   });
-  // the shared body pipeline (plan 080): settle the idle, idempotent
-  // normalize against dims cached on the gltf, bone map
-  const { mixer, B } = buildRig({ gltf: src, height: sp.h });
   const wrap = new THREE.Group();
   wrap.add(model);
   wrap.rotation.y = PLAYER_YAW;
@@ -662,14 +663,13 @@ async function buildPlayer(speciesId, weaponId, dress = null) {
   let weapon = null;
   if (hand) {
     const neutralQ = hand.getWorldQuaternion(new THREE.Quaternion());
-    weapon = equipTripo(hand, neutralQ, wp);
-    model.userData.weaponWrap = weapon.wrap;
+    weapon = equipTripo(hand, neutralQ, wp, sp.h);
   }
   // 080: the climber fights in their own gear — shield, armor, boots,
   // spare blades hang by the same GRIPS placements the portrait wears.
   // Charms/potions skip (unreadable at 320×112); the lead weapon's slot
-  // skips too (equipTripo owns the hand). buildRig stripped the previous
-  // kill's gear.
+  // skips too (equipTripo owns the hand). The body is a fresh clone (083)
+  // so no previous kill's gear survives on it.
   if (dress && dress.worn) {
     const leadSlot = dress.lead
       ? Object.keys(dress.worn).find((k) => dress.worn[k] === dress.lead)

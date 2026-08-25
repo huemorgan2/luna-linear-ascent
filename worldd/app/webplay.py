@@ -37,9 +37,9 @@ router = APIRouter()
 
 # 067: the two 3D modules on /play — kill finisher and the Labs arena
 # 071: figure3d is its own folder (Labs isolation — drop = delete it)
-FIGHT3D_URL = "/static/site/fight3d/fight3d.js?v=17"
-ARENA3D_URL = "/static/site/fight3d/arena3d.js?v=7"
-FIGURE3D_URL = "/static/site/figure3d/figure3d.js?v=10"
+FIGHT3D_URL = "/static/site/fight3d/fight3d.js?v=18"
+ARENA3D_URL = "/static/site/fight3d/arena3d.js?v=8"
+FIGURE3D_URL = "/static/site/figure3d/figure3d.js?v=11"
 
 
 # ── Bodies (mirror the plugin's routes.py, minus the chat-bridge ids) ────

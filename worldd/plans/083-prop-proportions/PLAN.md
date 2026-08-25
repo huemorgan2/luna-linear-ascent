@@ -1,4 +1,4 @@
-# 081 — props wear their own proportions (portrait gear fixes)
+# 083 — props wear their own proportions (portrait gear fixes)
 
 ## Problem
 
@@ -9,7 +9,7 @@ as a ball floating beside the forearm instead of a shield on the arm.
 
 Reproduced locally in the figure3d harness (elf + notched_cleaver /
 wolfsteel_broadsword + gate_buckler, injected specs, screenshots in the
-081 dojo results). Reproduction also surfaced a third bug: mounting two
+083 dojo results). Reproduction also surfaced a third bug: mounting two
 same-race figures on one page leaves all but the last BLACK — the shared
 `gltf.scene` is re-parented by `Group.add()`, so the last mount steals the
 body.

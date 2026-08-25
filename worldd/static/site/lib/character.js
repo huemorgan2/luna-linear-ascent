@@ -5,12 +5,17 @@
 // through the sockets grip table. Scene stagecraft — cameras, tone-curve
 // shaders, strike choreography, hover tints — stays in the scenes.
 //
-// Discipline inherited from the fight scene: a player gltf.scene is SHARED,
-// never cloned (cloning severs skinned meshes from their skeletons), and
-// normalization is idempotent against dims cached on the gltf. Props ARE
-// cloned per wear.
+// Bodies are CLONED per stage (083): a plain .clone() severs skinned
+// meshes from their skeletons — which is why 080 shared the scene — but
+// sharing meant `Group.add()` re-parented the one body, so two same-race
+// figures on a page stole it from each other (the portrait went black).
+// SkeletonUtils.clone rebinds the skeleton, so every stage owns its body.
+// Geometry/materials stay shared under the clones; scenes that tint
+// materials clone them per mesh (the portrait's liftMesh does).
+// Props are cloned per wear, as before.
 import * as THREE from "three";
 import { GLTFLoader } from "./vendor/GLTFLoader.js";
+import { clone as cloneSkinned } from "./vendor/SkeletonUtils.js";
 import { gripFor, boneMap, attachToSocket } from "./sockets.js";
 
 const MODELS = new URL("models/", import.meta.url);
@@ -39,11 +44,12 @@ export function unequipAll(root) {
   gone.forEach((o) => o.removeFromParent());
 }
 
-// One body pipeline: play clip 0 so the rig settles into its idle stance
-// (rest pose ≠ idle pose), normalize to `height` world units against dims
-// cached on the gltf, map the bones.
+// One body pipeline: clone the cached body (083 — skinned-safe, so every
+// stage owns its own), play clip 0 so the rig settles into its idle
+// stance (rest pose ≠ idle pose), normalize to `height` world units
+// against dims cached on the gltf, map the bones.
 export function buildRig({ gltf, height }) {
-  const model = gltf.scene;
+  const model = cloneSkinned(gltf.scene);
   unequipAll(model);
   shadowify(model);
   const mixer = new THREE.AnimationMixer(model);

@@ -44,15 +44,26 @@ export const SOCKETS = {
 // same frame; grip is the pivot's fraction along the prop's normalized
 // axis (0 = bottom); mode: "long" (Tripo long-axis up), "flat" (thin axis
 // faces the character's facing — shields), "none".
+// len is the TARGET size along the normalized axis, but squat items must
+// not balloon to it: girth caps the RMS cross-section radius (083 — a
+// cleaver whose blade is 45% as wide as it is long rendered as a slab at
+// sword length). RMS is mass-weighted, so a wide-but-thin crossguard
+// barely registers (slender swords hit len exactly: their rms/len is
+// 0.035-0.06) while a cleaver blade dominates it (0.11+) and shrinks.
+// Flat props take squashd instead: depth crushed to that fraction of the
+// diameter (domed bucklers otherwise read as balls riding the idle's
+// forearm twist).
 // lift is the emissive floor scenes apply so dark props survive their
 // tone curves. Per-item overrides shallow-merge over the family entry.
 export const GRIPS = {
   // scabbard hang down the outer thigh, hilt at palm height; the lead
   // blade rides the RIGHT hip so the shield arm never hides it
   blade:   { socket: "hip_r", mode: "long", len: 0.55, grip: 0.15,
+             girth: 0.035,
              orient: [2.95, 0, -0.10], offset: [0.073, 0.012, 0.085],
              lift: 0.24 },
   blade_l: { socket: "hip_l", mode: "long", len: 0.55, grip: 0.15,
+             girth: 0.035,
              orient: [-2.95, 0, -0.10], offset: [0.073, 0.012, -0.085],
              lift: 0.24 },
   // slung diagonally across the back, limbs past shoulder and hip
@@ -62,17 +73,25 @@ export const GRIPS = {
   // vertical walking-staff planted through the right fist, held clearly
   // in FRONT of the body so it never reads as lying on the torso
   staff:   { socket: "hand_r", mode: "long", len: 0.66, grip: 0.40,
+             girth: 0.040,
              orient: [-0.10, 0, 0], offset: [0.100, 0.010, -0.120],
              lift: 0.24 },
   staff_back: { socket: "back", mode: "long", len: 0.63, grip: 0.50,
+             girth: 0.040,
              orient: [0.35, 0, -0.10], offset: [-0.085, 0.030, 0.050],
              lift: 0.24 },
   // buckler face-out on the left forearm, pushed OUTSIDE the arm line.
   // flat mode leaves the face on +z (character's right); the ~π/2 yaw
   // turns it to the facing, backed off 0.45 so it reads as a shield and
   // not a perfect circle
-  shield:  { socket: "forearm_l", mode: "flat", len: 0.19, grip: 0.50,
-             orient: [0, 1.12, -0.15], offset: [0.060, -0.065, -0.085],
+  // strapped flush on the left forearm. Tripo bucklers are DOMED (~64%
+  // as deep as wide) and the idle twists the forearm, so a full dome
+  // swings between "floating ball" and "sliver" — squashd flattens the
+  // dome to a disc (depth ≤ 30% of diameter) that reads as a shield at
+  // every animation phase (083)
+  shield:  { socket: "forearm_l", mode: "flat", len: 0.16, grip: 0.50,
+             squashd: 0.30,
+             orient: [0, 0.90, -0.15], offset: [0.030, -0.055, -0.030],
              lift: 0.24 },
   focus:   { socket: "hand_l", mode: "long", len: 0.10, grip: 0.50,
              orient: [0, 0, 0], offset: [0.030, 0.018, -0.025],
@@ -122,9 +141,12 @@ export function resolveBone(B, socketName) {
 // whose origin is the GRIP POINT, axis normalized, centred on ALL three
 // axes (an off-centre-authored GLB otherwise lands beside the bone).
 // The returned group is unscaled; attachToSocket sizes it.
-export function normalizeProp(model, { mode = "long", grip = 0.5 } = {}) {
+export function normalizeProp(model,
+                              { mode = "long", grip = 0.5,
+                                squashd = 0 } = {}) {
   model.updateMatrixWorld(true);
   const inner = new THREE.Group();
+  let nrms = 0;
   if (mode === "flat") {
     // discs: the THINNEST bbox axis is the facing; the "long axis" of a
     // shield is a random diameter and mounts it like a cylinder
@@ -163,9 +185,29 @@ export function normalizeProp(model, { mode = "long", grip = 0.5 } = {}) {
       const axis = B.clone().sub(A).normalize();
       if (axis.y < 0) axis.negate();
       inner.quaternion.setFromUnitVectors(axis, new THREE.Vector3(0, 1, 0));
+      // mass-weighted cross-section (083): RMS deviation from the long
+      // axis, in the normalized frame — the girth cap reads it
+      let mx = 0, mz = 0;
+      const rot = pts.map((p) =>
+        p.clone().applyQuaternion(inner.quaternion));
+      for (const v of rot) { mx += v.x; mz += v.z; }
+      mx /= rot.length; mz /= rot.length;
+      let acc = 0;
+      for (const v of rot) {
+        acc += (v.x - mx) * (v.x - mx) + (v.z - mz) * (v.z - mz);
+      }
+      nrms = Math.sqrt(acc / rot.length);
     }
   }
   inner.add(model);
+  // flat props: crush the dome so depth stays a fraction of the diameter
+  // (083) — silhouette keeps its disc, the dome stops poking off the arm
+  if (mode === "flat" && squashd) {
+    const b0 = new THREE.Box3().setFromObject(inner);
+    const dia = Math.max(0.01, b0.max.x - b0.min.x, b0.max.y - b0.min.y);
+    const dep = Math.max(0.01, b0.max.z - b0.min.z);
+    if (dep > squashd * dia) inner.scale.z *= (squashd * dia) / dep;
+  }
   const nbox = new THREE.Box3().setFromObject(inner);
   const nlen = Math.max(0.01, nbox.max.y - nbox.min.y);
   inner.position.set(
@@ -174,7 +216,7 @@ export function normalizeProp(model, { mode = "long", grip = 0.5 } = {}) {
     -(nbox.min.z + nbox.max.z) / 2);
   const pivot = new THREE.Group();
   pivot.add(inner);
-  return { pivot, nlen };
+  return { pivot, nlen, nrms };
 }
 
 // Snap a PREPARED prop (already cloned/lit by the scene) onto a socket.
@@ -187,9 +229,15 @@ export function attachToSocket({ charRoot, charHeight, boneIndex, prop,
                                  grip }) {
   const bone = resolveBone(boneIndex, grip.socket);
   if (!bone) return null;
-  const { pivot, nlen } = normalizeProp(prop, grip);
+  const { pivot, nlen, nrms } = normalizeProp(prop, grip);
   const boneScale = bone.getWorldScale(new THREE.Vector3()).y || 1;
-  pivot.scale.setScalar((grip.len * charHeight) / nlen / boneScale);
+  // target len along the normalized axis, but never let a squat prop's
+  // cross-section balloon past girth (083): tightest constraint wins
+  let s = (grip.len * charHeight) / nlen;
+  if (grip.girth && nrms) {
+    s = Math.min(s, (grip.girth * charHeight) / nrms);
+  }
+  pivot.scale.setScalar(s / boneScale);
   const wrap = new THREE.Group();
   wrap.add(pivot);
   bone.add(wrap);
