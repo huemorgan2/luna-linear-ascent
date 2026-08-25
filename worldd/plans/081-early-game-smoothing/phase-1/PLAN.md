@@ -68,3 +68,34 @@ that asserts against the returned card, not just the doc.
 Revert the commit(s). No migration, no doc-shape change; `w["gold_held"]`
 is derived per-request. The vendor pointer reverts with the parent
 commit.
+
+## Execution status (2026-08-25)
+
+- **Step 1 evidence (prod, ascent-world-db).** huemorgan4 = tenant
+  `web`, player `huemorgan4`, now level 2, gold 1080. Ledger: `grant_in`
+  ◈ 90 (from huemorgan, 07:20:06Z) + `grant_in` ◈ 101 (from huemorgan3,
+  07:21:20Z), then ONE `letter_gold` ◈ 191 "collected" at 07:22:42Z —
+  the first click credited everything; the red banner was the stale
+  second click. No data lost, no correction needed. Access: machine IP
+  added to the DB allow list via Render API, queried, allow list
+  reverted to empty within minutes; connection material deleted.
+- **Steps 2-4 implemented.** `_REFRESH_KINDS` rebuild in
+  app/game.py `run_act` (re-inject world, `core.current_scene`, receipt
+  note "The clerk counts out ◈ N — yours now.", second
+  `execute_effects` pass); graceful stale `collect` in
+  engine core.py `apply_choice` (clerk ledger line, no refusal);
+  `w["gold_held"]` in app/social.py `inject_world` + gate in engine
+  `relay_scene`. Notices and door gates already used the uncapped
+  `inbox_count` (notices.py:151, core.py:1383, core.py:1461-1463) — no
+  change needed there.
+- **Step 5 tests.** `test_level1_collect_updates_card` (level-1
+  receiver, asserts the returned card: receipt note, no enclosed line,
+  no collect row, no refusal, friendly second click, exactly one ledger
+  row) and `test_collect_row_survives_deep_inbox` (gold letter buried
+  9th under 8 newer letters — Collect row present, ◈ 70 credited).
+- **Suites.** worldd 216/216 passed. Plugin: 1369 passed, 8 failed —
+  byte-identical failures on the pre-change tree (test_017 ×2,
+  test_022, test_048, test_067, test_kill3d ×3), pre-existing at
+  submodule HEAD a78de50, not from this phase.
+- **Commits.** Plan aa6f4fd; submodule 83f21b3; parent 1f8a6e3 (vendor
+  sync + pointer). Deploy deferred to phase-7 (ships all phases).

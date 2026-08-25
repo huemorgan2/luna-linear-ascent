@@ -68,3 +68,35 @@ never logs 2 misses in a row; the same sim at level 4 still shows natural
 Revert the commit. `e["miss_run"]` keys in live encounter docs are inert
 leftovers and vanish when the fight ends (encounter cleared at
 combat.py:1551/1715/2064).
+
+## Execution status (2026-08-25)
+
+- **Steps 1-3 implemented as planned.** `PITY_MISS_MAX_LEVEL = 3` +
+  `pity_miss_run()` in economy.py; pity short-circuit before
+  `state.roll_ok` in combat.py's default-attack branch (`miss_run`
+  increment inside the miss block, reset to 0 right after it); counter
+  lives in `p["encounter"]`, no migration.
+- **Step 4.** Forced hit consumes no RNG draw (short-circuit before
+  `roll_ok`), documented in the code comment. Replay-exact suites
+  (test_048_the_weapon_decides, test_smoothness) needed NO updates —
+  their fixtures never enter the pity window.
+- **Step 5 evolved.** Rule surfaced as a third `protections_active`
+  entry ("steady hands — … never go wide more than L in a row") plus a
+  proper registry close entry `steady_hands_end` at level 4 — required
+  by the 020 coverage guard, which caught the unregistered
+  `PITY_MISS_MAX_LEVEL` constant. Level 3→4 level-up now also announces
+  "steady hands end". Expectations updated in test_020_unlocks (×3
+  asserts) and test_020_visible_gates (protections count 2→3);
+  assertions strengthened, not weakened.
+- **Step 6 tests.** `tests/test_081_pity_misses.py` — 6 tests:
+  constants; L1 never misses twice; L3 exactly 3; L4 honest dice (6
+  straight); forced hit consumes no roll_ok call; hit resets run. All
+  pass.
+- **Simulation** (scratch, 500 rounds each): max consecutive misses
+  L1 = 1, L3 = 3, L4 = 4 (natural). Exact match to the goal.
+- **Suites.** Plugin: 1375 passed, 8 failed — the same pre-existing 8
+  as the phase-1 baseline (test_017 ×2, test_022, test_048_no_classes,
+  test_067, test_kill3d ×3). worldd: full suite green (count in
+  phase-7 summary).
+- **Vendor synced** (economy.py, unlocks.py, engine/combat.py);
+  `diff -rq` clean. Deploy deferred to phase-7.
