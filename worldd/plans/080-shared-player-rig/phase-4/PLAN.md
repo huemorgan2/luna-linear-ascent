@@ -30,3 +30,18 @@ set is a subset of the baseline; docs committed.
 ## Rollback
 
 Docs/results only — `git revert` if ever needed.
+
+## Execution status
+
+**Done** (2026-08-25). Dojo run 0051
+(`dojo/results/0051-080-shared-player-rig-2026-08-25/`): all four scenarios
+PASS with screenshots — portrait harness (human/elf/giant dressed through
+lib), finisher-ink harness (continuous ramp in tint), live finisher-gear and
+arena as fresh account DojoEighty (kill of grey_wolf, rig attr carried the
+starter gear). Suites: worldd `215 passed, 0 failed`; plugin `8 failed, 1369
+passed` — all 8 fail identically at pre-080 dc0742e (checked in a detached
+worktree), so the failure set is a subset of baseline; the 3 stale kill3d
+tests are filed in the plugin's MUST_BE_DONE_LATER.md §8. Docs:
+`vision/1bit-images.md` gained "One rig pipeline, two stages (080)";
+`fight3d/README.md` written; `figure3d/README.md` already updated in
+phase 1. No regressions found.

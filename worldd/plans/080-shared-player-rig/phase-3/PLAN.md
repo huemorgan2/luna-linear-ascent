@@ -54,3 +54,15 @@ those models in the finisher; the three generic weapon GLBs are deleted.
 `git revert` the worldd commit AND the plugin commit (both repos), restore
 the three placeholder GLBs (the revert brings them back), rsync vendor from
 the reverted submodule, bump the submodule pointer back.
+
+## Execution status
+
+**Done** — plugin ca65155, parent a4ca959 (2026-08-24). Server: `Meters.gear`
++ `data-rig3d` third field (worn slugs), `kill3d` and arena `me` carry
+`worn`/`paths`/`lead` from `figure3d.sheet()`. Client: `ensureFor` loads the
+real lead GLB (family fallback), `warmFor` pre-warms from the rig attr,
+`buildPlayer` dresses through `dressFigure` with `unequipAll` teardown.
+Plugin tests updated + 2 new payload tests — green. Live check: fresh
+account DojoEighty shipped
+`data-rig3d="human:blade:gate_jerkin+gate_buckler+rusted_sword"`. Verified
+again in dojo run 0051 (finisher-gear + arena PASS).

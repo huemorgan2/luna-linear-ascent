@@ -43,3 +43,13 @@ visible against both sky and dark scenery.
 
 `git revert` the phase commit — restores the posterize line, the bow-only
 lift, and the previous URL versions.
+
+## Execution status
+
+**Done** — committed as 89b14d3 (2026-08-24). The finisher's 6-step
+posterize replaced by the portrait's continuous `smoothstep(0.28, 0.75)`
+crushed-black ramp; per-weapon lift constants replaced by
+`gripFor(fam).lift` from the GRIPS table. `FIGHT3D_URL` → v17,
+`ARENA3D_URL` → v7. Harness check: no banding in sky/ground, blade separates
+from the silhouette in the card tint. Verified again in dojo run 0051
+(finisher-ink PASS).

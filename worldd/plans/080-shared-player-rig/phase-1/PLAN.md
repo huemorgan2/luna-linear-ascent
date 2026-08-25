@@ -64,3 +64,13 @@ finisher harnesses render as before (eye judgment on screenshots).
 
 `git revert` the phase commit — the asset move is `git mv` and reverts to
 the original paths; webplay version params revert with it.
+
+## Execution status
+
+**Done** — committed as fa1ecec (2026-08-24). `lib/character.js` created;
+player + item GLBs moved (`git mv`) to `lib/models/`; duplicate rigs and the
+second GLTFLoader deleted; both scenes port to the shared loader.
+`FIGURE3D_URL` → v10. Visual check in both harnesses: portrait pixel-stable
+vs pre-port screenshots (human/elf/giant, all gripped). Tests:
+`test_071_figure3d.py` rewritten to assert the lib layout — green. Verified
+again in dojo run 0051 (portrait-regression PASS).
