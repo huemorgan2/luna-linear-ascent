@@ -37,9 +37,9 @@ router = APIRouter()
 
 # 067: the two 3D modules on /play — kill finisher and the Labs arena
 # 071: figure3d is its own folder (Labs isolation — drop = delete it)
-FIGHT3D_URL = "/static/site/fight3d/fight3d.js?v=14"
-ARENA3D_URL = "/static/site/fight3d/arena3d.js?v=4"
-FIGURE3D_URL = "/static/site/figure3d/figure3d.js?v=9"
+FIGHT3D_URL = "/static/site/fight3d/fight3d.js?v=15"
+ARENA3D_URL = "/static/site/fight3d/arena3d.js?v=5"
+FIGURE3D_URL = "/static/site/figure3d/figure3d.js?v=10"
 
 
 # ── Bodies (mirror the plugin's routes.py, minus the chat-bridge ids) ────
@@ -103,17 +103,13 @@ async def _web_gmail(player: str) -> bool:
     return sub is not None
 
 
-def _card(scene_dict: dict, portrait_locked: bool = False) -> dict:
+def _card(scene_dict: dict) -> dict:
     """The pane's contract for scene answers — same shape routes.py
     returns to Luna, fragment rendered by the same renderer."""
     ensure_game_importable()
     from plugin_linear_ascent.engine.scene import Scene
     from plugin_linear_ascent.render import render_scene_fragment
     scene = Scene.from_dict(scene_dict)
-    # 010: gate the player portrait behind a Gmail link (web-only). Set as a
-    # runtime attribute the renderer reads via getattr — never serialized.
-    if portrait_locked:
-        scene.portrait_locked = True
     return {"ok": True, "scene_id": scene.scene_id,
             "event_kind": scene.event_kind, "headline": scene.headline,
             "fragment": render_scene_fragment(scene),
@@ -139,7 +135,9 @@ async def play_page(request: Request):
         return RedirectResponse("/#door-signin", status_code=303)
     ensure_game_importable()
     from plugin_linear_ascent.pane import render_pane
-    page = render_pane(api_base="/play/api", web=True)
+    page = render_pane(
+        api_base="/play/api", web=True,
+        gmail_recovery=not await _web_gmail(user))
     # Funnel Fighters rides only the WEBSITE's /play — injected here, so
     # the plugin (and every Luna chat surface) stays tracker-free. The
     # tag's data-user lets funnel.js identify without an extra fetch;
@@ -173,9 +171,8 @@ async def play_page(request: Request):
 async def pane_scene(ident: tuple = Depends(_identity)) -> dict:
     player, display = ident
     from . import game
-    locked = not await _web_gmail(player)
     scene = await game.run_scene(WEB_TENANT, player, display_name=display)
-    return _card(scene, portrait_locked=locked)
+    return _card(scene)
 
 
 @router.post("/play/api/act")
@@ -184,11 +181,10 @@ async def act(body: ActIn, ident: tuple = Depends(_identity)) -> dict:
     # engine's stale-option answer already make double-clicks harmless
     player, display = ident
     from . import game
-    locked = not await _web_gmail(player)
     scene = await game.run_act(WEB_TENANT, player, body.option.strip(),
                                body.text.strip(), "",
                                display_name=display)
-    return _card(scene, portrait_locked=locked)
+    return _card(scene)
 
 
 @router.get("/play/api/pane/peek")

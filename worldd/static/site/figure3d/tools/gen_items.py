@@ -28,8 +28,10 @@ _LOCK = threading.Lock()
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent                     # figure3d/
-OUT = ROOT / "models"
-ITEMS = OUT / "items"
+OUT = ROOT / "models"                  # raw Tripo sources + manifest stay here
+# finished runtime items live in the shared lib (plan 080) — both 3D
+# scenes load them from there
+ITEMS = ROOT.parent / "lib" / "models" / "items"
 API = "https://openapi.tripo3d.ai/v3"
 
 # walk up to the workspace so we can import economy + the existing .env
@@ -377,7 +379,7 @@ def main():
                 if err:
                     print(f"FAIL {n}: {err}")
     write_catalog(item_specs())
-    print("\nDone. See catalog.json / models/items/.")
+    print("\nDone. See catalog.json / ../lib/models/items/.")
 
 
 if __name__ == "__main__":

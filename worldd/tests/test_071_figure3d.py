@@ -62,9 +62,17 @@ def test_module_parses_and_stays_decoupled():
     subprocess.run([node, "--check", str(F3D / "figure3d.js")], check=True)
 
 
-def test_folder_has_player_copies():
+def test_shared_lib_has_player_models():
+    # plan 080: ONE canonical copy of every player rig and item, in lib —
+    # both 3D scenes load from here; the old per-scene copies are gone
+    lib = F3D.parent / "lib"
     for name in ("human", "elf", "giant"):
-        assert (F3D / "models" / "players" / f"{name}.glb").is_file()
+        assert (lib / "models" / "players" / f"{name}.glb").is_file()
+        assert not (F3D / "models" / "players" / f"{name}.glb").exists()
+    for kind in ("cast", "shoot", "slash"):
+        assert (lib / "models" / "players" / f"human_{kind}.glb").is_file()
     for fam in ("blade", "bow", "staff", "shield", "armor", "boots", "charm"):
-        assert (F3D / "models" / "items" / f"{fam}.glb").is_file()
-    assert (F3D / "vendor" / "utils" / "BufferGeometryUtils.js").is_file()
+        assert (lib / "models" / "items" / f"{fam}.glb").is_file()
+    assert (lib / "vendor" / "GLTFLoader.js").is_file()
+    assert (lib / "vendor" / "utils" / "BufferGeometryUtils.js").is_file()
+    assert (lib / "character.js").is_file()

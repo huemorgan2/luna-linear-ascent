@@ -1,6 +1,6 @@
 // figure3d — 071 Labs: the 3D climber in the profile portrait slot.
-// Own folder; imports only ../lib/sockets.js (plan 079) — never fight3d.
-// Drop = delete this directory (lib/sockets.js stays for fight3d).
+// Own folder; imports only ../lib/ (sockets 079, character + models 080)
+// — never fight3d. Drop = delete this directory (lib stays for fight3d).
 //
 // A card arrives with <canvas.portrait.figure3d data-figure3d='…'>.
 // This module mounts a 100×200 (giant 140×260) 1-bit stage, plays a
@@ -9,10 +9,9 @@
 // feet. Hovering a gear-map slot tints that piece (the one colour
 // exception). No WebGL → unhide the fallback <img>.
 import * as THREE from "three";
-import { GLTFLoader } from "./vendor/GLTFLoader.js";
-import { GRIPS, gripFor, boneMap, attachToSocket } from "../lib/sockets.js";
+import { GRIPS } from "../lib/sockets.js";
+import { loadModel, buildRig, dressFigure } from "../lib/character.js";
 
-const BASE = new URL(".", import.meta.url);
 // pure white, same ink as the drawn portrait_*.png files (255,255,255)
 const INK = new THREE.Color(0xffffff);
 // render buffer scale relative to the portrait's px spec (100×200,
@@ -23,27 +22,6 @@ const SLOT_INK = {
   weapon: 0xf5b825, weapon2: 0xf5b825, weapon3: 0xf5b825,
   charm: 0x45d0c0, armor: 0xdfe4ee, shoes: 0xf26541, shield: 0xa78bfa,
 };
-const FAMILY = {
-  blade: "blade", bow: "bow", staff: "staff",
-  shield: "shield", focus: "focus", armor: "armor",
-  shoes: "boots", charm: "charm", potion: "charm", item: "charm",
-};
-
-const loader = new GLTFLoader();
-const cache = {};
-const assets = {};
-
-function load(rel) {
-  if (!(rel in cache)) {
-    cache[rel] = loader.loadAsync(new URL(rel, BASE).href).catch(() => null);
-  }
-  return cache[rel];
-}
-
-function shadowify(o) {
-  o.traverse((c) => { if (c.isMesh) c.castShadow = true; });
-}
-
 // The 1-bit shader keeps saturated fragments coloured — that exception
 // exists ONLY for the hover tint. Tripo textures carry skin/wood colour
 // that leaked through it, so every material is forced to greyscale at
@@ -93,42 +71,10 @@ function tagSlot(o, slot) {
   o.traverse((m) => { if (m.isMesh) m.userData.slot = slot; });
 }
 
-function makePlaceholder(hold) {
-  const g = new THREE.Group();
-  const mat = new THREE.MeshStandardMaterial({
-    color: 0xc8cdd6, roughness: 0.7, metalness: 0.05,
-    emissive: 0xffffff, emissiveIntensity: 0.08,
-  });
-  let mesh;
-  if (hold === "blade") {
-    mesh = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.95, 0.02), mat);
-    mesh.position.y = 0.45;
-  } else if (hold === "bow") {
-    const t = new THREE.TorusGeometry(0.55, 0.03, 6, 16, Math.PI);
-    mesh = new THREE.Mesh(t, mat);
-    mesh.rotation.z = Math.PI / 2;
-  } else if (hold === "staff") {
-    mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.04, 1.4, 6), mat);
-    mesh.position.y = 0.7;
-  } else if (hold === "shield") {
-    mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.05, 12), mat);
-    mesh.rotation.x = Math.PI / 2;
-  } else if (hold === "focus") {
-    mesh = new THREE.Mesh(new THREE.SphereGeometry(0.08, 10, 8), mat);
-  } else if (hold === "armor") {
-    mesh = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.5, 0.22), mat);
-  } else if (hold === "shoes") {
-    mesh = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.16, 0.22), mat);
-  } else {
-    mesh = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), mat);
-  }
-  g.add(mesh);
-  return g;
-}
-
-// All placement lives in lib/sockets.js (plan 079). This scene only
-// prepares the prop for its 1-bit look (clone, shadows, greyscale +
-// emissive lift) and tags it for the hover map.
+// All placement lives in lib/sockets.js (plan 079); loading, body
+// normalization and the dressing loop live in lib/character.js (plan 080).
+// This scene only lights props for its 1-bit look (greyscale + emissive
+// lift) and tags them for the hover map.
 
 function bayerTex() {
   const BAYER8 = [
@@ -272,54 +218,16 @@ function renderFrame(gl) {
   renderer.render(postScene, postCam);
 }
 
-async function loadProp(slug, hold) {
-  const fam = FAMILY[hold] || "charm";
-  const own = await load(`models/items/${slug}.glb`);
-  if (own) return own.scene;
-  const fb = await load(`models/items/${fam}.glb`);
-  if (fb) return fb.scene;
-  return makePlaceholder(hold);
-}
-
-// fig = { B, wrap, h } from buildFigure. Prepares the prop for the 1-bit
-// look, then delegates ALL placement to the sockets module.
-function equip(fig, src, family, slot) {
-  const grip = gripFor(family);
-  if (!grip) return null;
-  const model = src.clone ? src.clone(true) : src;
-  shadowify(model);
-  liftMesh(model, grip.lift ?? 0.10);
-  const w = attachToSocket({ charRoot: fig.wrap, charHeight: fig.h,
-                             boneIndex: fig.B, prop: model, grip });
-  if (w) tagSlot(w, slot);
-  return w;
-}
-
 async function buildFigure(gl, spec) {
   const race = spec.race && ["human", "elf", "giant"].includes(spec.race)
     ? spec.race : "human";
-  const gltf = await load(`models/players/${race}.glb`);
+  const gltf = await loadModel(`players/${race}.glb`);
   if (!gltf) return null;
-  const model = gltf.scene;
-  shadowify(model);
-  liftMesh(model, 0.07);
-  const mixer = new THREE.AnimationMixer(model);
-  if (gltf.animations && gltf.animations.length) {
-    mixer.clipAction(gltf.animations[0]).play();
-  }
-  mixer.update(0.033);
-  model.scale.setScalar(1);
-  model.position.set(0, 0, 0);
-  model.updateMatrixWorld(true);
-  const box = new THREE.Box3().setFromObject(model);
   // the giant fills his frame; human and elf stand the same height,
   // two (human) head-sizes — 0.5 world units — shorter than him
   const wantH = race === "giant" ? 2.15 : 1.65;
-  const k = wantH / Math.max(0.1, box.max.y - box.min.y);
-  model.scale.setScalar(k);
-  model.position.set(
-    -(box.min.x + box.max.x) / 2 * k, -box.min.y * k,
-    -(box.min.z + box.max.z) / 2 * k);
+  const { model, mixer, B } = buildRig({ gltf, height: wantH });
+  liftMesh(model, 0.07);
   const wrap = new THREE.Group();
   wrap.add(model);
   // the rigs' animated idle faces +x; -90° turns them to the camera,
@@ -357,52 +265,16 @@ async function buildFigure(gl, spec) {
   const slack = Math.max(0, (frameW - rwFinal) / 2 - frameW * 0.02);
   wrap.position.x += Math.min(frameW / 8, slack);
   wrap.updateMatrixWorld(true);
-  const fig = { B: boneMap(model), wrap, h: wantH };
+  const fig = { B, wrap, h: wantH };
 
-  const worn = spec.worn || {};
-  const paths = spec.paths || {};
-  const blades = [];
-  const staffs = [];
-  for (const key of ["weapon", "weapon2", "weapon3"]) {
-    const slug = worn[key];
-    if (!slug) continue;
-    const hold = paths[slug] || "blade";
-    if (hold === "blade") blades.push({ slug, key });
-    else if (hold === "staff") staffs.push({ slug, key });
-    else {
-      const src = await loadProp(slug, hold);
-      equip(fig, src, hold === "bow" ? "bow" : hold, key);
-    }
-  }
-  for (let i = 0; i < blades.length; i++) {
-    const src = await loadProp(blades[i].slug, "blade");
-    equip(fig, src, i === 0 ? "blade" : "blade_l", blades[i].key);
-  }
-  for (let i = 0; i < staffs.length; i++) {
-    const src = await loadProp(staffs[i].slug, "staff");
-    equip(fig, src, i === 0 ? "staff" : "staff_back", staffs[i].key);
-  }
-  if (worn.shield) {
-    const h = paths[worn.shield] || "shield";
-    equip(fig, await loadProp(worn.shield, h),
-          h === "focus" ? "focus" : "shield", "shield");
-  }
-  if (worn.armor) {
-    equip(fig, await loadProp(worn.armor, "armor"), "armor", "armor");
-  }
-  if (worn.shoes) {
-    const boot = await loadProp(worn.shoes, "shoes");
-    equip(fig, boot, "boots_l", "shoes");
-    equip(fig, boot, "boots_r", "shoes");
-  }
-  if (worn.charm) {
-    const h = paths[worn.charm] || "charm";
-    equip(fig, await loadProp(worn.charm, h),
-          h === "charm" ? "charm" : "potion", "charm");
-  }
+  await dressFigure({
+    fig, worn: spec.worn, paths: spec.paths,
+    prep: (m, grip) => liftMesh(m, grip.lift ?? 0.10),
+    tag: (w, slot) => tagSlot(w, slot),
+  });
 
   gl.scene.add(wrap);
-  return { wrap, mixer, B: fig.B, model };
+  return { wrap, mixer, B, model };
 }
 
 const lives = new Map();   // canvas -> { gl, specKey, figure, raf }

@@ -21,9 +21,9 @@
 // procedural on top. The scenery is the demo2 background loop baked
 // into a 24-frame spritesheet, sampled in the post shader.
 import * as THREE from "three";
-import { GLTFLoader } from "./vendor/GLTFLoader.js";
-import { normalizeProp, boneMap as socketBoneMap, resolveBone }
-  from "../lib/sockets.js";
+import { GLTFLoader } from "../lib/vendor/GLTFLoader.js";
+import { normalizeProp, resolveBone } from "../lib/sockets.js";
+import { loadModel, buildRig, shadowify } from "../lib/character.js";
 
 const W = 320, H = 112;
 const FLOOR_FRAC = 0.91;              // combatants' feet, fraction of H
@@ -522,11 +522,13 @@ async function ensureFor(spec, { bgDir = "backgrounds" } = {}) {
   const line = WEAPONS[spec.line] ? spec.line : "blade";
   const kind = KIND_OF[line];
   // the slash clip is dead weight — the sword swing is fully hand-keyed
-  // (STRIKES), so a blade kill never fetches it
+  // (STRIKES), so a blade kill never fetches it. Bodies + strike clips
+  // come from the shared lib (plan 080); the generic weapons and the
+  // monsters stay this scene's own.
   const [pg, wg, mg, bg, cg] = await Promise.all([
-    load(`players/${race}.glb`), load(`players/${line}.glb`),
+    loadModel(`players/${race}.glb`), load(`players/${line}.glb`),
     load(`monsters/${spec.id}.glb`), loadBG(spec.id, bgDir),
-    kind === "slash" ? null : load(`players/${race}_${kind}.glb`),
+    kind === "slash" ? null : loadModel(`players/${race}_${kind}.glb`),
   ]);
   if (!pg || !wg || !mg) return null;
   assets[`t_${race}`] = pg;
@@ -547,10 +549,10 @@ async function ensureFor(spec, { bgDir = "backgrounds" } = {}) {
 // never competes with itself.
 let warmChain = Promise.resolve();
 const warmed = new Set();
-function warmRel(rel) {
+function warmRel(rel, fn = load) {
   if (warmed.has(rel)) return;
   warmed.add(rel);
-  warmChain = warmChain.then(() => load(rel));
+  warmChain = warmChain.then(() => fn(rel));
 }
 let glWarmed = false;
 function warmGL() {
@@ -570,9 +572,9 @@ function warmFor(card) {
     const race = SPECIES[r] ? r : "human";
     const line = WEAPONS[l] ? l : "blade";
     const kind = KIND_OF[line];
-    warmRel(`players/${race}.glb`);
+    warmRel(`players/${race}.glb`, loadModel);
     warmRel(`players/${line}.glb`);
-    if (kind !== "slash") warmRel(`players/${race}_${kind}.glb`);
+    if (kind !== "slash") warmRel(`players/${race}_${kind}.glb`, loadModel);
   }
   const foe = card.dataset.foe3d || "";
   if (foe && MONSTERS3D[foe]) {
@@ -580,10 +582,6 @@ function warmFor(card) {
     warmRel(`monsters/${foe}.glb`);
     warmGL();
   }
-}
-
-function shadowify(o) {
-  o.traverse((c) => { if (c.isMesh) { c.castShadow = true; } });
 }
 
 // attach a Tripo weapon prop to the hand bone. Long-axis + grip-pivot
@@ -622,7 +620,6 @@ function buildPlayer(speciesId, weaponId) {
     model.userData.weaponWrap.removeFromParent();
     model.userData.weaponWrap = null;
   }
-  shadowify(model);
   // Tripo bakes dark tones; a flat lift keeps the body out of solid black
   // at 320x112 without killing the key-light falloff
   model.traverse((m) => {
@@ -631,28 +628,14 @@ function buildPlayer(speciesId, weaponId) {
       m.material.emissiveIntensity = 0.06;
     }
   });
-  const mixer = new THREE.AnimationMixer(model);
-  if (src.animations.length) mixer.clipAction(src.animations[0]).play();
-  mixer.update(0.033);                   // settle: rest pose ≠ idle pose
-  // idempotent normalize against the ANIMATED pose, cached per asset
-  model.scale.setScalar(1);
-  model.position.set(0, 0, 0);
-  model.updateMatrixWorld(true);
-  if (!src.userData.dims) {
-    src.userData.dims = new THREE.Box3().setFromObject(model);
-  }
-  const box = src.userData.dims;
-  const k = sp.h / (box.max.y - box.min.y);
-  model.scale.setScalar(k);
-  model.position.set(
-    -(box.min.x + box.max.x) / 2 * k, -box.min.y * k,
-    -(box.min.z + box.max.z) / 2 * k);
+  // the shared body pipeline (plan 080): settle the idle, idempotent
+  // normalize against dims cached on the gltf, bone map
+  const { mixer, B } = buildRig({ gltf: src, height: sp.h });
   const wrap = new THREE.Group();
   wrap.add(model);
   wrap.rotation.y = PLAYER_YAW;
   wrap.updateMatrixWorld(true);
 
-  const B = socketBoneMap(model);
   const hand = resolveBone(B, "hand_r");
   let weapon = null;
   if (hand) {
