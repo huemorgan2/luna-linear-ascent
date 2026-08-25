@@ -22,7 +22,7 @@
 // into a 24-frame spritesheet, sampled in the post shader.
 import * as THREE from "three";
 import { GLTFLoader } from "../lib/vendor/GLTFLoader.js";
-import { normalizeProp, resolveBone } from "../lib/sockets.js";
+import { normalizeProp, resolveBone, gripFor } from "../lib/sockets.js";
 import { loadModel, buildRig, shadowify } from "../lib/character.js";
 
 const W = 320, H = 112;
@@ -226,13 +226,16 @@ const SPECIES = {
 // holds it; rot/pos are WORLD-space after the long axis is normalized to
 // +Y — the frame loop cancels the live hand-bone rotation (it differs per
 // rig), so one setting fits all three characters.
+// fam names the GRIPS family whose emissive lift the prop inherits (plan
+// 080 — dark Tripo props sank to solid black under the crushed-black tone
+// curve); a local lift key still overrides.
 const WEAPONS = {
-  blade: { label: "Blade", key: "w_blade", len: 0.95, grip: 0.14,
-           rot: [0.15, 0, -0.9] },
-  bow:   { label: "Bow", key: "w_bow", len: 1.30, grip: 0.50,
+  blade: { label: "Blade", key: "w_blade", fam: "blade", len: 0.95,
+           grip: 0.14, rot: [0.15, 0, -0.9] },
+  bow:   { label: "Bow", key: "w_bow", fam: "bow", len: 1.30, grip: 0.50,
            rot: [0, 0, -0.15], pos: [0, 0, 0.14], lift: 0.30 },
-  staff: { label: "Staff", key: "w_staff", len: 1.45, grip: 0.45,
-           rot: [0, 0, -0.08], pos: [0.10, 0, 0.14] },
+  staff: { label: "Staff", key: "w_staff", fam: "staff", len: 1.45,
+           grip: 0.45, rot: [0, 0, -0.08], pos: [0.10, 0, 0.14] },
 };
 const KIND_OF = { blade: "slash", bow: "shoot", staff: "cast" };
 
@@ -391,8 +394,12 @@ function createStage({ W: w = W, H: h = H, floorFrac = FLOOR_FRAC,
           float edge = step(0.010, behind);
           float lum = dot(s.rgb, vec3(0.2126, 0.7152, 0.0722));
           lum = pow(clamp(lum, 0.0, 1.0), 0.4545);
-          float shade = smoothstep(0.03, 0.95, lum);
-          shade = floor(shade * 6.0 + 0.5) / 6.0;      // 6-step posterize
+          // continuous ramp with crushed blacks — the portrait's curve
+          // (plan 080): the Bayer matrix itself draws the gradient, lit
+          // surfaces saturate to solid ink, the shadow side falls to true
+          // black. The old 6-step posterize banded the bodies into the
+          // same dither density as the scenery and they never separated.
+          float shade = smoothstep(0.28, 0.75, lum);
           float fill = step(t, shade);
           // the kicker's sliver: contour pixels facing the monster (+x)
           // catch the backlight solid instead of ink
@@ -591,11 +598,12 @@ function warmFor(card) {
 function equipTripo(handBone, neutralQ, wp) {
   const model = assets[wp.key].scene.clone(true);
   shadowify(model);
-  if (wp.lift) model.traverse((m) => {
+  const lift = wp.lift ?? gripFor(wp.fam)?.lift ?? 0;
+  if (lift) model.traverse((m) => {
     if (!m.isMesh) return;
     m.material = m.material.clone();
     m.material.emissive.set(0xffffff);
-    m.material.emissiveIntensity = wp.lift;
+    m.material.emissiveIntensity = lift;
   });
   const { pivot, nlen } = normalizeProp(model, { mode: "long",
                                                  grip: wp.grip });
