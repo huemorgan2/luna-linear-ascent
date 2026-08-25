@@ -64,3 +64,13 @@ DojoCtrl4 (L4) 60 rounds, 12 misses, maxMissStreak 4.
 Deploy is NOT taken from this phase: R-0053-1 blocks "complete" —
 fixed in phase-8 (planned + executed same day), s06 re-walked there,
 then the deploy step of this phase runs at 0.104.0.
+
+Deploy executed 2026-08-25 (after phase-8): dep-da6sa72fngtc73c82im0 via
+Render API, polled build → update → live; /health game=0.104.0, db=true.
+Post-deploy prod verification (temporary ipAllowList 213.249.38.162/32,
+reverted to empty immediately after): huemorgan4 ledger shows
+grant_in +90 (07:20:06, from huemorgan), grant_in +101 (07:21:20, from
+huemorgan3), one letter_gold +191 "collected" (07:22:42); both letters
+read=true with gold=0 remaining; player gold 1080, level 2 — the
+phase-1 finding stands: the money was credited, the bug was the stale
+card.

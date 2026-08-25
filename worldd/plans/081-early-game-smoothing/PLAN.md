@@ -220,3 +220,8 @@ Results: `dojo/results/0053-081-early-game-smoothing-2026-08-25/`.
 
 Deploy: engine 0.104.0 — see phase-7/phase-8 statuses; post-deploy
 verification recorded below after the deploy completed.
+
+Post-deploy 2026-08-25: live at 0.104.0 (/health ok, db true), deploy
+dep-da6sa72fngtc73c82im0. Prod scenario-01 evidence re-verified
+(huemorgan4: one letter_gold +191 collect, letters read, gold 1080) via
+temporary DB allowlist, reverted to empty after use. Plan complete.
