@@ -99,3 +99,33 @@ render.py:1952-1957, CSS render.py:3153-3160).
 
 Revert the commit(s). Pure presentation + scene copy; no schema, no doc
 shape, no economy values changed.
+
+## Execution status
+
+Executed 2026-08-25.
+
+1. (a) Click path carries the numbers: `_slot_cell` ships
+   `data-params` (same colored spans as the hover tip); `openMenu`
+   prints them in a `.pstat` block at the top of the popup — phones
+   that never hover now read ATK/DEF/HEALS + durability. Durability
+   span refined: real `left/total` when known, `DURABILITY ∞` only for
+   FORGE steel, omitted otherwise. APOTHECARY numbers parsed
+   (`heal_25` → `HEALS 25`) in both `_slot_map` and `_pack_strip`.
+2. (b) Pawn broker: price-0 gate kit (gate_buckler, gate_jerkin) is off
+   the offer list (was a ◈ 0 row that read as a glitch); the waves-off
+   line after the rate line names every refused pack piece — basics and
+   gate kit — "worth nothing to him, and never lost to you". A stale
+   `sell_` click for a refused piece answers with the same note as
+   `shard_note` instead of silently re-rendering (`_pawn_refused` /
+   `_pawn_waves_off`, fall-through in `_pawn_action`).
+3. (c) Popup action labels render as `[LABEL]` — `<span class="key">`
+   + bracket CSS (gold key, DIM brackets, INK on hover). Held-slot pack
+   rows say the move: weapon/shield hint is now "move to hand" when the
+   hand is empty (swap-out phrasing kept when a piece is worn).
+4. Tests: `tests/test_081_gear_clarity.py` — 6 passed (params on the
+   level-1 fragment + popup template, bracketed key span, waves-off
+   naming + no ◈ 0 row, stale-click note, sellable gear keeps its row,
+   move-to-hand hint both branches). test_029/test_069 regression: pass.
+5. Suites: plugin full suite at baseline, worldd full suite green
+   (run after vendor sync — see repo log). Vendor synced
+   (`diff -rq` clean). Deploy rides phase-7.

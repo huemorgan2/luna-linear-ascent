@@ -90,3 +90,33 @@ harmless and empty once emitters are gone). If the migration itself must
 go: `ALTER TABLE ascent_happenings DROP COLUMN to_tenant, DROP COLUMN
 to_player;` and drop the partial index — safe because nothing else reads
 them.
+
+## Execution status
+
+Executed 2026-08-25.
+
+1. Migration `worldd/migrations/023_directed_happenings.sql` written:
+   `to_tenant`/`to_player` TEXT columns + partial index `ha_directed_id`
+   (applies on next deploy boot; additive, no backfill needed).
+2. `add_happening` gained `to_tenant`/`to_player` params; `_fx_send_letter`
+   and `_fx_grant` emit `scope='player'` rows with `meta={"go":"relay"}`
+   after their INSERTs — same head-bump door, so realtime is free.
+3. `playing_feed`: broadcast/faction cached queries exclude
+   `scope='player'`; directed rows come from a deliberately UNCACHED
+   per-player query (7-day window, FEED_LIMIT cap, id-dedup merge);
+   `scope='player'` rows are exempt from the since-cursor so undismissed
+   mail resurfaces on reload. `meta` (jsonb→str) json-loaded into the row.
+4. Client (pane.py): `PLY_STICKY={grant,letter}`, `la_ntf_seen` capped-50
+   dismissal store, sticky toasts shown uncapped ahead of the capped rest,
+   ✕ marks seen, body click on `meta.go==='relay'` rows navigates
+   tab→game + `goto_relay`; gold/aether inks on feed rows and toasts.
+5. Engine `goto_relay` deep-link: refused mid-encounter, door rules
+   respected (RELAY_LEVEL gate unless inbox_count>0), clears town
+   sub-state, lands on the relay scene.
+6. Tests: 3 new in `test_060_playing_toasts.py` (recipient isolation,
+   since-cursor survival, no shared-cache leak) + 
+   `test_wire_and_letter_emit_directed_notifications` in
+   `test_social_api.py` (emitters + deep-link). Full worldd suite
+   221 passed / 0 failed (17:48). Plugin suite at pre-existing baseline
+   (8 known failures, 1375+ passed).
+7. Vendor synced (`diff -rq` clean). Deploy rides phase-7.

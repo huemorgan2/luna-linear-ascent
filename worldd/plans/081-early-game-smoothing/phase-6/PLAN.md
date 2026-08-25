@@ -123,3 +123,68 @@ weapon equips from the opener card.
 Revert the commit(s). `foe_sheet` is additive on Scene (old clients
 ignore it); `p["foehint_done"]` is a harmless orphan flag; no
 migration.
+
+## Execution status
+
+Executed 2026-08-25. All code in `plugin-linear-ascent` (submodule),
+vendor synced (`diff -rq --exclude=__pycache__` clean).
+
+1. **Engine truth — `combat._foe_sheet(p)`** (combat.py, before
+   fight_scene): builds `{type, def:{n,best,held}, fly:{yes,best,held},
+   resist:{pct,best,held}, speed:{n,closes}, hint}` from
+   `economy.TYPE_MULT`/`TYPE_SPEED` and the held weapon's line. Resist
+   pct derived, not hardcoded: `round((1-TYPE_MULT["magic_resist"]["staff"])*100)`
+   = 98. `hint` reads `not p.get("foehint_done")`. Attached to the
+   Scene as `foe_sheet` on opener cards only (`opener` branch); round
+   cards carry `None`. Scene dataclass gained the field + `to_text()`
+   parity lines (`◇ DEF n — best weapon: magic`, `◇ FLY — YES`,
+   `◇ MAGIC RES 98%`, `◇ SPEED n — closes distance fast`, plain →
+   `◇ no sign — every weapon bites full`).
+2. **Verdict prose dropped from the opener body**: `economy.type_line`
+   and `_verdict(p)` removed from fight_scene's opener body — the sheet
+   says it now. Prose line + You-line stay.
+3. **Renderer — `_foesheet_html(fs)`** (render.py): 2×2 grid
+   (`.foesheet`), 32px tinted mask icons (t_armor/ORANGE, t_wing/AETHER,
+   t_resist/VIOLET, t_speed/GOLD — no emoji), `.fsbig` stat +
+   `.fshint` best-weapon line (greyed `.fsheld` when the right weapon is
+   already in hand). Plain monsters get a NO SIGN cell. Dismissable
+   `.foehint` box ("You can switch to the proper weapon from your pack"
+   + ✕ `data-opt="foehint_close"`) rendered only while `fs["hint"]`.
+   Suppressed in arena_live. No-bold law respected (color, not weight).
+4. **Dismiss is server-side**: `foehint_close` handler in
+   `core.apply_choice` (before row validation, next to news_close) sets
+   `p["foehint_done"] = True` and re-renders the opener — survives
+   reload, next encounters render without the box.
+5. **Weapon swap at the sizing-up**: new `combat.swap_window(p)`
+   (`at_range and not attacked and not shot_used` — the treeline-shot
+   gate). `pack_actions` offers `wear_<slug>` ("Hold — swap before the
+   steel meets") for pack weapons inside the window, level-gated;
+   `_pack_use` routes it through `_wear_from_pack` (durability stash,
+   held-order, old→pack all inherited) and rebuilds the opener card.
+   Opener gains a "Open your pack" row; `resolve_fight_action("pack")`
+   answers with a pointer shard_note and costs no round.
+6. **Replay determinism**: opener rebuilds no longer consume RNG —
+   `_shard_advice` split into a caching wrapper (`e["_advice"]`) +
+   `_shard_advice_roll`. Proven by rng_counter assertion in the swap
+   test.
+7. **Copy drift fix**: bow press line prints
+   `×{BOW_CLOSE_MULT:g}` (0.5), not the stale "×0.6".
+8. **Tips**: new "pack" tip (test_014 full-walk coverage).
+
+**Tests.** New `tests/test_081_foe_sheet.py` — 9 tests: payload per
+type (incl. derived 98%), closes flag + to_text, no sheet on round
+cards, verdict prose gone, fragment draws sheet/hint, foehint_close
+flag, swap equips + durability stash + rng_counter unchanged, swap
+refused after attacked/shot_used/close, pack row costs no round.
+`test_048_visible.py` — 4 tests updated to read the sheet/dossier
+instead of the removed prose (intent preserved). `test_017_info_card.py`
+— 2 stale ×0.6 assertions now assert the constant.
+
+**Verification.** Targeted: test_081_foe_sheet + test_048_visible =
+29 passed. Full plugin suite: 8 failed, 1393 passed — exactly the
+pre-existing baseline (test_017_death_relics, test_017_speed_chase,
+test_022_002_retune, test_048_no_classes, test_067_arena, test_kill3d
+×3). Two new failures found and fixed en route: missing "pack" tip
+(test_014) and the pinned ×0.6 copy (test_017_info_card ×2). Vendor
+synced; full worldd suite run after sync (see phase-7 status for the
+count). Manual/dojo walkthrough: phase-7 scenario 06.

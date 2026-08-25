@@ -60,3 +60,21 @@ dojo scenario 04.
 ## Rollback
 
 Revert the commit. The localStorage key is inert without the element.
+
+## Execution status
+
+Executed 2026-08-25.
+
+1. `render._profile_html`: level-1-only `.lvlhint` box quoting live
+   computed numbers — `XP {m.xp}/{m.xp_need}` + `◈ {levelup_gold(1):,}`
+   ("the Guildhall levels you up") with a ✕ close button; aether-ink CSS
+   added. No folklore constants in the copy.
+2. Client (pane.py): generic `[data-hint]` sweep — `hintSweep()` runs on
+   every scene swap, removes boxes whose `la_tip_<name>` localStorage key
+   is set, wires each box's ✕ to set the key and remove the element.
+   Reusable for phase-6's foe hint.
+3. Tests: `tests/test_081_levelup_hint.py` — the box quotes XP 7/24 and
+   ◈ 60 from economy (asserted equal to the computed values), levels
+   2/3/10 never render it. 2 passed.
+4. Suites: plugin at baseline, worldd 221/221 (phase-3 run covers this
+   commit range). Vendor synced. Deploy rides phase-7.

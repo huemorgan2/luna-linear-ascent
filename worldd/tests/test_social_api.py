@@ -176,6 +176,53 @@ async def test_level1_collect_updates_card(client, tenants):
     assert n == 1
 
 
+async def test_wire_and_letter_emit_directed_notifications(client, tenants):
+    # 081 phase-3: a grant and a letter each write ONE directed
+    # happening addressed to the recipient (scope='player',
+    # meta.go='relay'), and the goto_relay deep-link walks a level-1
+    # recipient with held mail straight onto the Relay card.
+    a, b = tenants
+    pa, pb = f"a-{uuid.uuid4().hex[:6]}", f"b-{uuid.uuid4().hex[:6]}"
+    na, nb = f"Wire{pa[-4:]}", f"Post{pb[-4:]}"
+    await create(client, a, "tenant-a", pa, na)
+    await create(client, b, "tenant-b", pb, nb)
+
+    doca = await get_doc("tenant-a", pa)
+    doca.update({"gold": 1000, "level": 6})
+    await set_doc("tenant-a", pa, doca)
+    assert (await get_doc("tenant-b", pb))["level"] == 1
+
+    # letter A → B
+    await act(client, a, "tenant-a", pa, option="relay")
+    await act(client, a, "tenant-a", pa, option=f"write_{nb}")
+    await act(client, a, "tenant-a", pa, text="Meet me on floor three.")
+    # grant A → B (100 gross, 90 net)
+    await act(client, a, "tenant-a", pa, option="town")
+    await act(client, a, "tenant-a", pa, option="vault")
+    await act(client, a, "tenant-a", pa, option="grants")
+    await act(client, a, "tenant-a", pa, option=f"grantto_{nb}")
+    await act(client, a, "tenant-a", pa, option="grantamt_100")
+
+    pool = await db.get_pool()
+    rows = await pool.fetch(
+        "SELECT kind, line, scope, meta FROM ascent_happenings "
+        "WHERE to_tenant='tenant-b' AND to_player=$1 ORDER BY id", pb)
+    assert [r["kind"] for r in rows] == ["letter", "grant"]
+    for r in rows:
+        assert r["scope"] == "player"
+        assert json.loads(r["meta"]) == {"go": "relay"}
+        assert "Relay Office" in r["line"]
+    assert "◈ 90 wired" in rows[1]["line"]
+    assert na in rows[1]["line"]
+
+    # the toast's click-through: goto_relay from town lands on the
+    # Relay card (level 1, but held mail opens the door)
+    await act(client, b, "tenant-b", pb, option="town")
+    s = await act(client, b, "tenant-b", pb, option="goto_relay")
+    assert not s.get("refusal"), s
+    assert "collect" in [o["id"] for o in s["options"]], s
+
+
 async def test_collect_row_survives_deep_inbox(client, tenants):
     # 081 phase-1: the relay card shows the 8 newest letters — a gold
     # letter buried 9th must still get its Collect row (gold_held is

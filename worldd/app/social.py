@@ -861,14 +861,19 @@ _online_cache: dict = {"at": None, "n": 0}
 async def add_happening(conn, *, kind: str, line: str,
                         floor: int | None = None, actor: str | None = None,
                         faction: str | None = None, scope: str = "world",
-                        meta: dict | None = None) -> None:
-    """The one door every feed line walks through — bumps the head."""
+                        meta: dict | None = None,
+                        to_tenant: str | None = None,
+                        to_player: str | None = None) -> None:
+    """The one door every feed line walks through — bumps the head.
+    081: a (to_tenant, to_player) pair addresses the row to ONE player
+    (scope='player'); NULL recipient = broadcast."""
     hid = await conn.fetchval(
         "INSERT INTO ascent_happenings (world_day, kind, line, floor,"
-        " actor, faction, scope, meta)"
-        " VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb) RETURNING id",
+        " actor, faction, scope, meta, to_tenant, to_player)"
+        " VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9,$10) RETURNING id",
         pstate.world_day(), kind, str(line)[:200], int(floor or 0),
-        actor, faction, scope, json.dumps(meta) if meta else None)
+        actor, faction, scope, json.dumps(meta) if meta else None,
+        to_tenant, to_player)
     if hid is not None:
         _feed_head["id"] = max(int(_feed_head["id"] or 0), int(hid))
 
@@ -951,7 +956,16 @@ async def playing_feed(conn, tenant: str, player: str, scope: str,
     world_sql = (f"SELECT {_FEED_COLS} FROM ascent_happenings "
                  "WHERE scope='world' ORDER BY id DESC LIMIT $1")
     fac_sql = (f"SELECT {_FEED_COLS} FROM ascent_happenings "
-               "WHERE faction=$1 ORDER BY id DESC LIMIT $2")
+               "WHERE faction=$1 AND scope <> 'player' "
+               "ORDER BY id DESC LIMIT $2")
+    # 081: MY directed rows (wires, letters) — a separate UNCACHED query:
+    # the _feed_rows cache is keyed per scope, not per player, and must
+    # never serve one player's mail to another. Recent window only.
+    directed = [dict(r) for r in await conn.fetch(
+        f"SELECT {_FEED_COLS}, meta FROM ascent_happenings "
+        "WHERE to_tenant=$1 AND to_player=$2 "
+        "AND created_at > now() - interval '7 days' "
+        "ORDER BY id DESC LIMIT $3", tenant, player, FEED_LIMIT)]
     if scope == "faction":
         rows = await _feed_rows(conn, f"faction:{my_faction}", head,
                                 fac_sql, my_faction, FEED_LIMIT)
@@ -968,12 +982,23 @@ async def playing_feed(conn, tenant: str, player: str, scope: str,
         rows = rows[:FEED_LIMIT]
     else:
         rows = await _feed_rows(conn, "world", head, world_sql, FEED_LIMIT)
-    rows = [r for r in rows if int(r["id"]) > since]
+    if directed:
+        # merge, newest first, dedup by id, directed rows never dropped
+        seen = {r["id"] for r in directed}
+        rows = sorted(directed + [r for r in rows if r["id"] not in seen],
+                      key=lambda r: -int(r["id"]))[:FEED_LIMIT]
+    # 081: directed mail is exempt from the cursor — a reload peeks with
+    # since=head, and undismissed mail must still come down (the client's
+    # la_ntf_seen list is the only dismissal).
+    rows = [r for r in rows
+            if int(r["id"]) > since or r["scope"] == "player"]
     return {
         "ok": True, "faction": my_faction, "head": head,
         "rows": [{"id": r["id"], "kind": r["kind"], "line": r["line"],
                   "floor": r["floor"], "actor": r["actor"],
                   "scope": r["scope"],
+                  **({"meta": json.loads(r["meta"])}
+                     if r.get("meta") else {}),
                   "ts": r["created_at"].isoformat()} for r in rows],
     }
 
@@ -1260,11 +1285,17 @@ async def _fx_send_letter(conn, doc: dict, e: dict) -> None:
     row = await _find_player_by_name(conn, e["to_name"])
     if row is None:
         return
+    sender = doc.get("name") or "a climber"
     await conn.execute(
         "INSERT INTO ascent_letters (to_tenant, to_player, from_name, body)"
         " VALUES ($1,$2,$3,$4)",
-        row["tenant"], row["player"], doc.get("name") or "a climber",
-        e["body"])
+        row["tenant"], row["player"], sender, e["body"])
+    # 081: the recipient's live stream hears the knock
+    await add_happening(
+        conn, kind="letter", scope="player",
+        line=f"A letter from {sender} waits at the Relay Office",
+        actor=sender, meta={"go": "relay"},
+        to_tenant=row["tenant"], to_player=row["player"])
 
 
 async def _fx_collect_gold(conn, tenant: str, player: str,
@@ -1304,6 +1335,14 @@ async def _fx_grant(conn, doc: dict, e: dict) -> None:
         " VALUES ($1,$2,'grant_in',$3,$4)",
         row["tenant"], row["player"], e["net"],
         f"from {doc.get('name') or 'unknown'}")
+    # 081: the wire announces itself in the recipient's live stream
+    sender = doc.get("name") or "a climber"
+    await add_happening(
+        conn, kind="grant", scope="player",
+        line=f"◈ {e['net']:,} wired from {sender} — collect at the "
+             "Relay Office",
+        actor=sender, meta={"go": "relay"},
+        to_tenant=row["tenant"], to_player=row["player"])
 
 
 def _power(d: dict) -> int:
