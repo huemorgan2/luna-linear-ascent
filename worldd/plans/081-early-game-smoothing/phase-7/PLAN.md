@@ -36,3 +36,31 @@ The results folder itself, plus green full suites at the walked SHAs.
 
 Not applicable (no system change in this phase); deploy rollback is the
 standard revert-and-redeploy of the offending phase commit.
+
+## Execution status
+
+Executed 2026-08-25. Results: `dojo/results/0053-081-early-game-smoothing-2026-08-25/`
+(summary.md, 36 screenshots, s02-rounds.txt). Env: local uvicorn :8600,
+worldd 66e12ad, engine b3dc9e9 (vendor in sync), Postgres 16 :5434,
+Playwright headless Chromium. Six players seeded via real web signup.
+
+Verdicts: 01 PASS, 02 PASS, 03 PASS, 04 PASS, 05 PASS (desktop+mobile),
+**06 FAIL — regression R-0053-1 filed**: the phase-6 foe sheet (grid +
+swap hint) never renders on the web pane — `Scene.to_dict`/`from_dict`
+(engine/scene.py:381/440) do not carry the new `foe_sheet` field, and
+worldd's `/play/api/*` round-trips every scene through them
+(app/webplay.py `_card`). Reproduced both ways: live opener fragment
+has `data-arena phase:"opener"` and no `.foesheet`; a direct
+vendor-code render of the identical opener (no dict round-trip) draws
+the sheet. Working parts of 06 verified live: verdict prose gone from the
+opener body, `pack` row at sizing-up, `wear_<slug>` swap accepted in
+the window and refused with the re-rig reason after the first attack,
+`foehint_close` flag server-side. Plugin `test_081_foe_sheet.py`:
+10 passed (sheet renders off-arena).
+
+Numbers: s02 — DojoPity1 (L1) 60 rounds, 11 misses, maxMissStreak 1;
+DojoCtrl4 (L4) 60 rounds, 12 misses, maxMissStreak 4.
+
+Deploy is NOT taken from this phase: R-0053-1 blocks "complete" —
+fixed in phase-8 (planned + executed same day), s06 re-walked there,
+then the deploy step of this phase runs at 0.104.0.

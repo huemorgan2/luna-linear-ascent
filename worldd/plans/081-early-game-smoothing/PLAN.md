@@ -185,3 +185,38 @@ user; huemorgan4 needs no personal message — just the phase-1 fix.
    first fights (unlocks.py:360 already surfaces rules; add it there).
 9. **Toasts last 3 s** (`PLY_TOAST_MS`, pane.py:1212) — fast readers
    only. Phase 3's sticky kind helps; consider 5 s for the rest.
+
+## Execution status
+
+Executed 2026-08-25, phases 1–8 in order, each verified before the next.
+Engine work in submodule plugin-linear-ascent (vendor copy synced and
+`diff -rq` clean at every commit), worldd changes committed to main.
+
+- phase-1 — relay collect: post-effect card rebuild + friendly stale
+  collect. huemorgan4's ledger verified: the gold WAS credited on the
+  first click (bug was the stale card, not lost money).
+- phase-2 — beginner pity rule (L ≤ 3, streak cap = level). Dojo
+  numbers: L1 walker 60 rounds / 11 misses / max streak 1; L4 control
+  60 / 12 / max streak 4 (cap is the pity rule, not RNG luck).
+- phase-3 — directed sticky notifications (grant + letter), per-player
+  happenings, click-to-Relay, dismissal persisted.
+- phase-4 — level-up explainer box with computed numbers (24 XP + ◈ 60
+  at L1), dismissable, server-side gone at L2.
+- phase-5 — gear clarity: params in click popup (desktop + mobile),
+  pawn waves-off line, no ◈ 0 rows, [HOLD] key row.
+- phase-6 — foe sheet (DEF/FLY/MAGIC RES/SPEED + best-weapon lines),
+  dismissable pack-swap hint, weapon swap open during the sizing-up.
+- phase-7 — dojo run 0053: scenarios 01–05 PASS, 06 FAIL →
+  **R-0053-1 filed** (foe sheet never rendered on the web pane).
+- phase-8 — R-0053-1 root-caused and fixed: (1) `Scene.to_dict`/
+  `from_dict` dropped `foe_sheet` (worldd round-trips every scene);
+  (2) `_build_scene` rebuilt live encounters with `opener=False`, so
+  reloads lost the opener. Fixed (d8dfae5, ca4b5a4), round-trip +
+  rebuild tests added, scenario 06 re-walked: PASS.
+
+Suites at completion: plugin 1395 passed / 1 skipped / 1 xfailed
+(8 pre-existing failures, unchanged baseline); worldd 221 passed.
+Results: `dojo/results/0053-081-early-game-smoothing-2026-08-25/`.
+
+Deploy: engine 0.104.0 — see phase-7/phase-8 statuses; post-deploy
+verification recorded below after the deploy completed.
