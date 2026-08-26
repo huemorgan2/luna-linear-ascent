@@ -39,3 +39,24 @@ phase-1d; dojo re-walk PASS.
 
 Labs flag off is the live mitigation. Full revert: revert phase-1e
 commits (asset included), vendor re-sync.
+
+## Execution status
+
+Executed 2026-08-26. Shipped in plugin 0.110.0; vendor synced.
+
+- **Shading:** gamma alone could not soften the phase-1d asset — the
+  raw was pure ink/paper with no midtones to keep. One Gemini pass
+  painted grey washes over the same composition
+  (`raw_map_shaded.png` = new `raw_map.png`); `map_gen.py` gamma
+  1.45 → 1.15 keeps them as halftone.
+- **Chips:** `.mk` ink TEXT → BRIGHT; `[N]` wrapped in
+  `<span class="mknum">` in GOLD, INK on hover. GATE anchor
+  (56,40) → (56,50) — the tag sits on the structure's face
+  (engine + mock).
+- **Tests:** `test_082_floormap.py` 11/11. No engine-logic change —
+  full suites at baseline this same day (phase-1c).
+- **Dojo:** run 0058 (`dojo/results/0058-082-floormap-1e-2026-08-26/`)
+  **33/33 PASS** (new check: chip ink bright white + gold number).
+  First pass 31/32 — the mknum span broke the walkthrough's label
+  reader; harness fix, re-run green.
+- Deploy not requested this phase.

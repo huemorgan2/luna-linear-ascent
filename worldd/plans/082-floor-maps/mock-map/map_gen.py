@@ -55,7 +55,9 @@ img = ImageOps.autocontrast(img, cutoff=1)   # keep the gradient ramps wide
 # The model paints on light-grey paper; the game is ink on black. Gamma
 # pushes the flat mid-grey ground down to sparse dither while lit faces,
 # the stream and the glow pools stay bright.
-img = img.point(lambda p: int(255 * (p / 255) ** 1.45))
+# phase-1e: the raw carries painted grey washes now — a gentle 1.15
+# keeps them as halftone shading instead of crushing to white/black.
+img = img.point(lambda p: int(255 * (p / 255) ** 1.15))
 
 out = Image.new("RGBA", (W, H), (0, 0, 0, 255))
 po = out.load()
