@@ -58,5 +58,11 @@ Executed 2026-08-26. Shipped in plugin 0.109.0; vendor synced.
 - **Dojo:** run 0057 (`dojo/results/0057-082-floormap-1d-2026-08-26/`)
   **32/32 PASS**; card screenshot shows the stump with the lines off
   the top edge.
-- **Deploy:** see below — pushed and deployed via
-  `worldd/tools/deploy.sh`, live 0.109.0 verified.
+- **Deploy:** pushed (plugin, luna — rebased over two parallel remote
+  commits, monorepo), `worldd/tools/deploy.sh` deploy
+  dep-da7f7hmk1f9s73d7pgqg, 0.106.0 → **live 0.109.0** (/health).
+- **Post-deploy verification (prod):** throwaway player dojoverify1d,
+  labs floormap on — live card serves the new asset: natural 492×369,
+  full bleed (img 734px / card 736px), all five chips, HUNT wears the
+  pixel bolt (`.mkcost .eg` present, no ⚡ in text). Evidence:
+  `dojo/results/0057-082-floormap-1d-2026-08-26/screenshots/11-prod-live-0109.png`.
