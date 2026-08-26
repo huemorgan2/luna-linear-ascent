@@ -58,3 +58,10 @@ Executed 2026-08-26. Shipped in plugin 0.110.2; vendor synced.
 - **Dojo:** run 0060 (`dojo/results/0060-082-floormap-1g-2026-08-26/`)
   **33/33 PASS**.
 - Deploy not requested this phase (live remains 0.109.0).
+- **Deploy (requested after review):** `deploy.sh` →
+  dep-da7hdilg1s2s73fs9fhg, live 0.109.0 → **0.110.2**. Post-deploy:
+  prod login (dojoverify1d) shows the map card — natural 492x369,
+  img 734 / card 736, pixel bolt, no emoji, 5 chips
+  (`screenshots/11-prod-live-01102.png`); prod-served
+  `/static/laart/maps/map_001_492x369.png` byte-identical to the
+  shipped 0.110.2 asset.
