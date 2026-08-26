@@ -55,8 +55,9 @@ img = ImageOps.autocontrast(img, cutoff=1)   # keep the gradient ramps wide
 # The model paints on light-grey paper; the game is ink on black. Gamma
 # pushes the flat mid-grey ground down to sparse dither while lit faces,
 # the stream and the glow pools stay bright.
-# phase-1e: the raw carries painted grey washes now — a gentle 1.15
-# keeps them as halftone shading instead of crushing to white/black.
+# phase-1f: the raw is model-DESIGNED dither art now (vision/
+# 1bit-images.md discipline) — grey washes died white. 1.15 lands the
+# mountain band's tonal spread exactly on the phase-1d reference.
 img = img.point(lambda p: int(255 * (p / 255) ** 1.15))
 
 out = Image.new("RGBA", (W, H), (0, 0, 0, 255))

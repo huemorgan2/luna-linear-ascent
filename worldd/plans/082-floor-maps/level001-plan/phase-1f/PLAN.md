@@ -43,3 +43,20 @@ So the fix is a designed-dither re-render, not another wash.
 
 Labs flag off is the live mitigation. Full revert: revert phase-1f
 commits (asset included), vendor re-sync.
+
+## Execution status
+
+Executed 2026-08-26. Shipped in plugin 0.110.1; vendor synced.
+
+- **Art:** one Gemini designed-dither pass (refs: 1e raw for
+  composition, `raw_map_stump.png` for mountain tone) — composition
+  held, mountains back to dense hatching with solid-black cast
+  shadows. Gamma sweep 1.0/1.15/1.3: 1.15 kept (mountain-band block
+  spread matches phase-1d exactly: shadow 11.6%=11.6%, lit 27.6% vs
+  26.6%; phase-1e was 7.3%/15.1%).
+- **Markers:** all six anchors verified on the new art (red-dot
+  overlay + zooms); no coordinate changes.
+- **Tests:** `test_082_floormap.py` 11/11.
+- **Dojo:** run 0059 (`dojo/results/0059-082-floormap-1f-2026-08-26/`)
+  **33/33 PASS**.
+- Deploy not requested this phase (live remains 0.109.0).
