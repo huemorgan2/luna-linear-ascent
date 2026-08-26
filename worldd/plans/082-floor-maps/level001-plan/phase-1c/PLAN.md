@@ -43,3 +43,31 @@ literal ⚡; new art passes the dojo visual check.
 
 Labs flag off is the live mitigation. Full revert: revert the phase-1c
 plugin + monorepo commits (asset included), vendor re-sync.
+
+## Execution status
+
+Executed 2026-08-26. Shipped in plugin 0.108.0; vendor synced.
+
+- **Art:** two Gemini passes (door shrink + wheels + cable, then the
+  relight for 1-bit). The decisive fix was in the PIPELINE, not the
+  paint: `map_gen.py` gained an UnsharpMask(1.2, 180%, 2) after the
+  LANCZOS downscale — the engraving's thin lines blurred to mid-grey
+  and dithered to speckle; the unsharp pass re-crisps the wheel
+  spokes, the small door arch and the cable. Raws kept:
+  `raw_map_smalldoor.png` (pass 1), `raw_map.png` (= relit final),
+  `raw_map_1b.png` (phase-1b backup).
+- **Coords re-placed** (engine + mock): gate 54,40→56,40; town
+  58,64→63,69 (the village hugging the tower's foot); talk
+  44,63→43,60; keep 90,31→91,26. hunt/hunt_deep unchanged.
+- **Bolt:** `_map_html` cost `_e`→`_et` (⚡ → `_eglyph('bolt')` in
+  currentColor); CSS `.mk .eg` 12px. Chip textContent is now "1 " —
+  dojo scene() reads `.mkcost .eg` presence instead.
+- **Tests:** `test_082_floormap.py` 11/11 (new:
+  test_chip_cost_wears_pixel_bolt_not_emoji). Plugin suite 1411
+  passed / 7 failed — the known flaky pool (kill3d ×3, 017 ×2, 022,
+  048); none touch the map paths. worldd suite not re-run (no
+  worldd/app change beyond vendor).
+- **Dojo:** run 0056 (`dojo/results/0056-082-floormap-1c-2026-08-26/`)
+  **32/32 PASS** — pixel bolt in energy teal on the HUNT chip, no
+  emoji, wheels/door/cable legible on the card screenshot.
+- Deploy not requested.

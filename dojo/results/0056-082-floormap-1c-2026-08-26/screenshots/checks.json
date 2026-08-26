@@ -1,0 +1,162 @@
+[
+  {
+    "name": "S1 signup",
+    "ok": true,
+    "detail": "200 dojomap302045"
+  },
+  {
+    "name": "S1 seed floor 1",
+    "ok": true,
+    "detail": "seeded web:dojomap302045 floor=1 class=warrior level=3 hp=400 held=['rusted_sword']"
+  },
+  {
+    "name": "S2 camp shows the plain list, no map",
+    "ok": true,
+    "detail": "{\"map\":false,\"opts\":[\"hunt\",\"keep\",\"talk\",\"gate\",\"town\"]}"
+  },
+  {
+    "name": "S3 Labs card lists Floor maps",
+    "ok": true,
+    "detail": "LABSThe LabsThings being tried. Turn one on to test it.Experiments. Each one is off until you switch it on, and off agai"
+  },
+  {
+    "name": "S3 toggle reads ON",
+    "ok": true,
+    "detail": "2Floor maps — ONswitch off · floors 1"
+  },
+  {
+    "name": "S3 DB flag true",
+    "ok": true,
+    "detail": "doc.labs.floormap"
+  },
+  {
+    "name": "S4 map block on the camp card, 77% grid",
+    "ok": true,
+    "detail": "[492,369,734]"
+  },
+  {
+    "name": "S4 map takes the full card width",
+    "ok": true,
+    "detail": "{\"img\":734,\"card\":736}"
+  },
+  {
+    "name": "S4 card sheds art and prose — eyebrow under the map",
+    "ok": true,
+    "detail": "{\"banner\":false,\"headline\":false,\"support\":false,\"order\":true}"
+  },
+  {
+    "name": "S4 chips: gate/town/talk/keep/hunt",
+    "ok": true,
+    "detail": "hunt,keep,talk,gate,town"
+  },
+  {
+    "name": "S4 no dead deep-hunt chip on floor 1",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "S4 chip labels — the base town by its NAME",
+    "ok": true,
+    "detail": "[1] HUNT | [2] BRACKJAW | [3] CAMP | [4] GATE | [5] ROOTHOLLOW"
+  },
+  {
+    "name": "S4 hunt chip wears 1 + pixel bolt in the energy teal",
+    "ok": true,
+    "detail": "{\"cost\":\"1\",\"bolt\":true,\"emoji\":false,\"color\":\"rgb(69, 208, 192)\"}"
+  },
+  {
+    "name": "S4 BRACKJAW chip carries no cost",
+    "ok": true,
+    "detail": "{\"opt\":\"keep\",\"txt\":\"[2] BRACKJAW\",\"cost\":\"\",\"costColor\":\"\",\"costBolt\":false,\"costEmoji\":false,\"tip\":\"The Warden's keep — beat him to open the floor above.\"}"
+  },
+  {
+    "name": "S4 mapped options are not rows too",
+    "ok": true,
+    "detail": ""
+  },
+  {
+    "name": "S5 hunt tooltip visible on hover",
+    "ok": true,
+    "detail": "The near fields — hunt for coin and XP."
+  },
+  {
+    "name": "S6 talk lands on Hobb Fennick — rows, NO map",
+    "ok": true,
+    "detail": "{\"head\":\"Hobb Fennick — the last farmer\",\"map\":false,\"opts\":[\"hunt\",\"keep\",\"talk\",\"gate\",\"town\"]}"
+  },
+  {
+    "name": "S6 back at the camp map after Hobb",
+    "ok": true,
+    "detail": "{\"eyebrow\":\"FLOOR 1 · MEN · LAMPLIT STEADING\",\"map\":true}"
+  },
+  {
+    "name": "S7 gate lands in the Tower Gate lobby",
+    "ok": true,
+    "detail": "{\"head\":\"1 floor stand open\",\"eyebrow\":\"ROOTHOLLOW · THE TOWER GATE\"}"
+  },
+  {
+    "name": "S7 lobby back row says Roothollow, not the square",
+    "ok": true,
+    "detail": "2Back to Roothollow"
+  },
+  {
+    "name": "S7 back on floor 1, the map again",
+    "ok": true,
+    "detail": "{\"head\":\"\",\"map\":true}"
+  },
+  {
+    "name": "S8 town lands in Roothollow",
+    "ok": true,
+    "detail": "Roothollow — floor 1 is the frontier"
+  },
+  {
+    "name": "S8 gate back up — the map again",
+    "ok": true,
+    "detail": "{\"head\":\"\",\"map\":true}"
+  },
+  {
+    "name": "S9 hunt opens an encounter",
+    "ok": true,
+    "detail": "close_in,stand,run,shield_wall,pack"
+  },
+  {
+    "name": "S9 hunt spent exactly 1 ⚡",
+    "ok": true,
+    "detail": "24 -> 23"
+  },
+  {
+    "name": "S9 fled out, back at the camp map",
+    "ok": true,
+    "detail": "{\"head\":\"\",\"opts\":[]}"
+  },
+  {
+    "name": "S10 keep opens on Brackjaw",
+    "ok": true,
+    "detail": "Warden Brackjaw — ATK 15 / DEF 3 / HP 426/426"
+  },
+  {
+    "name": "S10 walking in was free",
+    "ok": true,
+    "detail": "23 -> 23"
+  },
+  {
+    "name": "S10 back at the camp map",
+    "ok": true,
+    "detail": "{\"head\":\"\",\"opts\":[]}"
+  },
+  {
+    "name": "S11 DB flag false",
+    "ok": true,
+    "detail": "doc.labs.floormap"
+  },
+  {
+    "name": "S11 plain list restored, no map",
+    "ok": true,
+    "detail": "{\"map\":false,\"opts\":[\"hunt\",\"keep\",\"talk\",\"gate\",\"town\"]}"
+  },
+  {
+    "name": "S12 no console errors",
+    "ok": true,
+    "detail": ""
+  }
+]

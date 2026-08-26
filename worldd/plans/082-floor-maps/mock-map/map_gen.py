@@ -20,7 +20,7 @@ Usage: python3 map_gen.py   (needs raw_map.png beside it)
        -> map_001_492x369.png
 """
 
-from PIL import Image, ImageOps
+from PIL import Image, ImageFilter, ImageOps
 
 W, H = 492, 369   # phase-1b (roy): 77% of 640x480
 INK = (217, 217, 211, 255)      # --art
@@ -47,6 +47,10 @@ else:
     nh = int(w / target)
     img = img.crop((0, (h - nh) // 2, w, (h + nh) // 2))
 img = img.resize((W, H), Image.LANCZOS)
+# phase-1c: the downscale blurs the engraving's thin lines to mid-grey,
+# which the dither turns to speckle — an unsharp pass re-crisps them
+# (the winch wheels and the small door live or die on this).
+img = img.filter(ImageFilter.UnsharpMask(radius=1.2, percent=180, threshold=2))
 img = ImageOps.autocontrast(img, cutoff=1)   # keep the gradient ramps wide
 # The model paints on light-grey paper; the game is ink on black. Gamma
 # pushes the flat mid-grey ground down to sparse dither while lit faces,
