@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOCK · floor-map — 082</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23000000'/%3E%3Crect x='2' y='7' width='12' height='2' fill='%23f5b825'/%3E%3Crect x='7' y='2' width='2' height='12' fill='%23f5b825'/%3E%3C/svg%3E">
+<style>
+  /* ── the terminal law, inlined so the mock opens from the plan folder ──
+     ONE font, ONE size. Hierarchy the ANSI way — caps, bright, dim,
+     reverse video, borders. All art 1-bit, pixelated. */
+  @font-face {
+    font-family: "VGA";
+    src: url("../../../static/site/fonts/WebPlus_IBM_VGA_8x16.woff") format("woff");
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box;
+      font-family: inherit; font-size: inherit; font-weight: normal; }
+  :root {
+    --bg:#000000; --fg:#adaba0; --dim:#5b5952; --bright:#fbfbf7;
+    --gold:#f5b825; --line:#5b5952;
+    --hp:#8ed24a; --en:#45d0c0; --xp:#d967c8; --hurt:#f26541;
+    --art:#d9d9d3;
+  }
+  html, body { background: var(--bg); color: var(--fg); }
+  body {
+    font-family: "VGA", "Px437 IBM VGA8", "Courier New", monospace;
+    font-size: 16px; line-height: 1.5;
+    -webkit-font-smoothing: none; text-rendering: optimizeSpeed;
+  }
+  b { color: var(--bright); }
+  .dim { color: var(--dim); }
+  .gold { color: var(--gold); }
+  .hurt { color: var(--hurt); }
+
+  #bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+    display: flex; justify-content: space-between; gap: 1ch; padding: 0 1ch;
+    background: var(--gold); color: var(--bg);
+    white-space: nowrap; overflow: hidden;
+  }
+  #bar a { color: var(--bg); text-decoration: none; }
+
+  main { max-width: 84ch; margin: 3.5rem auto 4rem; padding: 0 1ch; }
+  .note { color: var(--dim); margin: 0 auto 1.5rem; max-width: 72ch; }
+  .step { color: var(--dim); margin: 2rem auto .5rem; max-width: 72ch;
+    text-transform: uppercase; letter-spacing: .1ch; }
+
+  .card {
+    border: 1px solid var(--line);
+    outline: 1px solid #1c1c1c; outline-offset: 3px;
+    padding: 1rem 2ch 1.25rem; margin: 0 auto 2.5rem;
+    max-width: 72ch; background: #090909;
+  }
+  .card .eyebrow {
+    background: var(--fg); color: var(--bg);
+    margin: -1rem -2ch 1rem; padding: 0 1ch; text-transform: uppercase;
+  }
+  .card h2 { color: var(--bright); text-transform: uppercase;
+             margin-bottom: .75rem; }
+
+  /* ── meters: bars are text, drawn in ▓ and ░ ── */
+  .rail { margin-bottom: .75rem; }
+  .meter { display: flex; gap: 1ch; }
+  .meter .lab { width: 3ch; }
+  .meter .val { color: var(--dim); }
+  .meter.hp .blocks { color: var(--hp); }
+  .meter.en .blocks { color: var(--en); }
+  .meter.xp .blocks { color: var(--xp); }
+
+  /* ── the map — generated 1-bit pixel art (map_gen.py); the scene is
+     dithered, the UI is typography: labels are an HTML overlay ── */
+  .mapwrap { position: relative; max-width: 640px; margin: 0 auto;
+             border: 1px solid var(--line);
+             outline: 1px solid #1c1c1c; outline-offset: 3px; }
+  .mapwrap img { display: block; width: 100%; image-rendering: pixelated; }
+  .mk { position: absolute; transform: translate(-50%, -100%);
+        background: var(--bg); color: var(--gold); padding: 0 .5ch;
+        white-space: nowrap; line-height: 1.3; cursor: pointer; }
+  .mk:hover { background: var(--gold); color: var(--bg); z-index: 10; }
+  .mk.plain { color: var(--fg); }
+  .mk.plain:hover { background: var(--gold); color: var(--bg); }
+  .mk.sel { background: var(--bright); color: var(--bg); }
+  /* one-line tooltip: what the place holds for you */
+  .mk .tip { display: none; position: absolute; bottom: calc(100% + 5px);
+             left: 50%; transform: translateX(-50%);
+             background: var(--bg); color: var(--fg);
+             padding: .5rem 1.5ch;
+             width: max-content; max-width: 40ch; white-space: normal;
+             text-align: left; text-transform: none; z-index: 5; }
+  .mk .tip b { color: var(--gold); }
+  .mk:hover .tip { display: block; }
+  .mk .tip.tl { left: 0; transform: none; }
+  .mk .tip.tr { left: auto; right: 0; transform: none; }
+  .legend { color: var(--dim); text-align: center; margin: .5rem 0 1rem; }
+  .legend b { color: var(--gold); }
+
+  /* ── marker rows: an ANSI menu, dot leaders instead of borders ── */
+  .doors { margin-top: .5rem; }
+  .door { display: flex; gap: 1ch; align-items: baseline;
+          padding: 0 1ch; cursor: pointer; }
+  .door .key { white-space: pre; color: var(--gold); }
+  .door .lbl { color: var(--bright); text-transform: uppercase;
+               white-space: nowrap; }
+  .door .leader { flex: 1; overflow: hidden; white-space: nowrap;
+                  color: var(--dim); }
+  .door .leader::after { content: "· · · · · · · · · · · · · · · · · · · "
+    "· · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·"; }
+  .door .hint { color: var(--dim); white-space: pre; }
+  .door .q { color: var(--gold); }
+  .door:hover { background: var(--gold); }
+  .door:hover .key, .door:hover .lbl, .door:hover .leader,
+  .door:hover .hint, .door:hover .q { color: var(--bg); }
+  .door.faded .lbl { color: var(--fg); }
+
+  .options { display: flex; flex-wrap: wrap; gap: 1ch;
+             justify-content: center; margin-top: 1rem; }
+  .opt {
+    display: inline-block; padding: 0 1ch; color: var(--gold);
+    border: 1px solid var(--line); cursor: pointer; background: none;
+    text-transform: uppercase;
+  }
+  .opt:hover { background: var(--gold); color: var(--bg);
+               border-color: var(--gold); }
+  .opt.quiet { color: var(--fg); }
+
+  .terms { list-style: none; margin: .75rem 0; }
+  .terms li { padding-left: 2ch; text-indent: -2ch; }
+  .terms li::before { content: "▪ "; color: var(--dim); }
+  .prize { border: 1px solid var(--line); padding: .25rem 1ch;
+           margin: .75rem 0; }
+  .prize .plab { color: var(--gold); text-transform: uppercase; }
+
+  .pathline { text-align: center; margin: .75rem 0; }
+  .pathline .done { color: var(--en); }
+  .pathline .left { color: var(--dim); }
+
+  .toast { border: 1px solid var(--line); padding: .5rem 1ch;
+           margin: 0 0 1rem; }
+  .toast .tlab { text-transform: uppercase; }
+  .toast.good .tlab { color: var(--gold); }
+  .toast.bad  .tlab { color: var(--hurt); }
+</style>
+</head>
+<body>
+
+<header id="bar">
+  <span>MOCK · 082</span>
+  <span>FLOOR-MAP · LABS</span>
+  <a href="#away">[ THE HOUR AWAY ]</a>
+</header>
+
+<main>
+
+  <p class="note"><b>MOCK — not wired.</b> The look only, for review before we
+  build plan <b>082</b>. Labs experiment <b>floormap</b>: the camp menu of a
+  floor becomes a 1-bit map — gate, camp, fields, keep, and the floor's three
+  places of interest, each carrying a quest. Floor 1, the Fencerows.</p>
+
+  <!-- ═══ STEP 1 · THE MAP ══════════════════════════════════════════════ -->
+  <p class="step">Step 1 — the map replaces the menu</p>
+  <section class="card">
+    <div class="eyebrow">FLOOR 1 · MEN · LAMPLIT STEADING</div>
+
+    <div class="rail">
+      <p class="meter hp"><span class="lab">HP </span><span class="blocks">▓▓▓▓▓▓▓░░░</span> <span class="val">21/30</span></p>
+      <p class="meter en"><span class="lab">EN </span><span class="blocks">▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░</span> <span class="val">22/24</span></p>
+      <p class="meter xp"><span class="lab">XP </span><span class="blocks">▓▓▓░░░░░░░</span> <span class="val">Lv 3</span></p>
+    </div>
+
+    <!-- the Fencerows — model-painted, forced 1-bit (map_gen.py), 640x480
+         native shown 1:1. Every option IS a marker on the map. -->
+    <div class="mapwrap">
+      <img src="map_001_640x480.png" alt="Map of Floor 1 — the Fencerows"
+           width="640" height="480">
+      <div class="mk plain" style="left:55%; top:44%">[1] GATE
+        <span class="tip">The elevator between floors — ride up or down.</span></div>
+      <div class="mk plain" style="left:67%; top:66%">[2] TOWN
+        <span class="tip">Down to Roothollow — shops, forge, bank.</span></div>
+      <div class="mk" style="left:44%; top:16%">[3] SLUICE
+        <span class="tip tl"><b>Quest · easy</b> — kill the thing in the
+        sluice-arch. A short path, few enemies. Loot: coin and
+        salves.</span></div>
+      <div class="mk" style="left:36%; top:44%">[4] HEARTH
+        <span class="tip tl"><b>Quest · medium</b> — take the hearth-shard
+        back from the troll and its goblins. As hard as the
+        warden.</span></div>
+      <div class="mk sel" style="left:22%; top:74%">[5] WYRM
+        <span class="tip tl"><b>Quest · hard</b> — hunt the dragon for its
+        loot. Many enemies, hardship, a dragon hard to defeat.</span></div>
+      <div class="mk plain" style="left:66%; top:86%">[6] HUNT
+        <span class="tip tl">The near fields — hunt for coin and XP.
+        1 ⚡.</span></div>
+      <div class="mk plain" style="left:12%; top:38%">[7] HARD-HUNT
+        <span class="tip">The deep wilds — stronger monsters, richer pay.
+        2 ⚡.</span></div>
+      <div class="mk plain" style="left:88%; top:28%">[8] BRACKJAW
+        <span class="tip tr">The warden — beat him to open the floor above.
+        3 ⚡ a swing.</span></div>
+      <div class="mk plain" style="left:46%; top:58%">[9] CAMP
+        <span class="tip">The fire — healer, stew, and Hobb Fennick's
+        talk.</span></div>
+    </div>
+
+    <p class="legend">gold = <b>quest</b> · hover a marker for what the
+      place holds · click to select</p>
+  </section>
+
+  <!-- ═══ STEP 2 · TAKING A QUEST ═══════════════════════════════════════ -->
+  <p class="step">Step 2 — the quest sheet (marker 3, the hard one)</p>
+  <section class="card">
+    <div class="eyebrow">FAIRSTONE GREEN · QUEST ▮▮▮ HARD</div>
+    <h2>The Fair-Day Wyrm</h2>
+    <p class="dim">The old fair-green at the valley's heart, its weathered
+    market cross still standing over a ring of empty pitches. A young drake
+    has coiled itself on the cross — nothing gathers here while it does.
+    Raise the fair again and you give the scattered field-folk their one
+    rallying-place back.</p>
+
+    <ul class="terms">
+      <li><b>22 ⚡</b> paid now. The path itself costs nothing more —
+          every fight on it is <b>0 ⚡</b>.</li>
+      <li><b>Seven fights</b> stand between the gate and the wyrm. Everything
+          the Fencerows holds walks this path — even the hedge-wight.</li>
+      <li><b>No road to Roothollow.</b> Out here there is no healer, no stew,
+          no shop. Your pack is what you have.</li>
+      <li>Turning back is allowed — through <b>the same number of fights you
+          met going out</b>. You can run from them; running has teeth.</li>
+      <li>Leave whenever you like. The path holds your place.</li>
+      <li class="hurt">The wyrm is worse than Brackjaw. This is a quest for a
+          climber who has outgrown this floor.</li>
+    </ul>
+
+    <p class="prize"><span class="plab">The prize</span> — ◈ 640 · ✦ 320 XP
+      · a tier-2 weapon · a trollblood tonic</p>
+
+    <div class="options">
+      <button class="opt">[ TAKE THE QUEST — 22 ⚡ ]</button>
+      <button class="opt quiet">[ BACK TO THE MAP ]</button>
+    </div>
+  </section>
+
+  <!-- ═══ STEP 3 · ON THE PATH ══════════════════════════════════════════ -->
+  <p class="step">Step 3 — mid-quest: the map narrows to the path</p>
+  <section class="card">
+    <div class="eyebrow">ON A QUEST ▮▮▮ · FAIRSTONE GREEN · FIGHT 4 OF 7</div>
+    <h2>Past the drove-bridge</h2>
+
+    <p class="pathline">GATE <span class="done">▓▓▓▓</span><span class="left">░░░</span> WYRM</p>
+
+    <div class="rail">
+      <p class="meter hp"><span class="lab">HP </span><span class="blocks">▓▓▓▓▓░░░░░</span> <span class="val">14/30</span></p>
+      <p class="meter en"><span class="lab">EN </span><span class="blocks">░░░░░░░░░░░░░░░░░░░░░░░░</span> <span class="val">0/24 · spent at the gate</span></p>
+    </div>
+
+    <p>▪ Three fights won, one fled — the last pack still trails you.<br>
+       ▪ <span class="dim">The healer's tent is a floor away. You carry
+       1 medgel.</span></p>
+
+    <div class="options">
+      <button class="opt">[ PRESS ON ]</button>
+      <button class="opt quiet">[ TURN BACK — 4 FIGHTS TO THE GATE ]</button>
+    </div>
+    <p class="dim" style="text-align:center; margin-top:.5rem">no Roothollow ·
+      no Tower Gate · no shops — until you stand at the gate again</p>
+  </section>
+
+  <!-- ═══ STEP 4 · THE HOUR AWAY ════════════════════════════════════════ -->
+  <p class="step" id="away">Step 4 — the hour away (≥ 60 min idle, one roll,
+    never lethal)</p>
+  <section class="card">
+    <div class="eyebrow">WHILE YOU WERE AWAY</div>
+
+    <div class="toast good">
+      <p class="tlab">A stranger's blessing</p>
+      <p>A travelling merchant found your fire. He heard where you were
+      headed, left a whetted edge for the work, and blessed you for going to
+      kill the wyrm. <b>Weapon oil ×3</b> joined your pack.</p>
+    </div>
+
+    <div class="toast good">
+      <p class="tlab">The heath mushroom</p>
+      <p>You found a heath mushroom growing in the hedge-shade and ate it.
+      Your wounds closed while you slept. <b>HP 14 → 30.</b></p>
+    </div>
+
+    <div class="toast bad">
+      <p class="tlab">The scorpion</p>
+      <p>Something small found you first. A scorpion's sting burns in your
+      ankle. <b>HP 14 → 9.</b> <span class="dim">The hour away stings or
+      gifts — it never kills.</span></p>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>
