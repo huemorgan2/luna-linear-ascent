@@ -62,4 +62,26 @@ re-sync. No player-doc migration.
 
 ## Execution status
 
-(appended after execution)
+Executed 2026-08-26. Shipped in plugin 0.107.0 (0.106.0 was taken by a parallel 084 commit); vendor synced.
+
+- **Correction to step 1:** `_gate_town_scene` is the camp's
+  steady-state card (loc `gate_town`), not the base town — its seam
+  STAYS. Only the `_npc_scene` seam came out (that was the lock bug).
+- **Art:** two Gemini passes on the existing raw (tower swap, then a
+  relight so the tower survives 1-bit: near-white lit face, dark
+  shadow side, black door arch). `map_gen.py` now trims the painted
+  frame, gamma 1.45, 492×369 (77%). Asset renamed
+  `map_001_492x369.png`; markers re-placed (gate 54,40; town→ROOTHOLLOW
+  58,64 at the door; talk 44,63; keep 90,31; hunt 72,84; deep 18,20).
+- **Tests:** `test_082_floormap.py` 10/10 (two new: npc-no-map,
+  shed-art-and-prose). Plugin suite 1410 passed / 7 failed — all in the
+  known pre-existing flaky set (kill3d ×3, 017 ×2, 022, 048); none touch
+  the map paths. worldd suite not re-run (no worldd/app change beyond
+  vendor; 221/0 in phase-1 same day).
+- **Dojo:** run 0055 (`dojo/results/0055-082-floormap-1b-2026-08-26/`)
+  **32/32 PASS** — full-bleed 492×369 map (img 734px on a 736px card),
+  no banner/headline/support/body, eyebrow under the map, ROOTHOLLOW
+  chip at the tower's foot, "Back to Roothollow" in the lobby, Hobb card
+  with plain rows and no map, hunt exactly 1 ⚡, keep free, no console
+  errors.
+- Deploy not requested.

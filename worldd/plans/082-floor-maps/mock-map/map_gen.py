@@ -17,12 +17,12 @@ Labels/markers are NEVER in the pixels — the mock overlays them as HTML
 (the scene is dithered, the UI is typography).
 
 Usage: python3 map_gen.py   (needs raw_map.png beside it)
-       -> map_001_640x480.png
+       -> map_001_492x369.png
 """
 
 from PIL import Image, ImageOps
 
-W, H = 640, 480
+W, H = 492, 369   # phase-1b (roy): 77% of 640x480
 INK = (217, 217, 211, 255)      # --art
 
 BAYER = [
@@ -33,6 +33,11 @@ BAYER = [
 ]
 
 img = Image.open("raw_map.png").convert("L")
+# phase-1b: the model paints a decorative black frame — trim it before
+# the crop so the frame never eats map real estate.
+_bb = img.point(lambda p: 255 if p > 40 else 0).getbbox()
+if _bb:
+    img = img.crop(_bb)
 w, h = img.size
 target = W / H
 if w / h > target:
@@ -46,7 +51,7 @@ img = ImageOps.autocontrast(img, cutoff=1)   # keep the gradient ramps wide
 # The model paints on light-grey paper; the game is ink on black. Gamma
 # pushes the flat mid-grey ground down to sparse dither while lit faces,
 # the stream and the glow pools stay bright.
-img = img.point(lambda p: int(255 * (p / 255) ** 1.6))
+img = img.point(lambda p: int(255 * (p / 255) ** 1.45))
 
 out = Image.new("RGBA", (W, H), (0, 0, 0, 255))
 po = out.load()
@@ -56,5 +61,5 @@ for y in range(H):
         if pi[x, y] / 255 > (BAYER[y % 8][x % 8] + 0.5) / 64:
             po[x, y] = INK
 
-out.save("map_001_640x480.png")
-print("wrote map_001_640x480.png")
+out.save("map_001_492x369.png")
+print("wrote map_001_492x369.png")
