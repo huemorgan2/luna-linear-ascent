@@ -41,3 +41,22 @@ live, post-deploy verification.
 
 Labs flag off is the live mitigation. Full revert: revert phase-1d
 commits (asset included), vendor re-sync, redeploy previous version.
+
+## Execution status
+
+Executed 2026-08-26. Shipped in plugin 0.109.0; vendor synced.
+
+- **Art:** one Gemini pass on the phase-1c raw — shaft demolished to a
+  blocky 2–3 storey plinth, flat top, small door + winch wheels kept,
+  two bold cables straight off the top edge. Pipeline unchanged
+  (phase-1c unsharp pass carried the detail). Raw kept as
+  `raw_map_stump.png` (= new `raw_map.png`).
+- **Coords:** only CAMP nudged 43,60 → 45,59 (onto the tents); the
+  stump landed under the existing GATE/ROOTHOLLOW/KEEP anchors.
+- **Tests:** `test_082_floormap.py` 11/11. No renderer/engine change —
+  full suites not re-run (at baseline this same day, phase-1c).
+- **Dojo:** run 0057 (`dojo/results/0057-082-floormap-1d-2026-08-26/`)
+  **32/32 PASS**; card screenshot shows the stump with the lines off
+  the top edge.
+- **Deploy:** see below — pushed and deployed via
+  `worldd/tools/deploy.sh`, live 0.109.0 verified.
