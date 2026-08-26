@@ -58,7 +58,10 @@ img = ImageOps.autocontrast(img, cutoff=1)   # keep the gradient ramps wide
 # phase-1f: the raw is model-DESIGNED dither art now (vision/
 # 1bit-images.md discipline) — grey washes died white. 1.15 lands the
 # mountain band's tonal spread exactly on the phase-1d reference.
-img = img.point(lambda p: int(255 * (p / 255) ** 1.15))
+# phase-1g: highlight ceiling 0.85 — pure paper dithers at ~85%
+# density instead of saturating to solid ink, so nothing burns white;
+# below 0.85 the mountains' lit ridge faces go flat.
+img = img.point(lambda p: int(255 * ((p / 255) ** 1.15) * 0.85))
 
 out = Image.new("RGBA", (W, H), (0, 0, 0, 255))
 po = out.load()

@@ -43,3 +43,18 @@ mountain shadow 14.4% / lit 9.0% (ridge faces still pop). 0.78 and
 
 Labs flag off is the live mitigation. Full revert: revert phase-1g
 commits (asset included), vendor re-sync.
+
+## Execution status
+
+Executed 2026-08-26. Shipped in plugin 0.110.2; vendor synced.
+
+- **Pipeline:** `map_gen.py` tone ramp gained the 0.85 highlight
+  ceiling; raw unchanged, asset regenerated (byte-identical to the
+  eye-picked sweep variant).
+- **Metrics:** burned blocks 8.0% → 0.0%, whole-image ink
+  59.9% → 50.8%, mountain shadow blocks 11.6% → 14.4% (lit ridge
+  faces kept — 0.78/0.70 flattened them, rejected).
+- **Tests:** `test_082_floormap.py` 11/11.
+- **Dojo:** run 0060 (`dojo/results/0060-082-floormap-1g-2026-08-26/`)
+  **33/33 PASS**.
+- Deploy not requested this phase (live remains 0.109.0).
