@@ -89,3 +89,37 @@ changes are presentational; no doc/schema migration.
   plan lands on top of 392b530 and syncs only its own files to vendor.
 - Never `git add -A` in the parent repo (unrelated user-dirty files).
 - Secret-pattern scan before every commit.
+
+## Execution status (2026-08-26)
+
+**DONE — deployed 0.106.0.**
+
+- Engine (submodule 9f414b9, on top of 082's 392b530): opener body/
+  support/whisper stripped in `engine/combat.py`; `render.py` drops
+  headline + ◇ plate on opener cards, moves the [i] onto the stat slab
+  after SPEED (`display:inline-flex` — the base `.info` is a block;
+  ≤480px the slab folds instead of clipping), appends the monster name
+  (+ alpha/runt/tough specimen tag) to the eyebrow, and flattens the
+  foe sheet to one flex row of solid #26241f cells with white text.
+- **R-0055-1** (found by the dojo walk, fixed in-plan): the foehint ✕
+  was a dead button in a real browser — `wireOptions` in pane.py never
+  wired `button.x[data-opt]`. Run 0053 had verified the dismissal via
+  API only. Wired + coded guard test.
+- Tests: plugin 1408 passed / 7 pre-existing failures (same list as
+  baseline; the old 8th, test_067_arena, was updated by this plan and
+  passes); worldd 221 passed. RNG-stream shift from the retired
+  `_shard_advice` draw pinned with blade rank 10 in affected tests.
+- Dojo run 0055: PASS 33/33 checks, desktop + mobile, screenshots +
+  summary in `dojo/results/0055-084-encounter-opener-declutter-2026-08-26/`.
+  `foehint_done` flips server-side and holds across sessions.
+- Vendor sync limited to combat.py / render.py / pane.py / version.py —
+  082's unshipped floormap did not ride along (`git diff --stat` on the
+  vendor tree confirms only these four).
+- Commits: plugin 9f414b9, parent fbcd502, luna 836fdd1 (driver).
+- Deploy: trigger=api via tools/deploy.sh, live /health game=0.106.0;
+  post-deploy prod opener fragment spot-check recorded below.
+- Post-deploy verification (2026-08-26 ~07:10 UTC): live /health
+  `game=0.106.0, db=true`; prod opener fragment via fresh player
+  Dojo084Prod — eyebrow `FLOOR 1 · MEN · THE FENCEROWS · Grey wolf —
+  runt`, no headline/ehead/support/way-forward line, foesheet present,
+  exactly one [i] on the slab. 7/7 checks PASS.
