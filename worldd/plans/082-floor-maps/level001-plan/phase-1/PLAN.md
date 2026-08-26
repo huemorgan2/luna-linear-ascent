@@ -99,4 +99,22 @@ to phase-2.
 
 ## Execution status
 
-(appended after execution)
+Executed 2026-08-26. Shipped in plugin 0.105.0; vendor synced.
+
+- **Code:** labs registry + tip, `engine/floormap.py`, `Scene.map`
+  (to_dict AND from_dict), three core seams (`_floor_arrival_scene`,
+  `_npc_scene`, `_gate_town_scene`), `content/art/maps/map_001_640x480.png`
+  (territory-scale re-render), render map block + chips + tooltips + cost
+  inks + row suppression, `button.mk` added to BOTH click-wiring selector
+  lists (pane.py `wireOptions()` and the render.py bridge — chips were
+  inert without it; found by dojo run 0054, not by coded tests).
+- **Tests:** targeted `test_082_floormap.py` 8/8. Plugin suite 1406
+  passed / 5 failed — all 5 pre-existing at baseline (kill3d ×3,
+  048 no-classes, 013 combat-feel; verified failing on a stash of the
+  changes). worldd suite 221 passed / 0 failed.
+- **Dojo:** run 0054 (`dojo/results/0054-082-floormap-2026-08-26/`)
+  **28/28 PASS** — list-off byte path, toggle + DB flag both ways, map
+  card, five chips with correct labels/numbering, `1 ⚡` in AETHER on
+  HUNT only, tooltip, all five destinations reachable and returning to
+  the map, exactly 1 ⚡ spent on hunt, keep entry free, no console errors.
+- **Not done (by design):** quests (phase-2+); deploy not requested.
