@@ -66,3 +66,7 @@ Executed 2026-08-27. Shipped in plugin 0.110.3; vendor synced.
 - **Dojo:** run 0061 (`dojo/results/0061-082-floormap-1h-2026-08-27/`)
   **35/35 PASS** — new checks: keydown "4" opens the Tower Gate lobby
   from the map; back to the map after the ride.
+- **Deploy:** `deploy.sh` → dep-da7v19gu01pc73c3ivbg, live
+  0.110.2 → **0.110.3**. Post-deploy: prod login (dojoverify1d), map
+  card up, keydown "4" (the GATE chip's number) → ROOTHOLLOW · THE
+  TOWER GATE lobby (`screenshots/12-prod-keystroke-01103.png`).
