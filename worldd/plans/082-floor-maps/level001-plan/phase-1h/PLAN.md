@@ -47,3 +47,22 @@ old DOM-order fallback.
 
 Revert the phase-1h commits, vendor re-sync, redeploy (the handler
 returns to rows-only; chips stay clickable by mouse/touch).
+
+## Execution status
+
+Executed 2026-08-27. Shipped in plugin 0.110.3; vendor synced.
+
+- **Fix:** `pane.py` 041 keydown handler queries
+  `button.opt, button.mk` and picks the button whose displayed number
+  (`.key` / `.mknum`) matches the pressed key; DOM-order fallback kept
+  for numberless buttons.
+- **Tests:** `test_041_qol.py` assertion extended (chip selector);
+  targeted 041 + 082: 19/19.
+- **Full suite:** 1408 passed / 10 failed — the 10 reproduce
+  identically on clean HEAD b051366 (= live 0.110.2), so they are
+  PRE-EXISTING and unrelated (game-logic assertions: kill3d ×3,
+  engine xp ×2, 017, 045, 048 ×2, 067). Filed here, not fixed
+  mid-run.
+- **Dojo:** run 0061 (`dojo/results/0061-082-floormap-1h-2026-08-27/`)
+  **35/35 PASS** — new checks: keydown "4" opens the Tower Gate lobby
+  from the map; back to the map after the ride.
