@@ -11,63 +11,133 @@
       "source": "art/sources/map_002_v1.png",
       "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_002_492x369.png",
       "selected_source": "art/sources/map_002_v1.png",
-      "review": "Roy: \"i love the second floor just make it lower res.\" Preserve original composition; use 492x369 native grid. Supersedes proposed texture redesign."
+      "review": "Roy: \"i love the second floor just make it lower res.\" Preserve original composition; use 492x369 native grid. Supersedes proposed texture redesign.",
+      "final_sha256": "36c8e54a8a446eb4be147b52335db7c95b90342ca93d9009795066abd3294a61",
+      "native_size": [
+        492,
+        369
+      ],
+      "ink_percent": 30.7
     },
     {
       "floor": 3,
       "name": "The Drowned Pasture",
       "prompt": "Use case: stylized-concept. Create one production game map, 4:3 landscape, with the attached finished floor-1 map as STYLE AND SCALE reference only. A high oblique aerial view of roughly a thousand acres: an entire district, landscape running past all four edges, no horizon. Show forest canopy MASSES rather than individual large trees, settlement clusters of dozens of tiny roofs rather than one giant cottage. Monumental elevator/gate and fortress, tiny entrances/windows (about one-fifteenth the facade height), tiny nearby trees. Roads connect the settlement, gate and hunting lands. Gate near center, settlement lower-right of gate, warden keep in upper-right territory, nearby hunting country lower-right, dangerous remote country upper-left; leave separated quiet terrain patches near these for later HTML markers. Sculpted fully 3D-shaded terrain volumes, a strong raking upper-left light, long deep black cast shadows, rich large designed gradients in ordered Bayer dither, bold dark-to-light separation. STRICTLY black and white pixel/engraving art: every middle shade DESIGNED as ordered dither with large chunky pixels. Use a full tonal range, moody but readable, no burned-white paper fields or pale washed-out mountains, no photographic microtexture. Match the reference's etched landforms and zoomed-out proportions. No text, no numbers, no icons, no labels, no border, no compass, no UI. This is a DIFFERENT geography, not a copy of the reference's hedged meadow. Produce one complete map only.\n\nFLOOR 3 \u2014 The Drowned Pasture: An enormous flooded agricultural district: many drowned fields defined by submerged hedge lines, channels and sluice networks, half-submerged woods as broad canopy islands, hay-rick dots. Tiny Weirsend settlement on raised ground by the central monumental elevator pylon. Sedgeback's massive but distant sluice fortress sits on upper-right high ground. Whole floodplain to lower-right, remote reed marshes upper-left. Water shading has broad luminous-to-black dither gradients.",
       "source": "art/sources/map_003_v1.png",
-      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_003_492x369.png"
+      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_003_492x369.png",
+      "selected_source": "art/sources/map_003_v1.png",
+      "final_sha256": "444fbb88e0cf539dab878b67d36a34cd4c0826ec8277de3b46ee6c7198f602f7",
+      "native_size": [
+        492,
+        369
+      ],
+      "ink_percent": 30.4,
+      "review": "Native map inspected: regional terrain and tiny roofs/entrances retained, lit slopes separated from deep shadows. Dark cavern/forest tones intentionally preserved. Label fit requires browser verification in phase 3."
     },
     {
       "floor": 4,
       "name": "The Lightless Glade",
       "prompt": "Use case: stylized-concept. Create one production game map, 4:3 landscape, with the attached finished floor-1 map as STYLE AND SCALE reference only. A high oblique aerial view of roughly a thousand acres: an entire district, landscape running past all four edges, no horizon. Show forest canopy MASSES rather than individual large trees, settlement clusters of dozens of tiny roofs rather than one giant cottage. Monumental elevator/gate and fortress, tiny entrances/windows (about one-fifteenth the facade height), tiny nearby trees. Roads connect the settlement, gate and hunting lands. Gate near center, settlement lower-right of gate, warden keep in upper-right territory, nearby hunting country lower-right, dangerous remote country upper-left; leave separated quiet terrain patches near these for later HTML markers. Sculpted fully 3D-shaded terrain volumes, a strong raking upper-left light, long deep black cast shadows, rich large designed gradients in ordered Bayer dither, bold dark-to-light separation. STRICTLY black and white pixel/engraving art: every middle shade DESIGNED as ordered dither with large chunky pixels. Use a full tonal range, moody but readable, no burned-white paper fields or pale washed-out mountains, no photographic microtexture. Match the reference's etched landforms and zoomed-out proportions. No text, no numbers, no icons, no labels, no border, no compass, no UI. This is a DIFFERENT geography, not a copy of the reference's hedged meadow. Produce one complete map only.\n\nFLOOR 4 \u2014 The Lightless Glade: An immense unlit elven woodland viewed from high above: forest canopy masses cover huge rolling ridges, a network of clearings and paths, glimmering moss valleys represented as broad sparse-dither light pools. Tiny Lanternroot settlement beside the central monumental elevator pylon, distant Palegleam keep upper-right. Near hunting woodland lower-right and deepest dark forest upper-left. Trees must remain individually tiny and dense. Strong terrain volume, no giant foreground trees.",
       "source": "art/sources/map_004_v1.png",
-      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_004_492x369.png"
+      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_004_492x369.png",
+      "selected_source": "art/sources/map_004_v1.png",
+      "final_sha256": "2cd47d92433c110bd6002850f505093678c93c19e77919f1e67918db0915a9b7",
+      "native_size": [
+        492,
+        369
+      ],
+      "ink_percent": 27.2,
+      "review": "Native map inspected: regional terrain and tiny roofs/entrances retained, lit slopes separated from deep shadows. Dark cavern/forest tones intentionally preserved. Label fit requires browser verification in phase 3."
     },
     {
       "floor": 5,
       "name": "The Flooded Mine",
       "prompt": "Use case: stylized-concept. Create one production game map, 4:3 landscape, with the attached finished floor-1 map as STYLE AND SCALE reference only. A high oblique aerial view of roughly a thousand acres: an entire district, landscape running past all four edges, no horizon. Show forest canopy MASSES rather than individual large trees, settlement clusters of dozens of tiny roofs rather than one giant cottage. Monumental elevator/gate and fortress, tiny entrances/windows (about one-fifteenth the facade height), tiny nearby trees. Roads connect the settlement, gate and hunting lands. Gate near center, settlement lower-right of gate, warden keep in upper-right territory, nearby hunting country lower-right, dangerous remote country upper-left; leave separated quiet terrain patches near these for later HTML markers. Sculpted fully 3D-shaded terrain volumes, a strong raking upper-left light, long deep black cast shadows, rich large designed gradients in ordered Bayer dither, bold dark-to-light separation. STRICTLY black and white pixel/engraving art: every middle shade DESIGNED as ordered dither with large chunky pixels. Use a full tonal range, moody but readable, no burned-white paper fields or pale washed-out mountains, no photographic microtexture. Match the reference's etched landforms and zoomed-out proportions. No text, no numbers, no icons, no labels, no border, no compass, no UI. This is a DIFFERENT geography, not a copy of the reference's hedged meadow. Produce one complete map only.\n\nFLOOR 5 \u2014 The Flooded Mine: An immense open cutaway aerial cavern country, enough overhead cavern removed to see a whole district of terraced mines and branching drowned galleries. Huge interconnected dark underground reservoirs, monumental failed pump works, tiny gantries and rail lines establish distance. Tiny Pumpstead town on dry terraces near central elevator pylon extending beyond top of frame; distant Sumplock fortress upper-right above drowned workings. Dry workings lower-right, deepest flooded labyrinth upper-left. No close-up room or close-up cave entrance.",
       "source": "art/sources/map_005_v1.png",
-      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_005_492x369.png"
+      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_005_492x369.png",
+      "selected_source": "art/sources/map_005_v1.png",
+      "final_sha256": "d066295908593daca0150c708313c724c8141d07a3303fbfeeeb88681c6d10a4",
+      "native_size": [
+        492,
+        369
+      ],
+      "ink_percent": 25.4,
+      "review": "Native map inspected: regional terrain and tiny roofs/entrances retained, lit slopes separated from deep shadows. Dark cavern/forest tones intentionally preserved. Label fit requires browser verification in phase 3."
     },
     {
       "floor": 6,
       "name": "The Threshold Dark",
       "prompt": "Use case: stylized-concept. Create one production game map, 4:3 landscape, with the attached finished floor-1 map as STYLE AND SCALE reference only. A high oblique aerial view of roughly a thousand acres: an entire district, landscape running past all four edges, no horizon. Show forest canopy MASSES rather than individual large trees, settlement clusters of dozens of tiny roofs rather than one giant cottage. Monumental elevator/gate and fortress, tiny entrances/windows (about one-fifteenth the facade height), tiny nearby trees. Roads connect the settlement, gate and hunting lands. Gate near center, settlement lower-right of gate, warden keep in upper-right territory, nearby hunting country lower-right, dangerous remote country upper-left; leave separated quiet terrain patches near these for later HTML markers. Sculpted fully 3D-shaded terrain volumes, a strong raking upper-left light, long deep black cast shadows, rich large designed gradients in ordered Bayer dither, bold dark-to-light separation. STRICTLY black and white pixel/engraving art: every middle shade DESIGNED as ordered dither with large chunky pixels. Use a full tonal range, moody but readable, no burned-white paper fields or pale washed-out mountains, no photographic microtexture. Match the reference's etched landforms and zoomed-out proportions. No text, no numbers, no icons, no labels, no border, no compass, no UI. This is a DIFFERENT geography, not a copy of the reference's hedged meadow. Produce one complete map only.\n\nFLOOR 6 \u2014 The Threshold Dark: A vast cavern country seen from high above in a cutaway atlas view, with massive rock ridges, a labyrinth of chasms and broad silk-draped vaults. Last lit terrace near central elevator pylon and tiny Lastlight settlement. Giant rock masses cast long shadows; controlled pools of dither light let the terrain read against the black depths. Duskspin fortress upper-right, hunting terrace lower-right, deepest caverns upper-left. No giant foreground spider, no close-up cave room. Keep entrances tiny.",
       "source": "art/sources/map_006_v1.png",
-      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_006_492x369.png"
+      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_006_492x369.png",
+      "selected_source": "art/sources/map_006_v1.png",
+      "final_sha256": "9b60d38d89245e82fd4b46fd8c104676bd4291c4061a2005743f1df61a0f197e",
+      "native_size": [
+        492,
+        369
+      ],
+      "ink_percent": 25.5,
+      "review": "Native map inspected: regional terrain and tiny roofs/entrances retained, lit slopes separated from deep shadows. Dark cavern/forest tones intentionally preserved. Label fit requires browser verification in phase 3."
     },
     {
       "floor": 7,
       "name": "The Orchard Rows",
       "prompt": "Use case: stylized-concept. Create one production game map, 4:3 landscape, with the attached finished floor-1 map as STYLE AND SCALE reference only. A high oblique aerial view of roughly a thousand acres: an entire district, landscape running past all four edges, no horizon. Show forest canopy MASSES rather than individual large trees, settlement clusters of dozens of tiny roofs rather than one giant cottage. Monumental elevator/gate and fortress, tiny entrances/windows (about one-fifteenth the facade height), tiny nearby trees. Roads connect the settlement, gate and hunting lands. Gate near center, settlement lower-right of gate, warden keep in upper-right territory, nearby hunting country lower-right, dangerous remote country upper-left; leave separated quiet terrain patches near these for later HTML markers. Sculpted fully 3D-shaded terrain volumes, a strong raking upper-left light, long deep black cast shadows, rich large designed gradients in ordered Bayer dither, bold dark-to-light separation. STRICTLY black and white pixel/engraving art: every middle shade DESIGNED as ordered dither with large chunky pixels. Use a full tonal range, moody but readable, no burned-white paper fields or pale washed-out mountains, no photographic microtexture. Match the reference's etched landforms and zoomed-out proportions. No text, no numbers, no icons, no labels, no border, no compass, no UI. This is a DIFFERENT geography, not a copy of the reference's hedged meadow. Produce one complete map only.\n\nFLOOR 7 \u2014 The Orchard Rows: An enormous orchard district with mile upon mile of planting rows reading as patterned rectangular land blocks, tiny individual trees, broad wooded shelter belts, crossing farm lanes, fermenting ponds and dozens of tiny farmhouse roofs. Tiny Cider Cross settlement near the central monumental elevator pylon. Applewrath's fortress stands on distant upper-right high ground. Near orchard blocks lower-right, overgrown remote orchards upper-left. Rich rolling hills and designed light/shadow gradients.",
       "source": "art/sources/map_007_v1.png",
-      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_007_492x369.png"
+      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_007_492x369.png",
+      "selected_source": "art/sources/map_007_v1.png",
+      "final_sha256": "7b0a5b57b83e69a23809725a540d64384ec2c0a0b1ba8551e2244f328be875cd",
+      "native_size": [
+        492,
+        369
+      ],
+      "ink_percent": 32.8,
+      "review": "Native map inspected: regional terrain and tiny roofs/entrances retained, lit slopes separated from deep shadows. Dark cavern/forest tones intentionally preserved. Label fit requires browser verification in phase 3."
     },
     {
       "floor": 8,
       "name": "The Ashline",
       "prompt": "Use case: stylized-concept. Create one production game map, 4:3 landscape, with the attached finished floor-1 map as STYLE AND SCALE reference only. A high oblique aerial view of roughly a thousand acres: an entire district, landscape running past all four edges, no horizon. Show forest canopy MASSES rather than individual large trees, settlement clusters of dozens of tiny roofs rather than one giant cottage. Monumental elevator/gate and fortress, tiny entrances/windows (about one-fifteenth the facade height), tiny nearby trees. Roads connect the settlement, gate and hunting lands. Gate near center, settlement lower-right of gate, warden keep in upper-right territory, nearby hunting country lower-right, dangerous remote country upper-left; leave separated quiet terrain patches near these for later HTML markers. Sculpted fully 3D-shaded terrain volumes, a strong raking upper-left light, long deep black cast shadows, rich large designed gradients in ordered Bayer dither, bold dark-to-light separation. STRICTLY black and white pixel/engraving art: every middle shade DESIGNED as ordered dither with large chunky pixels. Use a full tonal range, moody but readable, no burned-white paper fields or pale washed-out mountains, no photographic microtexture. Match the reference's etched landforms and zoomed-out proportions. No text, no numbers, no icons, no labels, no border, no compass, no UI. This is a DIFFERENT geography, not a copy of the reference's hedged meadow. Produce one complete map only.\n\nFLOOR 8 \u2014 The Ashline: A whole burned frontier district of massive ash dune ridges, long winding tracks, black burned forest tracts, volcanic stone outcrops and a small secret-water basin. Tiny Greywell settlement around the basin near a central monumental elevator pylon. Cinderhide's distant huge fortress occupies upper-right rocky ground. Near hunting dunes lower-right, remote ash desert upper-left. Layered dune slopes have strong dither light gradients and deep shadow, no featureless white sand sheet.",
       "source": "art/sources/map_008_v1.png",
-      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_008_492x369.png"
+      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_008_492x369.png",
+      "selected_source": "art/sources/map_008_v1.png",
+      "final_sha256": "78d952ee72f4f1234f54992a42693e060282f0c7561cab2a1c2c3b1fd0139735",
+      "native_size": [
+        492,
+        369
+      ],
+      "ink_percent": 30.1,
+      "review": "Native map inspected: regional terrain and tiny roofs/entrances retained, lit slopes separated from deep shadows. Dark cavern/forest tones intentionally preserved. Label fit requires browser verification in phase 3."
     },
     {
       "floor": 9,
       "name": "The Beacon Field",
       "prompt": "Use case: stylized-concept. Create one production game map, 4:3 landscape, with the attached finished floor-1 map as STYLE AND SCALE reference only. A high oblique aerial view of roughly a thousand acres: an entire district, landscape running past all four edges, no horizon. Show forest canopy MASSES rather than individual large trees, settlement clusters of dozens of tiny roofs rather than one giant cottage. Monumental elevator/gate and fortress, tiny entrances/windows (about one-fifteenth the facade height), tiny nearby trees. Roads connect the settlement, gate and hunting lands. Gate near center, settlement lower-right of gate, warden keep in upper-right territory, nearby hunting country lower-right, dangerous remote country upper-left; leave separated quiet terrain patches near these for later HTML markers. Sculpted fully 3D-shaded terrain volumes, a strong raking upper-left light, long deep black cast shadows, rich large designed gradients in ordered Bayer dither, bold dark-to-light separation. STRICTLY black and white pixel/engraving art: every middle shade DESIGNED as ordered dither with large chunky pixels. Use a full tonal range, moody but readable, no burned-white paper fields or pale washed-out mountains, no photographic microtexture. Match the reference's etched landforms and zoomed-out proportions. No text, no numbers, no icons, no labels, no border, no compass, no UI. This is a DIFFERENT geography, not a copy of the reference's hedged meadow. Produce one complete map only.\n\nFLOOR 9 \u2014 The Beacon Field: An enormous night moor with a network of many distant signal pylons across rolling heath. Their beacons produce broad designed gradient pools of light and long knife-edged shadows over entire terrain slopes. Central monumental elevator pylon distinct from smaller signal towers, tiny Pylon Rest settlement just below-right. Distant Glarefang keep upper-right, near hunting heath lower-right, dangerous far beacon fields upper-left. The aerial landscape remains legible, no close-up lanterns or giant trees.",
       "source": "art/sources/map_009_v1.png",
-      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_009_492x369.png"
+      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_009_492x369.png",
+      "selected_source": "art/sources/map_009_v1.png",
+      "final_sha256": "0b8c6b71abd77a73fde67ac32e2b51d00a7bf62e0781e7eb2f01f1724013d854",
+      "native_size": [
+        492,
+        369
+      ],
+      "ink_percent": 26.2,
+      "review": "Native map inspected: regional terrain and tiny roofs/entrances retained, lit slopes separated from deep shadows. Dark cavern/forest tones intentionally preserved. Label fit requires browser verification in phase 3."
     },
     {
       "floor": 10,
       "name": "The Kingsfield",
       "prompt": "Use case: stylized-concept. Create one production game map, 4:3 landscape, with the attached finished floor-1 map as STYLE AND SCALE reference only. A high oblique aerial view of roughly a thousand acres: an entire district, landscape running past all four edges, no horizon. Show forest canopy MASSES rather than individual large trees, settlement clusters of dozens of tiny roofs rather than one giant cottage. Monumental elevator/gate and fortress, tiny entrances/windows (about one-fifteenth the facade height), tiny nearby trees. Roads connect the settlement, gate and hunting lands. Gate near center, settlement lower-right of gate, warden keep in upper-right territory, nearby hunting country lower-right, dangerous remote country upper-left; leave separated quiet terrain patches near these for later HTML markers. Sculpted fully 3D-shaded terrain volumes, a strong raking upper-left light, long deep black cast shadows, rich large designed gradients in ordered Bayer dither, bold dark-to-light separation. STRICTLY black and white pixel/engraving art: every middle shade DESIGNED as ordered dither with large chunky pixels. Use a full tonal range, moody but readable, no burned-white paper fields or pale washed-out mountains, no photographic microtexture. Match the reference's etched landforms and zoomed-out proportions. No text, no numbers, no icons, no labels, no border, no compass, no UI. This is a DIFFERENT geography, not a copy of the reference's hedged meadow. Produce one complete map only.\n\nFLOOR 10 \u2014 The Kingsfield: A vast muster-meadow and military district: regiment-scale patterned rows of tiny tents and banner poles, broad roads, entire earthwork networks, patches of forest and rolling farmland. Tiny Bannerline settlement beside the central monumental elevator pylon. Gnarl the Goblin King's monumental fortress with a citylike cluster of many tiny roofs stands upper-right; doors are tiny compared to walls. Near muster fields lower-right and abandoned far encampments upper-left. No large foreground flags or soldiers; everything establishes regional scale.",
       "source": "art/sources/map_010_v1.png",
-      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_010_492x369.png"
+      "final": "plugin-linear-ascent/plugin_linear_ascent/content/art/maps/map_010_492x369.png",
+      "selected_source": "art/sources/map_010_v1.png",
+      "final_sha256": "4cca34f0b88726e1dfd31dabfd44b886def344c74d1f9c7863f4c38f3c81db72",
+      "native_size": [
+        492,
+        369
+      ],
+      "ink_percent": 32.6,
+      "review": "Native map inspected: regional terrain and tiny roofs/entrances retained, lit slopes separated from deep shadows. Dark cavern/forest tones intentionally preserved. Label fit requires browser verification in phase 3."
     }
   ]
 }

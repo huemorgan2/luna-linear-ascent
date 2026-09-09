@@ -28,3 +28,5 @@ Revert release implementation commits (plugin plus parent vendor/pointer), push 
 Not started.
 
 > retro(phase-1, 2026-09-09): Roy approved the original floor-2 design and requested only lower resolution. Keep map_002_v1 composition, ship 492×369 like floor 1, and use its geography/scale alongside floor 1 as a reference. Do not perform the proposed texture redesign.
+
+> retro(phase-2, 2026-09-09): Art coverage is complete. Use `art/anchors.json`; edge keep chips sit at x=91–93%, so align their right edge to the anchor. Verify tooltips against viewport edges and top of map, especially 320px phones. Baseline browser confirmed destination controls visible through the old lift veil.

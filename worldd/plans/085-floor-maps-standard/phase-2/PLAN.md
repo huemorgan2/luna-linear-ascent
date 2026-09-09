@@ -24,6 +24,10 @@ Revert phase-2 additive assets and records. No runtime changes have shipped yet.
 
 ## Execution status
 
-Not started.
+Executed 2026-09-09. Built-in image generation produced eight separate sources for floors 3–10; all selected source files, exact prompts, output hashes and ink percentages are saved in `art/prompts.json`. Every final map was inspected at native size and as `art/contact-sheet.png`. All ten assets are opaque, two-color, 492×369 PNGs; floor 1 retains its original SHA-256.
+
+Measured ink coverage for the new maps is 25.4–32.8%; the large shadow areas are intentional, with the darkest maps representing unlit woods/caverns. The maps retain regional landforms, tiny settlement clusters and monumental structures. Floor 2 uses the approved original source. `art/anchors.json` records landmarks measured from each final image.
+
+Projected edge labels need horizontal anchoring toward the map interior; actual phone overlays are deferred to phase 3 because runtime layouts do not exist yet. This is explicitly not a completed mobile acceptance check.
 
 > retro(phase-1, 2026-09-09): Roy approved the original floor-2 design and requested only lower resolution. Keep map_002_v1 composition, ship 492×369 like floor 1, and use its geography/scale alongside floor 1 as a reference. Do not perform the proposed texture redesign.

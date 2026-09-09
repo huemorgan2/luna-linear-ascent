@@ -85,3 +85,5 @@ Acceptance includes all ten maps, absence of the Labs toggle, legacy-flag indepe
 Phase 1 executed: original floor-2 design approved by Roy; final reduced to 492×369. Production prompt/source/recipe saved. Runtime integration and live verification remain phases 3–4.
 
 > 2026-09-09 clarification: preserve the approved original floor-2 artwork; only lower its resolution. A proposed texture redraw was interrupted and is not selected.
+
+Phase 2 executed: all ten native assets exist and were visually inspected; source/prompt/hash manifest and landmark anchors saved. Runtime and phone acceptance remain next.
