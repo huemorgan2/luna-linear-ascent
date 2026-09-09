@@ -25,3 +25,5 @@ Revert phase-2 additive assets and records. No runtime changes have shipped yet.
 ## Execution status
 
 Not started.
+
+> retro(phase-1, 2026-09-09): Roy approved the original floor-2 design and requested only lower resolution. Keep map_002_v1 composition, ship 492×369 like floor 1, and use its geography/scale alongside floor 1 as a reference. Do not perform the proposed texture redesign.

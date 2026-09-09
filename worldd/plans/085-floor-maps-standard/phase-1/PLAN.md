@@ -25,4 +25,4 @@ Revert the phase's additive generator/source/asset commit. Runtime is unchanged,
 
 ## Execution status
 
-Not started.
+Executed 2026-09-09. Source and native output inspected. Roy explicitly approved the original floor-2 design ("i love the second floor just make it lower res"); native output is 492×369, two opaque colors, using the accepted floor-1 conversion recipe. The proposed texture redesign was interrupted and is not selected. Source: `art/sources/map_002_v1.png`; exact prompt: `art/prompts.json`; converter: `tools/prepare_map.py`; final: plugin `content/art/maps/map_002_492x369.png`. Floor-1 hash remains `2b47403f91a4e74bfb476f8ef9e0f9835dbe8e5422e45abea8edc1f55c2be5b5`. Gate/settlement/keep anchors are visible at approximately (53,50)/(64,65)/(88,13); final chip positioning is deferred to phase-3 responsive browser acceptance. No local service was listening at baseline; code confirms the translucent full-overlay root cause. Full live verification remains phase 4.
