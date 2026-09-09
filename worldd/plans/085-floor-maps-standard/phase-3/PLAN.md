@@ -27,7 +27,9 @@ Revert the plugin integration commit and parent vendor/pointer commit; restart t
 
 ## Execution status
 
-Not started.
+Integration implemented 2026-09-09, version 0.111.0. Standard maps cover 1–10 independent of legacy flags; floor 11 falls back. Map-only live actions retain number/cost routing and residual rows, GNARL is resolved correctly, descriptions expose accessible relationships with synchronous viewport fitting. Lift uses immediate opaque black and blocks input through the final reveal. Source/vendor match. Focused plugin tests: 68 passed. Web route/asset tests are recorded in the phase-4 results.
+
+Native Chrome smoke passed: floor 2 with floormap:false, absence of Maps from Labs, opaque elevator, hidden number action blocked, 320px readable labels/tooltips and mixed-row keys (GATE6 and heal3). Baseline full plugin suite before integration: 1409 passed, 9 failed, 1 skipped, 1 xfailed. Full acceptance continues in phase 4.
 
 > retro(phase-1, 2026-09-09): Roy approved the original floor-2 design and requested only lower resolution. Keep map_002_v1 composition, ship 492×369 like floor 1, and use its geography/scale alongside floor 1 as a reference. Do not perform the proposed texture redesign.
 
