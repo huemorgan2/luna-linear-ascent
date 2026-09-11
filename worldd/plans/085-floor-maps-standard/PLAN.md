@@ -89,3 +89,5 @@ Phase 1 executed: original floor-2 design approved by Roy; final reduced to 492Ã
 Phase 2 executed: all ten native assets exist and were visually inspected; source/prompt/hash manifest and landmark anchors saved. Runtime and phone acceptance remain next.
 
 Phase 3 and local phase 4 executed: maps are standard on floors 1â€“10 in game version 0.111.0, floor 11 retains its existing menu, descriptions fit 760/390/320px views, and elevator rides mount opaque black while blocking hidden input. Local browser, full-suite, and real Luna conversation evidence is recorded in dojo result 0062. Production deployment status is recorded in phase 4.
+
+Released 2026-09-11: Render deployment `dep-daht319594qs738g3f50` is live at game version 0.111.0. Health and all ten production assets passed post-deploy verification; no production player record was created or changed.

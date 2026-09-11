@@ -32,4 +32,6 @@ PASS locally. The browser database and destructive test-suite database were isol
 
 Detailed DOM records are in `geometry/geometry.json`, `routes-run.txt`, and `lift-frames-run.txt`. Human-read screenshots and accessibility snapshots are in `screenshots/`; the consolidated phone review is `geometry/phone-maps-contact.png`.
 
-Production deployment and post-deploy checks are recorded in the phase plan after completion.
+## Production
+
+Render deployment `dep-daht319594qs738g3f50` became live on 2026-09-11 at parent commit `b23d7bf`. Production health reports `ok=true`, `db=true`, game `0.111.0`. Maps 001–010 were downloaded from `/static/laart/maps/`; every file is 492×369, contains only opaque black and `(217,217,211)`, and is byte-identical to its reviewed local asset. Production player data was not changed for verification.
