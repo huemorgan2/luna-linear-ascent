@@ -1,0 +1,138 @@
+[
+  {
+    "floor": 3,
+    "old": {
+      "tone_range": 0.5012,
+      "tone_stddev": 0.0817,
+      "source_correlation": 0.9749,
+      "ink_percent": 30.24,
+      "sha256": "444fbb88e0cf539dab878b67d36a34cd4c0826ec8277de3b46ee6c7198f602f7"
+    },
+    "new": {
+      "tone_range": 0.6169,
+      "tone_stddev": 0.1067,
+      "source_correlation": 0.9961,
+      "ink_percent": 35.17,
+      "sha256": "f71169164acfe8e773cdb46ea902326ed64e0e4c3ea874804fdaeca4af1b2556"
+    }
+  },
+  {
+    "floor": 4,
+    "old": {
+      "tone_range": 0.4459,
+      "tone_stddev": 0.1001,
+      "source_correlation": 0.9868,
+      "ink_percent": 27.08,
+      "sha256": "2cd47d92433c110bd6002850f505093678c93c19e77919f1e67918db0915a9b7"
+    },
+    "new": {
+      "tone_range": 0.5945,
+      "tone_stddev": 0.135,
+      "source_correlation": 0.9978,
+      "ink_percent": 29.2,
+      "sha256": "c78f2b9d86ef1bbbfc326b58989902f918f02105e39e64e2d80cfeb7a1fe33ce"
+    }
+  },
+  {
+    "floor": 5,
+    "old": {
+      "tone_range": 0.4942,
+      "tone_stddev": 0.1102,
+      "source_correlation": 0.9891,
+      "ink_percent": 25.26,
+      "sha256": "d066295908593daca0150c708313c724c8141d07a3303fbfeeeb88681c6d10a4"
+    },
+    "new": {
+      "tone_range": 0.5962,
+      "tone_stddev": 0.1295,
+      "source_correlation": 0.9967,
+      "ink_percent": 29.23,
+      "sha256": "58cb355a44fccf2bc818034299158ea99c4923e7b986ce32bd432c87a806ac35"
+    }
+  },
+  {
+    "floor": 6,
+    "old": {
+      "tone_range": 0.5616,
+      "tone_stddev": 0.1154,
+      "source_correlation": 0.9931,
+      "ink_percent": 25.43,
+      "sha256": "9b60d38d89245e82fd4b46fd8c104676bd4291c4061a2005743f1df61a0f197e"
+    },
+    "new": {
+      "tone_range": 0.674,
+      "tone_stddev": 0.1454,
+      "source_correlation": 0.9971,
+      "ink_percent": 29.19,
+      "sha256": "6f568737238fb7b0389fef86aa2d80dc25f9ec28b3b90a5b64577dae3c426ad1"
+    }
+  },
+  {
+    "floor": 7,
+    "old": {
+      "tone_range": 0.3577,
+      "tone_stddev": 0.0699,
+      "source_correlation": 0.975,
+      "ink_percent": 32.62,
+      "sha256": "7b0a5b57b83e69a23809725a540d64384ec2c0a0b1ba8551e2244f328be875cd"
+    },
+    "new": {
+      "tone_range": 0.4562,
+      "tone_stddev": 0.093,
+      "source_correlation": 0.993,
+      "ink_percent": 36.44,
+      "sha256": "47375916ed8ff9829c7ae9a54f1ce62da2b4e9073fdcb63ffa68e7e2b2dafa0c"
+    }
+  },
+  {
+    "floor": 8,
+    "old": {
+      "tone_range": 0.4752,
+      "tone_stddev": 0.0863,
+      "source_correlation": 0.9759,
+      "ink_percent": 29.96,
+      "sha256": "78d952ee72f4f1234f54992a42693e060282f0c7561cab2a1c2c3b1fd0139735"
+    },
+    "new": {
+      "tone_range": 0.5893,
+      "tone_stddev": 0.1164,
+      "source_correlation": 0.996,
+      "ink_percent": 34.41,
+      "sha256": "4aaf837827192886cc2b935f9fde897f8ea356be53aa27bb71a53161f7154862"
+    }
+  },
+  {
+    "floor": 9,
+    "old": {
+      "tone_range": 0.4407,
+      "tone_stddev": 0.0816,
+      "source_correlation": 0.9789,
+      "ink_percent": 26.08,
+      "sha256": "0b8c6b71abd77a73fde67ac32e2b51d00a7bf62e0781e7eb2f01f1724013d854"
+    },
+    "new": {
+      "tone_range": 0.5495,
+      "tone_stddev": 0.1057,
+      "source_correlation": 0.9947,
+      "ink_percent": 29.18,
+      "sha256": "f35b8f764ca6d0da9187dd7caeb0480171b7d64a3197fe7f0efa7e61d6d2f465"
+    }
+  },
+  {
+    "floor": 10,
+    "old": {
+      "tone_range": 0.4614,
+      "tone_stddev": 0.0891,
+      "source_correlation": 0.9833,
+      "ink_percent": 32.43,
+      "sha256": "4cca34f0b88726e1dfd31dabfd44b886def344c74d1f9c7863f4c38f3c81db72"
+    },
+    "new": {
+      "tone_range": 0.5651,
+      "tone_stddev": 0.1133,
+      "source_correlation": 0.9961,
+      "ink_percent": 36.95,
+      "sha256": "398df449fb4d20736ee25201b3aa84389ff8e5a8706764f359dda88ff151ded2"
+    }
+  }
+]
