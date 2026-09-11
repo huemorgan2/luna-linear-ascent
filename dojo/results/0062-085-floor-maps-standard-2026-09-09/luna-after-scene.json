@@ -1,0 +1,9 @@
+{
+  "floor": 0,
+  "location": "gate",
+  "hp": 80,
+  "gold": 50,
+  "energy_val": 24.0,
+  "act_seq": 25,
+  "encounter": null
+}

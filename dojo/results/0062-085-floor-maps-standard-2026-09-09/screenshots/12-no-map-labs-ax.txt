@@ -1,0 +1,7 @@
+The following is a diff from the previous accessibility tree for Window: "LINEAR ASCENT 🔊" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 909
+~						888 text LABS The Labs Things being tried. Turn one on to test it. Experiments. Each one is off until you switch it on, and off again the moment you switch it off — nothing here changes what the game does for anyone else. ▪ Figure — 3D climber in the profile: Your portrait becomes the 3D climber, breathing still, wearing what sits in the slots: sword on the hip, bow on the back, staff in the hand, charm on the neck, boots on the feet. Hover a slot to light that piece. Off = the drawn portrait.
+~						749 button PLAYING 2
++							911 text 2
+~					730 tab (selected, settable, boolean) Description: LINEAR ASCENT - Audio playing - Memory usage - 214 MB, Value: on
+The focused UI element is 753 button LABS

@@ -1,0 +1,49 @@
+- complementary:
+  - generic: 🌙
+  - generic: Luna
+  - text: Local agent
+  - generic: · v0.92.042
+  - button "Collapse sidebar":
+  - navigation:
+    - link "Chat":
+      - /url: /chat
+      - generic: Chat
+    - link "Playbooks":
+      - /url: /p/playbooks
+      - generic: Playbooks
+    - link "Marketplace 6":
+      - /url: /p/marketplace
+      - generic: Marketplace
+      - generic: "6"
+    - link "Linear Ascent":
+      - /url: /p/linear-ascent
+      - generic: Linear Ascent
+    - link "Settings":
+      - /url: /settings
+      - generic: Settings
+  - iframe:
+- button "New chat":
+  - text: New chat
+- button "Operations OPS":
+  - generic: Operations
+  - generic: OPS
+- button "First Conversation":
+  - generic: First Conversation
+- generic: 🌙
+- generic: First Conversation
+- button "Conversation actions":
+- generic: 🌙
+- heading "Hi, I'm Luna." [level=2]
+- paragraph: Start typing below — I'll stream a reply. Try /help for commands, or tweak my personality under Settings.
+- textbox "Message Luna… (Shift+Enter for newline)":
+  - /placeholder: Message Luna…  (Shift+Enter for newline)
+- button "Building":
+  - generic: Building
+- button "Attach files (or paste / drop them)":
+- button "Send" [disabled]:
+  - text: Send
+- button "Claude Sonnet 4.5":
+  - generic: Claude Sonnet 4.5
+- button "Context 6% full 6% context":
+  - img "Context 6% full"
+  - generic: 6% context

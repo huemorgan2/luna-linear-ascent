@@ -1,0 +1,152 @@
+The following is a diff from the previous accessibility tree for Window: "Luna · Admin 🔊" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 509-535, 567, 574
++								574 container
++									575 text ROOTHOLLOW · THE TOWER GATE 11 floors stand open Pick any opened floor. The grind pays best near your level.
++									576 button [1] Floor 1 — The Fencerows Lamplit Steading · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++										577 text [
++										578 text 1
++										579 text ]
++										580 text Floor 1 — The Fencerows
++										581 text Lamplit Steading
++										582 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++									583 text [
++									584 text i
++									585 text ]
++									586 button [2] Floor 2 — The Rustwater Adit Lampfall · 1 camp · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++										587 text [
++										588 text 2
++										589 text ]
++										590 text Floor 2 — The Rustwater Adit
++										591 text Lampfall · 1 camp
++										592 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++									593 text [
++									594 text i
++									595 text ]
++									596 button [3] Floor 3 — The Drowned Pasture Weirsend · 1 camp · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++										597 text [
++										598 text 3
++										599 text ]
++										600 text Floor 3 — The Drowned Pasture
++										601 text Weirsend · 1 camp
++										602 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++									603 text [
++									604 text i
++									605 text ]
++									606 button [4] Floor 4 — The Lightless Glade Lanternroot · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++										607 text [
++										608 text 4
++										609 text ]
++										610 text Floor 4 — The Lightless Glade
++										611 text Lanternroot
++										612 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++									613 text [
++									614 text i
++									615 text ]
++									616 button [5] Floor 5 — The Flooded Mine Pumpstead · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++										617 text [
++										618 text 5
++										619 text ]
++										620 text Floor 5 — The Flooded Mine
++										621 text Pumpstead
++										622 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++									623 text [
++									624 text i
++									625 text ]
++									626 button [6] Floor 6 — The Threshold Dark Lastlight · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++										627 text [
++										628 text 6
++										629 text ]
++										630 text Floor 6 — The Threshold Dark
++										631 text Lastlight
++										632 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++									633 text [
++									634 text i
++									635 text ]
++									636 button [7] Floor 7 — The Orchard Rows Cider Cross · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++										637 text [
++										638 text 7
++										639 text ]
++										640 text Floor 7 — The Orchard Rows
++										641 text Cider Cross
++										642 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++									643 text [
++									644 text i
++									645 text ]
++									646 button [8] Floor 8 — The Ashline Greywell · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++										647 text [
++										648 text 8
++										649 text ]
++										650 text Floor 8 — The Ashline
++										651 text Greywell
++										652 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++									653 text [
++									654 text i
++									655 text ]
++									656 button [9] Floor 9 — The Beacon Field Pylon Rest · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++										657 text [
++										658 text 9
++										659 text ]
++										660 text Floor 9 — The Beacon Field
++										661 text Pylon Rest
++										662 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++									663 text [
++									664 text i
++									665 text ]
++									666 button [10] Floor 10 — The Kingsfield Bannerline · war party of 2 · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++										667 text [
++										668 text 10
++										669 text ]
++										670 text Floor 10 — The Kingsfield
++										671 text Bannerline · war party of 2
++										672 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++									673 text [
++									674 text i
++									675 text ]
++									676 button [11] Floor 11 — The Rustwater Adit Lampfall · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++										677 text [
++										678 text 11
++										679 text ]
++										680 text Floor 11 — The Rustwater Adit
++										681 text Lampfall
++										682 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++									683 text [
++									684 text i
++									685 text ]
++									686 button [12] Back to Roothollow · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++										687 text [
++										688 text 12
++										689 text ]
++										690 text Back to Roothollow
++										691 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++									692 text [
++									693 text i
++									694 text ]
++									695 text MapsLuna85 HUMAN BLADE LEVEL 1 COINS  50
++									696 button
++									697 button
++									698 button
++									699 text HP  80 /80 24 /25 XP  0 /24 LEVEL UP  — XP 0/24 + ◈ 60 — the Guildhall levels you up
++									700 button close
++									701 text ATK 8 DEF 14 SPD 5 PACK 0/6
++									702 button JOIN A FACTION
++									703 text no faction flies yet — be the first found your own level 4
++										704 text 2
++						705 container
++							706 button Message actions
++								707 image
++							708 text 4
++						709 text 🌙
++						710 container
++							711 button Message actions
++								712 image
++							713 text Eleven floors open — the climb's gotten tall.
++						714 container ascent_choose
++							715 image
++							716 text Ascent choose ·  4
+~							562 text entry area (settable) Message Luna — send anytime, it's read mid-turn…
+~							566 button (disabled) Send
++								717 image
+~							570 pop up button Context 10% full 10% context
+~								571 image Description: Context 10% full, Help: Context window 10% full
+~								572 text 10
+The focused UI element is 562 text entry area (settable) Message Luna — send anytime, it's read mid-turn…

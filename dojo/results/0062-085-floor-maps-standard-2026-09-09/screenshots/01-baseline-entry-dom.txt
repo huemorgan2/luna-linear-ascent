@@ -1,0 +1,35 @@
+- tablist:
+  - tab "Game"
+  - tab "Score"
+  - tab "Community"
+- generic: FLOOR 1 · THE FENCEROWS · I
+- generic: Men — The Fencerows
+- generic: Stolen meadowland rolls out under the tower's floodlights. Hedgerows still stand in their old lines, fencing fields no farmer will cut again. Somewhere out in the grass, something is moving.
+- generic: "\"The hedgerows were mine once. Wolves come through the gap in the third hedge — the dogs that kept it are gone. Mind the grass when it stops moving. That's when something has set its feet.\""
+- button "[1] Next · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·":
+  - generic: "[1]"
+  - generic: Next
+  - text: · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
+- note: "[ i ]"
+- button "[2] Skip · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·":
+  - generic: "[2]"
+  - generic: Skip
+  - text: · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
+- generic: pack 0/6
+- link "Connect Gmail to recover this player.":
+  - /url: /auth/google/start
+  - generic: Connect Gmail to recover this player.
+- button "sound on" [pressed]:
+  - generic: sound on
+- button "music on" [pressed]:
+  - generic: music on
+- button "playing 1":
+  - generic: ▶
+  - generic: playing
+  - generic: "1"
+- button "feedback":
+  - generic: feedback
+- button "labs":
+  - generic: labs
+- button "admin":
+  - generic: admin

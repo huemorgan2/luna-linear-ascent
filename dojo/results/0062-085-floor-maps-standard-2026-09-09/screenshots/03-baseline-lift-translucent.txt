@@ -1,0 +1,1 @@
+Confirmed defect: elevator machinery animation is centered in the viewport while the destination floor-1 map, map label chips, character portrait, coin count, colored meters, and footer remain visible through a translucent dark veil. The requested fix should make the veil fully black throughout travel.

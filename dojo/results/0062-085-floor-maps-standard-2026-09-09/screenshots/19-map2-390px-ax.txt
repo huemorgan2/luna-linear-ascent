@@ -1,0 +1,231 @@
+Window: "LINEAR ASCENT 🔊", App: Google Chrome.
+0 standard window LINEAR ASCENT - Audio playing - Google Chrome - roy, URL: 127.0.0.1:8600/play#flo, Secondary Actions: Raise
+	1 container LINEAR ASCENT - Audio playing - Google Chrome - roy, URL: 127.0.0.1:8600/play#flo
+		2 container
+			3 toolbar
+				4 button Back
+				5 button (disabled) Forward
+				6 button Reload
+				7 container
+					8 pop up button View site information
+					9 text field (settable) Description: Address and search bar, Value: 127.0.0.1:8600/play#flo, Placeholder: Ask Google or type a URL
+					10 button Bookmark this tab
+				11 pop up button Extensions
+				12 button Control your music, videos, and more
+				13 button roy
+				14 pop up button Chrome
+			15 toolbar Bookmarks
+				16 toolbar Saved Tab Groups
+					17 saved tab group button  Claude group - Closed
+					18 saved tab group button  Claude group - Closed
+					19 saved tab group button  Claude group - Closed
+					20 saved tab group button  Claude group - Closed
+					21 saved tab group button  Claude group - Closed
+					22 saved tab group button  unnamed group - Closed
+					23 button Tab groups
+				24 splitter Separator
+				25 bookmark button Kimi API Platform
+				26 bookmark button VidMuse | AI Music Video Agent for Suno, Udio & Spotify Artists
+				27 bookmark button Luna · Admin
+				28 bookmark button OpenClaw Control
+				29 bookmark button Luna Marketplaces
+				30 bookmark button Black Forest Labs - Frontier AI Lab
+				31 bookmark button 934-672-5539 - Google Ads
+				32 pop up button Menu containing hidden bookmarks
+			33 container
+				34 HTML content DevTools, URL: devtools://devtools/bundled/devtools_app.html?remoteBase=https://chrome-devtools-frontend.appspot.com/serve_file/@79460ebecaa5625e57a5fb679a735659e73dc687/&targetType=tab&can_dock=true
+					35 container
+						36 container
+							37 container
+								38 toolbar
+									39 text Dimensions:
+									40 pop up button Description: Device type, Value: Responsive
+										41 (selected) Responsive
+									42 stepper (settable, float) Description: Width, Value: 390
+									43 text ×
+									44 stepper (settable, float) Description: Height (leave empty for full), Value: 844
+									45 pop up button Description: Zoom, Value: Fit to window
+										46 (selected) Fit to window
+									47 pop up button Description: Throttling, Value: Disabled: No throttling
+										48 (selected) Disabled: No throttling
+									49 pop up button 'Save-Data': default
+										50 (selected) 'Save-Data': default
+									51 button Rotate
+								52 toolbar
+									53 button More options
+								54 container
+							55 container
+								56 container
+									57 container Main toolbar
+										58 toolbar
+											59 container Description: Select an element in the page to inspect it, Help: Select an element in the page to inspect it - ⌘ ⇧ C
+												60 toggle button Description: Select an element in the page to inspect it - ⌘ ⇧ C, Value: 0
+											61 container Description: Toggle device toolbar, Help: Toggle device toolbar - ⌘ ⇧ M
+												62 toggle button Description: Toggle device toolbar - ⌘ ⇧ M, Value: 1
+										63 container
+											64 tab group Panels
+												65 tab (settable, integer) Description: Elements, Value: 0
+												66 tab (selected) Description: Console, Value: 1
+												67 tab (settable, integer) Description: Sources, Value: 0
+												68 tab (settable, integer) Description: Network, Value: 0
+											69 pop up button More tabs
+										70 toolbar
+											71 container Open Console to view 1 error
+												72 button Open Console to view 1 error
+											73 button  AI assistance, Help: Open AI assistance panel
+											74 container Description: Settings, Help: Settings - F1 - ⇧ ?
+												75 button Settings - F1 - ⇧ ?
+											76 pop up button Customize and control DevTools
+												77 button Customize and control DevTools
+											78 container Close
+												79 button Close
+									80 container Console panel
+										81 container console
+											82 container
+												83 toolbar
+													84 container Show Console sidebar
+														85 button Show Console sidebar
+													86 container Description: Clear console, Help: Clear console - Ctrl L - ⌘ K
+														87 button Clear console - Ctrl L - ⌘ K
+													88 container Collapse all
+														89 button Collapse all
+													90 button JavaScript context: top
+													91 container Create live expression
+														92 button Create live expression
+													93 text entry area (settable) Filter
+														94 text Filter
+													95 pop up button Log level: Default levels
+														96 text Default levels
+													97 container Some problems no longer generate console messages, but are surfaced in the Issues tab. Click to go to the Issues tab
+														98 button Some problems no longer generate console messages, but are surfaced in the Issues tab. Click to go to the Issues tab
+													99 container Console settings
+														100 toggle button Description: Console settings, Value: 0
+													101 container 0 messages in console
+												102 container
+													103 container Failed to load resource: the server responded with a status of 404 (Not Found)
+														104 container
+															105 container Error
+															106 container favicon.ico:1 GET http://127.0.0.1:8600/favicon.ico 404 (Not Found) Stack table collapsed
+																107 container
+																	108 link Description: favicon.ico:1, Help: http://127.0.0.1:8600/favicon.ico
+																		109 text favicon.ico:1
+																	110 button Click to open the Network panel and show request for URL: http://127.0.0.1:8600/favicon.ico
+																	111 text GET
+																	112 link http://127.0.0.1:8600/favicon.ico
+																		113 text http://127.0.0.1:8600/favicon.ico
+																	114 text 404  ( Not Found )
+													115 container
+														116 container
+															117 text entry area (settable) Description: Console prompt, Value: Press cmd i to turn on code suggestions. Press cmd x to disable code suggestions.
+
+																118 text Press cmd i to turn on code suggestions. Press cmd x to disable code suggestions.
+								119 container Tool drawer
+									120 container
+										121 toolbar
+											122 pop up button More Tools
+												123 button More Tools
+										124 tab group
+											125 tab (settable, integer) Description: Console, Value: 0
+											126 tab (settable, integer) Description: AI assistance, Value: 0
+											127 tab (selected) Description: What’s new, Value: 1
+										128 toolbar
+											129 container Toggle drawer orientation
+												130 button Toggle drawer orientation
+											131 container Minimize drawer
+												132 button Minimize drawer
+											133 container Close drawer
+												134 button Close drawer
+										135 container What’s new panel
+											136 container whats-new
+												137 container
+													138 text What’s new in DevTools 152
+													139 button See all new features
+													140 heading DevTools for agents, Value: 3
+														141 link Description: DevTools for agents, Help: https://developer.chrome.com/blog/new-in-devtools-152/#devtools-for-agents
+															142 text DevTools for agents
+													143 container
+														144 text DevTools for agents 1.7 improves memory profiling with the  get_heapsnapshot_object_details  tool and native V8 context filtering.
+													145 heading Soft navigation metrics in Live Metrics, Value: 3
+														146 link Description: Soft navigation metrics in Live Metrics, Help: https://developer.chrome.com/blog/new-in-devtools-152/#performance
+															147 text Soft navigation metrics in Live Metrics
+													148 text The Live Metrics view in the Performance panel now captures and reports metrics like LCP and INP for client-side soft navigations in single-page applications by default.
+													149 heading Nested CSS parent selector interactions, Value: 3
+														150 link Description: Nested CSS parent selector interactions, Help: https://developer.chrome.com/blog/new-in-devtools-152/#nested-selectors
+															151 text Nested CSS parent selector interactions
+													152 container
+														153 text Hovering over parent selectors highlights matching elements on the page, nested rules respond to Styles tab filtering, and  @nested-declarations  include specificity tooltips.
+						154 text Console cleared 
+				155 HTML content LINEAR ASCENT, URL: 127.0.0.1:8600/play#flo
+					156 tab group
+						157 tab (selected) GAME, Value: 1
+						158 tab (settable, integer) SCORE, Value: 0
+						159 tab (settable, integer) COMMUNITY, Value: 0
+					160 container
+						161 image the floor, mapped
+						162 button HUNT, option 1, 1 ⚡
+							163 text [1]
+							164 text  HUNT
+							165 text 1
+						166 button RUSTMAW, option 2
+							167 text [2]
+							168 text  RUSTMAW
+						169 button CAMP, option 3
+							170 text [3]
+							171 text  CAMP
+						172 button GATE, option 4
+							173 text [4]
+							174 text  GATE
+						175 button ROOTHOLLOW, option 5
+							176 text [5]
+							177 text  ROOTHOLLOW
+						178 text FLOOR 2 · GIANTS · LAMPFALL PLAYERS ON FLOOR 2
+						179 button MapsLuna85 L1
+							180 text MapsLuna85
+							181 text L1
+						182 text MapsQA85 HUMAN BLADE LEVEL 1 COINS  49
+						183 button
+						184 button
+						185 button
+						186 text HP  80 /80 23 /25 XP  0 /24 LEVEL UP  — XP 0/24 + ◈ 60 — the Guildhall levels you up
+						187 button close
+						188 text ATK 8 DEF 14 SPD 5 PACK 0/6
+						189 button JOIN A FACTION
+						190 text no faction flies yet — be the first found your own level 4
+					191 link Description: CONNECT GMAIL TO RECOVER THIS PLAYER., Value: 127.0.0.1:8600/auth/google/start
+					192 container
+						193 toggle button SOUND ON, Value: 1
+						194 toggle button MUSIC ON, Value: 1
+						195 button PLAYING 2
+							196 text PLAYING
+							197 text 2
+						198 button FEEDBACK
+						199 button LABS
+						200 button ADMIN
+			201 pop up button Tab Search
+			202 container
+				203 tab group
+					204 tab (selected, settable, boolean) Description: LINEAR ASCENT - Audio playing - Memory usage - 413 MB, Value: on
+						205 button (disabled) Mute tab
+						206 button Close
+					207 tab (settable, boolean) Description: Luna · Admin - Memory usage - 137 MB, Value: off
+						208 button Close
+					209 tab (settable, boolean) Description: Luna · Admin - Memory usage - 134 MB, Value: off
+						210 button Close
+			211 button New Tab
+			212 button Open Gemini in Chrome
+	213 close button
+	214 full screen button Help: this button also has an action to zoom the window, Secondary Actions: zoom the window
+	215 minimize button
+216 menu bar
+	217 Chrome
+	218 File
+	219 Edit
+	220 View
+	221 History
+	222 Bookmarks
+	223 Profiles
+	224 Tab
+	225 Window
+	226 Help
+
+The focused UI element is 157 tab (selected) GAME, Value: 1

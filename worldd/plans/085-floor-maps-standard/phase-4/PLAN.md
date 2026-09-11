@@ -25,7 +25,7 @@ Revert release implementation commits (plugin plus parent vendor/pointer), push 
 
 ## Execution status
 
-Not started.
+Local acceptance complete 2026-09-11. Dojo result: `dojo/results/0062-085-floor-maps-standard-2026-09-09/summary.md`. All 30 desktop/phone map views, all-floor CAMP/keep/GATE routes, mixed number rows, instant tooltips, Labs graduation, floor-11 fallback, opaque input-locked rides, and the real three-turn Luna conversation passed after the recorded fixes. Plugin focused: 84 passed. Plugin full: 1440 passed with the same 9 failures reproduced at baseline, plus 1 skipped and 1 xfailed. worldd full: 223 passed against the isolated `ascent_maps_tests` database. Source and vendor match. Production deployment is pending below.
 
 > retro(phase-1, 2026-09-09): Roy approved the original floor-2 design and requested only lower resolution. Keep map_002_v1 composition, ship 492×369 like floor 1, and use its geography/scale alongside floor 1 as a reference. Do not perform the proposed texture redesign.
 

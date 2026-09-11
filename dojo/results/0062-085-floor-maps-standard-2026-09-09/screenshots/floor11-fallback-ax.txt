@@ -1,0 +1,80 @@
+The following is a diff from the previous accessibility tree for Window: "LINEAR ASCENT 🔊" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 684-738, 740-834
+~0 standard window LINEAR ASCENT - Google Chrome - roy, URL: 127.0.0.1:8600/play#flo, Secondary Actions: Raise
+~	1 container LINEAR ASCENT - Google Chrome - roy, URL: 127.0.0.1:8600/play#flo
+~				681 HTML content LINEAR ASCENT, URL: 127.0.0.1:8600/play#flo
+~					682 tab group
+~						683 tab (settable, integer) GAME, Value: 0
++						684 tab (settable, integer) SCORE, Value: 0
++						685 tab (settable, integer) COMMUNITY, Value: 0
++					686 container
++						687 text FLOOR 11 · IRONVALE · LAMPFALL Lampfall The fire is small but honest. Beyond the wire, the wilds.
++						688 button [1] Hunt the wilds 1 · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							689 text [
++							690 text 1
++							691 text ]
++							692 text Hunt the wilds
++							693 text 1
++							694 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						695 text [
++						696 text i
++						697 text ]
++						698 button [2] Hunt deep — off the lit paths 2 · harder, richer · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							699 text [
++							700 text 2
++							701 text ]
++							702 text Hunt deep — off the lit paths
++							703 text 2
++							704 text  · harder, richer
++							705 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						706 button [3] The Warden's keep — Warden Rustmaw 3 a swing · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							707 text [
++							708 text 3
++							709 text ]
++							710 text The Warden's keep — Warden Rustmaw
++							711 text 3
++							712 text  a swing
++							713 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						714 text [
++						715 text i
++						716 text ]
++						717 button [4] The Tower Gate change floors from here · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							718 text [
++							719 text 4
++							720 text ]
++							721 text The Tower Gate
++							722 text change floors from here
++							723 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						724 text [
++						725 text i
++						726 text ]
++						727 button [5] Return to Roothollow · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							728 text [
++							729 text 5
++							730 text ]
++							731 text Return to Roothollow
++							732 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						733 text [
++						734 text i
++						735 text ]
++						736 text MapsQA85 HUMAN BLADE LEVEL 1 COINS  49
++						737 button
++						738 button
++						739 button
++						740 text HP  80 /80 23 /25 XP  0 /24 LEVEL UP  — XP 0/24 + ◈ 60 — the Guildhall levels you up
++						741 button close
++						742 text ATK 8 DEF 14 SPD 5 PACK 0/6
++						743 button JOIN A FACTION
++						744 text no faction flies yet — be the first found your own level 4
++					745 link Description: CONNECT GMAIL TO RECOVER THIS PLAYER., Value: 127.0.0.1:8600/auth/google/start
++					746 container
++						747 toggle button SOUND ON, Value: 1
++						748 toggle button MUSIC ON, Value: 1
++						749 button PLAYING 2
++							750 text PLAYING
++							751 text 2
++						752 button FEEDBACK
++						753 button LABS
++						754 button ADMIN
+~					204 tab (selected, settable, boolean) Description: LINEAR ASCENT - Memory usage - 730 MB, Value: on
+The focused UI element is 681 HTML content LINEAR ASCENT, URL: 127.0.0.1:8600/play#flo

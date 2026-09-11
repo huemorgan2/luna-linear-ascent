@@ -1,0 +1,1 @@
+Floor-1 introductory card. Readable Fencerows title strip and narration, numbered Next and Skip, 1-bit field banner above, empty pack slots below. This is an arrival introduction, before the Labs map appears.

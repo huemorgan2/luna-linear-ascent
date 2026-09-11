@@ -1,0 +1,2 @@
+There has been no change in the accessibility tree for Window: "Luna · Admin 🔊".
+The focused UI element is 931 HTML content Luna · Admin, URL: 127.0.0.1:8799/p/linear-ascent

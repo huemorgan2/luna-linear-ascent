@@ -1,0 +1,192 @@
+..............................................................F......... [  4%]
+........................................................................ [  9%]
+...........F..............F.............x............................... [ 14%]
+........................................................................ [ 19%]
+........................................................................ [ 24%]
+........................................................................ [ 29%]
+........................................................................ [ 34%]
+........................................................................ [ 39%]
+........................................................................ [ 44%]
+........................................................................ [ 49%]
+........................................................................ [ 54%]
+........................................................................ [ 59%]
+F....................................................................... [ 64%]
+........................................................................ [ 69%]
+..................................................F..................... [ 74%]
+........................................................................ [ 79%]
+........................................................................ [ 84%]
+........................................................................ [ 89%]
+...............................F........................................ [ 94%]
+.F.F..F................................................................. [ 99%]
+..........                                                               [100%]
+=================================== FAILURES ===================================
+______________________ test_victory_line_names_the_weapon ______________________
+
+    def test_victory_line_names_the_weapon():
+        p = at_gate_town(create_character(fresh()))
+        in_fight(p)
+        p["encounter"]["hp"] = 1
+        s = choose(p, "attack")
+>       assert any("no match for your" in ln for ln in s.body_lines)
+E       assert False
+E        +  where False = any(<generator object test_victory_line_names_the_weapon.<locals>.<genexpr> at 0x10b5b0110>)
+
+tests/test_013_combat_feel.py:158: AssertionError
+________________ test_poison_ticks_true_damage_and_never_stacks ________________
+
+    def test_poison_ticks_true_damage_and_never_stacks():
+        p, fl = _fight("archer", floor_no=2, enc_id="shellback_tortoise",
+                       poison_arrows=5)
+        act(p, fl, "nock_poison_arrows")
+        act(p, fl, "attack")
+        e = p["encounter"]
+>       assert e["poison_left"] == economy.POISON_ROUNDS
+               ^^^^^^^^^^^^^^^^
+E       KeyError: 'poison_left'
+
+tests/test_017_death_relics.py:227: KeyError
+_________________ test_the_veil_holds_until_your_first_strike __________________
+
+    def test_the_veil_holds_until_your_first_strike():
+        p, fl = _fight("warrior", veil_draught=1)
+        act(p, fl, "use_veil")
+        assert p["encounter"]["veiled"]
+        hp0 = p["hp"]
+        act(p, fl, "stand")                            # it swings at a ghost
+        assert p["hp"] == hp0
+        act(p, fl, "attack")                           # the strike breaks it
+>       assert not p["encounter"].get("veiled")
+E       AssertionError: assert not True
+E        +  where True = <built-in method get of dict object at 0x10b6a50c0>('veiled')
+E        +    where <built-in method get of dict object at 0x10b6a50c0> = {'kind': 'wilds', 'name': 'Feral boar', 'prose': 'A boar the size of a cart tears up the turf between you and the path...and one ear ragged from old fights. It is thick through the shoulders, and it comes in hard.', 'id': 'feral_boar', ...}.get
+
+tests/test_017_death_relics.py:399: AssertionError
+____________________ test_no_clazz_reads_outside_migrations ____________________
+
+    def test_no_clazz_reads_outside_migrations():
+        """profile.py tolerates old REMOTE payloads; state.py migrates old
+        DOCS. Nothing else in the engine may read clazz."""
+        import plugin_linear_ascent as pkg
+        root = pathlib.Path(pkg.__file__).parent
+        whitelist = {"state.py", "profile.py"}
+        pat = re.compile(r"""\[\s*["']clazz["']\s*\]|\.get\(\s*["']clazz["']""")
+        bad = []
+        for f in sorted(root.rglob("*.py")):
+            if f.name in whitelist:
+                continue
+            for i, line in enumerate(f.read_text().splitlines(), 1):
+                if pat.search(line):
+                    bad.append(f"{f.name}:{i}: {line.strip()}")
+>       assert not bad, "\n".join(bad)
+E       AssertionError: scene.py:264: str(a.get("race") or ""), str(a.get("clazz") or "")) if x)
+E         render.py:1248: clazz = str(sheet.get("clazz") or "")
+E       assert not ['scene.py:264: str(a.get("race") or ""), str(a.get("clazz") or "")) if x)', 'render.py:1248: clazz = str(sheet.get("clazz") or "")']
+
+tests/test_048_no_classes.py:103: AssertionError
+____________________ test_distance_move_and_chase_recorded _____________________
+
+    def test_distance_move_and_chase_recorded():
+        p = _climber(clazz="archer")
+        p["training"]["bow"] = 8
+        s, fl = _hunt(p, 7)
+        e = p["encounter"]
+        e["range"] = "at_range"; e["gap"] = 1
+        e["profile"] = {"type": "plain", "flying": False, "bulwark": False,
+                        "speed": 3}
+        e["hp"] = e["hp_max"] = 5000
+        s = combat.resolve_fight_action(p, fl, "create_distance")
+        ev = s.arena["events"]
+>       assert ev[0]["who"] == "me" and ev[0]["kind"] == "move"
+E       AssertionError: assert ('foe' == 'me'
+E
+E         - me
+E         + foe)
+
+tests/test_067_arena.py:162: AssertionError
+_________________ test_profile_derived_and_stored_on_encounter _________________
+
+    def test_profile_derived_and_stored_on_encounter():
+        from plugin_linear_ascent.content import schema
+        from plugin_linear_ascent.engine import combat
+        fl = schema.get_floor(2)
+        tortoise = next(e for e in fl.encounters
+                        if e.id == "shellback_tortoise")
+        p = create_character(fresh())
+        combat.start_encounter(p, fl, tortoise)
+        prof = p["encounter"]["profile"]
+        assert prof["type"] == "armoured"
+>       assert prof["speed"] == economy.SPEED_SLOW
+E       assert 4 == 3
+E        +  where 3 = economy.SPEED_SLOW
+
+tests/test_engine.py:461: AssertionError
+_____________________ test_kill3d_card_ships_no_ending_gif _____________________
+
+    def test_kill3d_card_ships_no_ending_gif():
+        # PLAN4: where the 3D finisher plays, the old GIF ending is GONE —
+        # fx rides INSIDE the spec as the client's degrade slug, the card
+        # carries no reel, and the banner slot is bare black for the canvas.
+        p = _character("Sorrel")
+        s, _ = _hunt_victory(p)
+        assert s.fx is None
+        assert "fx" in s.kill3d                      # the degrade path's name
+        html = render_scene_fragment(s)
+>       assert 'class="banner"' in html              # the mount slot exists
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert 'class="banner"' in '<div class="card" data-scene="s19" data-loc="gate_town" data-rig3d="human:blade:gate_jerkin+gate_buckler+rusted_sword...D%222%22%20y%3D%2213%22%20width%3D%2212%22%20height%3D%221%22%2F%3E%3C%2Fsvg%3E\')"></span> level 4</span></div></div>'
+
+tests/test_kill3d.py:76: AssertionError
+_______________ test_fragment_emits_data_kill3d_with_banner_tint _______________
+
+    def test_fragment_emits_data_kill3d_with_banner_tint():
+        p = _character("Moss")
+        s, _ = _hunt_victory(p)
+        html = render_scene_fragment(s)
+>       assert "data-kill3d=" in html
+E       assert 'data-kill3d=' in '<div class="card" data-scene="s19" data-loc="gate_town" data-rig3d="human:blade:gate_jerkin+gate_buckler+rusted_sword...D%222%22%20y%3D%2213%22%20width%3D%2212%22%20height%3D%221%22%2F%3E%3C%2Fsvg%3E\')"></span> level 4</span></div></div>'
+
+tests/test_kill3d.py:91: AssertionError
+_______________ test_first_sighting_line_fires_once_per_creature _______________
+
+    def test_first_sighting_line_fires_once_per_creature():
+        p = _character("Tarn")
+        _to_floor(p)
+        s = core.apply_choice(p, "hunt")             # the opener fight card
+        first_id = p["encounter"]["id"]
+        assert any("First sighting" in ln for ln in s.body_lines), s.body_lines
+        assert first_id in p.get("seen_creatures", [])
+        # win it, then hunt until the same creature returns: no line
+        p["encounter"]["range"] = "close"
+        p["encounter"]["hp"] = 1
+        p["encounter"]["traits"] = []
+        p["encounter"]["profile"] = {}
+        core.apply_choice(p, "attack")
+        for _ in range(40):
+            s = core.apply_choice(p, "hunt")
+            again = p["encounter"]["id"]
+            lines = s.body_lines
+            p["encounter"]["range"] = "close"
+            p["encounter"]["hp"] = 1
+            p["encounter"]["traits"] = []
+            p["encounter"]["profile"] = {}
+            core.apply_choice(p, "attack")
+            if again == first_id:
+                assert not any("First sighting" in ln for ln in lines), lines
+                return
+>           assert any("First sighting" in ln for ln in lines), (again, lines)
+E           AssertionError: ('feral_boar', [])
+E           assert False
+E            +  where False = any(<generator object test_first_sighting_line_fires_once_per_creature.<locals>.<genexpr> at 0x10b5b3b90>)
+
+tests/test_kill3d.py:143: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_013_combat_feel.py::test_victory_line_names_the_weapon - as...
+FAILED tests/test_017_death_relics.py::test_poison_ticks_true_damage_and_never_stacks
+FAILED tests/test_017_death_relics.py::test_the_veil_holds_until_your_first_strike
+FAILED tests/test_048_no_classes.py::test_no_clazz_reads_outside_migrations
+FAILED tests/test_067_arena.py::test_distance_move_and_chase_recorded - Asser...
+FAILED tests/test_engine.py::test_profile_derived_and_stored_on_encounter - a...
+FAILED tests/test_kill3d.py::test_kill3d_card_ships_no_ending_gif - assert 'c...
+FAILED tests/test_kill3d.py::test_fragment_emits_data_kill3d_with_banner_tint
+FAILED tests/test_kill3d.py::test_first_sighting_line_fires_once_per_creature
+9 failed, 1440 passed, 1 skipped, 1 xfailed in 20.61s

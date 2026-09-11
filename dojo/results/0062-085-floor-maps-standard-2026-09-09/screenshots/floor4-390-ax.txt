@@ -1,0 +1,52 @@
+The following is a diff from the previous accessibility tree for Window: "LINEAR ASCENT 🔊" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 681-751
++														681 text Filter
++						682 text Console cleared 
++				683 HTML content LINEAR ASCENT, URL: 127.0.0.1:8600/play#flo
++					684 tab group
++						685 tab (settable, integer) GAME, Value: 0
++						686 tab (settable, integer) SCORE, Value: 0
++						687 tab (settable, integer) COMMUNITY, Value: 0
++					688 container
++						689 image the floor, mapped
++						690 button HUNT, option 1, 1 ⚡
++							691 text [1]
++							692 text  HUNT
++							693 text 1
++						694 button DEEP-HUNT, option 2, 2 ⚡
++							695 text [2]
++							696 text  DEEP-HUNT
++							697 text 2
++						698 button PALEGLEAM, option 3
++							699 text [3]
++							700 text  PALEGLEAM
++						701 button CAMP, option 4
++							702 text [4]
++							703 text  CAMP
++						704 button GATE, option 5
++							705 text [5]
++							706 text  GATE
++						707 button ROOTHOLLOW, option 6
++							708 text [6]
++							709 text  ROOTHOLLOW
++						710 text FLOOR 4 · ELVES · LANTERNROOT MapsQA85 HUMAN BLADE LEVEL 1 COINS  49
++						711 button
++						712 button
++						713 button
++						714 text HP  80 /80 23 /25 XP  0 /24 LEVEL UP  — XP 0/24 + ◈ 60 — the Guildhall levels you up
++						715 button close
++						716 text ATK 8 DEF 14 SPD 5 PACK 0/6
++						717 button JOIN A FACTION
++						718 text no faction flies yet — be the first found your own level 4
++					719 link Description: CONNECT GMAIL TO RECOVER THIS PLAYER., Value: 127.0.0.1:8600/auth/google/start
++					720 container
++						721 toggle button SOUND ON, Value: 1
++						722 toggle button MUSIC ON, Value: 1
++						723 button PLAYING 2
++							724 text PLAYING
++							725 text 2
++						726 button FEEDBACK
++						727 button LABS
++						728 button ADMIN
+~					204 tab (selected, settable, boolean) Description: LINEAR ASCENT - Memory usage - 719 MB, Value: on
+The focused UI element is 683 HTML content LINEAR ASCENT, URL: 127.0.0.1:8600/play#flo

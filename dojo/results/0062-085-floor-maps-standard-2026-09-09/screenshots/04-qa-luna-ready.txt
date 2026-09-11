@@ -1,0 +1,1 @@
+QA Luna rich chat UI is ready and authenticated. First Conversation is selected; empty composer is visible with Claude Sonnet 4.5 in the model picker. Sidebar includes Linear Ascent. No LLM messages have been sent, so live conversation acceptance is pending integration.

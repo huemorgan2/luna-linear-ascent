@@ -1,0 +1,50 @@
+The following is a diff from the previous accessibility tree for Window: "LINEAR ASCENT" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 835-876, 878-881
++				681 HTML content LINEAR ASCENT, URL: 127.0.0.1:8600/play#flo
++					682 tab group
++						683 tab (settable, integer) GAME, Value: 0
++						684 tab (settable, integer) SCORE, Value: 0
++						685 tab (settable, integer) COMMUNITY, Value: 0
++					686 container
++						687 image the floor, mapped
++						688 button HUNT, option 1, 1 energy
++							689 text [1]
++							690 text  HUNT
++							691 text 1
++						692 button DEEP-HUNT, option 2, 2 energy
++							693 text [2]
++							694 text  DEEP-HUNT
++							695 text 2
++						696 button APPLEWRATH, option 3
++							697 text [3]
++							698 text  APPLEWRATH
++						699 button CAMP, option 4
++							700 text [4]
++							701 text  CAMP
++						702 button GATE, option 5
++							703 text [5]
++							704 text  GATE
++						705 button ROOTHOLLOW, option 6
++							706 text [6]
++							707 text  ROOTHOLLOW
++						708 text FLOOR 7 · MEN · CIDER CROSS MapsQA85 HUMAN BLADE LEVEL 1 COINS  49
++						709 button
++						710 button
++						711 button
++						712 text HP  80 /80 23 /25 XP  0 /24 LEVEL UP  — XP 0/24 + ◈ 60 — the Guildhall levels you up
++						713 button close
++						714 text ATK 8 DEF 14 SPD 5 PACK 0/6
++						715 button JOIN A FACTION
++						716 text no faction flies yet — be the first found your own level 4
++					717 link Description: CONNECT GMAIL TO RECOVER THIS PLAYER., Value: 127.0.0.1:8600/auth/google/start
++					718 container
++						719 toggle button SOUND ON, Value: 1
++						720 toggle button MUSIC ON, Value: 1
++						721 button PLAYING 2
++							722 text PLAYING
++							723 text 2
++						724 button FEEDBACK
++						725 button LABS
++						726 button ADMIN
+~					204 tab (selected, settable, boolean) Description: LINEAR ASCENT - Memory usage - 698 MB, Value: on
+The focused UI element is 681 HTML content LINEAR ASCENT, URL: 127.0.0.1:8600/play#flo

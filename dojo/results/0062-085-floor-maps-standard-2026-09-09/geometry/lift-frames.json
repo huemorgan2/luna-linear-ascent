@@ -1,0 +1,120 @@
+{
+  "samples": [
+    {
+      "phase": "mount",
+      "at": 805.2999999523163,
+      "direction": "Descending",
+      "background": "rgb(0, 0, 0)",
+      "opacity": "1",
+      "pointerEvents": "auto",
+      "inert": true,
+      "rect": [
+        0,
+        0,
+        760,
+        1000
+      ],
+      "viewport": [
+        760,
+        1000
+      ]
+    },
+    {
+      "phase": "first-animation-frame",
+      "at": 806.0999999046326,
+      "direction": "Descending",
+      "background": "rgb(0, 0, 0)",
+      "opacity": "1",
+      "pointerEvents": "auto",
+      "inert": true,
+      "rect": [
+        0,
+        0,
+        760,
+        1000
+      ],
+      "viewport": [
+        760,
+        1000
+      ]
+    },
+    {
+      "phase": "second-animation-frame",
+      "at": 807.5,
+      "direction": "Descending",
+      "background": "rgb(0, 0, 0)",
+      "opacity": "1",
+      "pointerEvents": "auto",
+      "inert": true,
+      "rect": [
+        0,
+        0,
+        760,
+        1000
+      ],
+      "viewport": [
+        760,
+        1000
+      ]
+    },
+    {
+      "phase": "mount",
+      "at": 6865.200000047684,
+      "direction": "Ascending",
+      "background": "rgb(0, 0, 0)",
+      "opacity": "1",
+      "pointerEvents": "auto",
+      "inert": true,
+      "rect": [
+        0,
+        0,
+        760,
+        1000
+      ],
+      "viewport": [
+        760,
+        1000
+      ]
+    },
+    {
+      "phase": "first-animation-frame",
+      "at": 6868.899999856949,
+      "direction": "Ascending",
+      "background": "rgb(0, 0, 0)",
+      "opacity": "1",
+      "pointerEvents": "auto",
+      "inert": true,
+      "rect": [
+        0,
+        0,
+        760,
+        1000
+      ],
+      "viewport": [
+        760,
+        1000
+      ]
+    },
+    {
+      "phase": "second-animation-frame",
+      "at": 6886.200000047684,
+      "direction": "Ascending",
+      "background": "rgb(0, 0, 0)",
+      "opacity": "1",
+      "pointerEvents": "auto",
+      "inert": true,
+      "rect": [
+        0,
+        0,
+        760,
+        1000
+      ],
+      "viewport": [
+        760,
+        1000
+      ]
+    }
+  ],
+  "inertAfter": false,
+  "overlays": 0
+}

@@ -1,0 +1,54 @@
+The following is a diff from the previous accessibility tree for Window: "LINEAR ASCENT 🔊" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 681-722, 724-726, 785, 833, 835-836
+~0 standard window LINEAR ASCENT - Google Chrome - roy, URL: 127.0.0.1:8600/play#flo, Secondary Actions: Raise
+~	1 container LINEAR ASCENT - Google Chrome - roy, URL: 127.0.0.1:8600/play#flo
++														833 text Filter
++						834 text Console cleared 
++				835 HTML content LINEAR ASCENT, URL: 127.0.0.1:8600/play#flo
++					836 tab group
++						837 tab (settable, integer) GAME, Value: 0
++						838 tab (settable, integer) SCORE, Value: 0
++						839 tab (settable, integer) COMMUNITY, Value: 0
++					840 container
++						841 image the floor, mapped
++						842 button HUNT, option 1, 1 ⚡
++							843 text [1]
++							844 text  HUNT
++							845 text 1
++						846 button DEEP-HUNT, option 2, 2 ⚡
++							847 text [2]
++							848 text  DEEP-HUNT
++							849 text 2
++						850 button DUSKSPIN, option 3
++							851 text [3]
++							852 text  DUSKSPIN
++						853 button CAMP, option 4
++							854 text [4]
++							855 text  CAMP
++						856 button GATE, option 5
++							857 text [5]
++							858 text  GATE
++						859 button ROOTHOLLOW, option 6
++							860 text [6]
++							861 text  ROOTHOLLOW
++						862 text FLOOR 6 · DEEP · LASTLIGHT MapsQA85 HUMAN BLADE LEVEL 1 COINS  49
++						863 button
++						864 button
++						865 button
++						866 text HP  80 /80 23 /25 XP  0 /24 LEVEL UP  — XP 0/24 + ◈ 60 — the Guildhall levels you up
++						867 button close
++						868 text ATK 8 DEF 14 SPD 5 PACK 0/6
++						869 button JOIN A FACTION
++						870 text no faction flies yet — be the first found your own level 4
++					871 link Description: CONNECT GMAIL TO RECOVER THIS PLAYER., Value: 127.0.0.1:8600/auth/google/start
++					872 container
++						873 toggle button SOUND ON, Value: 1
++						874 toggle button MUSIC ON, Value: 1
++						875 button PLAYING 2
++							876 text PLAYING
++							877 text 2
++						878 button FEEDBACK
++						879 button LABS
++						880 button ADMIN
+~					204 tab (selected, settable, boolean) Description: LINEAR ASCENT - Memory usage - 716 MB, Value: on
+The focused UI element is 737 stepper (settable) Description: Height (leave empty for full), Placeholder: 715

@@ -1,0 +1,162 @@
+The following is a diff from the previous accessibility tree for Window: "LINEAR ASCENT 🔊" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 839-840
++					842 container
++						843 text ROOTHOLLOW · THE SQUARE Roothollow — floor 11 is the frontier The last free settlement. Everything starts and restarts here. NEXT — LEVEL 2: the Relay Office · the contract board · the night slot THE CLIMB
++						844 button [1] The Tower Gate leave town and climb · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							845 text [
++							846 text 1
++							847 text ]
++							848 text The Tower Gate
++							849 text leave town and climb
++							850 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						851 text [
++						852 text i
++						853 text ]
++						854 button [2] The contract board level 2 · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							855 text [
++							856 text 2
++							857 text ]
++							858 text The contract board
++							859 text  level 2
++							860 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						861 text [
++						862 text i
++						863 text ]
++						864 text THE MARKET
++						865 button [3] The Forge gear · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							866 text [
++							867 text 3
++							868 text ]
++							869 text The Forge
++							870 text gear
++							871 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						872 text [
++						873 text i
++						874 text ]
++						875 button [4] The Arcanum level 3 · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							876 text [
++							877 text 4
++							878 text ]
++							879 text The Arcanum
++							880 text  level 3
++							881 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						882 text [
++						883 text i
++						884 text ]
++						885 button [5] Apothecary & Medlab potions · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							886 text [
++							887 text 5
++							888 text ]
++							889 text Apothecary & Medlab
++							890 text potions
++							891 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						892 text [
++						893 text i
++						894 text ]
++						895 button [6] Pawn shop sell · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							896 text [
++							897 text 6
++							898 text ]
++							899 text Pawn shop
++							900 text sell
++							901 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						902 text [
++						903 text i
++						904 text ]
++						905 text THE KEEP
++						906 button [7] The Vault bank · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							907 text [
++							908 text 7
++							909 text ]
++							910 text The Vault
++							911 text bank
++							912 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						913 text [
++						914 text i
++						915 text ]
++						916 button [8] The Lodge pay 10/night · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							917 text [
++							918 text 8
++							919 text ]
++							920 text The Lodge
++							921 text pay
++							922 text  10
++							923 text /night
++							924 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						925 text [
++						926 text i
++						927 text ]
++						928 button [9] Sleep mend and HP faster — the Lodge or the fields · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							929 text [
++							930 text 9
++							931 text ]
++							932 text Sleep
++							933 text mend
++							934 text  and HP faster — the Lodge or the fields
++							935 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						936 text [
++						937 text i
++						938 text ]
++						939 text THE BANNER
++						940 button [10] The Guildhall training · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							941 text [
++							942 text 10
++							943 text ]
++							944 text The Guildhall
++							945 text training
++							946 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						947 text [
++						948 text i
++						949 text ]
++						950 button [11] The School train any weapon — blade, bow, staff · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							951 text [
++							952 text 11
++							953 text ]
++							954 text The School
++							955 text train any weapon — blade, bow, staff
++							956 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						957 text [
++						958 text i
++						959 text ]
++						960 text THE WIRE
++						961 button [12] The Relay Office level 2 · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							962 text [
++							963 text 12
++							964 text ]
++							965 text The Relay Office
++							966 text  level 2
++							967 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						968 text [
++						969 text i
++						970 text ]
++						971 button [13] Stone of the Climb news · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							972 text [
++							973 text 13
++							974 text ]
++							975 text Stone of the Climb
++							976 text news
++							977 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						978 text [
++						979 text i
++						980 text ]
++						981 button [14] The fields level 5 · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							982 text [
++							983 text 14
++							984 text ]
++							985 text The fields
++							986 text  level 5
++							987 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						988 text [
++						989 text i
++						990 text ]
++						991 text MapsQA85 HUMAN BLADE LEVEL 1 COINS  49
++						992 button
++						993 button
++						994 button
++						995 text HP  80 /80 23 /25 XP  0 /24 LEVEL UP  — XP 0/24 + ◈ 60 — the Guildhall levels you up
++						996 button close
++						997 text ATK 8 DEF 14 SPD 5 PACK 0/6
++						998 button JOIN A FACTION
++						999 text no faction flies yet — be the first found your own level 4
++							1000 text 3
+The focused UI element is 789 HTML content LINEAR ASCENT, URL: 127.0.0.1:8600/play#roo

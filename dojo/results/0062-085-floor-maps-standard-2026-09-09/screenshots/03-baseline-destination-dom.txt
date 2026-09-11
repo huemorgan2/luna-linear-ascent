@@ -1,0 +1,55 @@
+- tablist:
+  - tab "Game"
+  - tab "Score"
+  - tab "Community"
+- img "the floor, mapped"
+- button "[1] HUNT1":
+  - text: "[1] HUNT"
+  - generic: "1"
+- button "[2] BRACKJAW"
+- button "[3] CAMP"
+- button "[4] GATE"
+- button "[5] ROOTHOLLOW"
+- generic: FLOOR 1 · MEN · LAMPLIT STEADING
+- generic: MapsQA85
+- generic: human blade
+- generic: LEVEL 1
+- text: COINS
+- text: "50"
+- button
+- button
+- button
+- generic: HP 80/80
+- generic: ▓▓▓▓▓▓▓▓▓▓
+- generic: 24/25
+- generic: ▓▓▓▓▓▓▓▓▓▓
+- generic: XP 0/24
+- generic: ░░░░░░░░░░
+- text: LEVEL UP — XP 0/24 + ◈ 60 — the Guildhall levels you up
+- button "close": ✕
+- generic: ATK 8
+- generic: DEF 14
+- generic: SPD 5
+- generic: pack 0/6
+- button "JOIN A FACTION":
+  - generic: JOIN A FACTION
+- generic: no faction flies yet — be the first
+- text: found your own
+- text: level 4
+- link "Connect Gmail to recover this player.":
+  - /url: /auth/google/start
+  - generic: Connect Gmail to recover this player.
+- button "sound on" [pressed]:
+  - generic: sound on
+- button "music on" [pressed]:
+  - generic: music on
+- button "playing 1":
+  - generic: ▶
+  - generic: playing
+  - generic: "1"
+- button "feedback":
+  - generic: feedback
+- button "labs on":
+  - generic: labs on
+- button "admin":
+  - generic: admin

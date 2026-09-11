@@ -1,0 +1,28 @@
+The following is a diff from the previous accessibility tree for Window: "LINEAR ASCENT 🔊" with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 840-870, 881
+~0 standard window LINEAR ASCENT - Audio playing - Google Chrome - roy, URL: 127.0.0.1:8600/play#flo, Secondary Actions: Raise
+~	1 container LINEAR ASCENT - Audio playing - Google Chrome - roy, URL: 127.0.0.1:8600/play#flo
++					881 container
++						882 text FLOOR 10 · THE KEEP Gnarl, the Goblin King fell here The doors stand open. Nothing has held them since. Cast down in the early days of the climb, by climbers whose names the Stone no longer carries. The lift above has run free ever since. Nothing waits in here for you — the wilds outside still do.
++						883 button [1] Back to the camp · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++							884 text [
++							885 text 1
++							886 text ]
++							887 text Back to the camp
++							888 text · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·
++						889 text [
++						890 text i
++						891 text ]
++						892 text MapsQA85 HUMAN BLADE LEVEL 1 COINS  49
++						893 button
++						894 button
++						895 button
++						896 text HP  80 /80 23 /25 XP  0 /24 LEVEL UP  — XP 0/24 + ◈ 60 — the Guildhall levels you up
++						897 button close
++						898 text ATK 8 DEF 14 SPD 5 PACK 0/6
++						899 button JOIN A FACTION
++						900 text no faction flies yet — be the first found your own level 4
++							901 text 3
+~					204 tab (selected, settable, boolean) Description: LINEAR ASCENT - Audio playing - Memory usage - 766 MB, Value: on
++						902 button (disabled) Mute tab
+The focused UI element is 835 HTML content LINEAR ASCENT, URL: 127.0.0.1:8600/play#flo

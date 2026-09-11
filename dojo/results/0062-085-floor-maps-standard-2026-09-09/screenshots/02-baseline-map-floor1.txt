@@ -1,0 +1,1 @@
+Baseline Labs floor-1 map. Dense forest mass at left, fields bottom/right, mountains upper-right, central enormous gate. Black label chips carry yellow numbers and white location names. Labels visible: HUNT with 1 energy, BRACKJAW, CAMP, GATE, ROOTHOLLOW. Bottom footer still says LABS ON. Map is readable at the desktop viewport; no phone acceptance was attempted yet.

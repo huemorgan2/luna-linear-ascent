@@ -1,0 +1,246 @@
+{
+  "account": "Routes856844367",
+  "all": [
+    {
+      "floor": 1,
+      "opt": "talk",
+      "status": 200,
+      "headline": "Hobb Fennick — the last farmer",
+      "hasMap": 0,
+      "content": "FLOOR 1 · LAMPL\n1\nHunt the wilds\n1 \ni\n2\nHunter's stew\npay  2 · +5 HP\ni\n3\nThe healer's tent\npay  48 · +104428 HP\ni\n4\nThe keep where Warden Brackjaw fell\na monument · free\ni\n5\nTalk — Hobb Fennick\nthe last farmer\ni\n6\nThe Tower Gate\nchange floors from here\ni\n7\nReturn to Roothollow\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 1,
+      "opt": "keep",
+      "status": 200,
+      "headline": "Warden Brackjaw fell here",
+      "hasMap": 0,
+      "content": "FLOOR 1 · TH\n1\nBack to the camp\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 1,
+      "opt": "gate",
+      "status": 200,
+      "headline": "11 floors stand open",
+      "hasMap": 0,
+      "content": "ROOTHOLLO\n1\nFloor 1 — The Fencerows\nLamplit Steading\ni\n2\nFloor 2 — The Rustwater Adit\nLampfall\ni\n3\nFloor 3 — The Drowned Pasture\nWeirsend\ni\n4\nFloor 4 — The Lightless Glade\nLanternroot\ni\n5\nFloor 5 — The Flooded Mine\nPumpstead\ni\n6\nFloor 6 — The Threshold Dark\nLastlight\ni\n7\nFloor 7 — The Orchard Rows\nCider Cross\ni\n8\nFloor 8 — The Ashline\nGreywell\ni\n9\nFloor 9 — The Beacon Field\nPylon Rest\ni\n10\nFloor 10 — The Kingsfield\nBannerline · war party of 2 · 1 hot · 1 camp\ni\n11\nFloor 11 — The Rustwater Adit\nLampfall\ni\n12\nBack to Roothollow\ni\nPLAYERS NOW IN THE GATE\nMapsLuna85\nL1\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 2,
+      "opt": "talk",
+      "status": 200,
+      "headline": "Bergda Ironkettle — pit-foreman",
+      "hasMap": 0,
+      "content": "FLOOR 2 · LA\n1\nHunt the wilds\n1 \ni\n2\nHunter's stew\npay  2 · +5 HP\ni\n3\nThe healer's tent\npay  60 · +104428 HP\ni\n4\nThe keep where Warden Rustmaw fell\na monument · free\ni\n5\nTalk — Bergda Ironkettle\npit-foreman\ni\n6\nThe Tower Gate\nchange floors from here\ni\n7\nReturn to Roothollow\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 2,
+      "opt": "keep",
+      "status": 200,
+      "headline": "Warden Rustmaw fell here",
+      "hasMap": 0,
+      "content": "FLOOR 2 ·\n1\nBack to the camp\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 2,
+      "opt": "gate",
+      "status": 200,
+      "headline": "11 floors stand open",
+      "hasMap": 0,
+      "content": "ROOTHOLLO\n1\nFloor 1 — The Fencerows\nLamplit Steading\ni\n2\nFloor 2 — The Rustwater Adit\nLampfall\ni\n3\nFloor 3 — The Drowned Pasture\nWeirsend\ni\n4\nFloor 4 — The Lightless Glade\nLanternroot\ni\n5\nFloor 5 — The Flooded Mine\nPumpstead\ni\n6\nFloor 6 — The Threshold Dark\nLastlight\ni\n7\nFloor 7 — The Orchard Rows\nCider Cross\ni\n8\nFloor 8 — The Ashline\nGreywell\ni\n9\nFloor 9 — The Beacon Field\nPylon Rest\ni\n10\nFloor 10 — The Kingsfield\nBannerline · war party of 2 · 1 hot · 1 camp\ni\n11\nFloor 11 — The Rustwater Adit\nLampfall\ni\n12\nBack to Roothollow\ni\nPLAYERS NOW IN THE GATE\nMapsLuna85\nL1\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 3,
+      "opt": "talk",
+      "status": 200,
+      "headline": "Old Nan Sedge — weir-keeper",
+      "hasMap": 0,
+      "content": "FLOOR 3 ·\n1\nHunt the wilds\n1 \ni\n2\nHunter's stew\npay  2 · +5 HP\ni\n3\nThe healer's tent\npay  72 · +104428 HP\ni\n4\nThe keep where Warden Sedgeback fell\na monument · free\ni\n5\nTalk — Old Nan Sedge\nweir-keeper\ni\n6\nThe Tower Gate\nchange floors from here\ni\n7\nReturn to Roothollow\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 3,
+      "opt": "keep",
+      "status": 200,
+      "headline": "Warden Sedgeback fell here",
+      "hasMap": 0,
+      "content": "FLOOR 3 · THE K\n1\nBack to the camp\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 3,
+      "opt": "gate",
+      "status": 200,
+      "headline": "11 floors stand open",
+      "hasMap": 0,
+      "content": "ROOTHOLLO\n1\nFloor 1 — The Fencerows\nLamplit Steading\ni\n2\nFloor 2 — The Rustwater Adit\nLampfall\ni\n3\nFloor 3 — The Drowned Pasture\nWeirsend\ni\n4\nFloor 4 — The Lightless Glade\nLanternroot\ni\n5\nFloor 5 — The Flooded Mine\nPumpstead\ni\n6\nFloor 6 — The Threshold Dark\nLastlight\ni\n7\nFloor 7 — The Orchard Rows\nCider Cross\ni\n8\nFloor 8 — The Ashline\nGreywell\ni\n9\nFloor 9 — The Beacon Field\nPylon Rest\ni\n10\nFloor 10 — The Kingsfield\nBannerline · war party of 2 · 1 hot · 1 camp\ni\n11\nFloor 11 — The Rustwater Adit\nLampfall\ni\n12\nBack to Roothollow\ni\nPLAYERS NOW IN THE GATE\nMapsLuna85\nL1\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 4,
+      "opt": "talk",
+      "status": 200,
+      "headline": "Ithren of the Wicks — last lamplighter",
+      "hasMap": 0,
+      "content": "FLOOR 4 ·\n1\nHunt the wilds\n1 \ni\n2\nHunt deep — off the lit paths\n2  · harder, richer\n3\nHunter's stew\npay  2 · +5 HP\ni\n4\nThe healer's tent\npay  96 · +104428 HP\ni\n5\nThe keep where Warden Palegleam fell\na monument · free\ni\n6\nTalk — Ithren of the Wicks\nlast lamplighter\ni\n7\nThe Tower Gate\nchange floors from here\ni\n8\nReturn to Roothollow\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 4,
+      "opt": "keep",
+      "status": 200,
+      "headline": "Warden Palegleam fell here",
+      "hasMap": 0,
+      "content": "FLOOR 4 · TH\n1\nBack to the camp\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 4,
+      "opt": "gate",
+      "status": 200,
+      "headline": "11 floors stand open",
+      "hasMap": 0,
+      "content": "ROOTHOLLOW · TH\n1\nFloor 1 — The Fencerows\nLamplit Steading\ni\n2\nFloor 2 — The Rustwater Adit\nLampfall\ni\n3\nFloor 3 — The Drowned Pasture\nWeirsend\ni\n4\nFloor 4 — The Lightless Glade\nLanternroot\ni\n5\nFloor 5 — The Flooded Mine\nPumpstead\ni\n6\nFloor 6 — The Threshold Dark\nLastlight\ni\n7\nFloor 7 — The Orchard Rows\nCider Cross\ni\n8\nFloor 8 — The Ashline\nGreywell\ni\n9\nFloor 9 — The Beacon Field\nPylon Rest\ni\n10\nFloor 10 — The Kingsfield\nBannerline · war party of 2 · 1 hot · 1 camp\ni\n11\nFloor 11 — The Rustwater Adit\nLampfall\ni\n12\nBack to Roothollow\ni\nPLAYERS NOW IN THE GATE\nMapsLuna85\nL1\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 5,
+      "opt": "talk",
+      "status": 200,
+      "headline": "Durn Sumphand — master of pumps",
+      "hasMap": 0,
+      "content": "FLOOR 5 ·\n1\nHunt the wilds\n1 \ni\n2\nHunt deep — off the lit paths\n2  · harder, richer\n3\nHunter's stew\npay  2 · +5 HP\ni\n4\nThe healer's tent\npay  120 · +104428 HP\ni\n5\nThe keep where Warden Sumplock fell\na monument · free\ni\n6\nTalk — Durn Sumphand\nmaster of pumps\ni\n7\nThe Tower Gate\nchange floors from here\ni\n8\nReturn to Roothollow\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 5,
+      "opt": "keep",
+      "status": 200,
+      "headline": "Warden Sumplock fell here",
+      "hasMap": 0,
+      "content": "FLOOR 5 ·\n1\nBack to the camp\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 5,
+      "opt": "gate",
+      "status": 200,
+      "headline": "11 floors stand open",
+      "hasMap": 0,
+      "content": "ROOTHOLLO\n1\nFloor 1 — The Fencerows\nLamplit Steading\ni\n2\nFloor 2 — The Rustwater Adit\nLampfall\ni\n3\nFloor 3 — The Drowned Pasture\nWeirsend\ni\n4\nFloor 4 — The Lightless Glade\nLanternroot\ni\n5\nFloor 5 — The Flooded Mine\nPumpstead\ni\n6\nFloor 6 — The Threshold Dark\nLastlight\ni\n7\nFloor 7 — The Orchard Rows\nCider Cross\ni\n8\nFloor 8 — The Ashline\nGreywell\ni\n9\nFloor 9 — The Beacon Field\nPylon Rest\ni\n10\nFloor 10 — The Kingsfield\nBannerline · war party of 2 · 1 hot · 1 camp\ni\n11\nFloor 11 — The Rustwater Adit\nLampfall\ni\n12\nBack to Roothollow\ni\nPLAYERS NOW IN THE GATE\nMapsLuna85\nL1\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 6,
+      "opt": "talk",
+      "status": 200,
+      "headline": "Sable Lastlamp — echo-reader",
+      "hasMap": 0,
+      "content": "FLOOR 6 · LA\n1\nHunt the wilds\n1 \ni\n2\nHunt deep — off the lit paths\n2  · harder, richer\n3\nHunter's stew\npay  2 · +5 HP\ni\n4\nThe healer's tent\npay  144 · +104428 HP\ni\n5\nThe keep where Warden Duskspin fell\na monument · free\ni\n6\nTalk — Sable Lastlamp\necho-reader\ni\n7\nThe Tower Gate\nchange floors from here\ni\n8\nReturn to Roothollow\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 6,
+      "opt": "keep",
+      "status": 200,
+      "headline": "Warden Duskspin fell here",
+      "hasMap": 0,
+      "content": "FLOOR 6 ·\n1\nBack to the camp\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 6,
+      "opt": "gate",
+      "status": 200,
+      "headline": "11 floors stand open",
+      "hasMap": 0,
+      "content": "ROOTHOLLO\n1\nFloor 1 — The Fencerows\nLamplit Steading\ni\n2\nFloor 2 — The Rustwater Adit\nLampfall\ni\n3\nFloor 3 — The Drowned Pasture\nWeirsend\ni\n4\nFloor 4 — The Lightless Glade\nLanternroot\ni\n5\nFloor 5 — The Flooded Mine\nPumpstead\ni\n6\nFloor 6 — The Threshold Dark\nLastlight · 1 hot\ni\n7\nFloor 7 — The Orchard Rows\nCider Cross\ni\n8\nFloor 8 — The Ashline\nGreywell\ni\n9\nFloor 9 — The Beacon Field\nPylon Rest · 1 hot\ni\n10\nFloor 10 — The Kingsfield\nBannerline · war party of 2 · 1 hot · 1 camp\ni\n11\nFloor 11 — The Rustwater Adit\nLampfall\ni\n12\nBack to Roothollow\ni\nPLAYERS NOW IN THE GATE\nMapsLuna85\nL1\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 7,
+      "opt": "talk",
+      "status": 200,
+      "headline": "Cesta Pommet — master-presser",
+      "hasMap": 0,
+      "content": "FLOOR 7 ·\n1\nHunt the wilds\n1 \ni\n2\nHunt deep — off the lit paths\n2  · harder, richer\n3\nHunter's stew\npay  2 · +5 HP\ni\n4\nThe healer's tent\npay  186 · +104428 HP\ni\n5\nThe keep where Warden Applewrath fell\na monument · free\ni\n6\nTalk — Cesta Pommet\nmaster-presser\ni\n7\nThe Tower Gate\nchange floors from here\ni\n8\nReturn to Roothollow\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 7,
+      "opt": "keep",
+      "status": 200,
+      "headline": "Warden Applewrath fell here",
+      "hasMap": 0,
+      "content": "FLOOR 7 ·\n1\nBack to the camp\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 7,
+      "opt": "gate",
+      "status": 200,
+      "headline": "11 floors stand open",
+      "hasMap": 0,
+      "content": "ROOTHOLLO\n1\nFloor 1 — The Fencerows\nLamplit Steading\ni\n2\nFloor 2 — The Rustwater Adit\nLampfall\ni\n3\nFloor 3 — The Drowned Pasture\nWeirsend\ni\n4\nFloor 4 — The Lightless Glade\nLanternroot\ni\n5\nFloor 5 — The Flooded Mine\nPumpstead\ni\n6\nFloor 6 — The Threshold Dark\nLastlight · 1 hot\ni\n7\nFloor 7 — The Orchard Rows\nCider Cross\ni\n8\nFloor 8 — The Ashline\nGreywell\ni\n9\nFloor 9 — The Beacon Field\nPylon Rest · 1 hot\ni\n10\nFloor 10 — The Kingsfield\nBannerline · war party of 2 · 1 hot · 1 camp\ni\n11\nFloor 11 — The Rustwater Adit\nLampfall\ni\n12\nBack to Roothollow\ni\nPLAYERS NOW IN THE GATE\nMapsLuna85\nL1\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 8,
+      "opt": "talk",
+      "status": 200,
+      "headline": "Kesh of the Grey Wells — water-finder",
+      "hasMap": 0,
+      "content": "FLOOR 8 ·\n1\nHunt the wilds\n1 \ni\n2\nHunt deep — off the lit paths\n2  · harder, richer\n3\nHunter's stew\npay  2 · +5 HP\ni\n4\nThe healer's tent\npay  228 · +104428 HP\ni\n5\nThe keep where Warden Cinderhide fell\na monument · free\ni\n6\nTalk — Kesh of the Grey Wells\nwater-finder\ni\n7\nThe Tower Gate\nchange floors from here\ni\n8\nReturn to Roothollow\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 8,
+      "opt": "keep",
+      "status": 200,
+      "headline": "Warden Cinderhide fell here",
+      "hasMap": 0,
+      "content": "FLOOR 8 · TH\n1\nBack to the camp\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 8,
+      "opt": "gate",
+      "status": 200,
+      "headline": "11 floors stand open",
+      "hasMap": 0,
+      "content": "ROOTHOLLO\n1\nFloor 1 — The Fencerows\nLamplit Steading\ni\n2\nFloor 2 — The Rustwater Adit\nLampfall\ni\n3\nFloor 3 — The Drowned Pasture\nWeirsend\ni\n4\nFloor 4 — The Lightless Glade\nLanternroot\ni\n5\nFloor 5 — The Flooded Mine\nPumpstead\ni\n6\nFloor 6 — The Threshold Dark\nLastlight · 1 hot\ni\n7\nFloor 7 — The Orchard Rows\nCider Cross\ni\n8\nFloor 8 — The Ashline\nGreywell\ni\n9\nFloor 9 — The Beacon Field\nPylon Rest · 1 hot\ni\n10\nFloor 10 — The Kingsfield\nBannerline · war party of 2 · 1 hot · 1 camp\ni\n11\nFloor 11 — The Rustwater Adit\nLampfall\ni\n12\nBack to Roothollow\ni\nPLAYERS NOW IN THE GATE\nMapsLuna85\nL1\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 9,
+      "opt": "talk",
+      "status": 200,
+      "headline": "Wick Harlow — chief keeper",
+      "hasMap": 0,
+      "content": "FLOOR 9 · PYLON REST\n1\nHunt the wilds\n1 \ni\n2\nHunt deep — off the lit paths\n2  · harder, richer\n3\nHunter's stew\npay  2 · +5 HP\ni\n4\nThe healer's tent\npay  287 · +104428 HP\ni\n5\nThe keep where Warden Glarefang fell\na monument · free\ni\n6\nTalk — Wick Harlow\nchief keeper\ni\n7\nThe Tower Gate\nchange floors from here\ni\n8\nReturn to Roothollow\ni\nPLAYERS ON FLOOR 9\nMapsQA85\nL1\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 9,
+      "opt": "keep",
+      "status": 200,
+      "headline": "Warden Glarefang fell here",
+      "hasMap": 0,
+      "content": "FLOOR 9 ·\n1\nBack to the camp\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 9,
+      "opt": "gate",
+      "status": 200,
+      "headline": "11 floors stand open",
+      "hasMap": 0,
+      "content": "ROOTHOLLO\n1\nFloor 1 — The Fencerows\nLamplit Steading\ni\n2\nFloor 2 — The Rustwater Adit\nLampfall\ni\n3\nFloor 3 — The Drowned Pasture\nWeirsend\ni\n4\nFloor 4 — The Lightless Glade\nLanternroot\ni\n5\nFloor 5 — The Flooded Mine\nPumpstead\ni\n6\nFloor 6 — The Threshold Dark\nLastlight · 1 hot\ni\n7\nFloor 7 — The Orchard Rows\nCider Cross\ni\n8\nFloor 8 — The Ashline\nGreywell\ni\n9\nFloor 9 — The Beacon Field\nPylon Rest · 1 hot\ni\n10\nFloor 10 — The Kingsfield\nBannerline · war party of 2 · 1 hot · 1 camp\ni\n11\nFloor 11 — The Rustwater Adit\nLampfall\ni\n12\nBack to Roothollow\ni\nPLAYERS NOW IN THE GATE\nMapsLuna85\nL1\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 10,
+      "opt": "talk",
+      "status": 200,
+      "headline": "Serjeant Mella Rung — muster-serjeant",
+      "hasMap": 0,
+      "content": "FLOOR 10 \n1\nHunt the wilds\n1 \ni\n2\nHunt deep — off the lit paths\n2  · harder, richer\n3\nHunter's stew\npay  2 · +5 HP\ni\n4\nThe healer's tent\npay  359 · +104428 HP\ni\n5\nThe keep where Gnarl, the Goblin King fell\na monument · free\ni\n6\nTalk — Serjeant Mella Rung\nmuster-serjeant\ni\n7\nThe Tower Gate\nchange floors from here\ni\n8\nReturn to Roothollow\ni\nPLAYERS ON FLOOR 10\nGeometry856594504\nL99\nGeometry856761747\nL99\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 10,
+      "opt": "keep",
+      "status": 200,
+      "headline": "Gnarl, the Goblin King fell here",
+      "hasMap": 0,
+      "content": "FLOOR 10 \n1\nBack to the camp\ni\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    },
+    {
+      "floor": 10,
+      "opt": "gate",
+      "status": 200,
+      "headline": "11 floors stand open",
+      "hasMap": 0,
+      "content": "ROOTHOLLO\n1\nFloor 1 — The Fencerows\nLamplit Steading\ni\n2\nFloor 2 — The Rustwater Adit\nLampfall\ni\n3\nFloor 3 — The Drowned Pasture\nWeirsend\ni\n4\nFloor 4 — The Lightless Glade\nLanternroot\ni\n5\nFloor 5 — The Flooded Mine\nPumpstead\ni\n6\nFloor 6 — The Threshold Dark\nLastlight · 1 hot\ni\n7\nFloor 7 — The Orchard Rows\nCider Cross\ni\n8\nFloor 8 — The Ashline\nGreywell\ni\n9\nFloor 9 — The Beacon Field\nPylon Rest · 1 hot\ni\n10\nFloor 10 — The Kingsfield\nBannerline · war party of 2 · 1 hot · 1 camp\ni\n11\nFloor 11 — The Rustwater Adit\nLampfall\ni\n12\nBack to Roothollow\ni\nPLAYERS NOW IN THE GATE\nMapsLuna85\nL1\nRoutes856844367\nHUMAN BLADE\nLEVEL 99\nCOINS  200\nHP 400/104828\n░░░░░░░░░░\n 24/25\n▓▓▓▓▓▓▓▓▓▓\nXP 0/23,641\n░░░░░░░░░░\nATK 6051\nDEF 4043\nSPD 5\nPACK 0/6\nJOIN A FACTION\nno faction flies yet — be the first"
+    }
+  ],
+  "errors": []
+}
