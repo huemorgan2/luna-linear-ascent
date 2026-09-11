@@ -1,0 +1,70 @@
+{
+  "source": "worldd/plans/085-floor-maps-standard/art/sources/map_002_v1.png",
+  "candidates": {
+    "box_direct": {
+      "tone_range": 0.4994,
+      "tone_stddev": 0.1048,
+      "source_correlation": 0.9955,
+      "ink_percent": 35.01,
+      "regions": {
+        "lower_left_water": 0.2411,
+        "mid_left_water": 0.2836,
+        "bright_quarry": 0.4278,
+        "central_shadow": 0.3662
+      },
+      "sha256": "d5d46a03cc436ae3bbf7cd0365903b62a851529c9ee69ff0b05621d38b888f9e"
+    },
+    "box_mild_unsharp": {
+      "tone_range": 0.5081,
+      "tone_stddev": 0.1042,
+      "source_correlation": 0.9943,
+      "ink_percent": 35.31,
+      "regions": {
+        "lower_left_water": 0.2495,
+        "mid_left_water": 0.2882,
+        "bright_quarry": 0.4294,
+        "central_shadow": 0.3703
+      },
+      "sha256": "533ad19f47c29c6adfd27113b897b5c31b13646069f55609047d208ca4e3dbcf"
+    },
+    "lanczos_direct": {
+      "tone_range": 0.4994,
+      "tone_stddev": 0.1035,
+      "source_correlation": 0.9949,
+      "ink_percent": 35.26,
+      "regions": {
+        "lower_left_water": 0.2495,
+        "mid_left_water": 0.2862,
+        "bright_quarry": 0.4296,
+        "central_shadow": 0.3672
+      },
+      "sha256": "23beb066452f7e3deb07ea3281e1a3d288ec3edd417155721240889f15dfd9a2"
+    },
+    "lanczos_mild_unsharp": {
+      "tone_range": 0.496,
+      "tone_stddev": 0.1024,
+      "source_correlation": 0.9941,
+      "ink_percent": 35.61,
+      "regions": {
+        "lower_left_water": 0.2533,
+        "mid_left_water": 0.2901,
+        "bright_quarry": 0.4322,
+        "central_shadow": 0.3726
+      },
+      "sha256": "48e9bf811bb736dead37070e60182cb1a7ecb03e8ff210f4462bfc3081f5e864"
+    }
+  },
+  "old": {
+    "tone_range": 0.4096,
+    "tone_stddev": 0.0756,
+    "source_correlation": 0.98,
+    "ink_percent": 30.6,
+    "regions": {
+      "lower_left_water": 0.2425,
+      "mid_left_water": 0.2541,
+      "bright_quarry": 0.3545,
+      "central_shadow": 0.3205
+    },
+    "sha256": "36c8e54a8a446eb4be147b52335db7c95b90342ca93d9009795066abd3294a61"
+  }
+}

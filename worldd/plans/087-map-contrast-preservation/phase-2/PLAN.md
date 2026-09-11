@@ -22,4 +22,4 @@ Revert the plugin and parent release commits and redeploy. Verify the previous v
 
 ## Execution status
 
-Not started.
+Ready to execute. Phase 1 selected the `box_direct` recipe: direct area reduction preserves the approved source's regional ink density more faithfully than LANCZOS or either mild-sharpen variant. Phase 2 will expose that recipe as an explicit converter mode so the legacy floor-1 recipe and maps 1/3–10 remain byte-identical.
