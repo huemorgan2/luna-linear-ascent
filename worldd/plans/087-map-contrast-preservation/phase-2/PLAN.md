@@ -22,4 +22,14 @@ Revert the plugin and parent release commits and redeploy. Verify the previous v
 
 ## Execution status
 
-Ready to execute. Phase 1 selected the `box_direct` recipe: direct area reduction preserves the approved source's regional ink density more faithfully than LANCZOS or either mild-sharpen variant. Phase 2 will expose that recipe as an explicit converter mode so the legacy floor-1 recipe and maps 1/3–10 remain byte-identical.
+Complete locally — 2026-09-11.
+
+- Added the explicit `--tone-mode preserve-source` path to the existing converter; the default legacy path is unchanged.
+- Rebuilt only floor 2 and bumped the source/vendored package to `0.111.1`. Source and vendor are byte-identical at SHA-256 `d5d46a03cc436ae3bbf7cd0365903b62a851529c9ee69ff0b05621d38b888f9e`; the isolated HTTP response has the same hash.
+- The new regression check proves 492×369 dimensions, full opacity, the exact two-color palette, source/vendor equality, tone range `>=0.470`, tone standard deviation `>=0.095`, and source correlation `>=0.970`.
+- Targeted verification: plugin static-art `5 passed`; floor-map and contrast tests `3 passed`.
+- Full worldd suite: `220 passed` in 107.30 seconds. Full plugin suite: `1441 passed, 9 failed, 1 skipped, 1 xfailed` in 22.75 seconds. The same nine unrelated combat/class/3D failures were present at the 0.111.0 baseline; this change introduced no new failures.
+- Chrome desktop and narrow-layout review passed. The source-scale dark lakes and shadow masses remain distinct, structures and roads remain legible, all five markers remain visible, and the output remains crisp two-color art.
+- QA Luna used this branch's plugin and isolated worldd. `Show me my current Linear Ascent scene. Do not choose an option.` called `ascent_scene`, rendered floor 2 without spending energy, and a plain-text `6` called `ascent_choose` and moved to the gate.
+- Local QA rollback: stop ports 8610/8800 and remove Docker container `ascent-map-contrast-qa` plus `/tmp/ascent-maps-qa87`; production rollback remains the commit revert described above.
+- Production deployment: pending.

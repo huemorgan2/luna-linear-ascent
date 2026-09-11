@@ -1,0 +1,1 @@
+Chrome narrow-layout capture read during the run: Luna switched to its mobile bottom navigation, the floor map scaled to the available width, and HUNT, RUSTMAW, CAMP, GATE, and ROOTHOLLOW remained readable. The restored regional contrast survived the smaller display.
