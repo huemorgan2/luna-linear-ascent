@@ -1,8 +1,11 @@
 # Dojo 0064 — all-floor contrast and exact map points
 
-Date: 2026-09-11  
-Source parent: `3ace69f` plus release changes  
-Source plugin: `92c86b6f`  
+Date: 2026-09-11
+
+Source parent: `3ace69f` plus release changes
+
+Source plugin: `92c86b6f`
+
 Stack: isolated worldd at `127.0.0.1:8610`, isolated QA Luna at `127.0.0.1:8800`, Chrome, disposable local databases
 
 | Scenario | Result | Evidence read from Chrome |
@@ -20,6 +23,8 @@ The first request for a floor-3 map was made from the Tower Gate. Luna described
 
 Static verification: all ten assets are 492×369 RGBA, opaque, and exactly black plus `(217,217,211)`. Floors 1 and 2 kept their approved SHA-256 values. Floors 3–10 match the recorded preserve-source candidates. Focused plugin tests passed 61/61; the plugin full suite passed 1,461 with the same nine unrelated baseline failures; the vendored worldd suite passed 220/220.
 
-Regressions found: none.  
-Out-of-world or free-formed-state moments: none.  
+Regressions found: none.
+
+Out-of-world or free-formed-state moments: none.
+
 Recommendation: release 0.112.0.
