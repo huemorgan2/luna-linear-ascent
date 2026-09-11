@@ -1,0 +1,92 @@
+[
+  {
+    "width": 390,
+    "bars": [
+      {
+        "border": "0px",
+        "bottom": 0,
+        "height": 3,
+        "left": 0,
+        "name": "Green · 75%",
+        "right": 0
+      },
+      {
+        "border": "0px",
+        "bottom": 0,
+        "height": 3,
+        "left": 0,
+        "name": "Low · 25%",
+        "right": 0
+      },
+      {
+        "border": "0px",
+        "bottom": 0,
+        "height": 3,
+        "left": 0,
+        "name": "Broken",
+        "right": 0
+      },
+      {
+        "border": "0px",
+        "bottom": 0,
+        "height": 3,
+        "left": 0,
+        "name": "Packed ×2",
+        "right": 0
+      },
+      {
+        "border": "0px",
+        "bottom": 0,
+        "height": 3,
+        "left": 0,
+        "name": "Player sheet",
+        "right": 0
+      }
+    ]
+  },
+  {
+    "width": 320,
+    "bars": [
+      {
+        "border": "0px",
+        "bottom": 0,
+        "height": 3,
+        "left": 0,
+        "name": "Green · 75%",
+        "right": 0
+      },
+      {
+        "border": "0px",
+        "bottom": 0,
+        "height": 3,
+        "left": 0,
+        "name": "Low · 25%",
+        "right": 0
+      },
+      {
+        "border": "0px",
+        "bottom": 0,
+        "height": 3,
+        "left": 0,
+        "name": "Broken",
+        "right": 0
+      },
+      {
+        "border": "0px",
+        "bottom": 0,
+        "height": 3,
+        "left": 0,
+        "name": "Packed ×2",
+        "right": 0
+      },
+      {
+        "border": "0px",
+        "bottom": 0,
+        "height": 3,
+        "left": 0,
+        "name": "Player sheet",
+        "right": 0
+      }
+    ]
+  }
+]

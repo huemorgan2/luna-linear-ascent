@@ -1,0 +1,22 @@
+........................................................................ [ 32%]
+....................
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! KeyboardInterrupt !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/Users/roy/.local/share/uv/python/cpython-3.12.13-macos-aarch64-none/lib/python3.12/selectors.py:566: KeyboardInterrupt
+(to show a full traceback on KeyboardInterrupt use --full-trace)
+92 passed in 1400.16s (0:23:20)
+Task exception was never retrieved
+future: <Task finished name='Task-5954' coro=<test_dues_clip_at_the_brim_without_arrears() done, defined at /Users/roy/Library/CloudStorage/GoogleDrive-vaselin@gmail.com/My Drive/my-projects/luna-linear-ascent/worldd/tests/test_banner_hall.py:142> exception=RuntimeError('Cannot send a request, as the client has been closed.')>
+Traceback (most recent call last):
+  File "/Users/roy/Library/CloudStorage/GoogleDrive-vaselin@gmail.com/My Drive/my-projects/luna-linear-ascent/worldd/tests/test_banner_hall.py", line 147, in test_dues_clip_at_the_brim_without_arrears
+  File "/Users/roy/Library/CloudStorage/GoogleDrive-vaselin@gmail.com/My Drive/my-projects/luna-linear-ascent/worldd/tests/test_banner_hall.py", line 45, in _crew
+  File "/Users/roy/Library/CloudStorage/GoogleDrive-vaselin@gmail.com/My Drive/my-projects/luna-linear-ascent/worldd/tests/test_multiplayer.py", line 39, in create_player
+  File "/Users/roy/Library/CloudStorage/GoogleDrive-vaselin@gmail.com/My Drive/my-projects/luna-linear-ascent/worldd/tests/test_world_api.py", line 43, in act
+  File "/Users/roy/Documents/my-projects-docs/luna-linear-ascent/worldd/.venv/lib/python3.12/site-packages/httpx/_client.py", line 1859, in post
+    return await self.request(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/roy/Documents/my-projects-docs/luna-linear-ascent/worldd/.venv/lib/python3.12/site-packages/httpx/_client.py", line 1540, in request
+    return await self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/roy/Documents/my-projects-docs/luna-linear-ascent/worldd/.venv/lib/python3.12/site-packages/httpx/_client.py", line 1616, in send
+    raise RuntimeError("Cannot send a request, as the client has been closed.")
+RuntimeError: Cannot send a request, as the client has been closed.

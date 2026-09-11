@@ -1,0 +1,108 @@
+FFFFFFFFF                                                                [100%]
+=================================== FAILURES ===================================
+______________________ test_victory_line_names_the_weapon ______________________
+
+    def test_victory_line_names_the_weapon():
+        p = at_gate_town(create_character(fresh()))
+        in_fight(p)
+        p["encounter"]["hp"] = 1
+        s = choose(p, "attack")
+>       assert any("no match for your" in ln for ln in s.body_lines)
+E       assert False
+E        +  where False = any(<generator object test_victory_line_names_the_weapon.<locals>.<genexpr> at 0x10b2d0ad0>)
+
+plugin-linear-ascent/tests/test_013_combat_feel.py:158: AssertionError
+______________________ test_fire_arrow_bursts_half_again _______________________
+
+>   ???
+E   assert 0 > 0
+E    +  where 0 = <function test_fire_arrow_bursts_half_again.<locals>._dmg at 0x10b379580>(nock=True)
+E    +  and   0 = <function test_fire_arrow_bursts_half_again.<locals>._dmg at 0x10b379580>(nock=False)
+
+/Users/roy/Library/CloudStorage/GoogleDrive-vaselin@gmail.com/My Drive/my-projects/luna-linear-ascent/plugin-linear-ascent/tests/test_017_death_relics.py:297: AssertionError
+______________ test_oil_buffs_ten_strikes_then_the_flask_is_gone _______________
+
+>   ???
+E   AssertionError: assert 10 == (10 - 1)
+E    +  where 10 = <function oil_left at 0x10a799300>({'act_seq': 13, 'bank': 0, 'bank_day': 253.2, 'charm_dur': 0, ...})
+E    +    where <function oil_left at 0x10a799300> = state.oil_left
+E    +  and   10 = economy.OIL_STRIKES
+
+/Users/roy/Library/CloudStorage/GoogleDrive-vaselin@gmail.com/My Drive/my-projects/luna-linear-ascent/plugin-linear-ascent/tests/test_017_death_relics.py:311: AssertionError
+______________________ test_kill_xp_still_accrues_at_cap _______________________
+
+>   ???
+E   AssertionError: assert {'atk': 6, 'attacked': True, 'breed': 'native', 'deep': False, ...} is None
+
+/Users/roy/Library/CloudStorage/GoogleDrive-vaselin@gmail.com/My Drive/my-projects/luna-linear-ascent/plugin-linear-ascent/tests/test_022_002_retune.py:220: AssertionError
+____________________ test_no_clazz_reads_outside_migrations ____________________
+
+>   ???
+E   AssertionError: scene.py:264: str(a.get("race") or ""), str(a.get("clazz") or "")) if x)
+E     render.py:1248: clazz = str(sheet.get("clazz") or "")
+E   assert not ['scene.py:264: str(a.get("race") or ""), str(a.get("clazz") or "")) if x)', 'render.py:1248: clazz = str(sheet.get("clazz") or "")']
+
+/Users/roy/Library/CloudStorage/GoogleDrive-vaselin@gmail.com/My Drive/my-projects/luna-linear-ascent/plugin-linear-ascent/tests/test_048_no_classes.py:103: AssertionError
+____________________ test_distance_move_and_chase_recorded _____________________
+
+    def test_distance_move_and_chase_recorded():
+        p = _climber(clazz="archer")
+        p["training"]["bow"] = 8
+        s, fl = _hunt(p, 7)
+        e = p["encounter"]
+        e["range"] = "at_range"; e["gap"] = 1
+        e["profile"] = {"type": "plain", "flying": False, "bulwark": False,
+                        "speed": 3}
+        e["hp"] = e["hp_max"] = 5000
+        s = combat.resolve_fight_action(p, fl, "create_distance")
+        ev = s.arena["events"]
+>       assert ev[0]["who"] == "me" and ev[0]["kind"] == "move"
+E       AssertionError: assert ('foe' == 'me'
+E
+E         - me
+E         + foe)
+
+plugin-linear-ascent/tests/test_067_arena.py:162: AssertionError
+___________ test_arrows_bind_on_the_road_and_the_quiver_spends_them ____________
+
+>   ???
+E   assert 5 == 4
+
+/Users/roy/Library/CloudStorage/GoogleDrive-vaselin@gmail.com/My Drive/my-projects/luna-linear-ascent/plugin-linear-ascent/tests/test_069_slots_not_pack.py:279: AssertionError
+_____________________ test_kill3d_card_ships_no_ending_gif _____________________
+
+    def test_kill3d_card_ships_no_ending_gif():
+        # PLAN4: where the 3D finisher plays, the old GIF ending is GONE —
+        # fx rides INSIDE the spec as the client's degrade slug, the card
+        # carries no reel, and the banner slot is bare black for the canvas.
+        p = _character("Sorrel")
+        s, _ = _hunt_victory(p)
+        assert s.fx is None
+        assert "fx" in s.kill3d                      # the degrade path's name
+        html = render_scene_fragment(s)
+>       assert 'class="banner"' in html              # the mount slot exists
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       assert 'class="banner"' in '<div class="card" data-scene="s19" data-loc="gate_town" data-rig3d="human:blade:gate_jerkin+gate_buckler+rusted_sword...D%222%22%20y%3D%2213%22%20width%3D%2212%22%20height%3D%221%22%2F%3E%3C%2Fsvg%3E\')"></span> level 4</span></div></div>'
+
+plugin-linear-ascent/tests/test_kill3d.py:76: AssertionError
+_______________ test_fragment_emits_data_kill3d_with_banner_tint _______________
+
+    def test_fragment_emits_data_kill3d_with_banner_tint():
+        p = _character("Moss")
+        s, _ = _hunt_victory(p)
+        html = render_scene_fragment(s)
+>       assert "data-kill3d=" in html
+E       assert 'data-kill3d=' in '<div class="card" data-scene="s19" data-loc="gate_town" data-rig3d="human:blade:gate_jerkin+gate_buckler+rusted_sword...D%222%22%20y%3D%2213%22%20width%3D%2212%22%20height%3D%221%22%2F%3E%3C%2Fsvg%3E\')"></span> level 4</span></div></div>'
+
+plugin-linear-ascent/tests/test_kill3d.py:91: AssertionError
+=========================== short test summary info ============================
+FAILED plugin-linear-ascent/tests/test_013_combat_feel.py::test_victory_line_names_the_weapon
+FAILED plugin-linear-ascent/tests/test_017_death_relics.py::test_fire_arrow_bursts_half_again
+FAILED plugin-linear-ascent/tests/test_017_death_relics.py::test_oil_buffs_ten_strikes_then_the_flask_is_gone
+FAILED plugin-linear-ascent/tests/test_022_002_retune.py::test_kill_xp_still_accrues_at_cap
+FAILED plugin-linear-ascent/tests/test_048_no_classes.py::test_no_clazz_reads_outside_migrations
+FAILED plugin-linear-ascent/tests/test_067_arena.py::test_distance_move_and_chase_recorded
+FAILED plugin-linear-ascent/tests/test_069_slots_not_pack.py::test_arrows_bind_on_the_road_and_the_quiver_spends_them
+FAILED plugin-linear-ascent/tests/test_kill3d.py::test_kill3d_card_ships_no_ending_gif
+FAILED plugin-linear-ascent/tests/test_kill3d.py::test_fragment_emits_data_kill3d_with_banner_tint
+9 failed in 8.71s

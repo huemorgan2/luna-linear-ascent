@@ -1,0 +1,20 @@
+[
+  {
+    "player": "owner",
+    "hp": 80,
+    "gold": 50,
+    "energy_val": 24.0,
+    "act_seq": 25,
+    "gear": {
+      "armor": "gate_jerkin",
+      "charm": null,
+      "shoes": null,
+      "shield": "gate_buckler",
+      "weapon": "rusted_sword"
+    },
+    "durability": {
+      "weapon": 1300
+    },
+    "location": "gate"
+  }
+]

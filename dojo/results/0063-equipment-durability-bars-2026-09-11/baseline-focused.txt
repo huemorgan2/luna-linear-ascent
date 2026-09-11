@@ -1,0 +1,11 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_arrows_bind_on_the_road_and_the_quiver_spends_them ____________
+
+>   ???
+E   assert 5 == 4
+
+/Users/roy/Library/CloudStorage/GoogleDrive-vaselin@gmail.com/My Drive/my-projects/luna-linear-ascent/plugin-linear-ascent/tests/test_069_slots_not_pack.py:279: AssertionError
+=========================== short test summary info ============================
+FAILED plugin-linear-ascent/tests/test_069_slots_not_pack.py::test_arrows_bind_on_the_road_and_the_quiver_spends_them
+1 failed in 22.69s
