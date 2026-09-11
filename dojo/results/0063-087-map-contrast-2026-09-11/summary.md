@@ -1,7 +1,7 @@
 # Dojo 0063 — floor-2 contrast preservation
 
 Date: 2026-09-11  
-Source parent: `cbe7c85`  
+Source parent: `cbe7c85`
 Source plugin: `c9877ae`  
 Stack: isolated worldd at `127.0.0.1:8610`, isolated QA Luna at `127.0.0.1:8800`, Chrome, disposable local databases
 
