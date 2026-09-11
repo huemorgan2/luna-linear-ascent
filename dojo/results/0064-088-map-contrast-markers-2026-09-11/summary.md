@@ -2,7 +2,7 @@
 
 Date: 2026-09-11
 
-Source parent: `3ace69f` plus release changes
+Source parent: `2f18569`
 
 Source plugin: `92c86b6f`
 
@@ -28,3 +28,5 @@ Regressions found: none.
 Out-of-world or free-formed-state moments: none.
 
 Recommendation: release 0.112.0.
+
+Production follow-up: PASS. Render deploy `dep-dai6lne743jc73d9rah0` reached live, `/health` reports 0.112.0, and all ten production map PNGs are byte-identical to the reviewed release.

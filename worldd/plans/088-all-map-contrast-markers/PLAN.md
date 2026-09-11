@@ -62,3 +62,7 @@ None. Production 0.111.1 is functional. This is a visual correction with no play
 ## Rollback
 
 Revert the plugin asset/UI/version commit and the parent vendor/pointer commit. If deployed, push the revert, trigger Render, poll until live, and verify the previous version plus all ten previous asset hashes. No database rollback is required.
+
+## Execution status
+
+Complete and deployed — 2026-09-12. Floors 3–10 now use direct BOX reduction plus one Bayer encoding, every map destination carries the reviewed stepped gold/black point, and production 0.112.0 serves all ten exact release assets. Phase evidence and the Chrome walkthrough are recorded below and in `dojo/results/0064-088-map-contrast-markers-2026-09-11/summary.md`.
