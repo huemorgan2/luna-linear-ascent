@@ -46,4 +46,4 @@ The Site is an isolated repository for publishing. Only that source is uploaded;
 
 ## Execution status
 
-Plan recorded; implementation not started.
+Research/reference work completed on 11 September 2026. Short reading note: `research/combat-atlas/SUMMARY.md`; detailed proposal: `research/combat-atlas/PLAN.md`. Independent Site source commit `abff00d2a6419d083aebbdcb596641f1d03965a6`, version 1 privately published at https://linear-ascent-combat-atlas.vaselin957545.chatgpt.site. Desktop/mobile browser walkthrough and arithmetic/build results are recorded in `research/combat-atlas/VALIDATION.md` and `verification/001-2026-09-11/summary.md`. Full generated-scaffold lint retains 19 inherited failures; authored-source lint, build and type checking passed. Screenshots are captured inline in the task. Remote publication succeeded; the browser requires owner sign-in. No game phase, migration, live combat or production rollout was executed.
