@@ -49,4 +49,4 @@ Revert the plugin asset/converter commit and parent vendor/pointer commit. This 
 
 ## Execution status
 
-Complete locally — 2026-09-11. Phase 1 selected direct BOX reduction and phase 2 integrated it as an explicit converter mode. Floor 2 now ships at SHA-256 `d5d46a03cc436ae3bbf7cd0365903b62a851529c9ee69ff0b05621d38b888f9e`; deployment evidence is recorded in phase 2.
+Complete and deployed — 2026-09-11. Phase 1 selected direct BOX reduction and phase 2 integrated it as an explicit converter mode. Production `0.111.1` serves floor 2 at SHA-256 `d5d46a03cc436ae3bbf7cd0365903b62a851529c9ee69ff0b05621d38b888f9e`; deployment evidence is recorded in phase 2.

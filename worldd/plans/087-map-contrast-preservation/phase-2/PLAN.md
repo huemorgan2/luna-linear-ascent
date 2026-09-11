@@ -32,4 +32,5 @@ Complete locally — 2026-09-11.
 - Chrome desktop and narrow-layout review passed. The source-scale dark lakes and shadow masses remain distinct, structures and roads remain legible, all five markers remain visible, and the output remains crisp two-color art.
 - QA Luna used this branch's plugin and isolated worldd. `Show me my current Linear Ascent scene. Do not choose an option.` called `ascent_scene`, rendered floor 2 without spending energy, and a plain-text `6` called `ascent_choose` and moved to the gate.
 - Local QA rollback: stop ports 8610/8800 and remove Docker container `ascent-map-contrast-qa` plus `/tmp/ascent-maps-qa87`; production rollback remains the commit revert described above.
-- Production deployment: pending.
+- Pushed plugin `c9877ae` and parent `cbe7c85` to their `main` branches. Render API deploy `dep-dai60h8jo6nc73fhvco0` reached `live` at 2026-09-11T20:15:27Z.
+- Post-deploy `/health` reports `ok: true`, `db: true`, and game `0.111.1`. The production versioned PNG is 492×369, fully opaque, exactly two colors, and byte-identical to the selected local asset at SHA-256 `d5d46a03cc436ae3bbf7cd0365903b62a851529c9ee69ff0b05621d38b888f9e`.
