@@ -12,7 +12,7 @@ Deliver the first reviewable playable slice: profile → collection → group op
 4. Implement the minimal coherent combat rules: independent reach/affinity, explicit Air Power exception, four gaps, partial shield protection/wear, one lasting effect and one push/control option. Carry HP, condition, cooldowns and supplies between enemies.
 5. Implement profile/collection/preview/battle/results screens through shared Scene/render/pane/tool contracts, following `PLAYER-EXPERIENCE.md`. Numbered replies, clicks, tap and keyboard use the same actions and instance IDs. Show actual paid-versus-exhausted state. Add per-hit resistance feedback from authoritative events: the Power shield or distinct Magic shield rises in pixels above the defender beside actual HP damage, with matching log text and a static reduced-motion alternative. Do not infer resistance from low damage alone.
 6. Connect real material rolls, dedicated material storage, +1 Forge upgrade, source condition, repair and zero-gold recovery. The outside card links to the Forge; transaction validation stays there.
-7. Adapt the existing headless policy to complete this exact slice. Test under an explicitly recorded QA frontier fixture so phase 3 does not claim multiplayer unlocks are implemented. Do not grant player gold/XP/energy to rescue the test. Show the working slice for review before expanding it.
+7. Adapt the existing headless policy to complete this exact slice. Test under an explicitly recorded QA frontier fixture so phase 3 does not claim multiplayer unlocks are implemented. Do not grant player gold/XP/energy to rescue the test. Verify the working slice before expanding it.
 
 ## Verification
 
@@ -32,4 +32,4 @@ Follow the [parent plan](../PLAN.md) and its ownership map. No new production ru
 
 ## Execution status
 
-Not started. Rewritten for the three-weapon/group design on12 September2026; awaiting the user's plan review. This document is not evidence that runtime changes or tests have run.
+Not started. Rewritten for the three-weapon/group design on12 September2026; authorized for implementation by the subsequent user request. This document is not evidence that runtime changes or tests have run.

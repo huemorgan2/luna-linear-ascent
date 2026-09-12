@@ -1,8 +1,8 @@
 # 015 — Three-weapon collections, group battles and progression
 
-12 September 2026 · Revision 2 · Branch: `change_everything`
+12 September 2026 · Revision 3 · Branch: `change_everything`
 
-**Ready for design review. Implementation has not started.** This replaces the original eight-phase implementation draft and its group addendum. The user asked to review the complete change before execution. No new combat rules, migrations, deployment or balance tuning are authorized by this planning task.
+**Execution authorized.** The user approved building the redesign, making implementation decisions autonomously, iterating game rules against trustworthy actual-engine simulations, and adding gathering sites to improve upgrade progression. Work remains phase-driven and verified; no phase is complete merely because its code exists. This revision supersedes the previous review hold and the exclusion of mining.
 
 ## The change to review
 
@@ -22,6 +22,8 @@ The first version is proposed as **sequential enemies**, with the next enemy vis
 | Wardens and endgame | All floors, including 100, use actual accepted attacks against shared HP that heals with time. Replace pledge and combined-power victory. |
 | Simulation and wiki | Execute the same game rules in headless runs; graph median and fastest observed progress, days per next floor, sustained hunting costs and measured concurrent player needs. Wiki and game use the same definitions. |
 
+Execution additions: [Gathering, investment and iterative tuning](EXECUTION-DECISIONS.md).
+
 Read [Player experience](PLAYER-EXPERIENCE.md) for the screens and example hunt, [Rules and migration](RULES-AND-MIGRATION.md) for combat/data contracts, and [Progression and simulation](PROGRESSION-AND-SIMULATION.md) for the curve, evidence and release gates.
 
 ## Decisions already given by the user
@@ -35,11 +37,11 @@ Read [Player experience](PLAYER-EXPERIENCE.md) for the screens and example hunt,
 - Distinct weapon families, four grades with different art and pixel frames, weapon levels 0–20, growing gold/material costs, source-specific starting levels/condition, and upgrades performed only in the Forge.
 - Clever deck building and farming should create substantial advantages. Do not equalize every weapon, route, drop probability or chance of winning.
 - Fast early improvement, followed by a gradual slowdown. The measured curve must emerge from legal play, not a graph drawn to a desired shape.
-- Wardens heal against actual concurrent damage; no stored pledges or timezone compensation. Mining remains separate in [plan 013](../013-mining-and-gathering/PLAN.md).
+- Wardens heal against actual concurrent damage; no stored pledges or timezone compensation. Gathering is now included: the eight-site outline in [plan 013](../013-mining-and-gathering/PLAN.md) is incorporated under the [execution decisions](EXECUTION-DECISIONS.md).
 
-## Concrete recommendations awaiting this review
+## Implementation decisions
 
-These are design choices, not assertions that the user already selected their exact details.
+The user now authorizes us to select and test these starting choices. Preserve the fixed user requirements and record evidence-driven revisions; do not stop for another design review of reversible implementation details.
 
 | Recommendation | Reason / consequence |
 |---|---|
@@ -73,7 +75,7 @@ The previous plan treated weapons, screens and economy as separate changes. Grou
 
 No production intervention. Completed simulator/research changes and their plugin dependency are committed and pushed. Historical runs, the old proposal simulator and published wiki stay identifiable. This revision prevents execution of the obsolete phase instructions; it makes no player-state changes.
 
-## Execution order after review
+## Execution order
 
 | Phase | Deliverable and gate |
 |---|---|
@@ -108,4 +110,4 @@ Checked all 27 plan/scenario documents, 49 local plan links, eight Goal/Steps/Ve
 
 ## Execution status
 
-**Planning revision complete; awaiting user review. Phases 1–8 not started.** The earlier research and simulator remain completed work, not evidence that this game redesign has shipped. No new gameplay, migration, balancing run, dojo playthrough or deployment was performed for this planning revision.
+**Execution started with plan revision 3.** Phase 1 is in progress; phases 2–8 follow their verified dependencies. The earlier research/simulator remain completed work, not evidence that the new game has shipped. Read EXECUTION-DECISIONS.md for gathering, investment and strategy-search scope. Every phase records code, tests, actual play, measurements and rollback before closure.

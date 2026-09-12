@@ -1,6 +1,8 @@
-# Mining and gathering — future project note
+# Mining and gathering — incorporated into the game redesign
 
-**Status: proposed, not started.** This is a separate project from the [weapon/material research](/Users/roy/Documents/my-projects-docs/luna-linear-ascent/research/weapon-upgrades/RESEARCH.md). Mining must not be required to ship or complete weapon progression. This note reserves the eight material sites and their intended loop; it does not authorize a production mutation or claim an executed phase.
+**Status: incorporated, implementation authorized.** [Plan015 execution decisions](../015-weapon-combat-progression/EXECUTION-DECISIONS.md) supersede this historical note’s separate-project restriction and define the exact current scope.
+
+**Historical proposal follows.** This is a separate project from the [weapon/material research](/Users/roy/Documents/my-projects-docs/luna-linear-ascent/research/weapon-upgrades/RESEARCH.md). Mining must not be required to ship or complete weapon progression. This note reserves the eight material sites and their intended loop; it does not authorize a production mutation or claim an executed phase.
 
 ## Problem, evidence, and timeline
 

@@ -32,4 +32,4 @@ Follow the [parent plan](../PLAN.md) and its ownership map. No new production ru
 
 ## Execution status
 
-Not started. Rewritten for the three-weapon/group design on12 September2026; awaiting the user's plan review. This document is not evidence that runtime changes or tests have run.
+Not started. Rewritten for the three-weapon/group design on12 September2026; authorized for implementation by the subsequent user request. This document is not evidence that runtime changes or tests have run.
