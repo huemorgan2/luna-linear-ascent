@@ -1,0 +1,77 @@
+{
+  "date": "2026-09-12T17:21:10.661Z",
+  "checks": [
+    {
+      "name": "Floor 6 / tactician",
+      "details": {
+        "visible": "Floor 6 / Preparation\n\nReached: 4 / 4 (100%)\n\nMean among reached: 56 days\n\nPopulation median: 40.3 days\n\nRestricted mean ≥ 56 days\n\nWarden Duskspin / Whole swarm\n\n17 qualified hunters\n\nRequired: 1 peers · observed cohort sufficient\n\nHP 289 · DEF 11\n\nHealing 0 HP/sec\n\nReference equipment benchmark\n\n2 peers\n\nNormal group wins: 62.5%\n\nReference FAILS hunting readiness. These are not qualified hunters.\n\nParty requires 3 / 3 successful trials.",
+        "expected": {
+          "players": 4,
+          "reached": 4,
+          "censored": 0,
+          "reach_fraction": 1,
+          "mean_days": 56,
+          "median_days": 55.83333333333333,
+          "p90_days": 74.83333333333333,
+          "population_median": 40.333333333333336,
+          "population_p90": 76.33333333333333,
+          "restricted_mean_days": 56,
+          "mean_active_minutes": 567.075,
+          "probe_win_rate": 0.875
+        }
+      }
+    },
+    {
+      "name": "Graph hover",
+      "details": {
+        "visible": "Floor 6\nTactician: 56 days",
+        "expectedMean": 56
+      }
+    },
+    {
+      "name": "Run comparison",
+      "details": "Dashed comparison: 20260912T171714Z-140fca47. Setting differences: Group hp scale 0.5 → 1."
+    },
+    {
+      "name": "Focus reached floors",
+      "details": "Floors 1–20"
+    },
+    {
+      "name": "Unreached floor 100",
+      "details": "Floor 100 / Preparation\n\nReached: 0 / 24 (0%)\n\nMean among reached: Not reached\n\nPopulation median: Not reached\n\nRestricted mean ≥ 120 days\n\nVharuk, the Demon King / Whole swarm\n\n0 qualified hunters\n\nRequired: no qualified players\n\nHP 95,227,900,133,612 · DEF 572,154,256,377\n\nHealing 2,859,237,393,161.5 HP/sec\n\nReference equipment benchmark\n\n53 peers\n\nNormal group wins: 25%\n\nReference FAILS hunting readiness. These are not qualified hunters.\n\nParty requires 3 / 3 successful trials."
+    },
+    {
+      "name": "Download / return to saved run",
+      "details": "20260912T171623Z-b5e298bf"
+    },
+    {
+      "name": "Invalid settings",
+      "details": {
+        "valid": false,
+        "message": "Value must be greater than or equal to 1."
+      }
+    },
+    {
+      "name": "Narrow overflow",
+      "details": {
+        "viewport": 390,
+        "body": 390,
+        "font": "VGA, monospace"
+      }
+    },
+    {
+      "name": "Browser errors",
+      "details": []
+    }
+  ],
+  "screenshots": [
+    "02-tooltip.png",
+    "03-charts.png",
+    "07-focused-charts.png",
+    "04-unreached-floor.png",
+    "01-desktop.png",
+    "05-mobile-top.png",
+    "06-mobile-chart.png"
+  ],
+  "status": "PASS"
+}

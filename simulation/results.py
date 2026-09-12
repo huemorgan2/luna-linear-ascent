@@ -44,6 +44,31 @@ def available_cpus():
     return os.cpu_count() or 1
 
 
+class CpuPool:
+    """One pool normally; Windows needs shards to exceed its 61-worker pool limit."""
+    def __init__(self, workers, config):
+        self.pools = []
+        self.workers, self.cursor = workers, 0
+        self.chunk = 61 if platform.system() == "Windows" else workers
+        try:
+            for start in range(0, workers, self.chunk):
+                self.pools.append(ProcessPoolExecutor(max_workers=min(self.chunk, workers-start),
+                    mp_context=multiprocessing.get_context("spawn"), initializer=_init_worker,
+                    initargs=(config.to_dict(),)))
+        except Exception:
+            self.shutdown()
+            raise
+
+    def submit(self, fn, *args):
+        pool = self.pools[(self.cursor % self.workers)//self.chunk]
+        self.cursor += 1
+        return pool.submit(fn, *args)
+
+    def shutdown(self):
+        for pool in self.pools:
+            pool.shutdown(wait=True, cancel_futures=True)
+
+
 def quantile(values, q):
     if not values:
         return None
@@ -105,8 +130,7 @@ def simulate(config, progress=None):
     try:
         if workers > 1:
             # Spawn avoids inheriting web-server locks and works on Linux, macOS and Windows.
-            pool = ProcessPoolExecutor(max_workers=workers, mp_context=multiprocessing.get_context("spawn"),
-                initializer=_init_worker, initargs=(config.to_dict(),))
+            pool = CpuPool(workers, config)
             futures = {pool.submit(_run_worker, i, config.policies[i % len(config.policies)]): i for i in range(config.players)}
             for n, future in enumerate(as_completed(futures), 1):
                 players[futures[future]] = future.result()
@@ -135,7 +159,7 @@ def simulate(config, progress=None):
                     progress(dict(stage="wardens", completed=f, total=config.max_floor, fraction=.8+.2*f/config.max_floor))
     finally:
         if pool:
-            pool.shutdown(wait=True, cancel_futures=True)
+            pool.shutdown()
     floors = aggregate(players, config)
     if code_hash() != source_hash:
         raise RuntimeError("Simulator source changed during this run; restart with a stable checkout")

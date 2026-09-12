@@ -2,4 +2,4 @@ __pycache__/
 *.pyc
 runs/*.json
 !runs/.gitkeep
-verification/*/*.png
+replay.json

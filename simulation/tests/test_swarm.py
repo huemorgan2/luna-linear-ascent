@@ -3,10 +3,11 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from simulation.bosses import battle, evaluate_floor, minimum_party, parameters
 from simulation.model import Config, Rules, new_player
-from simulation.results import aggregate, cohort_stats, save_run, simulate, validate_run
+from simulation.results import CpuPool, aggregate, cohort_stats, save_run, simulate, validate_run
 from simulation.swarm import readiness, reference_player, snapshot
 
 
@@ -54,11 +55,23 @@ class SwarmTests(unittest.TestCase):
     def test_parallel_matches_serial(self):
         cfg = dict(players=6, days=2, max_floor=6, readiness_trials=4, warden_trials=1)
         a = simulate({**cfg, "workers": 1})
-        b = simulate({**cfg, "workers": 3})
+        with patch("simulation.results.available_cpus", return_value=3):
+            b = simulate({**cfg, "workers": 0})
+        self.assertEqual(b["execution"]["workers"], 3)
         self.assertEqual(a["deterministic_sha256"], b["deterministic_sha256"])
         self.assertEqual(a["players"], b["players"])
         self.assertEqual(a["wardens"], b["wardens"])
         self.assertEqual([p["id"] for p in b["players"]], list(range(6)))
+
+    def test_many_cpu_windows_pool_shards(self):
+        # Verify dispatch past Python's per-pool limit without spawning 128 test processes.
+        with patch("simulation.results.platform.system", return_value="Windows"), patch("simulation.results.ProcessPoolExecutor") as executor:
+            pool = CpuPool(128, Config())
+            self.assertEqual([c.kwargs["max_workers"] for c in executor.call_args_list], [61,61,6])
+            for i in range(128):
+                pool.submit(str, i)
+            self.assertEqual(executor.return_value.submit.call_count, 128)
+            pool.shutdown()
 
     def test_run_roundtrip_and_validation(self):
         a = simulate(dict(players=1, days=1, max_floor=2, readiness_trials=4, warden_trials=1))

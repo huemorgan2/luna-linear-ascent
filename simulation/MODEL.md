@@ -31,7 +31,7 @@ Reference party demand uses explicit floor-reference gear and is labeled separat
 
 ## Honest graphs
 
-Report mean/median/P90 **among players who reached a floor**, alongside the fraction who reached it and the count still censored at the run horizon. Full-population median/P90 are null until that fraction reaches the corresponding quantile. Restricted mean time uses the run horizon for censored players and is explicitly a lower-bound horizon statistic, not a forecast of eventual completion. No late-floor line is extrapolated through missing results.
+Report mean/median/P90 **among players who reached a floor**, alongside the fraction who reached it and the count still censored at the run horizon. Full-population median/P90 use nearest rank (the empirical CDF inverse) and are null until that fraction reaches the corresponding quantile. The reached-only table uses interpolated quantiles; small cohorts can therefore have different medians even at full coverage. Restricted mean time uses the run horizon for censored players and is explicitly a lower-bound horizon statistic, not a forecast of eventual completion. No late-floor line is extrapolated through missing results.
 
 Readiness is checked at session boundaries when the gear/ammunition state changes; condition is bucketed in tenths and ammunition in sets of six to avoid repeating equivalent expensive probes. This can delay detection by a session or small condition changes. No milestone is awarded from a training win alone.
 
