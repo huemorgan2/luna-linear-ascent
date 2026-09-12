@@ -39,3 +39,11 @@ The wiki is public game documentation. Draft combat values must remain visibly d
 ## Execution status
 
 Plan committed before implementation. No code changed yet.
+
+## Scope addition — user follow-up before implementation of loot controls
+
+Add a full, image-bearing loot/settings section for all 425 hunt creatures and every floor, including each creature's current parameters and separate proposed material/weapon rarity probabilities. Show normal versus deep hunting and specimen effects explicitly. Percentages must distinguish independent material rolls from a single categorical weapon drop; show no-weapon probability. Retain nonzero but very rare early Epic finds. Reuse the earlier material progression knots, and expose all new coefficients as draft settings.
+
+Acquisition settings are per weapon family and source: shop starting levels Common0/Rare2/Epic4/Legendary6, full durability; hunt drops start at0 with Common40%/Rare30%/Epic20%/Legendary10% remaining durability. Shop unlocks at the starting-level gate, so Legendary+6 unlocks at floor84 rather than importing floor84 stats into floor76. Initial shop price includes the grade's acquisition and upgrade charges through the delivered level; do not charge upgrades twice. Show actual starting attack, durability, floor, price, source/eligible monster count and weight for all64 grade variants. Data settings must be editable in the checked-in model and validated by tests.
+
+Deep hunts increase high-grade material and weapon odds; species and specimen factors remain unequal. Explain whether a modifier changes encounter selection, rarity chance, bundle yield or wear. No proposed loot or acquisition setting changes live game drops in this documentation phase. Add browser checks for probabilities changing by floor/hunting mode, 64 acquisition rows and Legendary shop+6 versus drop+0/10% durability.
