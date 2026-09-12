@@ -82,6 +82,21 @@ After a kill, animate a brief defeat and focus the next portrait in the same res
 
 HP, ammo, shield/weapon condition, player statuses, cooldowns and group-level rescue limits persist. Each next enemy has an authored arrival distance, shown before it engages. Do not grant every bow a free Cover opener, and do not make every arrival Contact. A new enemy cannot strike before the player's first accepted action against it.
 
+### Resisted-hit feedback
+
+When a landed hit is weakened by resistance, show **why at the moment of impact**. A small, crisp pixel icon appears above the defender, floats upward and fades alongside the actual reduced damage number. On a monster it rises from that monster's portrait/body; on a player it rises from the player. It is hit feedback, in addition to the persistent type badge.
+
+| What actually reduced the hit | Feedback |
+|---|---|
+| Power resistance, such as an ordinary bow shot against a resistant monster | The game's Power shield icon rises in its established color, with the short label **Power resisted**. |
+| Magic resistance, such as a spell or arcane arrow against a resistant monster | A distinct pixel **magic shield**, using the game's Magic symbol/color and shield motif, rises with **Magic resisted**. |
+
+Show the damage that actually reached HP; the icon explains the small number without suggesting a complete block. Choose the icon from the resolved damage channel and resistance cause, not the weapon's appearance, rarity or the monster's badge alone. Arcane arrows use Magic feedback; the physical impact and Magic burn of a fire arrow can have different results. The Air Power spell-dispersal exception shows Magic resistance feedback when it reduces magic damage.
+
+Do not show a resistance icon merely because an attack was weak: misses, lack of reach, exhaustion, worn equipment, ordinary armor absorption and immunity have their own explanations. The same feedback can describe an existing player resistance without adding new player/PvP resistance rules.
+
+Keep the animation brief and nonblocking, synchronized with that hit and anchored to its defender even if the next group member appears. Preserve pixel edges rather than blur/glow. The combat log/text response also says **Power resisted — 3 damage** or **Magic resisted — 2 damage**, using real values. A reduced-motion setting shows the same icon/label without floating; meaning must remain clear on mobile and without animation or color. Re-rendering or retrying the same hit must not replay the popup as a new hit.
+
 ## Results, failure and reconnect
 
 | Event | Player-facing result |

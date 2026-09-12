@@ -16,7 +16,7 @@ The first version is proposed as **sequential enemies**, with the next enemy vis
 | Profile and equipment | Three always-available weapon cells, separate defensive gear, readable current condition and abilities. Open the collection from the profile or battle preparation. Remove School slot purchases and associated locks. |
 | Weapon collection | Browse everything owned; choose specific instances for three slots; compare role, reach, grade, level, durability and arrows. Selection stays fixed through the hunt. |
 | Encounter opening | Show the actual ordered group, images, affinities, flight, traits, arrival distance, possible drops and energy coverage before the first attack. |
-| Battle scene | One active enemy, group progress and next portrait; three weapon actions; visible gap, intent, effects and cooldowns. Preserve wounds, ammunition and wear between members. |
+| Battle scene | One active enemy, group progress and next portrait; three weapon actions; visible gap, intent, effects and cooldowns. When resistance reduces a hit, its pixel shield or magic-shield icon rises above the defender alongside the actual damage. Preserve wounds, ammunition and wear between members. |
 | Rewards and recovery | One energy when each enemy begins; meaningful exhaustion at zero; XP immediately per kill; gold/materials/items pending until the full group is defeated. Retreat/death keeps earned XP and forfeits the pending haul. |
 | World content and economy | Retain 16 families / 64 grade variants and 425 creatures; +0–20 upgrades, eight materials, source-specific condition and levels, unequal routes and drops, and Forge-only upgrading. |
 | Wardens and endgame | All floors, including 100, use actual accepted attacks against shared HP that heals with time. Replace pledge and combined-power victory. |
@@ -31,6 +31,7 @@ Read [Player experience](PLAYER-EXPERIENCE.md) for the screens and example hunt,
 - Normal and deep hunts cost **one energy per enemy when its fight begins**. No whole-group prepayment. With two energy against five enemies, the first two are normal and the later three significantly weaker, assuming no regeneration. Leaving avoids charges for unstarted enemies.
 - XP is earned per kill. Gold requires defeating the whole group. This plan recommends putting material/item drops in that same final haul.
 - Common / Power / Magic is separate from Ground / Air. Give monsters readable counters and traits, and retain the large, visually varied roster.
+- Make resisted hits visible: a pixel shield rises from the monster when Power resistance reduces an ordinary bow/physical hit; a distinct pixel magic shield rises when Magic resistance reduces a spell or magic hit. Anchor feedback to the actual defender, including the player when their existing defenses apply.
 - Distinct weapon families, four grades with different art and pixel frames, weapon levels 0–20, growing gold/material costs, source-specific starting levels/condition, and upgrades performed only in the Forge.
 - Clever deck building and farming should create substantial advantages. Do not equalize every weapon, route, drop probability or chance of winning.
 - Fast early improvement, followed by a gradual slowdown. The measured curve must emerge from legal play, not a graph drawn to a desired shape.

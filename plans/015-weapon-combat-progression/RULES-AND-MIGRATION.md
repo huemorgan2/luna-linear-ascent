@@ -90,6 +90,12 @@ All bows may use ordinary, arcane, poison, fire, pinning and concussive arrows. 
 
 A direct action resolves validation/start → direct hit → landed-hit effects → pre-existing DoTs → surviving enemy action/pursuit → expiry/outcome. Pin death order and whether a killed enemy can act; do not carry a dead member's intent to the next member. Boss status clocks are separate timestamped service rules, independent of the number of attackers.
 
+### Resistance events for presentation
+
+The authoritative combat result must expose the actual damage channel, defender ID, applied resistance cause and final HP damage for each hit/tick, tied to a stable combat-event ID. The shared Scene/card/tool payload carries that explanation to web and Luna. The renderer maps a resolved Power-resistance reduction to the pixel shield and a Magic-resistance reduction to the pixel magic shield, then animates it upward from the defender with the damage number. It does not infer resistance from a low damage value or recalculate combat math.
+
+Emit resistance feedback only when that resistance genuinely contributes to reducing the resolved hit. Preserve channel/cause per component for mixed-channel arrows and later damage ticks. Keep armor/shield absorption, exhaustion, miss, immunity and unreachable-target explanations separate; the small damage number must not falsely imply a full block. Event identity and defender anchoring prevent duplicate popups on reconnect and feedback appearing over the next enemy. Persistent logs and static/reduced-motion presentation retain the same cause and amount. This changes presentation contracts, not damage coefficients or player/PvP resistance rules.
+
 ## Sources, materials and upgrades
 
 Use per-family acquisition settings from wiki revision `089.3` as candidates, not hardcoded rarity-wide logic. All 64 records need explicit gates, delivered condition, cost and art.
