@@ -1,23 +1,23 @@
-# S06 — Forge, inventory and accessibility
+# S06 — Forge/source settings and concurrent item actions
 
 ## Preconditions
 
-All64 variants, materials, +0/+19/+20 instances, two tabs and two QA players.
+Phases 3,4,7. Common+0/+19/+20, damaged/broken items and a Legendary shop/drop pair; exact known materials/gold; two clients on the same owner.
 
 ## Scenario
 
-Inspect through hover, focus and tap; attempt upgrade outside the Forge and during combat. At the Forge, retry one request and submit competing quotes from two tabs. Try insufficient materials/gold, a stale item version, +20 and another player's instance.
+Open upgrade details from profile/collection; navigate to Forge, request the same upgrade twice from two tabs, try insufficient resources and a stale quote. Upgrade a damaged/broken weapon. Inspect shop/craft/drop +level and condition. Try upgrading a committed group weapon.
 
 ## Expected behavior
 
-Only a valid Forge transaction upgrades once. Every surface shows the same grade art, condition and owned/needed values. Selecting an upgrade never reserves the same materials on every card.
+Only Forge can perform the transaction. One level/cost is applied once; +20 is explicit; condition fraction is preserved. Shop Legendary+6/full and dropped+0/10% show their actual gates/stats. A committed weapon cannot be changed mid-group.
 
 ## Fail conditions
 
-Double charge, free/remote upgrade, ownership leak, stale quotes accepted incorrectly, invented attack delta on a durability-only level, or unreadable phone controls.
+Remote card upgrade, duplicate deduction, full repair hidden in an upgrade, double honing multiplier, source gates bypassed, wrong item instance, or a broken item becoming usable without repair.
 
 ## Verify
 
-Inspect transaction receipts and both players' inventories, plus desktop and390px screenshots. Verify all 64 drawings and all 84 level states through data and representative UI cases.
+Check quote/rules/instance revisions, paired material and gold deltas, level/endurance and transaction deduplication; verify the card and text reply match.
 
-Record SHAs, environment, PASS/FAIL with notes, screenshots and any regressions in a numbered dojo results folder. Fix failures and rerun the affected scenario before marking its phase complete.
+The LLM tester walks the real browser, reads the DOM and screenshots, and records PASS/FAIL with evidence. Coded checks complement this walkthrough. Record date, root/plugin/client SHAs, environment, accounts/fixtures, timings, screenshots and regressions in a numbered results folder; file failures before fixing and rerun the affected scenario. This scenario is planned, not executed by the current documentation revision.

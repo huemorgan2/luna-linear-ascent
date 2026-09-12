@@ -1,23 +1,23 @@
-# S05 — Create an opening and survive a hit
+# S05 — Movement, effects, shields and arrivals
 
 ## Preconditions
 
-Ramguard, a carried bow, ordinary/steadfast enemies and a shield with known current endurance.
+Phases 3,4,7. Candidate push/bow/poison/stun weapons, full and broken shields, ground pursuer, fast flyer and immune creatures; known authored next arrival gap.
 
 ## Scenario
 
-Push an ordinary ground enemy, then take a paid bow shot; repeat and escape instead. Try pushing a steadfast enemy. Use Shield wall at several defenses and repeat with a broken shield.
+Push then fire a bow, push then escape, poison then switch, chain stun attempts, guard with strong Shield wall, and fight the next member without resetting resources. Repeat against an immunity and while exhausted.
 
 ## Expected behavior
 
-A successful push creates a usable distance opening. Speed changes retreat/escape. A landed covered hit still reaches HP; wear matches only shield absorption.
+Push opens an opportunity for the next normal combat action; flight closes distance faster; effects tick on their specified phases; shared resistance prevents permanent control. Landed hits leak HP, shield wear equals only absorption, and next arrivals obey their preview.
 
 ## Fail conditions
 
-Free extra attacks; instantaneous pursuit erases every push benefit; permanent kiting/stun; full Shield wall immunity; armor/barrier absorption is charged to shield.
+Zero HP loss from Shield wall, shield wear for a dodge, effects doubled by switching/exhaustion, free attack/heal/cooldown reset on kill, or all arrivals silently at Cover.
 
 ## Verify
 
-Verify gap, action costs, clocks and allocation. For the documented raw100/armor40/shield80 fixture, expect armor20, shield40, HP40 and shield wear40 before other explicitly modeled modifiers.
+Compare displayed damage/absorption/wear/gap and status durations to engine receipts. Pin small-number rounding and effect death-order examples in coded tests.
 
-Record SHAs, environment, PASS/FAIL with notes, screenshots and any regressions in a numbered dojo results folder. Fix failures and rerun the affected scenario before marking its phase complete.
+The LLM tester walks the real browser, reads the DOM and screenshots, and records PASS/FAIL with evidence. Coded checks complement this walkthrough. Record date, root/plugin/client SHAs, environment, accounts/fixtures, timings, screenshots and regressions in a numbered results folder; file failures before fixing and rerun the affected scenario. This scenario is planned, not executed by the current documentation revision.

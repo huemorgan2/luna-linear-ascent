@@ -1,23 +1,23 @@
-# S07 — Sources and grade transitions
+# S07 — Material routes, grade access and recovery
 
 ## Preconditions
 
-Candidate characters at 25/26,50/51,75/76 and shop gates28/57/84; early-discovery fixtures.
+Phases 4,5,7. Legally derived reference saves near25→26,50→51,75→76 and shop gates28/57/84, plus fresh/zero-gold/broken-weapon accounts. Fixture provenance is stated; they are not calendar-progression results.
 
 ## Scenario
 
-Buy, receive a monster drop and craft each grade. Compare Common+19 with a new-grade item by actual stats. Attempt to equip an early Epic/Legendary discovery, then reach its legal gate.
+Use a previous-grade deck to collect both native materials, craft+0 before higher-rank stock, compare normal/deep/species routes and recover from a broken main weapon. Inspect an early high-grade discovery and its equip gate.
 
 ## Expected behavior
 
-Bought ranks are0/2/4/6 at full condition; drops+0 at 40/30/20/10%; craft+0/full at 1/26/51/76. Both recipe materials are available; stats make grade differences understandable.
+Both materials and a viable counter are obtainable before they are mandatory. Crafting bridges shop gates, repaired drops have meaningful value, and preparation changes net costs/rewards. No mandatory lucky item drop.
 
 ## Fail conditions
 
-A mandatory transition depends only on winning a weapon lottery; shop+6 power is released at 76 instead of84; early finds secretly bypass gates; sources report incorrect condition.
+Circular acquisition gate, one missing material carrier, unaffordable unavoidable repair with no recovery route, identical grade art, or collection ownership bypassing equip/travel requirements.
 
 ## Verify
 
-Reconcile source records, purchase prices including delivered levels, repair quotes, instance ownership and reachable material/counter routes.
+Trace secured material pairs, recipe/craft/shop/repair gold and remaining deck capability. Compare actual game/source/wiki records and source-specific condition.
 
-Record SHAs, environment, PASS/FAIL with notes, screenshots and any regressions in a numbered dojo results folder. Fix failures and rerun the affected scenario before marking its phase complete.
+The LLM tester walks the real browser, reads the DOM and screenshots, and records PASS/FAIL with evidence. Coded checks complement this walkthrough. Record date, root/plugin/client SHAs, environment, accounts/fixtures, timings, screenshots and regressions in a numbered results folder; file failures before fixing and rerun the affected scenario. This scenario is planned, not executed by the current documentation revision.

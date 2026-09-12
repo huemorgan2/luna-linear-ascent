@@ -1,10 +1,12 @@
 # Combat expansion — read this first
 
+**Current implementation roadmap: [plan 015, revision 2](../../plans/015-weapon-combat-progression/PLAN.md), on `change_everything`.** All eight phases and fourteen browser scenarios are now rewritten for the three-weapon collection, sequential groups, per-enemy energy, XP/haul separation, complete screen flows, real-engine simulation and concurrent healing wardens. The plan and its concrete recommendations are ready for user review; implementation has not started.
+
 **Latest research: [Three-weapon decks and monster groups](DECKS-AND-MONSTER-GROUPS.md).** Three battle slots are available from the start; School slot purchases are removed. Weapons have deliberately unequal matchups. The recommended hunt is one continuous sequence of at least two enemies, with XP earned per kill and gold/materials/items secured after the complete group. It covers deck choices, floor progression, energy, overflow XP, loot, migration and validation. These are design changes, not live gameplay.
 
 **Updated energy rule:** one energy is spent when each enemy's fight begins, in normal and deep hunts. Unstarted enemies cost nothing when the player leaves. With two energy against five enemies, the first two are fought normally and the last three exhausted, assuming no regeneration. Zero energy permits continued fighting with significantly reduced performance; the proposed penalty is half outgoing damage and minus two speed. The rule comes from the user; these exact penalty numbers still need testing.
 
-The earlier [plan015: weapons, combat and player progression](../../plans/015-weapon-combat-progression/PLAN.md) has eight phases and nine browser scenarios. Its phases and acceptance gates now need rebasing around groups and three-weapon ownership before execution. Runtime implementation has not started. The research above takes precedence over the earlier single-enemy implementation order below.
+The historical research below provides weapon and combat candidates. The revised plan takes precedence for execution order, group-level verification, player experience and progression targets. Its [player flow](../../plans/015-weapon-combat-progression/PLAYER-EXPERIENCE.md) and [progression review](../../plans/015-weapon-combat-progression/PROGRESSION-AND-SIMULATION.md) describe the complete change.
 
 The current visual reference is the [game wiki](https://linearascent.net/wiki), published12 September2026. It contains425 authored creatures, full rarity drop tables, deep-hunt modifiers and64 weapon source settings. See [Wiki loot and sources](WIKI-LOOT-AND-SOURCES.md) for this follow-up; it supersedes the eight-creature prototype.
 

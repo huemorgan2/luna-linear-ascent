@@ -1,30 +1,35 @@
-# Phase 4 — All weapon families, creatures and combat rules
+# Phase 4 — Full arsenal, bestiary and routes
 
 ## Goal
 
-Extend the proven loop to all 16 families,64 grade variants and425 authored creatures without multiplying old/new type modifiers or losing readability.
+Expand the working group loop to all 16 families / 64 grade variants and 425 authored creatures, with meaningful unequal niches, readable images/traits, valid sources and a matching generated wiki.
 
 ## Steps
 
-1. Implement poison, burn, bleed, push, stun, slow and Expose with one documented action order. New DoTs first tick on the next enemy phase. Effects refresh under their stated limits; an immune target remains immune.
-2. Implement all six arrow payloads, techniques and cooldowns. One accepted shot consumes one arrow even on a miss; rejected actions consume none. Switching gear cannot reset cooldowns or award free actions.
-3. Preserve authored body/bite/specimen differences while assigning fixed movement/affinity/traits. Expand floors through content bands; no eight-image replacement roster or unrestricted universal reskins.
-4. Complete all 64 weapon definitions and their Forge/source display, frames and drawings. Every family needs at least one intentional tactical or resource role and a meaningful weakness.
-5. Update pack, shop, loot, death, Forge, combat, tool descriptions and encyclopedia from the same definitions. Retain16px game typography, game icons, keyboard/tap access and open selectors of six or fewer options.
-6. Keep any new monster-specific control behavior out of PvP until explicit PvP rules are verified; item/stat compatibility is still required.
+1. Port approved family/grade/source/art records from wiki model revision089.3 into canonical runtime definitions. Extend lint/schema checks for distinct images, material/icon/frame mapping, grades, +0–20, probabilities and source gates. Preserve the original creature roster and neighboring variant/biome identities.
+2. Implement all seven effects and six arrow payloads, source snapshots, exact timing, immunities, cooldown carry-over, control resistance and condition-dependent stats. Avoid double old/new type multipliers, double exhaustion and percent-max-HP boss damage.
+3. Author groups/trails over floors1–100 using real local creature IDs. Candidate ranges: 2 on1–3; 2–3 on4–10; 2–4 on11–25; 3–4 on26–50; 3–5 on51–75; 3–6 on76–100. Keep shorter later routes. Do not multiply count by old full-monster threat/payout blindly.
+4. Configure group arrival gaps and durable/fragile/fast roles. Ordinary and deep mode use one energy per begun enemy; deep danger, specimen mix and each rarity premium remain separate. No hidden deck-dependent counter-spawning or free preview rerolls.
+5. Wire per-enemy independent material grades and categorical item rolls with actual family/carrier weights, source-specific +level/condition and Forge crafting at grade transitions. Update all reward, pawn, storage, trade/gift and equipment consumers.
+6. Generate wiki/art payloads from the runtime definitions, with full creature parameters, individual/group conditional odds, deck coverage, acquisition and Forge recipes. Mark any unreleased settings as proposed. Audit avatars/3D weapons and fallback images so grade selection does not revert to one drawing.
+7. Prove each family has a useful tested context; document blind spots and cost. Do not require equal win rates. Two-active-enemy waves remain an optional future prototype outside the release gate.
 
 ## Verification
 
-Run the content lint and full catalog/instance checks. Exhaustively validate legal reach, effect timing, counters, 84 upgrade states and all 425 species; use end-to-end encounters to test their combinations. Run dojo S04/S05/S06, including Ramguard push → paid bow shot/escape, spell-dispersing flyers, poison immunity, Shield wall and max-grade art. Inspect event logs rather than just final HP.
+Run content lint and `python3 worldd/tools/gen_wiki.py --check` after the generator reads runtime definitions; add exact distribution tests for caps/no-drop/family weights and integer/rounding tests for statuses. S04/S05/S07/S12 verify contrasting decks, push→bow/escape, poison→switch, repeated stun resistance, source gates25→26/50→51/75→76, paid Legendary+6 versus dropped+0/10%, all425 IDs/images and floor-slider changes. Review a coverage table per family/route and group duration/action distributions. Required full engine/service/simulator suites follow targeted tests.
+
+All commands are future implementation verification, not actions performed by this planning revision. New test/tool interfaces named conceptually must be implemented and their actual commands recorded before use. Never point worldd tests at production. See [scenario index](../DOJO-SCENARIOS.md).
 
 ## Rollback
 
-Revert the content/combat/UI implementation as a unit in QA. Preserve readers and asset history. Do not run different damage-rule versions against one shared warden.
+Revert candidate content/effect/art/wiki commits in QA in reverse order while retaining state compatibility. Pin the prior content/rules revision for already-started groups and outstanding quotes; never reinterpret pending loot with a different probability table. Keep newly owned item records readable and reconcile any necessary conversion through receipts.
+
+For each implementation commit, record its exact SHA and the reverse-order `git revert` sequence before starting the next phase. Data-changing operations require their tested compensating commands and receipt IDs before execution. Keep all new-format data readable.
 
 ## Operational notes
 
-This is future work. Planned harness/tool paths named above must be implemented before their commands can run. Record exact implementation SHAs, deployed revisions and any migration arguments before executing a release or conversion. The plugin owns engine/content/cards; worldd owns authoritative shared state. Both inherit the versioned definitions. See the parent plan and DOJO-SCENARIOS.md.
+Follow the [parent plan](../PLAN.md) and its ownership map. No new production rules during phases2–7. Run targeted checks before full relevant suites; preserve existing work and source-pinned evidence. A real browser/Luna walkthrough is required before reporting an implementation phase complete.
 
 ## Execution status
 
-Not started. This planning task does not claim runtime verification.
+Not started. Rewritten for the three-weapon/group design on12 September2026; awaiting the user's plan review. This document is not evidence that runtime changes or tests have run.

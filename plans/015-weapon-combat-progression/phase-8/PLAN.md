@@ -1,30 +1,35 @@
-# Phase 8 — Controlled release and progression monitoring
+# Phase 8 — Explicit release and measured rollout
 
 ## Goal
 
-Publish one coherent ruleset, preserve existing players and verify both immediate reliability and actual progression before considering the redesign fully accepted.
+Release one coherent, source-pinned game after review and verification, preserving player investment and confirming both new/returning play and shared wardens on the actual serving system.
 
 ## Steps
 
-1. Record release SHAs, migrations, active-world conversion boundary, compatibility matrix and exact rollback/compensation commands. Secret-scan every commit.
-2. Canary in an isolated QA world using production code paths, with new and migrated players and simultaneous attacks. Do not mix candidate and legacy participants against the same production boss.
-3. Publish matching plugin, vendor, server, card/tool assets and generated wiki definitions. Keep the existing single-instance topology. Push and trigger the Render deploy explicitly, then poll to live and check the actual serving revision/health.
-4. Perform immediate public smoke checks and the authorized production verification scenarios. Confirm ownership, quotes, material counts, accepted hits and one-time receipts.
-5. Evaluate first-session results and repeated24-hour/7-day cohort reports: upgrade pace, resource stalls, repair share, ordinary/deep deaths, weapon use and raid attempts. Synthetic late-floor fixtures remain necessary before real players reach the end.
-6. Stop expansion or disable affected mutations on duplicate charges/rewards, lost items, migration corruption, impossible required progression or a reproducible solo finale. Tuning ordinary inefficiencies must not erase a valid clever strategy.
+1. Require phase1–7 reports, approved rules/target decisions, rollback runbook and source/art/content manifests. Inventory production active fights/wounds/pledges and snapshot before the planned conversion. Snapshot is evidence/recovery input, not permission to overwrite later progress.
+2. Canary the complete release in an isolated QA world; verify health, new-account opening, migration and a shared warden. Do not mix old/new rules among players damaging the same boss.
+3. Commit plugin implementation first; push its branch/revision; update and commit parent submodule/vendor, service, clients and generated wiki together. Run secret-pattern scans and all required release checks before commits.
+4. Deploy only after explicit release authorization: push intended release revision, trigger the deployment API, poll serving revision/health, execute the reviewed migration boundary and verify receipts. The current planning-task push is not this deployment.
+5. Immediately verify real opening/profile/collection/group/Forge/reconnect and two-player warden behavior. Verify the service imports the pinned game path/hash and wiki labels reflect implemented rules.
+6. Observe group clear/escape/death rates, net recovery cost, exhausted kills, duplicate/refused actions, stalled floor/material gates, deck/route choices and actual warden demand. Compare the reviewed schedule/cohort to its predictions; do not disguise population differences as balance improvement.
+7. Pause new candidate entries and execute the tested rollback path if ownership/reward integrity fails. Investigate pacing deviations before changing coefficients; version future tuning. Append execution evidence and deployed SHAs to every phase.
 
 ## Verification
 
-Release evidence includes exact deployed SHAs, health/game/wiki versions, canary and post-deploy dojo results, migration reconciliation and signed-off acceptance reports. Compare real cohorts to equivalent simulated cohorts rather than their raw averages. Rebalance by versioned coefficients with recorded reasons; never silently modify paid levels or settled rewards.
+Use the exact deployment, health, migration/reconciliation and rollback commands recorded in phase7 for the chosen environment. Do not substitute hypothetical endpoints. Run S14 post-deploy on authorized test accounts, inspect persisted receipts and actual serving version, and record response times/screenshots. Verify monitoring covers lost/duplicate rewards and zero-resource recovery as well as HTTP health. Keep production data and historical kills/eras intact.
+
+All commands are future implementation verification, not actions performed by this planning revision. New test/tool interfaces named conceptually must be implemented and their actual commands recorded before use. Never point worldd tests at production. See [scenario index](../DOJO-SCENARIOS.md).
 
 ## Rollback
 
-Use the pre-recorded compatible application rollback while retaining new-schema readers and append-only receipts. Disable unsafe new mutations and issue idempotent compensating refunds where warranted. Preserve all earned progress and completed boss/era outcomes. Restoring a whole old database is not a valid rollback after new writes.
+Execute the phase7 rehearsed runbook: stop new candidate entries, retain readers, drain/settle groups once, compensate selected receipts and revert routing/version at the recorded world boundary. Roll back the release through the recorded deployment API/revision if compatible. Never restore an old database over new progress, duplicate compensation, or reopen a closed rewarded era. Record every operation and post-rollback verification.
+
+For each implementation commit, record its exact SHA and the reverse-order `git revert` sequence before starting the next phase. Data-changing operations require their tested compensating commands and receipt IDs before execution. Keep all new-format data readable.
 
 ## Operational notes
 
-This is future work. Planned harness/tool paths named above must be implemented before their commands can run. Record exact implementation SHAs, deployed revisions and any migration arguments before executing a release or conversion. The plugin owns engine/content/cards; worldd owns authoritative shared state. Both inherit the versioned definitions. See the parent plan and DOJO-SCENARIOS.md.
+Follow the [parent plan](../PLAN.md) and its ownership map. No new production rules during phases2–7. Run targeted checks before full relevant suites; preserve existing work and source-pinned evidence. A real browser/Luna walkthrough is required before reporting an implementation phase complete.
 
 ## Execution status
 
-Not started. This planning task does not claim runtime verification.
+Not started. Rewritten for the three-weapon/group design on12 September2026; awaiting the user's plan review. This document is not evidence that runtime changes or tests have run.

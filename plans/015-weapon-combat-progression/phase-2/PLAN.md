@@ -1,29 +1,34 @@
-# Phase 2 — Shared definitions and migration preparation
+# Phase 2 — Item instances, fixed decks and safe state
 
 ## Goal
 
-Represent all weapon instances and monster traits without corrupting old saves. One definition must drive engine, cards and wiki. No player loses paid power or has several old copies collapsed into one.
+Implement versioned item/deck/group/receipt state in QA with exactly three available slots and no lost or duplicated ownership. Both backends must accept the same valid actions and refuse the same invalid ones before the group loop is enabled.
 
 ## Steps
 
-1. Define item instance IDs, family, grade,upgrade level, current/max endurance, effective progression floor, recipe version and conversion provenance. Preserve the ten equipment bands separately.
-2. Define movement, defensive affinity, outgoing channel and traits independently. Import the64 approved art mappings and425 species records. The new three mauls must enter the canonical game asset distribution, including inventory-size assets.
-3. Add versioned readers and migration previews for equipped/held gear, pack, faction storage, pawn/offers, gifts and pending rewards. Resolve instance ownership in local and HTTP backends. List every consumer, including PvP.
-4. Add a planned `tools/progression/migrate.py` dry-run/report tool. Preserve legacy items when conversion cannot be fair; freeze death, condition, transfer and repair policy in its schema contract. Weapon honing remains only on unconverted legacy calculations.
-5. Ensure old clients cannot mutate new instances through slug-only payloads. Produce an item-by-item reconciliation and rollback design before any live conversion.
+1. Implement the contracts in `RULES-AND-MIGRATION.md` in the plugin state/content/core and worldd ownership/persistence paths. IDs distinguish duplicate families and conditions; keep ten equipment bands, storage rules and unrelated defensive slots separate.
+2. Set three available battle cells in creation and migration; remove School carry offers/fees/locks in all action and text paths. Replace first-held-family attack lookup with explicit selected-instance actions. Keep a compatibility reader for old documents and old active fights.
+3. Add persisted offers, group/member lifecycle, deck locks, energy/kill/settlement receipt identities and XP reserve accounting. New instance/receipt fields must serialize losslessly, including large numbers.
+4. Implement read-only conversion preview and reconciliation tooling (new tool path/CLI to be recorded before use). Audit old honing/style/oils, storage/pawn/gifts/faction assets and paid `carry 2`/`carry 3` receipts. Draft exact/capped fallback compensation from evidence; no production apply.
+5. Add local/HTTP contracts for ownership, stale actions, duplicate receipt IDs, XP overflow/spending/cap30 and invalid deck changes. Add tests for serializers, profile visibility and tool payloads.
+6. Commit plugin first, pin root submodule/vendor and matching service schema. Candidate rules remain isolated in QA; do not expose half-converted production players.
 
 ## Verification
 
-Run `python tools/progression/migrate.py --dry-run --fixtures tests/015-weapon-combat-progression/fixtures --report output/progression/migration.json` after creating the planned tool. Check every current weapon record, duplicated copies, all storage locations, hone/style/oil/wear extremes and missing optional fields. A second dry run produces the same mapping. Run dojo S02; both backends must pass the same inventory contracts.
+Create targeted tests for the new instance/deck/migration contracts, then run them in both backends. Existing regression entry points include `PYTHONPATH=plugin-linear-ascent python3 -m pytest plugin-linear-ascent/tests/test_069_slots_not_pack.py -q` and, from `worldd`, `python3 -m pytest tests/test_web_play.py -q` against an isolated test database. Update old assertions only for explicitly changed contracts. S02/S10 inspect one/two/three-slot saves, two same-family weapons, complete ownership reconciliation, third-slot refund once and a read-only second player's profile. Run the phase's required full suites.
+
+All commands are future implementation verification, not actions performed by this planning revision. New test/tool interfaces named conceptually must be implemented and their actual commands recorded before use. Never point worldd tests at production. See [scenario index](../DOJO-SCENARIOS.md).
 
 ## Rollback
 
-Before enabling new writes, revert the adapters and keep original documents. After any new-format writes, retain compatibility readers and receipts; disable new mutations rather than restoring stale whole-player documents. Document exact compensating migration commands once the schema is implemented, before conversion is allowed.
+Disable candidate mutations in QA. Revert this phase's engine/UI commits in reverse order, retaining compatibility readers and original save fields if any candidate writes occurred. Reconcile ownership and XP from receipts; never replace a progressed player with a preview snapshot. Record concrete migration preview/apply/compensate command syntax and receipt selectors before phase 7 can execute conversion.
+
+For each implementation commit, record its exact SHA and the reverse-order `git revert` sequence before starting the next phase. Data-changing operations require their tested compensating commands and receipt IDs before execution. Keep all new-format data readable.
 
 ## Operational notes
 
-This is future work. Planned harness/tool paths named above must be implemented before their commands can run. Record exact implementation SHAs, deployed revisions and any migration arguments before executing a release or conversion. The plugin owns engine/content/cards; worldd owns authoritative shared state. Both inherit the versioned definitions. See the parent plan and DOJO-SCENARIOS.md.
+Follow the [parent plan](../PLAN.md) and its ownership map. No new production rules during phases2–7. Run targeted checks before full relevant suites; preserve existing work and source-pinned evidence. A real browser/Luna walkthrough is required before reporting an implementation phase complete.
 
 ## Execution status
 
-Not started. This planning task does not claim runtime verification.
+Not started. Rewritten for the three-weapon/group design on12 September2026; awaiting the user's plan review. This document is not evidence that runtime changes or tests have run.

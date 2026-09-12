@@ -1,155 +1,110 @@
-# 015 — weapons, combat and player progression
+# 015 — Three-weapon collections, group battles and progression
 
-12 September 2026. **Implementation draft requiring a phase rebase; runtime work has not started.** The public wiki is a design reference, not evidence that its combat, loot or Forge rules already run in the game.
+12 September 2026 · Revision 2 · Branch: `change_everything`
 
-## Scope revision — fixed decks and monster groups
+**Ready for design review. Implementation has not started.** This replaces the original eight-phase implementation draft and its group addendum. The user asked to review the complete change before execution. No new combat rules, migrations, deployment or balance tuning are authorized by this planning task.
 
-The user's subsequent direction changes the foundation: every player has three battle weapon slots from the start, School no longer sells those slots, and ordinary hunts contain groups of at least two enemies. Each kill earns XP; gold requires defeating the whole group. Weapon performance is deliberately unequal across matchups. A specialist deck may greatly outperform a general deck on a suitable route.
+## The change to review
 
-The subsequent energy rule is **one energy per enemy when its fight begins**, in normal and deep hunts. No whole-group fee is prepaid. Starting an enemy without energy is allowed but significantly reduces performance; spending the last point still funds that enemy normally. Leaving avoids charges for enemies whose fights have not started. The next portrait can appear without starting its fight, so a player can retreat before paying for it. Exhaustion coefficients remain research proposals; shared wardens retain their separate energy design.
+A player builds a **weapon collection** and chooses **three weapons for the next hunt**. A hunt is one continuous scene against a group. The player's preparation, attack choice, movement and use of effects determine whether they can finish the group and bring its haul home. Weapons are intentionally better and worse against different monsters; knowing the route should pay.
 
-Read [Three-weapon decks and monster groups](../../research/combat-atlas/DECKS-AND-MONSTER-GROUPS.md) before executing this plan. It recommends sequential continuous hunts first, committing three weapon instances at entry, carrying resources/cooldowns between enemies, securing materials/items with the final haul, and retaining overflowing kill XP. These additional recommendations, group-size ranges and proposed exhaustion coefficients are not tested or implemented mechanics. One energy per begun enemy is the user's fixed direction and supersedes the original group-entry pricing proposal.
+The first version is proposed as **sequential enemies**, with the next enemy visible in the same scene. It removes repeated town → hunt → loot screens without multiplying the number of enemies attacking after every click. Simultaneous two-enemy waves are a later prototype, not a prerequisite for this release. Shared wardens remain real concurrent multiplayer battles.
 
-**The original eight phase documents below must be rebased before runtime execution.** In particular, phase 2 needs group state, per-enemy energy/XP receipts, pending rewards and slot-purchase migration; phase 3 must deliver the complete group loop including exhaustion and retreat before the next charge; phase 5 must measure group completion, partially spent energy, zero-energy performance, revised deep costs and ownership of three useful weapons. The research maps all eight phases and their verification requirements. Existing dojo scenarios must be extended for decks, partial rewards, XP overflow, energy/exhaustion and group retries before the affected phases begin.
+| Area | What will change |
+|---|---|
+| Opening and first session | Teach the collection and three battle slots; an easy two-enemy hunt; XP versus pending haul; obtainable bow/magic access before required counters; first Forge upgrade. |
+| Profile and equipment | Three always-available weapon cells, separate defensive gear, readable current condition and abilities. Open the collection from the profile or battle preparation. Remove School slot purchases and associated locks. |
+| Weapon collection | Browse everything owned; choose specific instances for three slots; compare role, reach, grade, level, durability and arrows. Selection stays fixed through the hunt. |
+| Encounter opening | Show the actual ordered group, images, affinities, flight, traits, arrival distance, possible drops and energy coverage before the first attack. |
+| Battle scene | One active enemy, group progress and next portrait; three weapon actions; visible gap, intent, effects and cooldowns. Preserve wounds, ammunition and wear between members. |
+| Rewards and recovery | One energy when each enemy begins; meaningful exhaustion at zero; XP immediately per kill; gold/materials/items pending until the full group is defeated. Retreat/death keeps earned XP and forfeits the pending haul. |
+| World content and economy | Retain 16 families / 64 grade variants and 425 creatures; +0–20 upgrades, eight materials, source-specific condition and levels, unequal routes and drops, and Forge-only upgrading. |
+| Wardens and endgame | All floors, including 100, use actual accepted attacks against shared HP that heals with time. Replace pledge and combined-power victory. |
+| Simulation and wiki | Execute the same game rules in headless runs; graph median and fastest observed progress, days per next floor, sustained hunting costs and measured concurrent player needs. Wiki and game use the same definitions. |
 
-The acceptance table below is retained as the original planning baseline. Its single-encounter success metric, main-plus-counter spending assumption, material-tail threshold, fixed smart-play improvement range and old pacing envelope are **superseded pending group-level calibration**. They must not be used to equalize weapons, decks, routes or drop chances. Retain the exponential reference, distinct weapon/species assets, Forge/source settings, and continuously healing shared-warden objective. Mining remains separate.
+Read [Player experience](PLAYER-EXPERIENCE.md) for the screens and example hunt, [Rules and migration](RULES-AND-MIGRATION.md) for combat/data contracts, and [Progression and simulation](PROGRESSION-AND-SIMULATION.md) for the curve, evidence and release gates.
+
+## Decisions already given by the user
+
+- Three available weapon slots from the beginning. No School purchase of a fourth slot or of access to the existing three. A player can choose any combination, including specialists.
+- Monster groups have at least two members. Group size and composition develop over the tower. Weapon choice must matter across the group.
+- Normal and deep hunts cost **one energy per enemy when its fight begins**. No whole-group prepayment. With two energy against five enemies, the first two are normal and the later three significantly weaker, assuming no regeneration. Leaving avoids charges for unstarted enemies.
+- XP is earned per kill. Gold requires defeating the whole group. This plan recommends putting material/item drops in that same final haul.
+- Common / Power / Magic is separate from Ground / Air. Give monsters readable counters and traits, and retain the large, visually varied roster.
+- Distinct weapon families, four grades with different art and pixel frames, weapon levels 0–20, growing gold/material costs, source-specific starting levels/condition, and upgrades performed only in the Forge.
+- Clever deck building and farming should create substantial advantages. Do not equalize every weapon, route, drop probability or chance of winning.
+- Fast early improvement, followed by a gradual slowdown. The measured curve must emerge from legal play, not a graph drawn to a desired shape.
+- Wardens heal against actual concurrent damage; no stored pledges or timezone compensation. Mining remains separate in [plan 013](../013-mining-and-gathering/PLAN.md).
+
+## Concrete recommendations awaiting this review
+
+These are design choices, not assertions that the user already selected their exact details.
+
+| Recommendation | Reason / consequence |
+|---|---|
+| Sequential groups first; normally 2–6 members, with short routes retained at high floors | Gives coverage and endurance choices without an unreadable multi-target launch. Larger challenges can be authored later. |
+| Collection means all owned weapons; “Bring to battle” contains three slots | Avoids confusing ownership with the three-weapon limit. “Deck” is shorthand, not random card drawing. Empty slots and duplicate families are legal. |
+| Starter blade, bow and staff access during the opening, through fixed starter grants/quests with no rare-drop requirement | Three available slots are useful immediately; the first hunt can teach only one weapon. The player does not need to upgrade all three equally. |
+| Attack with any selected weapon as the normal action, without an extra switch action | Makes reacting to the next enemy quick. No extra attack is awarded; no fourth weapon can be pulled from the pack mid-group. |
+| Exhaustion starts at 50% outgoing damage and −2 effective speed, minimum 1 | A measurable first tuning candidate. XP for a real kill is unchanged. Exhaustion is not a hard XP cap. |
+| Preserve overflowing XP in a visible reserve; no automatic mid-hunt level-up or heal | Later kills still count at a full XP bar; normal advancement costs remain. |
+| Gold, materials and items settle together after full victory; earned weapon levels and previously secured materials survive ordinary death | Protects long-term collection investment while making each hunt's haul genuinely at risk. Repair loss and the existing purse/death rules remain explicit costs. |
+| Air Power keeps the proposed visible “Spell dispersal” exception | Preserves the user's particularly weak magic-versus-Power-air direction despite the general ground Power weakness to Magic. Explain this exception, never hide it behind a shield icon alone. |
+| Native-grade guaranteed supply only where needed to prevent a mandatory acquisition dead end | Fixed opening rewards and craftable access first. Any later dry-streak protection needs separate evidence; do not automatically make rare discoveries predictable. |
+
+Existing matrix, effect, recipe, source-gate and group-size numbers are starting candidates. Their inclusion is not proof they work together. The optional target curve in the progression document is for review, not a promised season duration.
 
 ## Problem, evidence and timeline
 
-The 11 September research replaced a large mostly attack-based catalog with persistent weapons and tactical identities. The 12 September wiki now shows 16 families, 64 different grade drawings, 425 authored creatures, source settings and proposed loot rates. The next task is to make that loop work for actual players.
+11–12 September: weapon/material research and the public wiki established the four-grade catalog, tactical families, creature art, drop settings and upgrade reference. The subsequent fixed-deck, group and per-enemy energy requests changed the state model and the reward boundary. Plan 015 only appended those requests; its phase instructions still referred to individual hunts, a main-plus-counter budget and a new standalone balance harness.
 
-Inspection of game 0.112.0, as vendored in release 4e052b1, confirms that the engine still uses the old item/honing model, mutually exclusive enemy types, complete protection in the Shield wall branch, and two different shared-warden paths. Ordinary warden damage is reported at the end of an exchange; milestone floors use pledges and an aggregate-power resolution. The current per-swing energy charge does not match the whole-exchange unit used in warden sizing. This is a source-supported calibration concern to reproduce in phase 1, not a claim of a measured production outage.
+12 September: plans 018–020 instead built and verified `simulation/` using the actual imported engine. Better legal decisions greatly improve the result: on two independent validation seeds, the selected planner's median final monster floor in 30 days was 7.5 and 8, against the corrected Mage's 4.5 and 4. The pooled planner reaches floor 5 at a median 4.668 days; nobody in those eight trajectories qualifies for floor 9 within 30 days. This is evidence of remaining pacing work and limited policies, not proof that floor 9 is impossible. See [measured results](../../research/simulation-strategy-search/RESULTS.md).
 
-The existing 84-state neutral upgrade table matches the reference weapon contribution across all 100 floors. It does **not** validate new statuses, family premiums, ammunition, repair losses, gold balances, XP, or finite-energy group combat. Earlier +0.18% effort-index parity is not a forecast of player progress or season length.
+Those runs use local game **0.111.0**, individual hunts and School slots. They do not measure the proposed groups. Published wiki source on `origin/main` at `1897edd` includes **0.112.0** and wiki revision `089.3`. This branch starts at completed simulator commit `65f3c1c`; integrating the newer published baseline and repeating a source-pinned comparison is phase 1, before any gameplay edits. Do not pretend old run hashes describe a newer checkout or production.
+
+Source inspection confirms slug-based held selection, XP clipping in `engine/state.py:gain_xp`, per-enemy victory returning to town in `engine/combat.py:_victory`, and separate warden strike/pledge paths in `worldd/app/social.py`. The existing profile exposes equipment through `engine/profile.py` and the same scene renderer serves web and Luna. Changing only the battle HTML would leave the authoritative rules and other clients inconsistent.
 
 ## Root cause
 
-Item identity, combat choices, resource supply, UI and boss timing have evolved separately. A visually correct weapon table can still produce an unaffordable counter, a repair trap, an obsolete upgraded weapon, or a boss no real group can finish.
+The previous plan treated weapons, screens and economy as separate changes. Groups make them one system: three committed item instances must survive several enemy lifecycles; energy starts per member; XP commits per kill; the haul commits per group; clients must show those exact boundaries. The old plan also over-relied on neutral attack-table parity as a pacing guarantee. Survival, repair, healing, three useful weapons, training and failed hauls determine actual days of progress.
 
-## Emergency mitigation
+## Emergency mitigation already taken
 
-None required for this planning task. Keep the current runtime while the replacement is developed in an isolated QA world.
+No production intervention. Completed simulator/research changes and their plugin dependency are committed and pushed. Historical runs, the old proposal simulator and published wiki stay identifiable. This revision prevents execution of the obsolete phase instructions; it makes no player-state changes.
 
-## What we are building
+## Execution order after review
 
-- 16 weapon families × Common/Rare/Epic/Legendary, each +0–20, with the wiki's 64 distinct drawings and grade frames.
-- Individual weapon instances: levels, condition, ownership and history belong to that item. Techniques work from +0; levels improve attack and endurance without extending stun indefinitely.
-- 425 authored creatures on their actual floors. Separate Ground/Air, Common/Power/Magic defensive affinity, outgoing attack channel, and species traits. Preserve identities, art and ecology; at most three nearby variants of one animal.
-- Persistent distance, useful speed, poison/burn/bleed, push, stun, slow, Expose and six arrow payloads. The first release adds no boss-healing suppression or passive energy regeneration.
-- Eight materials, unequal creature drops, stronger deep-hunt rewards, and useful choices of hunting trail. Mining and its expedition-loss rules stay in plan 013.
-- Forge-only upgrades, visible gathered/required materials and exact gold, shop/drop/craft starting settings, and recoverable weapon investment.
-- One shared warden health bar with healing over actual time. Accepted attacks damage it immediately. No pledge pool, combined-stat victory or timezone-compensation mechanic.
-
-## Progression rules to protect
-
-Keep the power/capital scale 1.3 per floor, income scale 1.25, pacing ratio 1.04, warden growth factor 1.02, character cap 30 and ten equipment/energy bands as reference anchors. Keep rarity, weapon level, character level and effective progression floor separate. Weapon upgrades replace weapon honing; never multiply both. Removing its XP cost must be included in character-level pacing.
-
-The reference is a measuring stick, not a requirement for equal damage or equal progress. Family factors, counters, species, preparation and routes must produce different outcomes. A clever player can skip an inefficient purchase, use a specialist, farm the right carrier and move faster.
-
-| Grade | Native floors | Materials | Forge delivers | Shop delivers | Hunt drop delivers |
-|---|---|---|---|---|---|
-| Common | 1–25 | Wood + Raw Metal | +0, full condition, floor 1 | +0, full, floor 1 | +0, 40% |
-| Rare | 26–50 | Hardwood + Steel | +0, full, floor 26 | +2, full, floor 28 | +0, 30% |
-| Epic | 51–75 | Meteorite + Starforged Steel | +0, full, floor 51 | +4, full, floor 57 | +0, 20% |
-| Legendary | 76–100 | Mythic Threads + Shard Matter | +0, full, floor 76 | +6, full, floor 84 | +0, 10% |
-
-Rare/Epic discoveries can occur earlier at the wiki's small rates. Legendary discovery begins at 50; equipping the dropped item still requires76. Character and access gates are checked independently. An item +0 is not comparable across grades by its level number alone; show actual before/after performance. Native-grade crafting bridges the gap before higher-level shop stock, but crafting is not a guaranteed acquisition route unless its materials are obtainable too.
-
-Default design recommendations to validate: upgraded weapon levels survive ordinary death; death adds repair loss rather than deleting the investment. Ordinary Materials storage is safe. Existing beginner/protection rules take precedence. These reduce old loss sinks and must be priced in the account simulation. On an upgrade, preserve the item's remaining-condition fraction against its new maximum; do not grant a hidden full repair. Broken weapons remain broken until repaired. Shop/craft full condition and damaged drops are explicit source exceptions.
-
-## Steps and completion gates
-
-Each phase has its own [goal, steps, verification and rollback](phase-1/PLAN.md). Implementation is sequential; every phase must pass before the next expands scope. Phases2–7 run behind a versioned ruleset in QA, not as incomplete production features.
-
-| Step | What players will eventually receive | Evidence before proceeding |
-|---|---|---|
-| [1. Measure the current game](phase-1/PLAN.md) | A tested pacing baseline and a defined action clock | Existing hunts and both boss paths reproduced with finite energy; actual client latency recorded |
-| [2. Establish shared data and safe item conversion](phase-2/PLAN.md) | Persistent weapon identity; consistent stats and art everywhere | Every old item/storage case maps safely; no silent loss or duplicate instance; migration can be rerun |
-| [3. Build a complete Floors1–10 loop](phase-3/PLAN.md) | Hunt → collect → Forge → upgrade → useful counter → recover after loss | A fresh character completes the loop in real Luna and web play without developer gifts/refills |
-| [4. Expand combat and content](phase-4/PLAN.md) | All64 weapons,425 creatures, effects, arrows and readable fight controls | All families have a tested useful role; reach, status clocks, shields and movement work together |
-| [5. Balance the whole climb and economy](phase-5/PLAN.md) | Meaningful upgrades, viable material routes and affordable recovery | Whole-account simulations, native-grade access, median and P90 effort pass across floors 1–100 |
-| [6. Replace shared wardens](phase-6/PLAN.md) | Real concurrent attacks against continuously healing HP, including100 | Discrete attacks with finite energy prove group wins, appropriate solo failure and one-time rewards |
-| [7. Play through and rehearse conversion](phase-7/PLAN.md) | A coherent game for new and returning players | Real multi-turn Luna, web/mobile and multiple-player scenarios pass; migration and rollback rehearsed |
-| [8. Release and measure](phase-8/PLAN.md) | A verified release with preserved player progress | Isolated-world canary, explicit deployment, public verification and measured progression gates |
-
-The first visible milestone is step3. We will show that complete small loop before building out the rest of the tower. A phase 3 warden fixture is a QA teaching encounter; it does not claim that multiplayer phase 6 is complete.
-
-## How we judge playability and progression
-
-These are **proposed starting acceptance targets**, to freeze against measured phase 1 data before implementation expands. They are not measured results or promises of equal outcomes.
-
-| Concern | Proposed launch gate | What happens if it fails |
-|---|---|---|
-| First session | Starter gear and the floor 2 +1 upgrade are reachable through the authored opening rewards and normal available energy; first 10 committed actions teach a clear next goal | Change opening rewards/tutorial cost or instruction; do not raise rare-drop odds globally |
-| Ordinary hunting | Prepared reference characters win at least80% of eligible ordinary encounters in each tested band; runts and alphas are reported separately | Inspect a counter/access or survival failure; deliberate elite fights need not meet this rate |
-| Spending has a purpose | Every paid upgrade improves displayed attack or useful endurance; durability-only levels are identified | Change the recipe/gate or the presentation; never advertise a nonexistent damage gain |
-| No resource dead end | Both native materials and at least one affordable answer to every mandatory encounter are reachable before they are needed | Add a fitting hunting trail or adjust that floor's supply; a rare weapon drop cannot be compulsory |
-| Bad luck | P90 time to required native materials is at most2× the median on a sensible route | Tune a native-grade dry-streak safeguard; keep early Epic/Legendary discoveries exceptional |
-| Gold pressure | Median time to reference progression milestones starts within±15% of the measured old whole-account route, unless a deliberate change is recorded | Adjust actual net-income/upgrade sinks; do not infer parity from nominal sticker prices |
-| Smart play | Demonstrate roughly 25–50% faster progress to representative upgrades through route/loadout/upgrade choices | Improve actionable information and specialization; larger local advantages are allowed |
-| Choice remains useful | No family is strictly outperformed in every intended matchup/resource situation; no one loadout wins every comparison on damage, safety and cost | Rework a redundant family or a universal interaction; equal win rates are not the objective |
-| Recovery | After death or breakage, a legal starter/repair/recovery route can earn the cost of returning to play without an unaffordable counter dependency | Adjust recovery access or repair basis; retest repeated losses |
-| Deep hunts | Better rarity per successful kill; a demonstrated net reward advantage for suitably prepared builds after one energy per begun enemy, exhaustion, failure, healing and wear | Recalibrate species/mode premiums after removing the old two-energy entry fee; ordinary hunting stays viable for weaker builds |
-| Cooperative finale | A prepared reference group can finish within its real energy/HP window; no legal single-account endgame build can burst or sustain the kill | Tune HP/healing/cadence together; do not just compare average DPS |
-| Reliability | Zero duplicate charges, items, kills, refunds, rewards or era closure in the concurrency/retry suite | Block release and correct the transaction path |
-
-P90 means90% of the simulated players finished within that effort; also report non-completion and P99, rather than discarding stalled characters. Material tails, gold tails and full progression tails are different metrics.
-
-The native-grade safeguard is a proposed adoption of the research's optional rule: after a tuned number of eligible wins without that grade, award one ordinary bundle with the defeated creature's normal carrier ratio. It persists across sessions and cannot accelerate higher-grade discoveries before their native band. The wiki must show both base probability and the actual safeguard state. The opening tutorial reward is separate. Neither changes all monsters to equal drop chances.
-
-Simulate at least10,000 seeded progression runs per representative policy cohort after a smaller calibration run. Compare baseline and proposed systems using paired seeds where meaningful. Include ordinary, informed and deliberately poor routes; new accounts, returning characters and wealthy/overprepared legal builds; multiple races/paths; at least a main weapon plus a practical counter. Report actual gold balance and interest, XP/training, energy waiting, healing, ammo, repairs, death, both material bottlenecks and contribution to bosses. No infinite bags of gold or per-round energy refill. Separate personal economic effort from the availability of a concurrent party. Do not promise a season duration from the current income formula.
-
-## How teamwork grows
-
-These are reference tuning targets, not a headcount gate. Fit a smooth rising group-demand curve and validate each floor rather than introducing a sudden jump at a table boundary.
-
-| Floor range | Intended experience |
+| Phase | Deliverable and gate |
 |---|---|
-| 1–9 | Solo learning; healing low enough for the intended starter/reference path |
-| 10–25 | Small groups become necessary at frontier strength; roughly 2–5 prepared players |
-| 26–50 | More combined damage and complementary tools; roughly 5–12 |
-| 51–75 | Organized concurrent attacks; roughly 12–25 |
-| 76–100 | Large groups; roughly 25–50, with floor 100 initially tuned around 50 reference players |
+| [1 — Baseline and final contracts](phase-1/PLAN.md) | Integrate published work, pin source, reproduce current play, freeze the reviewed UX/rule choices and initial pacing target. Reuse `simulation/`; do not build a second combat model. |
+| [2 — Item instances, three slots and safe state](phase-2/PLAN.md) | One shared schema for collection, committed deck, group, receipts and migration; both backends and old clients handle it safely. QA only. |
+| [3 — Complete opening and first-ten-floor loop](phase-3/PLAN.md) | Profile → collection → group preview → sequential fight → XP/haul → Forge/recovery, using real production paths, with per-enemy energy and readable exhaustion. First player-review milestone. |
+| [4 — All weapon identities and monster groups](phase-4/PLAN.md) | All 64 variants, 425 creature mappings, unequal routes, effects/arrows, acquisition settings and wiki. Prove useful niches rather than equal power. |
+| [5 — Personal progression and economy](phase-5/PLAN.md) | Real-engine, multi-CPU strategy trials tune the complete account economy; publish median/fastest days and next-floor delays, including failures. |
+| [6 — Concurrent healing wardens](phase-6/PLAN.md) | One timed shared battle service, real hit settlement, finite energy, measured party sizes, and exactly-once floor-100 era closure. Recheck phase-5 progression under actual world gating. |
+| [7 — Full playthrough and migration rehearsal](phase-7/PLAN.md) | New/returning players, web/Luna/mobile, multiple users, recovery, stale cards, data conversion and rollback all verified. |
+| [8 — Explicit release and observation](phase-8/PLAN.md) | QA canary, pinned plugin/vendor/site release, production verification and measured rollout. Deployment is a later explicit action. |
 
-At floor 100, roughly 35 well-prepared specialists winning where about 50 ordinary prepared players are needed is a useful test case, not a guaranteed result. Do not resize the boss when the actual party improves its equipment. An overprepared character defeating some early gates is acceptable; the late solo ceiling must include legacy items and all legal bonuses.
+Execute phases in order. Later infrastructure can be designed early, but it cannot be reported validated before its dependencies pass. Phases 2–7 stay in an isolated QA world until the coherent release gate. Do not expose different battle rules to participants in the same shared warden.
 
-The necessary check is:
+## Verification
 
-`time to kill = remaining HP / (actual group DPS − healing per second)`
+Each phase supplies concrete checks and a browser scenario in [DOJO-SCENARIOS.md](DOJO-SCENARIOS.md). Mathematical rules get coded tests; subjective readability and fun require actual multi-turn play. Before reporting any implementation phase complete, run its targeted checks, required full suites and the real web/Luna walkthrough. Record SHAs, settings, results, screenshots and failures in a numbered results folder.
 
-It must fit the group's energy and survival window. Final proof uses timestamped individual attacks, misses, setup, status ticks, withdrawal, reconnect and ordinary UI latency. A positive average margin alone is insufficient.
+Hard gates include zero duplicate energy/XP/loot/refund/kill receipts; no required counter locked behind the monster it must defeat; no lost earned progress during conversion; no fourth weapon through another client; real shield chip damage; measured group completion and sustainable costs; and real concurrent warden victory. The progression document defines how to compare strategies without inventing a fastest-possible claim or equalizing choices.
 
-Keep server acceptance cadence explicit and playable through both Luna and web cards. More browser tabs or faster duplicate clicks do not buy extra turns. Boss DoT clocks are real-time and independent of how many players click; stun resilience is shared; push only changes the acting player's gap. Preserve the research's simple healing rule rather than layering stored contributions or timezone windows over it.
+## Operational notes and rollback
 
-## Release and migration safeguards
+The plugin owns engine/content/cards; worldd owns shared transactions, effects and the served vendor; `simulation/` imports those same rules; the wiki is generated from them. Future plugin work uses a corresponding `change_everything` branch in its own repository, commits there first, then updates the root pointer/vendor. The root branch name is the user's explicit choice; this existing plan keeps its stable number and links.
 
-Before migration, inventory all old weapons, honing, styles, oils, wear, held/equipped slots, pack/storage, offers and pending rewards. Preserve instances individually. When no fair new state exists, retain a functional legacy item and an explicit conversion path; do not silently round down paid power or bypass an unopened gate. Include those retained items in the endgame solo-ceiling check.
+Before phase 1 integration, isolate or preserve unrelated workspace edits; do not include admin/feedback changes, local credentials, unrelated research or book drafts just to make the tree clean. Record exact source revisions and rollback commits before runtime changes. Before each commit run the secret-pattern scan and `git diff --cached --check`.
 
-Keep compatibility readers and append-only migration/transaction receipts. Never restore an old whole-database snapshot after players have earned new progress. After new writes, rollback means disabling the new mutations while keeping readable items and using idempotent compensating operations where required. Exact commands and receipt identifiers are recorded before each implementation phase is executed.
+Documentation rollback before implementation: revert only this revision's documentation commit. Runtime rollback: stop new candidate entries, keep compatibility readers and transaction receipts, drain or explicitly settle active encounters once, then apply tested compensating operations. Never restore an old whole-player/database snapshot over newly earned progress. Phase 7 must record the actual runbook commands and their receipt IDs before production conversion is allowed.
 
-Wardens require a separate conversion boundary: no mid-fight silent HP reset; resolve/migrate active wounds explicitly, refund unconsumed pledges once, and preserve historical kill/era records. The real floor 100 death must invoke era closure once.
+## Planning verification
 
-Canary the new shared rules in an isolated QA world first. Do not put old and new combat rules on different participants in the same production boss. Production stays on the existing single-instance deployment topology. Deploy the pinned plugin implementation, matching worldd vendor, clients and wiki definitions together; verify the actual serving version after deployment.
-
-## Operational notes and ownership
-
-The runtime work spans the plugin engine/content/cards and worldd's authoritative actions, ownership, rewards and persistence. Use the project devprocess: committed plans and dojo scenarios first; implementation branches in the owning repositories; plugin commit → parent pointer/vendor → targeted tests → full suites → real Luna walkthrough → explicit deployment → post-deploy verification. The local and HTTP backends must obey the same rules.
-
-The runtime content becomes the canonical source for live definitions and the wiki generator. Preserve a separately labeled proposal where necessary; do not maintain two competing live balance tables. Rebuild tool descriptions and card payloads, not just HTML. Existing PvP, trade, gifts, pawn, storage and rewards must understand the new item instance schema. Monster-control mechanics must not silently become untested PvP effects.
-
-## Sources and prior decisions
-
-- [Current published wiki](https://linearascent.net/wiki) and [released model](https://github.com/huemorgan2/luna-linear-ascent/blob/4e052b184f15177dd8f8c40b13893d23582a7e33/worldd/static/site/wiki/model.json): source levels, condition, loot and64 art records.
-- [Combat proposal](../../research/combat-atlas/PLAN.md): family roles, counter matrix, damage and effect timing. The wiki supersedes its eight-species prototype and older frame colors.
-- [Progression tables](../../research/weapon-upgrades/PROGRESSION-TABLES.md) and [validation limits](../../research/weapon-upgrades/VALIDATION.md).
-- [Boss-system analysis](../../research/weapon-upgrades/BOSS-SYSTEMS.md): timing, energy-unit mismatch, pledge replacement and finite-energy group math.
-- Source anchors at release 4e052b1: `worldd/vendor/plugin_linear_ascent/economy.py`; `engine/state.py`; `engine/combat.py` (Shield wall, per-swing energy, exchange report); `worldd/app/social.py` (shared pool and `_fx_boss_commit`).
-- [Mining stays separate](../013-mining-and-gathering/PLAN.md).
-
-## Verification and rollback of this planning task
-
-Check every local Markdown reference and each phase's Goal/Steps/Verification/Rollback/Execution status. No runtime tests or player walkthrough can validate unimplemented mechanics; those remain mandatory phase gates. This task only writes plan/research documents. Its rollback is reverting this documentation-only commit, preserving all unrelated work.
+Checked all 27 plan/scenario documents, 49 local plan links, eight Goal/Steps/Verification/Rollback phase contracts, and fourteen five-part browser scenarios. Recalculated all eight rows of the illustrative target curve from its stated formula. Whitespace and secret-pattern checks run before this documentation commit. The historical simulator verification remains in `simulation/verification/005/summary.md`; it is not verification of these unimplemented rules.
 
 ## Execution status
 
-Original eight-phase draft recorded; the subsequent deck/group research is complete as a document. Rebasing the phase instructions and scenarios remains outstanding before runtime execution. Phases1–8 are not started. No engine changes, migrations, balance simulations, gameplay dojo or production deployment were performed for this plan or its scope revision.
+**Planning revision complete; awaiting user review. Phases 1–8 not started.** The earlier research and simulator remain completed work, not evidence that this game redesign has shipped. No new gameplay, migration, balancing run, dojo playthrough or deployment was performed for this planning revision.

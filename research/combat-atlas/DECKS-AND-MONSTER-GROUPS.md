@@ -1,5 +1,7 @@
 # Three-weapon decks and monster groups
 
+**Execution roadmap updated:** [plan 015 revision 2](../../plans/015-weapon-combat-progression/PLAN.md) now incorporates this research into eight rewritten phases and fourteen browser scenarios, including the collection/profile/opening/battle flow and actual-engine simulator. It is ready for review; runtime implementation has not started. The phase-rebase discussion below records the reason for that revision, not an outstanding task to repeat.
+
 12 September 2026 · Design research and proposed replacement scope for [plan 015](../../plans/015-weapon-combat-progression/PLAN.md). **No gameplay changes have been implemented or tested for this proposal.**
 
 ## Recommendation
@@ -365,7 +367,7 @@ Ironhide's own **Kingdom Rush Battles** guide describes physical armor answered 
 
 ## Research status and next step
 
-The recommendation is to rebase plan 015 around **three fixed weapons → one energy per enemy as its fight begins → exhaustion when unfunded → per-kill XP → one secured haul**. The user's energy rule replaces the original group-entry pricing; exhaustion numbers remain proposals. Build that complete first-ten-floor loop before expanding group complexity. Simultaneous waves remain a separate prototype decision; they are not necessary to deliver the first improvement.
+Plan 015 revision 2 is now rebased around **three fixed weapons → one energy per enemy as its fight begins → exhaustion when unfunded → per-kill XP → one secured haul**. The next step is user review of that complete plan before implementation. The user's energy rule replaces the original group-entry pricing; exhaustion numbers remain proposals. Build that complete first-ten-floor loop before expanding group complexity. Simultaneous waves remain a separate prototype decision; they are not necessary to deliver the first improvement.
 
 This document records source inspection, design reasoning and illustrative arithmetic. It does not claim measured completion rates, tested economics or a finished gameplay plan. The parent plan is marked for revision so its original phases cannot be mistaken for an executable specification of the new design. No runtime code, wiki release, migration, simulation campaign or dojo run was performed.
 

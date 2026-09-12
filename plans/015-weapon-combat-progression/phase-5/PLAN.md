@@ -1,31 +1,35 @@
-# Phase 5 — The complete economy and progression curve
+# Phase 5 — Personal progression and complete economy
 
 ## Goal
 
-Show that ordinary and informed players can fund survival and progress across100 floors, with better decisions yielding a measurable advantage and bad luck unable to create a resource dead end.
+Measure and tune actual whole-account progression toward the reviewed gentle slowdown, while preserving large legitimate advantages from deck, route and spending choices. Publish median and fastest observed capability without hiding stalled players.
 
 ## Steps
 
-1. Apply the84 neutral upgrade states once, all family recipes and shop/drop/craft settings. Preserve grade-transition crafting at 1/26/51/76 and shop delivery at 1/28/57/84.
-2. Implement material and item rolls using the wiki's floor/species/specimen/deep modifiers. Materials are independent grade rolls; weapons use one categorical roll including no weapon. Keep rates unequal and show individual family odds.
-3. Add a small set of fitting hunting trails where the roster supports them. Trails alter encounter weights, not a free reroll; show carrier/danger before energy is spent. Ensure both materials remain reachable.
-4. Calibrate and expose the proposed native-grade dry-streak safeguard. It must retain carrier ratios and never guarantee early Epic/Legendary discoveries. Include the safeguard in all published probabilities and simulations.
-5. Set repair, ammo and resale formulas against actual net earnings. Preserve condition fraction on upgrade and avoid repair/reforge/resale loops that create currency. Account for removed weapon XP honing and preserved levels/materials on death.
-6. Run baseline/candidate policies with paired seeds: ordinary, informed, wrong-counter; main weapon plus counter; saving versus upgrading; normal versus deep; migration and wealthy cases. Analyze each material bottleneck, not just total units.
-7. Publish tables of median/P90/P99 effort and stalled runs for each floor and grade boundary. Record every changed coefficient and its reason.
+1. Extend existing simulation agents/planner/search for three-slot preparation, group completion, resource carry-over, exhaustion/escape decisions, arrows/effects and source-aware upgrades. Same real game library; no new balance resolver or hypothetical standalone harness.
+2. Replace single-enemy readiness with recorded full-group probes and add repeated-hunt sustainability tests. Preserve immutable disposable probes, per-player event timing, cohort denominators and independent world-access fixtures.
+3. Screen legal policies under matched seeds/schedules: generalist, several specialists, cautious/greedy continuation, focused versus broad upgrades, counter-ammo substitution, normal/deep and deliberately weak choices. Reject refusal loops as diagnostics; retain all run files. Freeze winners before fresh-seed validation.
+4. Measure gold after all recovery/ammo/repair/death costs, XP reserve and training, both recipe materials, three useful weapons, grade access, optional guarantees, exhausted XP, partial-group farming and zero-resource recovery. Trace actual bottlenecks before retuning costs/supply/threat.
+5. Use the proposed pacing envelope in `PROGRESSION-AND-SIMULATION.md` only after review. Keep exponential reference anchors, but measure group-level net outcomes. Record every coefficient change and reason; do not manufacture a smooth line or equalize routes.
+6. Add/verify cumulative median+fastest, per-player extra-days intervals, reached counts, route costs and stall explanations in the dashboard. Start small, then extend horizon to cover the reviewed curve (e.g.365 days), with cohort size chosen for uncertainty and practical runtime. Use all available CPUs without nested oversubscription.
+7. Publish source-pinned findings, replay samples, raw-run/config locations and remaining limitations. World-gated end-to-end conclusions wait for phase6; this phase measures personal capability and sustainability.
 
 ## Verification
 
-Run `python tools/progression/run.py --rules candidate --floors 1-100 --runs 10000 --seed 1501 --output output/progression/candidate`. Compare with phase 1 and the main acceptance table. Run dojo S07/S08 at boundaries25→26,50→51,75→76 and shop gates28/57/84. Test unlucky paths, zero-gold recovery, an unaffordable secondary weapon, and repeated deep-hunt losses.
+Run `python3 -m unittest discover -s simulation/tests -v`. Extend existing `simulation/game_search.py` and `simulation/run.py` config/CLI only for implemented rules; record exact new reproduction commands in README and the phase report. Verify identical semantic outcomes at 1 worker and automatic workers, copied-probe non-mutation and replay. S13 checks both lines/tooltips, fastest identity, full-range missing values, per-player interval definitions and late-floor horizons. Grade/resource recovery scenarios S07/S08 must also pass through actual game play, with no test grants used as progression evidence.
+
+All commands are future implementation verification, not actions performed by this planning revision. New test/tool interfaces named conceptually must be implemented and their actual commands recorded before use. Never point worldd tests at production. See [scenario index](../DOJO-SCENARIOS.md).
 
 ## Rollback
 
-Revert candidate tuning/configuration in QA and rerun the same seed set. For any later live tuning, version outstanding quotes and preserve already-completed transactions; never charge a player retroactively.
+Revert tuning/config/policy/chart commits in QA and rerun the same seeds on the previously pinned rules. Preserve all historical runs, search reports and changed-source hashes. Never rewrite completed player transactions or old reports to match new prices. Do not roll back the shared-engine architecture to the historical proposal simulator.
+
+For each implementation commit, record its exact SHA and the reverse-order `git revert` sequence before starting the next phase. Data-changing operations require their tested compensating commands and receipt IDs before execution. Keep all new-format data readable.
 
 ## Operational notes
 
-This is future work. Planned harness/tool paths named above must be implemented before their commands can run. Record exact implementation SHAs, deployed revisions and any migration arguments before executing a release or conversion. The plugin owns engine/content/cards; worldd owns authoritative shared state. Both inherit the versioned definitions. See the parent plan and DOJO-SCENARIOS.md.
+Follow the [parent plan](../PLAN.md) and its ownership map. No new production rules during phases2–7. Run targeted checks before full relevant suites; preserve existing work and source-pinned evidence. A real browser/Luna walkthrough is required before reporting an implementation phase complete.
 
 ## Execution status
 
-Not started. This planning task does not claim runtime verification.
+Not started. Rewritten for the three-weapon/group design on12 September2026; awaiting the user's plan review. This document is not evidence that runtime changes or tests have run.

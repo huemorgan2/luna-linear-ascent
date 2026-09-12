@@ -1,5 +1,7 @@
 # Combat and weapon identity — short research plan
 
+**Historical coefficient/family research.** For the current scope, screen flows and implementation sequence, use [plan 015 revision 2](../../plans/015-weapon-combat-progression/PLAN.md). Its fixed three-weapon groups and per-enemy energy supersede single-fight assumptions here; the published wiki supersedes this document’s eight-creature prototype and old Rare frame color. Numerical combat values remain candidates to test in the actual engine.
+
 11 September 2026 · **Proposed design, not implemented game behavior.** Companion: the interactive Combat Atlas in `site/`. This extends the [weapon/material research](../weapon-upgrades/RESEARCH.md) and supersedes its three-family, twelve-template catalog. The exact [84 upgrade states and 100-floor money/material tables](../weapon-upgrades/PROGRESSION-TABLES.md) remain the neutral baseline. Mining stays in [its separate plan](../../plans/013-mining-and-gathering/PLAN.md).
 
 ## Decision

@@ -1,29 +1,34 @@
-# Phase 1 — Measure the game and establish the balance harness
+# Phase 1 — Baseline and reviewed contracts
 
 ## Goal
 
-Produce a reproducible baseline for floors 1–100 and a measured action clock for hunts and wardens. Record how long progress takes in energy, gold, materials where applicable, actions and elapsed time. Reproduce the suspected warden energy-unit mismatch before choosing replacement HP or healing.
+Pin one current game/vendor/service/wiki revision, establish a measured old-game baseline, and freeze the reviewed collection/group/energy/UX contracts and initial progression target before changing gameplay.
 
 ## Steps
 
-1. Pin the current plugin/server/client SHAs and capture the reference loadouts,100 floor definitions and actual economy constants. Read-only production measurements, if used, must be separated from test fixtures.
-2. Run fresh, returning and overprepared legal characters through normal/deep hunts and ordinary/milestone keeps in the QA browser. Measure request-to-visible-result latency, energy charged per action and when shared HP changes. Do not refill energy between swings.
-3. Add a planned comparison harness at `tools/progression/run.py` with baseline/candidate rules, seeded policies, discrete timestamps and machine-readable reports. Its configuration explicitly budgets training, armor, counter weapons, ammo, bank interest, sleep, repairs and death.
-4. Use a small calibration run first. Capture milestone distributions and non-completion, then freeze the main plan's proposed gates or record a justified revision before adding candidate behavior.
-5. Commit baseline fixtures, reports and scenarios. These artifacts are inherited by every later phase; they are not another combat implementation.
+1. Integrate published `origin/main` work (observed at `1897edd`) with completed simulator work (`65f3c1c`) in a clean checkout. Preserve unrelated local edits. Record root/plugin/vendor/wiki versions and engine hashes; resolve source differences without retuning gameplay.
+2. Review the parent plan and its three companion documents. Freeze sequential-first, collection naming, starter access, XP reserve, death/haul policy, Air Power exception, candidate exhaustion and target pacing. Record what remains optional, especially simultaneous waves and dry-streak protection. Measure and settle the separate warden energy/cadence proposal before phase 6 sizes bosses.
+3. Inventory every affected game action, scene, storage/ownership consumer and world effect. Produce a before/after schema/action map and baseline creature/item/reference table exports. The plugin, vendor, local backend, HTTP backend, wiki and simulator inherit these contracts.
+4. Reproduce normal/deep entry, School slots, XP clipping, Shield wall and ordinary/milestone wardens through real QA web and Luna. Record actual action/request/display times and finite energy; no per-swing refills. Use S01.
+5. Repeat a small actual-engine search/comparison on the integrated source. Keep the old 0.111.0 reports immutable. Identify policy failures separately from economic or world gates; do not run the historical proposal model as the new baseline.
+6. Write baseline findings and concrete screen/action review fixtures. Commit these contracts before phase 2 begins.
 
 ## Verification
 
-Run `python tools/progression/run.py --rules baseline --floors 1-100 --runs 10000 --seed 1501 --output output/progression/baseline` after the planned harness exists. Compare a sample of simulated actions against engine events and actual QA browser play. Run dojo S01. Explicitly show entry energy, swing energy, allowed swings, elapsed time and damage committed for floors 1/10/31/50/99/100.
+After integration, run `python3 -m unittest discover -s simulation/tests -v` and `python3 worldd/tools/gen_wiki.py --check`. Run the bounded comparison command in `research/simulation-strategy-search/RESULTS.md`, recording new run IDs/hashes rather than replacing old reports. Verify sample action replay. In S01 record floors 1/10/31/50/99/100, entry/swing energy, maximum legal swings, accepted timestamps and shared HP settlement. Document unavailable QA prerequisites rather than passing missing checks.
+
+All commands are future implementation verification, not actions performed by this planning revision. New test/tool interfaces named conceptually must be implemented and their actual commands recorded before use. Never point worldd tests at production. See [scenario index](../DOJO-SCENARIOS.md).
 
 ## Rollback
 
-Remove/revert only the harness/report implementation commit. No player or shared-world writes belong to baseline collection; retain evidence if a pre-existing issue is found.
+Record the integration commit and both parent SHAs before proceeding. Before any new rules exist, revert that integration with `git revert -m 1 <recorded-merge-sha>` if a merge was used, or revert its recorded integration commits in reverse order; revert only this phase's adapter/report changes. Preserve all historical result files. No production or player-state conversion belongs to this phase.
+
+For each implementation commit, record its exact SHA and the reverse-order `git revert` sequence before starting the next phase. Data-changing operations require their tested compensating commands and receipt IDs before execution. Keep all new-format data readable.
 
 ## Operational notes
 
-This is future work. Planned harness/tool paths named above must be implemented before their commands can run. Record exact implementation SHAs, deployed revisions and any migration arguments before executing a release or conversion. The plugin owns engine/content/cards; worldd owns authoritative shared state. Both inherit the versioned definitions. See the parent plan and DOJO-SCENARIOS.md.
+Follow the [parent plan](../PLAN.md) and its ownership map. No new production rules during phases2–7. Run targeted checks before full relevant suites; preserve existing work and source-pinned evidence. A real browser/Luna walkthrough is required before reporting an implementation phase complete.
 
 ## Execution status
 
-Not started. This planning task does not claim runtime verification.
+Not started. Rewritten for the three-weapon/group design on12 September2026; awaiting the user's plan review. This document is not evidence that runtime changes or tests have run.

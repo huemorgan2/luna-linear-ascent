@@ -1,23 +1,23 @@
-# S04 — Reach, counters and effects
+# S04 — Three selected weapons and contrasting groups
 
 ## Preconditions
 
-Candidate ground/air and affinity fixtures, affordable blade/bow/staff loadouts, known trait examples.
+Phases 3,4,7. Owned duplicate-family weapons with different condition; generalist and specialist decks; actual ground/air/Power/Magic groups and visible traits.
 
 ## Scenario
 
-Fight a Common enemy, a Power ground target and a spell-dispersing Power flyer. Try a wrong counter, change ammo, apply poison to immune/living targets, and inspect burn/bleed/stun/slow/Expose timing.
+Build three swords, inspect a flyer warning, then choose an informed deck for a mixed group. Attack with each explicit instance. Try replacing one through pack, profile, trade and another tab mid-group. Compare a specialized ground route with an air-heavy route using earned supplies.
 
 ## Expected behavior
 
-Bad choices have understandable consequences; the right tools improve the outcome; reach and immunity are explained before cost where applicable. Each effect ticks on its defined clock.
+Any three owned eligible instances are selectable; no class recipe is enforced. The committed three remain fixed, the chosen instance supplies its own effect/condition, and specialist advantage/blind spots are understandable.
 
 ## Fail conditions
 
-Blades hit Air; magic resistance is applied twice; fresh DoT ticks early; changing weapons resets cooldowns; repeated clients multiply status ticks.
+Automatic easier enemies after changing deck, first-sword lookup using the wrong copy, a fourth weapon, permanent stun by cycling three weapons, or a universal score concealing reach immunity.
 
 ## Verify
 
-Read server combat events and exact HP/energy/ammo changes. Compare the UI's active durations, labels and damage channels with the resolver.
+Inspect committed IDs, action payloads, refused-action resource deltas, effect/cooldown states and route completion/cost traces. Both clients must enforce the lock.
 
-Record SHAs, environment, PASS/FAIL with notes, screenshots and any regressions in a numbered dojo results folder. Fix failures and rerun the affected scenario before marking its phase complete.
+The LLM tester walks the real browser, reads the DOM and screenshots, and records PASS/FAIL with evidence. Coded checks complement this walkthrough. Record date, root/plugin/client SHAs, environment, accounts/fixtures, timings, screenshots and regressions in a numbered results folder; file failures before fixing and rerun the affected scenario. This scenario is planned, not executed by the current documentation revision.

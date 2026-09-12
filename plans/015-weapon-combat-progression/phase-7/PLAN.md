@@ -1,30 +1,34 @@
-# Phase 7 — Full playtesting and migration rehearsal
+# Phase 7 — Full playthrough and migration rehearsal
 
 ## Goal
 
-Validate that the complete game is understandable and recoverable through actual player interfaces, including returning saves and concurrent play. Numbers passing alone do not complete this phase.
+Demonstrate that new and returning players can understand and play the complete redesign across clients, and that converting/rolling back real-shaped saves preserves every owned item and earned balance.
 
 ## Steps
 
-1. Run the full plugin and worldd test suites, local/HTTP contracts, content lint and client builds against the same pinned candidate.
-2. Conduct real multi-turn Luna conversations and web/mobile walkthroughs for fresh, mid-game and late-game players. Include a player following ordinary advice and one deliberately choosing efficient routes.
-3. Execute all dojo scenarios, including plain-text options, stale cards, dual tabs, deaths, repairs, grade transitions, deep hunts and shared wardens. Read screenshots, deltas, server events and receipts.
-4. Rehearse conversion on preserved representative saves and a sanitized snapshot where available. Run it twice, exercise post-conversion transactions, then rehearse rollback without losing new progress.
-5. Invite a small QA player pilot when available; record whether players can explain the counter, choose a useful upgrade, find missing materials and recover after losing. Do not treat a mathematically legal flow as proof it is enjoyable.
-6. Re-run whole-account comparisons after boss tuning, since raid energy, consumables, deaths and rewards alter hunting/upgrade pace. Fix regressions and repeat only affected checks plus required release suites.
+1. Rehearse the complete migration in isolated copies of representative saves: all old weapon/slot states, full/overflow XP, storage/faction assets, pending trades, broken items, legacy active fights, wounded wardens and pledges. Use anonymized fixtures; no credentials or player secrets in Git.
+2. Run conversion preview, apply twice, reconcile and compensate using implemented tooling. Record exact executable commands, source SHAs, world IDs, receipts and inverse operations in a runbook. Demonstrate post-conversion progress is preserved on rollback, not replaced by old snapshots.
+3. Walk every S01–S14 browser scenario, including multi-turn Luna and web, keyboard/tap, desktop/390px, profile/collection/popup and public/private visibility. Inspect ledgers and shared state beyond the displayed cards.
+4. Run two-user/two-tab flows: A prepares a deck, B acts elsewhere, A reconnects; trade/refund/upgrade/final-kill races; active legacy fight finishing before new groups; stale cards attempting a fourth weapon.
+5. Assess the actual opening and later mixed-group pacing. Ask the tester to explain current enemy, next threat, energy, weapon choice and pending reward. Record active minutes/actions and any repeated navigation. Regressions are filed with evidence before fixes and rerun.
+6. Repeat representative real-engine strategy/warden validations after migration changes. Freeze release versions and the full art/content bundle only when all hard gates pass.
 
 ## Verification
 
-The LLM drives and judges the browser scenarios; coded tests cannot replace them. Record a numbered dojo/results folder with SHAs/environment, per-scenario PASS/FAIL, screenshots, measured outcomes and regressions. Require every launch gate in the parent plan to pass or be deliberately revised with evidence before release. Do not report gameplay complete while a required real multi-player scenario is pending.
+Run targeted regression tests first, then `PYTHONPATH=plugin-linear-ascent python3 -m pytest plugin-linear-ascent/tests -q`, the full `worldd` pytest suite against an explicitly isolated test database, `python3 -m unittest discover -s simulation/tests -v`, content lint and wiki generation check. Zero untriaged new failures. Complete all browser scenarios with screenshots, client/root/plugin hashes and PASS/FAIL tables in a numbered results folder. Both a real multi-turn Luna walkthrough and web play are mandatory; a simulation or screenshot of a fixture alone does not substitute.
+
+All commands are future implementation verification, not actions performed by this planning revision. New test/tool interfaces named conceptually must be implemented and their actual commands recorded before use. Never point worldd tests at production. See [scenario index](../DOJO-SCENARIOS.md).
 
 ## Rollback
 
-Reset only disposable QA fixtures from their preserved baseline; retain failure evidence. Revert the responsible implementation phase and replay its dependent scenarios. No production rollout occurs in this phase.
+Use the rehearsed compensation runbook on the isolated converted world, retain compatibility readers, and preserve all newly earned receipts/items/XP. Revert only the phase's code fixes that are unsafe, then rerun affected scenarios and reconciliation. Production remains unchanged until phase8. A failed rollback rehearsal blocks release.
+
+For each implementation commit, record its exact SHA and the reverse-order `git revert` sequence before starting the next phase. Data-changing operations require their tested compensating commands and receipt IDs before execution. Keep all new-format data readable.
 
 ## Operational notes
 
-This is future work. Planned harness/tool paths named above must be implemented before their commands can run. Record exact implementation SHAs, deployed revisions and any migration arguments before executing a release or conversion. The plugin owns engine/content/cards; worldd owns authoritative shared state. Both inherit the versioned definitions. See the parent plan and DOJO-SCENARIOS.md.
+Follow the [parent plan](../PLAN.md) and its ownership map. No new production rules during phases2–7. Run targeted checks before full relevant suites; preserve existing work and source-pinned evidence. A real browser/Luna walkthrough is required before reporting an implementation phase complete.
 
 ## Execution status
 
-Not started. This planning task does not claim runtime verification.
+Not started. Rewritten for the three-weapon/group design on12 September2026; awaiting the user's plan review. This document is not evidence that runtime changes or tests have run.

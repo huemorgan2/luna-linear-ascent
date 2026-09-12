@@ -1,23 +1,23 @@
-# S09 — Concurrent wardens and the true finale
+# S09 — Actual overlapping attacks and floor100
 
 ## Preconditions
 
-Separate QA world, version-matched clients, multiple actual browser players plus authenticated load clients for larger parties; bosses 10/50/100, fixed HP/healing and finite budgets.
+Phases 6,7. Candidate shared-service world with fixed HP/regen/cadence and finite-energy eligible players in two browsers; action-driven larger party harness for late floors.
 
 ## Scenario
 
-Observe idle healing, attack from two browsers and watch shared HP change per accepted hit. Compare staggered with overlapping attacks. Add finite-energy group load, disconnect/rejoin, duplicate requests and nearly simultaneous killing blows. Kill100 through actual combat.
+A attacks and B watches HP; wait to observe healing. Attempt a staggered assault, then comparable overlapping attacks. Retry a hit, reconnect, apply status effects and race two killing blows. Execute a full floor100 shared-service victory.
 
 ## Expected behavior
 
-HP/healing follows server time. Prepared overlapping groups win within their budgets; insufficient groups and the strongest permitted solo finale build fail. One real death awards once and closes the era once at 100.
+Every accepted hit promptly affects one shared bar; healing occurs with time. Overlap can win where staggered low damage fails. Finite resources matter. Floor100 closes the era and pays eligible contributors once without pledges.
 
 ## Fail conditions
 
-Private damage is banked; pledges resolve victory; clicks change tick speed; infinite-energy assumptions; rewards/refunds repeat; no viable UI cadence; a second final blow ends the era again.
+Private damage totals banked until exit, sum-of-stats auto-win, clock advanced by number of viewers, free attacks from extra tabs, duplicate rewards, unsafe integer HP or an old pledge triggering victory.
 
 ## Verify
 
-Inspect player costs, per-action IDs/timestamps, boss state, status clocks, contribution and kill receipts, frontier and era records. Load tests support rather than replace the multi-browser walkthrough.
+Inspect authoritative event timestamps, accepted damage/energy, status tick IDs, HP trajectory, participant eligibility, one kill/reward/unlock/era receipt. Record tested party size and uncertainty, not an asserted optimum.
 
-Record SHAs, environment, PASS/FAIL with notes, screenshots and any regressions in a numbered dojo results folder. Fix failures and rerun the affected scenario before marking its phase complete.
+The LLM tester walks the real browser, reads the DOM and screenshots, and records PASS/FAIL with evidence. Coded checks complement this walkthrough. Record date, root/plugin/client SHAs, environment, accounts/fixtures, timings, screenshots and regressions in a numbered results folder; file failures before fixing and rerun the affected scenario. This scenario is planned, not executed by the current documentation revision.

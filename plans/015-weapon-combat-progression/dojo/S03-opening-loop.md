@@ -1,23 +1,23 @@
-# S03 — First session and first upgrade
+# S03 — First session: collection, group, Forge
 
 ## Preconditions
 
-A fresh candidate character with normal authored starter resources.
+Phases 3,7. Fresh candidate account with only normal authored starter resources; phase3 may use an explicitly open QA frontier, not gifted personal resources.
 
 ## Scenario
 
-Type “play linear ascent”; use plain-text “2” for an actual numbered choice; hunt, reach floor 2, inspect +1 requirements, collect opening rewards, visit Forge, upgrade and fight again. Ask “where am I?” twice.
+Type “play linear ascent”. Open profile and Weapon collection, select weapons, inspect the opening pair, defeat its first member and continue from the same scene. Secure the haul, obtain starter counter access, visit Forge, perform the first upgrade and hunt again. Use one numbered reply as well as clicks.
 
 ## Expected behavior
 
-The player has a clear next step, earns the first upgrade without needing a random rare drop, sees its real benefit and spends resources once. Reads change no game state.
+Three slots are available immediately; the first pair teaches XP and haul; the next member takes no mandatory Continue click; counter gear and +1 are earned through the real opening. The upgraded weapon shows the correct benefit.
 
 ## Fail conditions
 
-Developer grants/refills are needed; text choices fail; a read rerolls loot; a broken or unaffordable starter prevents progress; prose invents results without an action.
+Developer gifts/refills needed, School slot lock, mandatory rare drop, repeated town/loot navigation between members, unreadable next action, or prose claiming an action that the engine did not accept.
 
 ## Verify
 
-Record the first 10 committed actions and all resource deltas. Verify grade/level/art, one transaction receipt and the floor/character gate.
+Record first-session resource ledger, energy/XP/haul and owned instances, all required actions and elapsed/active time. Take desktop and390px screenshots. Explain what the next useful purchase/upgrade is.
 
-Record SHAs, environment, PASS/FAIL with notes, screenshots and any regressions in a numbered dojo results folder. Fix failures and rerun the affected scenario before marking its phase complete.
+The LLM tester walks the real browser, reads the DOM and screenshots, and records PASS/FAIL with evidence. Coded checks complement this walkthrough. Record date, root/plugin/client SHAs, environment, accounts/fixtures, timings, screenshots and regressions in a numbered results folder; file failures before fixing and rerun the affected scenario. This scenario is planned, not executed by the current documentation revision.

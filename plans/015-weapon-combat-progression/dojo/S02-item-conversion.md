@@ -1,23 +1,23 @@
-# S02 — Returning players and item identity
+# S02 — Returning players and ownership conversion
 
 ## Preconditions
 
-Preserved fixtures cover every old weapon, multiple copies, hone/style/oil/wear, equipped/held/pack/storage/offer/reward locations.
+Phases 2,7. Isolated one/two/three-slot saves, duplicate old slugs, different honing/styles/condition, stored/faction items, complete and missing carry purchase histories, active old fight and full XP bar.
 
 ## Scenario
 
-Preview conversion, apply it in QA, inspect each location through player UI, refresh, and rerun conversion. Buy/receive another copy and change one instance.
+Preview conversion, open owner collection and another player’s profile, apply conversion twice, inspect each location and refund, finish the old fight then start a new hunt. Earn a new item/XP after conversion and rehearse compensation.
 
 ## Expected behavior
 
-Each item remains owned, distinct and usable with its documented power/condition. A second conversion makes no additional change.
+Three slots appear; item instances and ownership remain distinct; recorded fees refund once; XP overflow survives; other profiles cannot edit or expose private bank data. Old fight finishes under its old rules. Compensation preserves later earnings.
 
 ## Fail conditions
 
-Merged copies, missing paid stats, free extra items/gold, lost oil/style, an item becoming usable past a closed gate, or old clients corrupting new items.
+Item collapse/duplication, lost paid value, refund at an invented current price, double refund, mixed battle rules, stale snapshot replacing new progress, or a public profile carrying owner mutation actions.
 
 ## Verify
 
-Compare before/after instance reconciliation and append-only receipts; verify both local and HTTP backends and the planned compatibility rollback.
+Reconcile per-owner item IDs, locations, XP/gold/refund totals and receipt IDs before/after both applies and compensation. Archive the exact implemented commands and inverse operations.
 
-Record SHAs, environment, PASS/FAIL with notes, screenshots and any regressions in a numbered dojo results folder. Fix failures and rerun the affected scenario before marking its phase complete.
+The LLM tester walks the real browser, reads the DOM and screenshots, and records PASS/FAIL with evidence. Coded checks complement this walkthrough. Record date, root/plugin/client SHAs, environment, accounts/fixtures, timings, screenshots and regressions in a numbered results folder; file failures before fixing and rerun the affected scenario. This scenario is planned, not executed by the current documentation revision.

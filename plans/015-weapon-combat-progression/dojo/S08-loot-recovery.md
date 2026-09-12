@@ -1,23 +1,23 @@
-# S08 — Unequal loot routes and recovering from losses
+# S08 — Kill XP, pending haul and all outcomes
 
 ## Preconditions
 
-Normal/deep rosters, A/B carriers, native-grade drought fixtures, fragile/well-prepared characters, broken items and no-gold recovery fixtures.
+Phases 3,5,7. Groups with known reproducible reward seeds, full XP bar, full pack, contract/weekly progress, carried purse and previously secured materials; revive and rescue cases.
 
 ## Scenario
 
-Choose different trails/specimens; compare normal/deep outcomes per energy. Trigger the documented native-grade safeguard. Die, inspect materials/weapon levels, repair, then resume normal play with a practical counter.
+Kill a member and inspect XP/haul; try spending/trading/claiming its pending rewards. Finish one group, escape another, die on the final exchange, revive in place and use rescue extraction. Retry a final kill and claim from two tabs.
 
 ## Expected behavior
 
-Species and route choices matter; deep risk/reward is explicit; the native safeguard preserves carrier differences and rare early finds remain rare. Invested levels survive under the new policy and a legal recovery route exists.
+XP is earned once per resolved kill including overflow. Only a full clear while alive secures the haul; extraction/failure forfeits it. Earlier possessions are accounted separately. Contracts/assists cannot cash out unfinished loot; full-pack rewards remain claimable.
 
 ## Fail conditions
 
-Equalized species rates; early Legendary guarantee; refreshing resets the safeguard; entire Materials stacks disappear; repair and earning require each other with no exit.
+Clipped earned XP, double XP/item/gold, loot rerolled at claim, pending gold deducted from the purse on failure, death granting full-clear reward, lost overflow item or unlimited claim storage.
 
 ## Verify
 
-Compare observed rolls and safeguards to the published settings; run the seeded distribution tests for rates/tails. Inspect death/protection precedence, net gold, repair receipts and no-risk resale loops.
+Reconcile enemy kill IDs, XP/reserve/rested bonus, pending/secured ownership, objective receipts and outcome. Check that mutual final death keeps XP and forfeits haul.
 
-Record SHAs, environment, PASS/FAIL with notes, screenshots and any regressions in a numbered dojo results folder. Fix failures and rerun the affected scenario before marking its phase complete.
+The LLM tester walks the real browser, reads the DOM and screenshots, and records PASS/FAIL with evidence. Coded checks complement this walkthrough. Record date, root/plugin/client SHAs, environment, accounts/fixtures, timings, screenshots and regressions in a numbered results folder; file failures before fixing and rerun the affected scenario. This scenario is planned, not executed by the current documentation revision.
