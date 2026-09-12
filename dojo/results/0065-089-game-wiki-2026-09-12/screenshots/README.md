@@ -11,3 +11,5 @@ The CUA tool emitted the following actual browser screenshots inline in the task
 - Phone: Legendary Ramguard dossier with visible shop/drop condition and206 eligible sources.
 
 These are inline screenshot records, not local PNG files. All pass/fail judgments above were made after reading these captures and the corresponding DOM; screenshot file paths have not been fabricated.
+
+Production was also inspected in the real browser: homepage Wiki link, all425 rows/64 weapons, Floor80 deep settings and Legendary Ramguard dossier at linearascent.net.

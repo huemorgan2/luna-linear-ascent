@@ -15,17 +15,21 @@ First user action for this public reference is opening the website's `/wiki`. Th
 | Full loot/settings roster | PASS |425 rows initially; Floor80 has4. Deep excludes2 feeble creatures. Remount common normal/deep Legendary weapon0.05618571%/0.22474286%; deep alpha0.50567143%. Search, parameter view and per-family dossier work. |
 | All weapon sources | PASS |64 rows. Legendary Ramguard shop+6,4798/4798,Floor84; drop+0,449/4486 (10%),discovery50/equip76.206 eligible creature sources for Legendary,425 for other grades. |
 | Phone | PASS |390px document width at390px viewport, no horizontal page overflow; dossier352px wide and scrollable. Frame controls, bestiary and modal remain readable at16px. |
-| Public production route and homepage link | PENDING | Deploy and inspect exact revision after release. |
+| Public production route and homepage link | PASS | Clicked homepage Wiki link at linearascent.net. Revision089.1 loaded425 creature rows/64 weapon rows. Floor80 deep remount odds0.22474286% and Legendary Ramguard source settings match local. Console0 errors. |
 
 ## Automated verification
 
 - Worldd suite:223 passed in83.36s.
 - Targeted route/data/progression tests:3 passed; all100 floors and425 creatures covered.
 - Node model checks:5 passed, covering3400 creature/mode/specimen outcomes,2304 loadout combinations and5400 shield allocations.
-- Reproducible data check: current; no missing creature/weapon art. No game state writes.
+- Reproducible data check: current; no missing creature/weapon art. All441 creature/weapon image URLs returned HTTP200 locally. Browser console recorded0 errors. No game state writes.
 
 ## Regressions and corrections
 
 The initial suite had222 passing/1 failure because this isolated checkout lacked the plugin submodule's source map. Initialized its exact pinned commit92c86b6 and reran the full suite:223 passing. Two initial new assertions incorrectly treated base acquisition as an upgrade charge and expected attack to rise on legacy hold floors; corrected the assertions, preserving the verified economy. Review found and fixed grade control synchronization after a source-table click, and moved loot probabilities ahead of the wide parameter table. All are resolved.
 
 Screenshot evidence was captured and inspected in the task's browser tool output; see `screenshots/README.md`. Browser artifacts are inline, not invented local PNGs.
+
+## Production release
+
+Implementation693d4f7, Render deployment dep-daik2p5g1s2s73flpv10, live2026-09-12T12:15:34Z. Game remains0.112.0. `/wiki` HTTP200; `/health` ok:true,db:true; generated data bytes match the source bundle. The custom-domain page was verified through the real browser (a plain urllib request to that hostname received403; the Render origin returned200). Public UI behaved correctly. No unresolved regressions.
