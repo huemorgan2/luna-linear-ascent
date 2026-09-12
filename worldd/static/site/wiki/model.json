@@ -1,5 +1,5 @@
 {
-  "revision": "089.1",
+  "revision": "089.2",
   "types": [
     {
       "id": "ground-common",
@@ -84,25 +84,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -127,25 +135,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -170,25 +186,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -213,25 +237,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -256,25 +288,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -299,25 +339,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -342,25 +390,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -385,25 +441,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -428,25 +492,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -471,25 +543,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -514,25 +594,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -557,25 +645,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -600,25 +696,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -643,25 +747,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -686,25 +798,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     },
@@ -729,25 +849,33 @@
           "shopLevel": 0,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 40
+          "dropDurabilityPct": 40,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Rare": {
           "shopLevel": 2,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 30
+          "dropDurabilityPct": 30,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Epic": {
           "shopLevel": 4,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 20
+          "dropDurabilityPct": 20,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         },
         "Legendary": {
           "shopLevel": 6,
           "shopDurabilityPct": 100,
           "dropLevel": 0,
-          "dropDurabilityPct": 10
+          "dropDurabilityPct": 10,
+          "craftLevel": 0,
+          "craftDurabilityPct": 100
         }
       }
     }

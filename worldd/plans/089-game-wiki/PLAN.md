@@ -54,4 +54,4 @@ Post-release source review identified a design gap: Rare+2/Epic+4/Legendary+6 sh
 
 Goal: every grade has a visible Forge-crafted +0/full-condition route at its original floor1/26/51/76, with gold and paired material requirements. Keep shop starting ranks and drop conditions unchanged. Add explicit per-family craft settings, source columns, dossier costs and research guidance. Verify all64 entries, the four transition gates, browser source detail and the full suite. Redeploy the static revision and verify it.
 
-Rollback: revert only this follow-up implementation commit and redeploy693d4f7. No database state or live mechanic changes. Execution status: plan recorded before follow-up edits; verification pending.
+Rollback: revert only this follow-up implementation commit and redeploy693d4f7. No database state or live mechanic changes. Execution status: plan4b39221 committed before follow-up edits. All64 explicit craft settings added; Python3/3, Node5/5 and full suite223/223 pass (85.53s). Browser verifies Legendary Ramguard craft+0/full4486 at76,20 Mythic Threads+80 Shard Matter+19,193,000,429 gold. Static revision089.2 release verification pending.

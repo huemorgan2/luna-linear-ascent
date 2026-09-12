@@ -10,6 +10,11 @@ test('all 64 weapon source settings have valid ranks, delivered condition and pr
   const a=acquisition(data,w,gi);
   assert.equal(a.cfg.shopLevel,[0,2,4,6][gi]);
   assert.equal(a.shop.floor,[1,28,57,84][gi]);
+  assert.equal(a.cfg.craftLevel,0);
+  assert.equal(a.craft.floor,[1,26,51,76][gi]);
+  assert.equal(a.craftNow,a.craftMax);
+  assert(a.craftQ>0&&a.craftGold>0);
+  assert(a.craft.floor<=a.shop.floor);
   assert.equal(a.cfg.dropLevel,0);
   assert.equal(a.cfg.dropDurabilityPct,[40,30,20,10][gi]);
   assert.equal(a.shopNow,a.shopMax);

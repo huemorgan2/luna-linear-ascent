@@ -61,7 +61,7 @@ async def test_public_wiki_routes_assets_and_home_link_need_no_account():
         for route in ('/wiki', '/wiki/'):
             response = await client.get(route)
             assert response.status_code == 200
-            assert 'data-wiki-revision="089.1"' in response.text
+            assert 'data-wiki-revision="089.2"' in response.text
             assert 'set-cookie' not in response.headers
         assert 'href="/wiki"' in (await client.get('/')).text
         for path in ('wiki.mjs', 'wiki.css', 'data.json'):

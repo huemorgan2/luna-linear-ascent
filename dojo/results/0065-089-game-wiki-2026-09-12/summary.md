@@ -33,3 +33,7 @@ Screenshot evidence was captured and inspected in the task's browser tool output
 ## Production release
 
 Implementation693d4f7, Render deployment dep-daik2p5g1s2s73flpv10, live2026-09-12T12:15:34Z. Game remains0.112.0. `/wiki` HTTP200; `/health` ok:true,db:true; generated data bytes match the source bundle. The custom-domain page was verified through the real browser (a plain urllib request to that hostname received403; the Render origin returned200). Public UI behaved correctly. No unresolved regressions.
+
+## Crafting follow-up — revision089.2
+
+A post-release design review found that deferring higher-level shop stock left a gap at grade entry. Exposed the existing +0 gold/material recipe as a full-condition Forge crafting source for all64 entries at floors1/26/51/76. Browser PASS: Legendary Ramguard crafts at76,+0,4486/4486 END,19,193,000,429 gold,20 Mythic Threads and80 Shard Matter. Shop+6 and drop+0/10% remain distinct. Full suite223 passed in85.53s; Node5/5, targeted Python3/3, generator-current check pass. Follow-up deployment verification pending.
