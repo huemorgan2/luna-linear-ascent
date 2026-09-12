@@ -4,6 +4,7 @@ from pathlib import Path
 import argparse
 import json
 import sys
+import statistics
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from simulation.model import Config
@@ -42,7 +43,7 @@ def main():
     print(json.dumps(dict(file=str(path), seconds=data["duration_seconds"],
         deterministic_sha256=data["deterministic_sha256"], players=config.players,
         workers=data["execution"]["workers"],
-        median_floor=sorted(p["ready_floor"] for p in data["players"])[config.players//2]), indent=2))
+        median_floor=statistics.median(p["ready_floor"] for p in data["players"])), indent=2))
 
 
 if __name__ == "__main__":

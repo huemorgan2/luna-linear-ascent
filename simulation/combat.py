@@ -22,6 +22,8 @@ class Outcome:
     materials: list = field(default_factory=lambda: [[0, 0] for _ in range(4)])
     drops: list = field(default_factory=list)
     trace: list = field(default_factory=list)
+    failure: str = ""
+    types: dict = field(default_factory=dict)
 
 
 def make_group(rules, floor, rng, deep=False, carrier=None, ground_bias=False):
@@ -91,10 +93,12 @@ def choose_attack(rules, p, enemy, gap, rng, exhausted, exposed):
     for i, item in enumerate(p.deck):
         w = rules.weapons[item.family]
         arrows = [a for a, n in p.ammo.items() if n > 0] if w["path"] == "Bow" else ["ordinary"]
+        if item.source == "recovery-starter" and "ordinary" not in arrows:
+            arrows.append("ordinary")
         for a in arrows:
             hit, channel = damage(rules, p, item, enemy, gap, a, exhausted, exposed)
             score = hit
-            if policy["tactical"] and item.cooldown == 0 and hit:
+            if policy["tactical"] and item.cooldown == 0 and hit and item.source != "recovery-starter":
                 effect = w["effect"]
                 if w["path"] == "Bow" and a not in ("ordinary", "arcane"):
                     effect = {"fire":"Burn", "poison":"Poison", "pinning":"Slow", "concussive":"Knockback"}[a]
@@ -159,11 +163,15 @@ def fight_group(rules, p, floor, enemies, rng, *, probe=False, trace=False, retr
     for index, original in enumerate(enemies):
         if retreat_after is not None and index >= retreat_after:
             result.retreated = True
+            result.failure = "planned_retreat"
             break
         if index and not probe and (p.hp < max_hp*policy["retreat"] or (p.energy < 1 and not policy["exhausted"])):
             result.retreated = True
+            result.failure = "health_retreat" if p.hp < max_hp*policy["retreat"] else "energy_retreat"
             break
         enemy = dict(original)
+        typ = result.types.setdefault(enemy["proposedType"],dict(started=0,kills=0,actions=0,incoming=0))
+        typ["started"] += 1
         funded = start_enemy(p)
         result.energy_spent += int(funded)
         result.exhausted_enemies += int(not funded)
@@ -175,6 +183,7 @@ def fight_group(rules, p, floor, enemies, rng, *, probe=False, trace=False, retr
         alive = True
         for turn in range(rules.config.max_combat_actions):
             result.actions += 1
+            typ["actions"] += 1
             speed = max(1, p.speed-(0 if funded else rules.config.exhaustion_speed))
             mspd = max(1, enemy["speed"]-(3 if slow else 0))
             stunned = pushed = False
@@ -186,16 +195,18 @@ def fight_group(rules, p, floor, enemies, rng, *, probe=False, trace=False, retr
                     gap -= 1
                 else:
                     result.retreated = True
+                    result.failure = "no_reachable_weapon_or_ammo"
                     break
             elif not probe and p.hp < max_hp*policy["retreat"] and turn > 0:
                 if rng.random() < min(.9, max(.15, .5+.05*(speed-mspd)+.1*gap)):
                     result.retreated = True
+                    result.failure = "health_retreat"
                     break
             else:
                 _, wi, arrow, hit, channel = action
                 item = p.deck[wi]
                 weapon = rules.weapons[item.family]
-                if weapon["path"] == "Bow":
+                if weapon["path"] == "Bow" and not (item.source == "recovery-starter" and arrow == "ordinary"):
                     p.ammo[arrow] -= 1
                 item.condition = max(0, item.condition-1/rules.endurance(item))
                 if rng.random() >= .08:
@@ -258,16 +269,20 @@ def fight_group(rules, p, floor, enemies, rng, *, probe=False, trace=False, retr
                         hit, absorbed = shield_hit(raw, rules.armor(p)+rules.characters[p.level-1]["defense"], rules.shield(p))
                         p.hp -= hit
                         result.incoming += hit
+                        typ["incoming"] += hit
                         p.shield_condition = max(0, p.shield_condition-absorbed/rules.shield_endurance(p))
             slow, stun_resist = max(0, slow-1), max(0, stun_resist-1)
             if p.hp <= 0:
                 result.died = True
+                result.failure = "survival"
                 break
         if alive:
             if not result.died:
                 result.retreated = True
+                result.failure = result.failure or "action_limit"
             break
         result.kills += 1
+        typ["kills"] += 1
         if not probe:
             spec = rules.floors[floor-1]["specimens"][enemy.get("specimen", "common")]
             deep_mult = rules.floors[floor-1]["deep"]["reward"] if enemy.get("deep") else 1

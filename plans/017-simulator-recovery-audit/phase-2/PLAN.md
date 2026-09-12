@@ -18,4 +18,4 @@ Revert the phase implementation commit recorded below; preserve saved runs and b
 
 ## Execution status
 
-Not started.
+Complete. 30 tests pass (6.311s), including resource conservation, same-slot basic recovery, paid fractional repair, preserved reckless policy, lower-route choice, failed-probe diagnostics and parallel identity. A 24-player/120-day smoke run `20260912T174802Z-56e3dcd6` has median ready floor 22 (maximum28), versus original median6; this bundle is not a one-factor attribution. Four paid decks break completely, all Rushers. Code inspection found and corrected the CLI upper-middle statistic to a true median. Diagnostic UI added; full browser verification follows in phase4. Exact phase commit recorded after commit. Rollback: revert that phase commit and restart the local simulator; preserve runs.

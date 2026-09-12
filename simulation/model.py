@@ -34,7 +34,7 @@ POLICIES = {
 @dataclass
 class Config:
     model_revision: str = "audited-v2"
-    decision_model: str = "original"
+    decision_model: str = "adaptive"
     recovery_mode: str = "starter"
     durability_scale: float = 1
     heal_cost_scale: float = 1
@@ -248,6 +248,9 @@ class Player:
     last_time: float = 0
     last_bank_day: int = 0
     tutorial: bool = False
+    stored_deck: dict = field(default_factory=dict)
+    route_cache: dict = field(default_factory=dict)
+    route_memory: dict = field(default_factory=dict)
 
     def count(self, key, amount=1):
         self.counters[key] = self.counters.get(key, 0) + amount

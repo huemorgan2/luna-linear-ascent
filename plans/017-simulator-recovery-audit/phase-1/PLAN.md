@@ -18,4 +18,4 @@ Revert the phase implementation commit recorded below; preserve saved runs and b
 
 ## Execution status
 
-Complete. 24 tests pass (22.403s under concurrent run load). The preserved v1 run `20260912T174103Z-7084aad9` matches original player, floor and warden digests exactly. Audit at `research/simulation-audit/AUDIT.md`; pinned input unchanged. Implementation commit is the next audit commit; exact SHA added after commit. Rollback: revert that commit; keep old run files.
+Complete. 24 tests pass (22.403s under concurrent run load). The preserved v1 run `20260912T174103Z-7084aad9` matches original player, floor and warden digests exactly. Audit at `research/simulation-audit/AUDIT.md`; pinned input unchanged. Implementation: `f6c4c5b`. Rollback: `git revert --no-edit f6c4c5b`; keep old run files.

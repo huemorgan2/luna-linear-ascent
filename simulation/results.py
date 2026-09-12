@@ -19,6 +19,7 @@ from . import VERSION
 from .bosses import evaluate_floor
 from .model import Config, POLICIES, ROOT, Rules
 from .swarm import simulate_player
+from .diagnostics import summarize
 
 _WORKER_RULES = None
 
@@ -183,7 +184,8 @@ def simulate(config, progress=None):
             "readiness":"full HP/energy, owned gear and ammo, fixed normal-group probes",
             "averages":"among reached players; censored players reported separately",
             "warden":"continuous healing; direct attacks only; finite HP/energy; no pledges",
-            "details":"MODEL.md"}, **payload)
+            "model_revision":config.model_revision,"decision_model":config.decision_model,
+            "details":"MODEL.md"}, diagnostics=summarize(players), **payload)
 
 
 def validate_run(data):

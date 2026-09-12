@@ -10,7 +10,9 @@ const sum = (xs, fn) => xs.reduce((a,x)=>a+(fn(x)||0),0);
 const median = xs => { const a=[...xs].sort((a,b)=>a-b); return a.length ? (a[Math.floor((a.length-1)/2)]+a[Math.floor(a.length/2)])/2 : null; };
 async function api(path, options) { const r=await fetch(path, options); const d=await r.json(); if(!r.ok) throw Error(d.error||`Request failed (${r.status})`); return d; }
 function error(message='') { $('error').textContent=message; $('error').hidden=!message; }
+const stringSettings=['model_revision','decision_model','recovery_mode','warden_pool'];
 const advanced = {
+ durability_scale:['Weapon durability ×',.25,10,.25], heal_cost_scale:['Healing prices ×',0,4,.1], repair_reserve:['Upkeep reserve share',0,.8,.05],
  attendance:['Daily attendance',.1,1,.05], activity_spread:['Activity variation',0,.8,.05], action_seconds:['Seconds / action',1,60,1], energy_regen_minutes:['Minutes / energy',1,180,1], sleep_hours:['Sleep hours',0,12,1],
  group_hp_scale:['Group enemy HP ×',.1,5,.05], group_size_scale:['Group size ×',.5,2,.1], exhaustion_damage:['Exhausted damage ×',.05,1,.05], exhaustion_speed:['Exhausted speed loss',0,8,1], max_combat_actions:['Max actions / enemy',8,160,1],
  gold_scale:['Gold rewards ×',.1,20,.1], material_scale:['Material quantity ×',.1,20,.1], upgrade_cost_scale:['Weapon costs ×',.1,10,.1], defense_cost_scale:['Defense costs ×',.1,10,.1], repair_fraction:['Full repair cost share',0,1,.01], death_gold_loss:['Death purse loss share',0,1,.05], death_condition_loss:['Death condition loss',0,.9,.05], bank_interest_daily:['Daily bank interest',0,.1,.005],
@@ -25,17 +27,17 @@ function setupForm(defaults) {
 }
 function readSettings() {
  const data=new FormData($('run-form')), cfg={...state.config, workers:0};
- for(const [key,value] of data.entries()) if(key!=='policies'&&key!=='warden_pool') cfg[key]=Number(value);
+ for(const [key,value] of data.entries()) if(key!=='policies') cfg[key]=stringSettings.includes(key)?value:Number(value);
  cfg.policies=data.getAll('policies'); cfg.warden_pool=data.get('warden_pool');
  if(!cfg.policies.length) throw Error('Select at least one player strategy.');
  return cfg;
 }
 function useSettings() {
  if(!state.run) return;
- state.config={...state.run.config,workers:0};
+ state.config={...state.config,...state.run.config,workers:0,model_revision:state.run.config.model_revision||'proposal-v1',decision_model:state.run.config.decision_model||'original',recovery_mode:state.run.config.recovery_mode||'none'};
  for(const el of $('run-form').elements) {
   if(el.name==='policies') el.checked=state.config.policies.includes(el.value);
-  else if(el.name==='warden_pool') el.checked=el.value===state.config.warden_pool;
+  else if(stringSettings.includes(el.name)) el.checked=el.value===state.config[el.name];
   else if(el.name && el.name in state.config) el.value=state.config[el.name];
  }
  $('run-form').scrollIntoView({behavior:'smooth'});
@@ -123,7 +125,7 @@ function renderCharts() {
 function metric(label,value,detail) { return `<div class="metric"><span>${esc(label)}</span><strong>${esc(value)}</strong><span>${esc(detail)}</span></div>`; }
 function render() {
  const run=state.run, c=run.config, ps=members();
- $('run-meta').textContent=`${c.players} players · ${c.days} days · ${c.minutes_per_day} min/day · ${c.sessions_per_day} sessions/day · ${fmt(run.duration_seconds)}s to compute · ${run.execution?.workers??c.workers??'legacy'} CPU workers`;
+ $('run-meta').textContent=`${c.model_revision||'proposal-v1'} / ${c.decision_model||'original'} · Enemy HP ×${c.group_hp_scale} · ${c.players} players · ${c.days} days · ${c.minutes_per_day} min/day · ${c.sessions_per_day} sessions/day · ${fmt(run.duration_seconds)}s to compute · ${run.execution?.workers??c.workers??'legacy'} CPU workers`;
  $('cohort-filters').innerHTML=[['all','Whole swarm',colors.ink],...c.policies.map(p=>[p,run.policy_definitions[p].name,run.policy_definitions[p].color])].map(([id,name,color])=>`<button data-policy="${id}" class="${id===state.cohort?'active':''}" style="color:${color}" aria-pressed="${id===state.cohort}">${esc(name)}</button>`).join('');
  const reachedTop=ps.filter(p=>p.ready_floor>=c.max_floor).length;
  $('metrics').innerHTML=metric('Median final ready floor',fmt(median(ps.map(p=>p.ready_floor))),`${ps.length} players in selected cohort`)+metric(`Reached floor ${c.max_floor}`,`${reachedTop} / ${ps.length}`,`${ps.length-reachedTop} still censored at day ${c.days}`)+metric('Mean active play',`${fmt(sum(ps,p=>p.active_minutes)/ps.length)} minutes`,'Combat time actually used per player')+metric('Readiness requirement',`${Math.ceil(c.readiness_trials*c.readiness_threshold-1e-9)} / ${c.readiness_trials} groups`,'Prepared HP/energy · owned gear');
@@ -142,7 +144,7 @@ function render() {
  const biggest=Math.max(1,...Object.values(blocks));
  $('bottlenecks').innerHTML=Object.entries(blocks).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div><div class="bar-label"><span>${esc(human(k))}</span><span>${fmt(v,0)}</span></div><div class="bar-track"><span style="width:${v/biggest*100}%"></span></div></div>`).join('')||'<p>No blocked decisions recorded.</p>';
  $('player-table').innerHTML=ps.slice(0,100).map(p=>`<tr><td>#${p.id}</td><td>${esc(run.policy_definitions[p.policy].name)}</td><td>${p.ready_floor}</td><td>Level ${p.final.level}</td><td>${fmt(p.final.gold+p.final.bank)}</td><td>${p.final.deck.map(w=>`${esc(human(w.family))} · ${['Common','Rare','Epic','Legendary'][w.grade]} +${w.level} · ${fmt(w.condition*100,0)}%`).join('<br>')}</td></tr>`).join('');
- renderCharts(); renderFloor();
+ renderCharts(); renderFloor(); renderDiagnostics();
 }
 function setFloor(f) { state.floor=Math.max(1,Math.min(state.run.config.max_floor,Number(f)||1)); renderFloor(); }
 function renderFloor() {
@@ -169,6 +171,7 @@ async function poll() {
 }
 $('run-form').addEventListener('submit',async e=>{e.preventDefault();error();try { $('run-button').disabled=true; $('job-label').textContent='Starting…'; await api('/api/runs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(readSettings())}); } catch(e) {error(e.message);$('run-button').disabled=false;} });
 $('copy-settings').onclick=useSettings;
+$('diagnostic-player').onchange=renderDiagnostics;
 $('run-select').onchange=e=>loadRun(e.target.value).catch(e=>error(e.message));
 $('compare-select').onchange=async e=>{const serial=++compareSerial;try{const run=e.target.value?await api(`/api/runs/${e.target.value}`):null;if(serial!==compareSerial)return;state.compare=run;render();}catch(e){error(e.message);}};
 $('cohort-filters').onclick=e=>{const button=e.target.closest('[data-policy]');if(button){state.cohort=button.dataset.policy;render();}};
@@ -177,3 +180,16 @@ $('range-buttons').onclick=e=>{const b=e.target.closest('[data-range]');if(b){st
 $('floor-slider').oninput=e=>setFloor(e.target.value);$('floor-number').oninput=e=>setFloor(e.target.value);
 let resize;window.addEventListener('resize',()=>{clearTimeout(resize);resize=setTimeout(renderCharts,100);});
 (async()=>{try{setupForm(await api('/api/defaults'));await refreshRuns();poll();}catch(e){error(e.message);}})();
+
+function renderDiagnostics() {
+ const players=members(), select=$('diagnostic-player'), previous=select.value;
+ select.innerHTML=players.map(p=>`<option value="${p.id}">#${p.id} · ${esc(state.run.policy_definitions[p.policy].name)} · floor ${p.ready_floor}</option>`).join('');
+ if(players.some(p=>String(p.id)===previous)) select.value=previous;
+ const p=players.find(p=>String(p.id)===select.value),d=p?.diagnosis;
+ if(!d){$('diagnostic-detail').innerHTML='<p class="note">This original run has no detailed diagnostic telemetry. Its existing results are preserved; run the audited model to see recovery and failure details.</p>';return;}
+ const finances=d.finances, total=Object.values(finances.spending).reduce((a,b)=>a+b,0), wallet=p.final.gold+p.final.bank;
+ const bars=Object.entries(finances.spending).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div><div class="bar-label"><span>${esc(human(k))}</span><span>${fmt(v)} · ${pct(v/(total||1))}</span></div><div class="bar-track"><span style="width:${100*v/(total||1)}%"></span></div></div>`).join('');
+ const req=d.requirements.weapons.map(w=>`<tr><td>${esc(human(w.family))} +${w.level}</td><td>${fmt(w.gold_missing)} / ${fmt(w.gold)}</td><td>${w.materials_missing.join(' + ')}</td><td>${w.gate_blocked?'Gate closed':w.broken?'Repair first':'Available'}</td><td>${fmt(w.repair_quote)}</td></tr>`).join('');
+ const recovery=p.recovery_episodes.map(e=>`Day ${fmt(e.start_day)} → ${e.censored?'still recovering at horizon':'day '+fmt(e.end_day)} (${fmt(e.days)} days)`).join('<br>')||'No all-paid-weapons-broken episode recorded.';
+ $('diagnostic-detail').innerHTML=`<p class="note">Next floor ${d.next_floor}: ${d.reasons.map(r=>esc(human(r))).join(' · ')}</p><div class="metrics">${metric('Current deck probe',pct(d.probe.win_rate),'Prepared HP/energy; owned condition/ammo')}${metric('After repairs — diagnostic',pct(d.repaired_probe.win_rate),'Disposable copy; no free repair granted')}${metric('After supplies — diagnostic',pct(d.resupplied_probe.win_rate),'Repaired copy with stocked ammunition')}${metric('Available gold',fmt(wallet),'Purse + bank; resources actually owned')}</div><p>${esc(d.counterfactual_note)}</p><div class="bars">${bars}</div><p class="chart-note">Earned hunting gold ${fmt(finances.incoming.earned_gold)} · interest ${fmt(finances.incoming.interest)} · salvage ${fmt(finances.incoming.salvage_gold)} · death loss ${fmt(finances.death_loss)} · forfeited pending haul ${fmt(finances.forfeited_pending_gold)}. Pending haul was never part of the purse. Accounting error: ${fmt(finances.conservation_error,8)}.</p><h3>Next weapon steps / missing resources</h3><div class="table-scroll"><table><thead><tr><th>Weapon</th><th>Gold missing / price</th><th>Materials missing A+B</th><th>Gate</th><th>Repair quote</th></tr></thead><tbody>${req}</tbody></table></div><p>Next training: ${d.requirements.training.level??'level cap'} · ${fmt(d.requirements.training.gold_missing)} gold missing · ${fmt(d.requirements.training.xp_missing)} XP missing.</p><h3>Recovery history</h3><p>${recovery}</p><details><summary>Weekly finances & failed encounter types</summary><pre>${esc(JSON.stringify({failedProbe:d.probe.failures,types:d.probe.types,lastRoute:d.last_route,timeline:p.timeline},null,2))}</pre></details>`;
+}
