@@ -43,3 +43,17 @@ class GameSwarmTests(unittest.TestCase):
     def test_validation_rejects_proposal_knobs(self):
         for cfg in ({'group_hp_scale':.5},{'days':True},{'world_frontier':101},{'policies':[{}]}):
             with self.assertRaises(ValueError):GameConfig.from_dict(cfg)
+
+class RecoveryChoiceTests(unittest.TestCase):
+    def test_smart_policy_buys_actual_affordable_food(self):
+        from simulation.game_agents import Agent
+        from simulation.game_adapter import economy,state
+        a=Agent(GameConfig(days=1),0,'tactician');s=a.s
+        s.act('gate');s.act('floor_1')
+        if s.doc.get('movie_floor'):s.act('skip')
+        # A prepared low-health fixture, with insufficient full-heal money.
+        s.doc['hp']=10;s.doc['gold']=economy.STEW_PRICE;s.look()
+        self.assertEqual(a.step(),'stew')
+        before=s.doc['hp'];s.act('stew')
+        self.assertEqual(s.doc['gold'],0)
+        self.assertEqual(s.doc['hp'],min(state.max_hp(s.doc),before+economy.STEW_HEAL_HP))

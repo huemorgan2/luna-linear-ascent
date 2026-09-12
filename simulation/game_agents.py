@@ -236,6 +236,12 @@ class Agent:
         if state.energy_now(p)<(economy.COST_WILDS_DEEP if self.policy=='rusher' and self.target>=economy.DEEP_HUNT_MIN_FLOOR else economy.COST_WILDS_FIGHT):
             self.blocked['energy_wait']+=1;return None
         if p['hp']<state.max_hp(p)*(.2 if self.policy=='rusher' else .55):
+            missing=state.max_hp(p)-p['hp']
+            quote=economy.healer_tent_price(max(1,p['floor']),p['hp'],state.max_hp(p))
+            if self.policy not in ('learner','rusher') and p['gold']>=economy.STEW_PRICE and (
+                    p['gold']<quote or economy.STEW_PRICE/min(missing,economy.STEW_HEAL_HP)<quote/missing):
+                if 'stew' in {o.id for o in self.s.legal()}:return 'stew'
+                self.goal=('lodge','stew');return self.goto('lodge') or 'stew'
             if p['location']=='gate_town':
                 price=economy.healer_tent_price(p['floor'],p['hp'],state.max_hp(p))
                 if p['gold']>=price:return 'heal'
