@@ -62,7 +62,7 @@ def shield_hit(raw, armor, shield):
 
 def damage(rules, p, item, enemy, gap, arrow="ordinary", exhausted=False, exposed=False):
     w, typ = rules.weapons[item.family], rules.types[enemy["proposedType"]]
-    if item.condition <= 0 or (w["path"] == "Blade" and (typ["air"] or gap > 0)):
+    if (item.condition <= 0 and item.source != "recovery-starter") or (w["path"] == "Blade" and (typ["air"] or gap > 0)):
         return 0., "power"
     channel = "magic" if w["path"] == "Staff" else "power"
     factor = 1.
@@ -78,7 +78,8 @@ def damage(rules, p, item, enemy, gap, arrow="ordinary", exhausted=False, expose
             factor *= 1.2
     raw = rules.attack(p, item) * .75 * factor
     defense = enemy["defense"] * (.8 if exposed else 1)
-    result = max(1, raw-defense/2) * typ[channel]
+    floor_damage = 1 if rules.config.model_revision == "proposal-v1" else .15*raw
+    result = max(floor_damage, raw-defense/2) * typ[channel]
     if exhausted:
         result *= rules.config.exhaustion_damage
     return max(1., result), channel
@@ -196,7 +197,7 @@ def fight_group(rules, p, floor, enemies, rng, *, probe=False, trace=False, retr
                 weapon = rules.weapons[item.family]
                 if weapon["path"] == "Bow":
                     p.ammo[arrow] -= 1
-                item.condition = max(0, item.condition-1/(rules.state(item)["dur"]*weapon["end"]))
+                item.condition = max(0, item.condition-1/rules.endurance(item))
                 if rng.random() >= .08:
                     dealt = hit*rng.uniform(2/3, 4/3)
                     enemy["hp"] -= dealt
@@ -204,7 +205,7 @@ def fight_group(rules, p, floor, enemies, rng, *, probe=False, trace=False, retr
                         result.trace.append(dict(enemy=index+1, turn=turn+1, event="hit", damage=dealt, weapon=item.family))
                     if exposed:
                         exposed -= 1
-                    if item.cooldown == 0:
+                    if item.cooldown == 0 and item.source != "recovery-starter":
                         effect = weapon["effect"]
                         if weapon["path"] == "Bow" and arrow not in ("ordinary", "arcane"):
                             effect = {"poison":"Poison", "fire":"Burn", "pinning":"Slow", "concussive":"Knockback"}[arrow]
@@ -257,7 +258,7 @@ def fight_group(rules, p, floor, enemies, rng, *, probe=False, trace=False, retr
                         hit, absorbed = shield_hit(raw, rules.armor(p)+rules.characters[p.level-1]["defense"], rules.shield(p))
                         p.hp -= hit
                         result.incoming += hit
-                        p.shield_condition = max(0, p.shield_condition-absorbed/max(1300, rules.economy[p.shield_floor-1]["shield"]*80))
+                        p.shield_condition = max(0, p.shield_condition-absorbed/rules.shield_endurance(p))
             slow, stun_resist = max(0, slow-1), max(0, stun_resist-1)
             if p.hp <= 0:
                 result.died = True
@@ -270,7 +271,7 @@ def fight_group(rules, p, floor, enemies, rng, *, probe=False, trace=False, retr
         if not probe:
             spec = rules.floors[floor-1]["specimens"][enemy.get("specimen", "common")]
             deep_mult = rules.floors[floor-1]["deep"]["reward"] if enemy.get("deep") else 1
-            fade = max(.1, 1/(1+.15*max(0, p.ready_floor-floor)))
+            fade = rules.fade(p.ready_floor,floor)
             gold = max(1, round(enemy["gold"]*spec["gold"]*deep_mult*rng.uniform(.5, 1.5)*rules.config.gold_scale*fade))
             xp = min(max(1, round(enemy["xp"]*spec["hp"]*deep_mult*rng.uniform(.75, 1.25)*fade)), max(1, gold//2))
             p.xp += xp

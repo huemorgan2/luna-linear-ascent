@@ -12,12 +12,13 @@ from .model import POLICIES, Weapon, new_player, stream
 def restock(rules, p, floor):
     row, cfg = rules.economy[floor-1], rules.config
     if p.hp < rules.hp_max(p)*.65:
-        cost = math.ceil(row["heal_full"]*(1-p.hp/rules.hp_max(p))*cfg.heal_cost_scale)
+        cost = math.ceil(row["heal_full"]*(1-p.hp/rules.hp_max(p)))
         if p.pay(cost, "healing"):
             p.hp = rules.hp_max(p)
     for w in p.deck:
         if w.condition < .65:
-            cost = rules.repair_quote(w)
+            gate = rules.state(w)["floor"]
+            cost = max(1, round(rules.price(w, True)*cfg.repair_fraction*(1-w.condition)/1.04**(gate-1)))
             if p.pay(cost, "repairs"):
                 w.condition = 1
     if p.shield_condition < .6:
@@ -56,9 +57,8 @@ def invest(rules, p, access):
         gold_block = False
         for i, w in enumerate(p.deck):
             candidates = []
-            upgraded = rules.upgraded(w)
-            if upgraded:
-                candidates.append((upgraded, "upgrade"))
+            if w.level < 20:
+                candidates.append((Weapon(w.family, w.grade, w.level+1, w.condition), "upgrade"))
             if w.grade < 3:
                 candidates += [(Weapon(w.family, w.grade+1, 0), "craft"),
                     (Weapon(w.family, w.grade+1, [0, 2, 4, 6][w.grade+1]), "shop")]
@@ -78,8 +78,7 @@ def invest(rules, p, access):
                 weight = 2.5 if p.policy == "learner" and i == 0 else .5 if p.policy == "learner" else 1
                 if p.policy == "saver" and rules.state(w)["floor"] >= max(1, p.ready_floor):
                     weight *= .25
-                if gain > 0 or (new.level>w.level and new.grade==w.grade and rules.endurance(new)>rules.endurance(w)):
-                    gain = max(gain, .01*(rules.endurance(new)/rules.endurance(w)-1))
+                if gain > 0:
                     offers.append((gain*weight/max(1, price), kind, i, new, price, recipe))
         for slot in ("armor", "shield"):
             current = getattr(p, slot+"_floor")
@@ -188,9 +187,6 @@ def choose_route(rules, p, rng):
 
 
 def simulate_player(rules, ident, policy):
-    if rules.config.model_revision == "proposal-v1":
-        from .legacy_swarm import simulate_player as legacy_player
-        return legacy_player(rules,ident,policy)
     c = rules.config
     p = new_player(rules, ident, policy)
     rng = stream(c.seed, ident, "training")

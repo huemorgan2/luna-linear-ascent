@@ -33,6 +33,12 @@ POLICIES = {
 
 @dataclass
 class Config:
+    model_revision: str = "audited-v2"
+    decision_model: str = "original"
+    recovery_mode: str = "starter"
+    durability_scale: float = 1
+    heal_cost_scale: float = 1
+    repair_reserve: float = .15
     players: int = 60
     days: int = 180
     workers: int = 0
@@ -56,7 +62,7 @@ class Config:
     material_scale: float = 1
     upgrade_cost_scale: float = 1
     defense_cost_scale: float = 1
-    repair_fraction: float = .2
+    repair_fraction: float = .13
     death_gold_loss: float = .5
     death_condition_loss: float = .1
     bank_interest_daily: float = .05
@@ -81,6 +87,8 @@ class Config:
             raise ValueError("Unknown settings: " + ", ".join(sorted(unknown)))
         c = cls(**values)
         ranges = {
+            "durability_scale": (.25, 10, float), "heal_cost_scale": (0, 4, float),
+            "repair_reserve": (0, .8, float),
             "players": (1, 100000, int), "days": (1, 3650, int), "seed": (0, 2**31-1, int),
             "workers": (0, 1024, int),
             "max_floor": (1, 100, int), "minutes_per_day": (1, 240, float),
@@ -114,6 +122,12 @@ class Config:
             raise ValueError("Policies cannot be duplicated")
         if c.warden_pool not in ("base", "legacy_shared"):
             raise ValueError("warden_pool must be base or legacy_shared")
+        if c.model_revision not in ("proposal-v1", "audited-v2"):
+            raise ValueError("Unknown model_revision")
+        if c.decision_model not in ("original", "adaptive"):
+            raise ValueError("Unknown decision_model")
+        if c.recovery_mode not in ("none", "starter", "partial"):
+            raise ValueError("Unknown recovery_mode")
         return c
 
     def to_dict(self):
@@ -140,8 +154,41 @@ class Rules:
         return self.upgrades[(item.grade, item.level)]
 
     def attack(self, p, item):
+        if item.source == "recovery-starter":
+            return self.characters[p.level-1]["atk"] + 5*max(.5, item.condition)
         return (self.characters[p.level-1]["atk"] + self.state(item)["atk"] *
                 self.weapons[item.family]["factor"] * max(0, item.condition))
+
+    def endurance(self, item):
+        return self.state(item)["dur"]*self.weapons[item.family]["end"]*self.config.durability_scale
+
+    def repair_quote(self, item, target=1):
+        missing = max(0, min(1,target)-item.condition)
+        if not missing:
+            return 0
+        if item.source == "recovery-starter":
+            return 1
+        gate = self.state(item)["floor"]
+        basis = self.price(item, True) if self.config.model_revision == "proposal-v1" else 200*1.3**(gate-1)*self.weapons[item.family]["cost"]
+        return max(1, round(basis*self.config.repair_fraction*missing/1.04**(gate-1)))
+
+    def upgraded(self, item):
+        if item.level >= 20 or item.condition <= 0 or item.source == "recovery-starter":
+            return None
+        new = Weapon(item.family, item.grade, item.level+1, item.condition)
+        if self.config.model_revision != "proposal-v1":
+            missing = self.endurance(item)*(1-item.condition)
+            new.condition = max(0, 1-missing/self.endurance(new))
+        return new
+
+    def fade(self, frontier, floor):
+        if self.config.model_revision == "proposal-v1":
+            return max(.1, 1/(1+.15*max(0,frontier-floor)))
+        return max(.25, 1-.1*max(0,frontier-floor-5))
+
+    def shield_endurance(self, p):
+        bonus = self.economy[p.shield_floor-1]["shield"]
+        return max(1300,bonus*80) if self.config.model_revision == "proposal-v1" else max(1,25*bonus)
 
     def armor(self, p):
         return self.economy[p.armor_floor-1]["armor"]
