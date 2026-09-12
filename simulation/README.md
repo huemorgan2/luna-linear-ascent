@@ -45,7 +45,9 @@ This tests 18 planner choices (sword/bow/magic focus, levels/training first, thr
 
 The winner is selected using the whole training population, including unfinished players: highest mean qualified floor, then the accumulated time qualified for each floor. Validation never changes that selection. The historical Mage, corrected Mage and corrected Learner provide matched comparison arms. A bounded search can find better methods; it cannot prove the fastest possible path. Different seeds and a larger cohort are needed before trusting small differences.
 
-The dashboard’s **Stronger player paths** section opens matched strategy graphs and can apply the winning planner settings to the next swarm. Its cyan line shows when half the players can defeat each floor’s monsters; purple shows the earliest observed player, with identity in the tooltip. Saved searches and runs are ignored by Git: copy both directories to inspect those results on another computer, or rerun the commands there.
+The validated default planner favors magic, buys levels first when both investments are available, and farms one floor below character level. Levels-first tied training-first in the initial validation; farming below character level beat farming at it. See [measured findings](../research/simulation-strategy-search/RESULTS.md).
+
+The dashboard’s **Stronger player paths** section opens matched strategy graphs and can apply the winning planner settings to the next swarm. Disqualified searches are hidden from normal run history and remain available through **Show disqualified search runs**. Its cyan line shows when half the players can defeat each floor’s monsters; purple shows the earliest observed player, with identity in the tooltip. Saved searches and runs are ignored by Git: copy both directories to inspect those results on another computer, or rerun the commands there.
 
 ## Replay and inspect
 

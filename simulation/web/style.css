@@ -11,3 +11,5 @@
 #source-summary{overflow-wrap:anywhere}
 
 #game-results .chart{height:300px}.chart-context{color:var(--cyan);margin:0 0 12px}.floor-explanation{color:var(--cyan)}#tooltip{width:max-content;max-width:min(360px,calc(100vw - 16px));max-height:calc(100vh - 16px);overflow:auto;overflow-wrap:anywhere;font:16px/1.5 VGA,monospace}
+
+#strategy-search h3{margin-top:24px;color:var(--gold)}#strategy-search td:first-child{white-space:normal;min-width:230px}#strategy-search td{vertical-align:top}#strategy-search td button{margin-top:8px;white-space:normal;max-width:210px}#strategy-search details{margin-top:24px}#strategy-search p{overflow-wrap:anywhere}

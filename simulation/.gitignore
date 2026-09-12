@@ -8,3 +8,5 @@ studies/*.json
 game-runs/*.json
 
 game-searches/*.json
+
+game-runs/test-artifacts/

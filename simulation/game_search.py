@@ -40,7 +40,7 @@ def measure(run):
 
 
 def run_trial(task):
-    cfg=GameConfig.from_dict(task['config']);run=simulate(cfg);path=save(run)
+    cfg=GameConfig.from_dict(task['config']);run=simulate(cfg);path=save(run,task.get('run_directory'))
     return dict(candidate=task['candidate'],stage=task['stage'],seed=cfg.seed,config=cfg.to_dict(),
         run_id=run['run_id'],file=path.name,metrics=measure(run),
         engine_sha256=run['engine_source']['sha256'],runner_sha256=run['runner_sha256'],
@@ -83,7 +83,7 @@ def batch(tasks,workers,on_result):
 
 
 def search(*,screen_players=3,screen_days=7,training_seeds=(1701,1702),validation_players=6,
-           validation_days=30,validation_seeds=(1801,1802,1803),finalists=3,workers=0,directory=SEARCHES,grid=None,progress=print):
+           validation_days=30,validation_seeds=(1801,1802,1803),finalists=3,workers=0,directory=SEARCHES,run_directory=None,grid=None,progress=print):
     if set(training_seeds)&set(validation_seeds):raise ValueError('Training and validation seeds must be disjoint')
     if not training_seeds or not validation_seeds or len(set(training_seeds))!=len(training_seeds) or len(set(validation_seeds))!=len(validation_seeds):raise ValueError('Each stage needs distinct seeds')
     if type(workers) is not int or not 0<=workers<=4096:raise ValueError('workers must be 0–4096')
@@ -109,7 +109,7 @@ def search(*,screen_players=3,screen_days=7,training_seeds=(1701,1702),validatio
     def task(profile,stage,seed,n,days,policy='planner',mode='improvements'):
         cfg=GameConfig.from_dict(dict(players=n,days=days,seed=seed,policies=[policy],probe_mode=mode,workers=1,trace_players=1,
             **{k:v for k,v in profile.items() if k.startswith('planner_')}))
-        return dict(candidate=profile['id'],stage=stage,config=cfg.to_dict())
+        return dict(candidate=profile['id'],stage=stage,config=cfg.to_dict(),run_directory=str(run_directory) if run_directory else None)
     try:
         jobs=[task(p,'training',seed,screen_players,screen_days) for p in grid for seed in training_seeds]
         batch(jobs,workers,receive)

@@ -63,7 +63,7 @@ def travel(a,room,action,reason):
 
 def owned_by_path(p):
     groups={k:[] for k in ('blade','bow','staff')}
-    for slug in set(combat._held_slugs(p))|set(p['inventory']):
+    for slug in sorted(set(combat._held_slugs(p))|set(p['inventory'])):
         g=economy.FORGE.get(slug)
         if g and g.slot=='weapon':groups[path_of(slug)].append(slug)
     return groups

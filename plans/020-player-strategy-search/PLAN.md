@@ -32,4 +32,7 @@ Revert phase implementation commits in reverse order (record exact SHAs after ea
 
 ## Execution status
 
-Plan written before implementation. Investigation confirms carried road heals are legal via use_medgel/use_trauma_kit at the camp; actual pawn offers and equip APIs exist. Phase implementation pending.
+Plan written before implementation. Investigation confirms carried road heals are legal via use_medgel/use_trauma_kit at the camp; actual pawn offers and equip APIs exist. All three phases implemented and verified. See phase statuses and simulation/verification/005/summary.md. Initial invalid search retained; corrected search validates a faster magic/farming path on two fresh seeds. Game source is unchanged.
+
+
+Implementation commits: 69bf1cc (phase 1), 932aa50 (phase 2 plus long-run correction). Phase 3 carries the default profile, dashboard, findings and browser evidence. Revert phase 3 first, then `git revert 932aa50 69bf1cc` to unwind code. Label/fastest-line commit 856f73f can be independently reverted if also rolling back plan 019.

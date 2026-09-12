@@ -16,7 +16,7 @@ class SearchTests(unittest.TestCase):
     def test_parallel_search_matches_serial_and_locks_training_winner(self):
         with tempfile.TemporaryDirectory() as folder:
             args=dict(screen_players=1,screen_days=1,training_seeds=(41,),validation_players=1,validation_days=1,
-                      validation_seeds=(42,),finalists=1,directory=folder,grid=candidates()[:2],progress=None)
+                      validation_seeds=(42,),finalists=1,directory=folder,run_directory=folder+'/runs',grid=candidates()[:2],progress=None)
             a,_=search(workers=1,**args);b,path=search(workers=2,**args)
             self.assertEqual(a['ranking'],b['ranking']);self.assertEqual(a['validation'],b['validation'])
             self.assertEqual([t['deterministic_sha256'] for t in a['trials']],[t['deterministic_sha256'] for t in b['trials']])

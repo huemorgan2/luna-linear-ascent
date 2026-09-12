@@ -63,3 +63,16 @@ class PlannerTests(unittest.TestCase):
         self.assertEqual(p,before)
         self.assertIn(action,legal_actions(a.s))
         a.s.act(action);self.assertFalse(a.s.scene.refusal)
+
+    def test_equal_power_spares_are_consistent_across_process_hash_seeds(self):
+        import os,subprocess,sys
+        code="""from simulation.game_agents import Agent,GameConfig
+from simulation.game_planner import obsolete_sale
+from simulation.game_adapter import at_time
+a=Agent(GameConfig(players=1,days=1),0,'planner')
+a.s.doc['held']=['worn_staff'];a.s.doc['gear']['weapon']='worn_staff'
+a.s.doc['inventory']={'scrap_dagger':1,'warded_scrap_dagger':1}
+with at_time(0):print(obsolete_sale(a.s.doc))
+"""
+        answers=[subprocess.check_output([sys.executable,'-c',code],env=dict(os.environ,PYTHONHASHSEED=seed),text=True).strip() for seed in ('1','7','123')]
+        self.assertEqual(len(set(answers)),1,answers)

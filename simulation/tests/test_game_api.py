@@ -34,6 +34,17 @@ class GameApiTests(unittest.TestCase):
                 self.assertEqual(data['backend'],'actual-game-engine')
                 self.assertEqual(len(call('/api/game/runs')['runs']),1)
                 self.assertEqual(len(call('/api/runs')['runs']),0)
+                reports=Path(root)/'game-searches';reports.mkdir()
+                report=dict(search_id=ident,status='complete',winner='staff-levels-margin1')
+                (reports/(ident+'.json')).write_text(json.dumps(report))
+                self.assertEqual(call('/api/game/searches')['searches'],[report])
+                self.assertEqual(call('/api/game/searches/'+ident+'.json'),report)
+                report.update(status='invalid',trials=[dict(run_id=ident)])
+                (reports/(ident+'.json')).write_text(json.dumps(report))
+                self.assertTrue(call('/api/game/runs')['runs'][0]['diagnostic'])
+
+                with self.assertRaises(HTTPError):call('/api/game/searches/not-an-id')
+
                 self.assertTrue(call('/api/game/replay',dict(run_id=ident,player=0))['match'])
             finally:
                 server.shutdown();server.server_close();thread.join()

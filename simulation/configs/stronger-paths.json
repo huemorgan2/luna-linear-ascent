@@ -1,0 +1,12 @@
+{
+  "players": 24,
+  "days": 30,
+  "seed": 2201,
+  "workers": 0,
+  "trace_players": 24,
+  "probe_mode": "improvements",
+  "planner_path": "staff",
+  "planner_growth": "levels",
+  "planner_margin": 2,
+  "policies": ["learner", "tactician", "saver", "archer", "mage", "planner"]
+}

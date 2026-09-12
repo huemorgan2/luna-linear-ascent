@@ -143,8 +143,29 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = urlparse(self.path).path
+        if path == '/api/game/searches':
+            rows=[];errors=[]
+            for target in sorted((self.server.game.directory.parent/'game-searches').glob('*.json'),reverse=True):
+                if not RUN_ID.fullmatch(target.stem):continue
+                try:rows.append(json.loads(target.read_text()))
+                except (OSError,ValueError) as e:errors.append(target.name+': '+str(e))
+            return self.json(dict(searches=rows,errors=errors))
+        if path.startswith('/api/game/searches/'):
+            ident=path.removeprefix('/api/game/searches/').removesuffix('.json')
+            if not RUN_ID.fullmatch(ident):return self.json(dict(error='Invalid search ID'),400)
+            target=self.server.game.directory.parent/'game-searches'/(ident+'.json')
+            if not target.is_file():return self.json(dict(error='Search not found'),404)
+            return self.send_bytes(target.read_bytes(),filename=target.name)
         if path == '/api/game/defaults':return self.json(self.server.game.defaults())
-        if path == '/api/game/runs':return self.json(self.server.game.manifest())
+        if path == '/api/game/runs':
+            manifest=self.server.game.manifest();disqualified=set()
+            for report in (self.server.game.directory.parent/'game-searches').glob('*.json'):
+                try:data=json.loads(report.read_text())
+                except (OSError,ValueError):continue
+                if data.get('status') in ('invalid','failed'):
+                    disqualified.update(t['run_id'] for t in data.get('trials',[]))
+            manifest['runs']=[dict(r,diagnostic=r['run_id'] in disqualified) for r in manifest['runs']]
+            return self.json(manifest)
         if path.startswith('/api/game/runs/'):
             ident=path.removeprefix('/api/game/runs/').removesuffix('.json')
             if not RUN_ID.fullmatch(ident):return self.json(dict(error='Invalid run ID'),400)

@@ -39,7 +39,7 @@ class GameConfig:
     probe_mode:str='improvements'
     planner_path:str='staff'
     planner_growth:str='levels'
-    planner_margin:int=1
+    planner_margin:int=2
     policies:tuple=('learner','tactician','saver','archer','mage','planner')
 
     def to_dict(self):
