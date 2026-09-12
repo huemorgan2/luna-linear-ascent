@@ -1,0 +1,896 @@
+{
+  "date": "2026-09-12T18:27:42.564Z",
+  "steps": [
+    {
+      "name": "Actual source",
+      "data": "What runs here\n\nCalls plugin_linear_ascent.engine.core.apply_choice — the same entry point used by worldd.\n\nNo proposed mechanics are injected. The imported revision determines slots, encounters, XP and rewards. Personal progression uses synthetic documents and virtual time. Shared-world database services and warden victories are not simulated.\n\nRead the engine boundary & verification ↗ · Play through the same engine ↓\n\nExact library path & source hash"
+    },
+    {
+      "name": "gate",
+      "data": {
+        "headline": "1 floor stand open",
+        "meters": {
+          "hp": 80,
+          "hp_max": 80,
+          "energy": 24,
+          "energy_max": 25,
+          "xp": 0,
+          "xp_need": 24,
+          "gold": 50,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "events": [],
+        "rng": 0
+      }
+    },
+    {
+      "name": "floor_1",
+      "data": {
+        "headline": "Men — The Fencerows",
+        "meters": null,
+        "events": [],
+        "rng": 0
+      }
+    },
+    {
+      "name": "skip",
+      "data": {
+        "headline": "Lamplit Steading — the floor's last safe fire",
+        "meters": {
+          "hp": 80,
+          "hp_max": 80,
+          "energy": 24,
+          "energy_max": 25,
+          "xp": 0,
+          "xp_need": 24,
+          "gold": 50,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "events": [],
+        "rng": 0
+      }
+    },
+    {
+      "name": "hunt",
+      "data": {
+        "headline": "Grey wolf",
+        "meters": {
+          "hp": 80,
+          "hp_max": 80,
+          "energy": 23,
+          "energy_max": 25,
+          "xp": 0,
+          "xp_need": 24,
+          "gold": 50,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "events": [
+          {
+            "kind": "energy",
+            "gold": 0,
+            "xp": 0,
+            "note": "wilds"
+          }
+        ],
+        "rng": 2
+      }
+    },
+    {
+      "name": "close_in",
+      "data": {
+        "headline": "Grey wolf",
+        "meters": {
+          "hp": 80,
+          "hp_max": 80,
+          "energy": 23,
+          "energy_max": 25,
+          "xp": 0,
+          "xp_need": 24,
+          "gold": 50,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "events": [],
+        "rng": 3
+      }
+    },
+    {
+      "name": "attack",
+      "data": {
+        "headline": "Grey wolf",
+        "meters": {
+          "hp": 79,
+          "hp_max": 80,
+          "energy": 23,
+          "energy_max": 25,
+          "xp": 0,
+          "xp_need": 24,
+          "gold": 50,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "events": [],
+        "rng": 6
+      }
+    },
+    {
+      "name": "attack",
+      "data": {
+        "headline": "Grey wolf",
+        "meters": {
+          "hp": 78,
+          "hp_max": 80,
+          "energy": 23,
+          "energy_max": 25,
+          "xp": 0,
+          "xp_need": 24,
+          "gold": 50,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "events": [],
+        "rng": 8
+      }
+    },
+    {
+      "name": "attack",
+      "data": {
+        "headline": "Grey wolf",
+        "meters": {
+          "hp": 76,
+          "hp_max": 80,
+          "energy": 23,
+          "energy_max": 25,
+          "xp": 0,
+          "xp_need": 24,
+          "gold": 50,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "events": [],
+        "rng": 10
+      }
+    },
+    {
+      "name": "attack",
+      "data": {
+        "headline": "Grey wolf",
+        "meters": {
+          "hp": 75,
+          "hp_max": 80,
+          "energy": 23,
+          "energy_max": 25,
+          "xp": 0,
+          "xp_need": 24,
+          "gold": 50,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "events": [],
+        "rng": 13
+      }
+    },
+    {
+      "name": "attack",
+      "data": {
+        "headline": "Grey wolf",
+        "meters": {
+          "hp": 73,
+          "hp_max": 80,
+          "energy": 23,
+          "energy_max": 25,
+          "xp": 0,
+          "xp_need": 24,
+          "gold": 50,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "events": [],
+        "rng": 16
+      }
+    },
+    {
+      "name": "attack",
+      "data": {
+        "headline": "Grey wolf",
+        "meters": {
+          "hp": 72,
+          "hp_max": 80,
+          "energy": 23,
+          "energy_max": 25,
+          "xp": 0,
+          "xp_need": 24,
+          "gold": 50,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "events": [],
+        "rng": 18
+      }
+    },
+    {
+      "name": "attack",
+      "data": {
+        "headline": "Grey wolf — freed",
+        "meters": {
+          "hp": 72,
+          "hp_max": 80,
+          "energy": 23,
+          "energy_max": 25,
+          "xp": 2,
+          "xp_need": 24,
+          "gold": 63,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "events": [
+          {
+            "kind": "kill",
+            "gold": 13,
+            "xp": 2,
+            "note": "Grey wolf"
+          }
+        ],
+        "rng": 21
+      }
+    },
+    {
+      "name": "Fight verdict",
+      "data": {
+        "eyebrow": "FLOOR 1 · MEN · THE FENCEROWS",
+        "headline": "Grey wolf — freed",
+        "support": "The fever's shape drops away. The shy grey wolf the farm dogs kept past the fences shakes itself loose and slips back to the wild edges.",
+        "shard_note": "",
+        "body_lines": [
+          "The Grey wolf goes down — no match for your Rusted Sword.",
+          "+ 2 XP",
+          "+ ◈ 13 gold (young-tower bounty)"
+        ],
+        "options": [
+          {
+            "id": "hunt",
+            "label": "Hunt the wilds again",
+            "hint": "1 ⚡",
+            "aether": false,
+            "locked": false
+          },
+          {
+            "id": "stew",
+            "label": "Hunter's stew",
+            "hint": "pay ◈ 2 · +5 HP",
+            "aether": false,
+            "locked": false
+          },
+          {
+            "id": "heal",
+            "label": "The healer's tent",
+            "hint": "pay ◈ 5 · +8 HP",
+            "aether": false,
+            "locked": false
+          },
+          {
+            "id": "keep",
+            "label": "The Warden's keep — Warden Brackjaw",
+            "hint": "3 ⚡ a swing",
+            "aether": false,
+            "locked": false
+          },
+          {
+            "id": "talk",
+            "label": "Talk — Hobb Fennick",
+            "hint": "the last farmer",
+            "aether": false,
+            "locked": false
+          },
+          {
+            "id": "gate",
+            "label": "The Tower Gate",
+            "hint": "change floors from here",
+            "aether": false,
+            "locked": false
+          },
+          {
+            "id": "town",
+            "label": "Return to Roothollow",
+            "hint": "",
+            "aether": false,
+            "locked": false
+          }
+        ],
+        "option_badges": {},
+        "option_danger": [],
+        "option_nest": [],
+        "option_section": {},
+        "meters": {
+          "hp": 72,
+          "hp_max": 80,
+          "energy": 23,
+          "energy_max": 25,
+          "xp": 2,
+          "xp_need": 24,
+          "gold": 63,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "event_kind": "loot",
+        "banner": "",
+        "banner_variant": "",
+        "banner_ink": "",
+        "fx": null,
+        "scene_id": "s24",
+        "awaits_text": "",
+        "inventory": [],
+        "pack_slots": 6,
+        "tally": [
+          {
+            "kind": "aether",
+            "n": 2
+          },
+          {
+            "kind": "gold",
+            "n": 13,
+            "note": "young-tower bounty"
+          }
+        ],
+        "notices": [],
+        "ask": null,
+        "gallery": [],
+        "paper": null,
+        "strip": null,
+        "enemy": null,
+        "option_art": {
+          "hunt": "greenreach",
+          "hunt_deep": "greenreach",
+          "keep": "warden_001"
+        },
+        "grid": false,
+        "npc": null,
+        "activity": "",
+        "location": "gate_town",
+        "players_here": [],
+        "players_title": "",
+        "players_total": 0,
+        "refusal": "",
+        "kill3d": {
+          "id": "grey_wolf",
+          "race": "human",
+          "line": "blade",
+          "breed": "native",
+          "specimen": "common",
+          "fx": "grey_wolf_freed_human_blade",
+          "worn": {
+            "armor": "gate_jerkin",
+            "shield": "gate_buckler",
+            "weapon": "rusted_sword"
+          },
+          "paths": {
+            "gate_jerkin": "armor",
+            "gate_buckler": "shield",
+            "rusted_sword": "blade"
+          },
+          "lead": "rusted_sword"
+        },
+        "labs": [],
+        "arena": {
+          "v": 1,
+          "w": 320,
+          "h": 300,
+          "floor": 1,
+          "phase": "victory",
+          "foe": {
+            "id": "grey_wolf",
+            "name": "Grey wolf",
+            "hp": 0,
+            "hp_max": 18,
+            "atk": 6,
+            "def": 3,
+            "spd": 5,
+            "type": "plain",
+            "flying": false,
+            "armoured": true,
+            "resist_pct": 0,
+            "bulwark": false,
+            "breed": "native",
+            "specimen": "common",
+            "kind": "wilds"
+          },
+          "me": {
+            "hp": 72,
+            "hp_max": 80,
+            "charm": null,
+            "atk": 8,
+            "atk_base": 3,
+            "def": 14,
+            "def_base": 2,
+            "spd": 5,
+            "race": "human",
+            "line": "blade",
+            "name": "Simclimber",
+            "weapons": [
+              {
+                "slug": "rusted_sword",
+                "name": "Rusted Sword",
+                "path": "blade",
+                "lead": true,
+                "rank": 2,
+                "bonus": 5,
+                "atk": 8,
+                "broken": false
+              }
+            ],
+            "guard": {
+              "shield": {
+                "slug": "gate_buckler",
+                "name": "Gate-Issue Buckler",
+                "bonus": 5,
+                "broken": false
+              },
+              "armor": {
+                "slug": "gate_jerkin",
+                "name": "Gate-Issue Jerkin",
+                "bonus": 7,
+                "broken": false
+              }
+            },
+            "worn": {
+              "armor": "gate_jerkin",
+              "shield": "gate_buckler",
+              "weapon": "rusted_sword"
+            },
+            "paths": {
+              "gate_jerkin": "armor",
+              "gate_buckler": "shield",
+              "rusted_sword": "blade"
+            },
+            "lead": "rusted_sword"
+          },
+          "range": {
+            "state": "close",
+            "gap": 0
+          },
+          "start": {
+            "me_hp": 72,
+            "foe_hp": 5,
+            "range": "close",
+            "gap": 0
+          },
+          "events": [
+            {
+              "who": "me",
+              "kind": "strike",
+              "outcome": "hit",
+              "path": "blade",
+              "weapon": "Rusted Sword",
+              "dmg": 6,
+              "raw": 7,
+              "blocked": 1,
+              "crit": false,
+              "why": "",
+              "foe_hp": 0,
+              "text": "Simclimber hits with the blade for 6 damage (1 taken by its DEF)."
+            },
+            {
+              "who": "foe",
+              "kind": "die",
+              "text": "Grey wolf is defeated."
+            }
+          ],
+          "log": [
+            "Simclimber hits with the blade for 6 damage (1 taken by its DEF).",
+            "Grey wolf is defeated."
+          ],
+          "note": "",
+          "tiles": {},
+          "kill3d": {
+            "id": "grey_wolf",
+            "race": "human",
+            "line": "blade",
+            "breed": "native",
+            "specimen": "common",
+            "fx": "grey_wolf_freed_human_blade",
+            "worn": {
+              "armor": "gate_jerkin",
+              "shield": "gate_buckler",
+              "weapon": "rusted_sword"
+            },
+            "paths": {
+              "gate_jerkin": "armor",
+              "gate_buckler": "shield",
+              "rusted_sword": "blade"
+            },
+            "lead": "rusted_sword"
+          }
+        },
+        "map": null,
+        "foe_sheet": null,
+        "slots": [
+          {
+            "key": "charm",
+            "side": "left",
+            "row": 0,
+            "label": "charm / potion",
+            "kind": "charm",
+            "state": "locked",
+            "lock_text": "Locked — the charm pouch. School, level 9: 400 XP and a fee. Holds one charm or potion.",
+            "slug": "",
+            "name": "",
+            "icon": "lock",
+            "count": 0
+          },
+          {
+            "key": "armor",
+            "side": "left",
+            "row": 1,
+            "label": "armour",
+            "kind": "armor",
+            "state": "filled",
+            "lock_text": "",
+            "slug": "gate_jerkin",
+            "name": "Gate-Issue Jerkin",
+            "icon": "armor",
+            "count": 1,
+            "equipped": true,
+            "stat_name": "DEF",
+            "stat_val": 7,
+            "lead": false,
+            "acts": [
+              {
+                "opt": "unequip_armor",
+                "label": "Move to the pack",
+                "hint": "the Gate-Issue Jerkin rides in the pack — it does nothing there"
+              }
+            ]
+          },
+          {
+            "key": "shoes",
+            "side": "left",
+            "row": 2,
+            "label": "boots",
+            "kind": "shoes",
+            "state": "empty",
+            "lock_text": "",
+            "slug": "",
+            "name": "",
+            "icon": "shoes",
+            "count": 0
+          },
+          {
+            "key": "shield",
+            "side": "right",
+            "row": 0,
+            "label": "shield",
+            "kind": "shield",
+            "state": "filled",
+            "lock_text": "",
+            "slug": "gate_buckler",
+            "name": "Gate-Issue Buckler",
+            "icon": "shield",
+            "count": 1,
+            "equipped": true,
+            "stat_name": "DEF",
+            "stat_val": 5,
+            "lead": false,
+            "acts": [
+              {
+                "opt": "unequip_shield",
+                "label": "Move to the pack",
+                "hint": "the Gate-Issue Buckler rides in the pack — it does nothing there"
+              }
+            ]
+          },
+          {
+            "key": "weapon",
+            "side": "right",
+            "row": 1,
+            "label": "weapon",
+            "kind": "weapon",
+            "state": "filled",
+            "lock_text": "",
+            "slug": "rusted_sword",
+            "name": "Rusted Sword",
+            "icon": "weapon",
+            "count": 1,
+            "equipped": true,
+            "stat_name": "ATK",
+            "stat_val": 5,
+            "dur": 0.9946153846153846,
+            "dur_left": 1293,
+            "dur_max": 1300,
+            "lead": true,
+            "why": "You keep one blade in hand."
+          },
+          {
+            "key": "weapon2",
+            "side": "right",
+            "row": 2,
+            "label": "weapon 2",
+            "kind": "weapon",
+            "state": "locked",
+            "lock_text": "Locked — the second grip. School: 60 XP and ◈ 30.",
+            "slug": "",
+            "name": "",
+            "icon": "lock",
+            "count": 0
+          },
+          {
+            "key": "weapon3",
+            "side": "right",
+            "row": 3,
+            "label": "weapon 3",
+            "kind": "weapon",
+            "state": "locked",
+            "lock_text": "Locked — the third grip. School, level 8: 500 XP and a fee.",
+            "slug": "",
+            "name": "",
+            "icon": "lock",
+            "count": 0
+          }
+        ],
+        "figure3d": null,
+        "avatar": null,
+        "lift": ""
+      }
+    },
+    {
+      "name": "Start engine run",
+      "data": {
+        "status": "running",
+        "backend": "actual-game-engine",
+        "stage": "starting",
+        "fraction": 0,
+        "workers": 2
+      }
+    },
+    {
+      "name": "Saved engine run",
+      "data": {
+        "id": "20260912T182749Z-94cc119a",
+        "source": "3217d52ec623a7b41376921310173bf681573edbe6c9e9d730fccc6a7ae29dae",
+        "workers": 2
+      }
+    },
+    {
+      "name": "Unreached floor and warden boundary",
+      "data": "Floor 10\n0 / 2 ready\n0%\nPopulation median\nNot reached days\nMean of reached\nNot reached days\nWarden party requirement\nNot measured\nShared service execution required\n\nGnarl, the Goblin King · actual library shared HP 4,727 · regeneration 0% / hour. Current milestone pledge quorum: 2. Quorum alone is not proof of victory.\n\nThese are current engine parameters. The proposed simultaneous-healing warden rules have not been substituted."
+    },
+    {
+      "name": "Full-state replay",
+      "data": "MATCH: complete document, scene and RNG · 33 inputs · 29bb0f51476623f37487ceae8a7d64cca57795b0405075bc5b798dba0d04dc50"
+    },
+    {
+      "name": "Same source comparison",
+      "data": "Gold dashed line: 20260912T182749Z-94cc119a. Changed settings: none. Same engine source. Same runner source."
+    },
+    {
+      "name": "Mobile geometry",
+      "data": {
+        "width": 390,
+        "body": 393,
+        "font": "VGA, monospace"
+      }
+    },
+    {
+      "name": "Overflowing elements",
+      "data": []
+    }
+  ],
+  "screenshots": [
+    "01-engine-dashboard.png",
+    "02-actual-monster.png",
+    "03-engine-verdict.png",
+    "04-actual-charts.png",
+    "05-mobile-source.png",
+    "06-mobile-chart.png",
+    "failure.png"
+  ],
+  "status": "FAIL",
+  "error": "Error: Horizontal overflow\n    at file:///Users/roy/Documents/my-projects-docs/luna-linear-ascent/simulation/verification/game-walkthrough.mjs:47:482",
+  "errors": []
+}

@@ -32,4 +32,4 @@ Revert the phase commits in reverse order, restart only simulation/serve.py, and
 
 ## Execution status
 
-Plan committed before actual-engine implementation.
+Plan committed as 252afec before implementation. Phase 1: 667f237. Phase 2: 8935fb8. Phase 3 policy correction: 45b97a5; final verification/UI commit recorded below after committing. All three phases are complete for the explicitly defined personal-engine scope. Final checks: 45 passing simulator tests, exact replay and CPU parity, six repeated 30-day cohorts, and a passing 21-step real-browser walkthrough with desktop/mobile screenshot judgment. No production service or game-library code changed. Shared-world warden execution remains outside this local runner and is clearly labeled unavailable; this plan does not claim full MMORPG or proposed-mechanics coverage.

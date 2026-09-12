@@ -57,3 +57,21 @@ class RecoveryChoiceTests(unittest.TestCase):
         before=s.doc['hp'];s.act('stew')
         self.assertEqual(s.doc['gold'],0)
         self.assertEqual(s.doc['hp'],min(state.max_hp(s.doc),before+economy.STEW_HEAL_HP))
+
+class ManyCpuGameTests(unittest.TestCase):
+    def test_windows_128_cpu_dispatch_uses_all_shards(self):
+        from concurrent.futures import Future
+        pools=[]
+        class Pool:
+            def __init__(self,**kwargs):
+                self.size=kwargs['max_workers'];self.ids=[];pools.append(self)
+            def submit(self,fn,ident,policy):
+                self.ids.append(ident);f=Future()
+                f.set_result(dict(id=ident,policy=policy,ready_floor=0,milestones=[],floors={}))
+                return f
+            def shutdown(self,**kwargs):pass
+        with patch('simulation.game_results.platform.system',return_value='Windows'),patch('simulation.game_results.ProcessPoolExecutor',side_effect=Pool):
+            run=simulate(dict(players=128,days=1,max_floor=1,workers=128,readiness_trials=2))
+        self.assertEqual([p.size for p in pools],[61,61,6])
+        self.assertEqual([len(p.ids) for p in pools],[61,61,6])
+        self.assertEqual([p['id'] for p in run['players']],list(range(128)))

@@ -49,7 +49,7 @@ def digest(value):
 
 def engine_source():
     root = Path(plugin_linear_ascent.__file__).resolve().parent
-    files = {str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest()
+    files = {p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted(root.rglob('*')) if p.is_file() and p.suffix in ('.py','.yaml','.yml','.json')}
     files['@host/gamepath.py'] = hashlib.sha256((REPO/'worldd/app/gamepath.py').read_bytes()).hexdigest()
     fingerprint=digest(files)

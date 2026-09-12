@@ -41,6 +41,8 @@ The first `trace_players` players (six by default) retain all engine reads, choi
 
 ## Wardens
 
+Displayed population-dependent HP and quorum use the run's cohort size as an illustrative active-player census. They are not observations from a live world or from the count of hunters who qualified for that floor.
+
 The inspector shows the real library's warden HP, hourly regeneration fraction and milestone quorum. Those parameters are not a simulated party victory. The server's shared pool, pity, pledges, rewards and unlock transactions live in PostgreSQL-backed worldd services; they are not replaced with local formulas. Required party size is `null` and is labeled not measured. Floor 100 therefore keeps its current milestone distinction in this inspection. The proposed simultaneous-healing design must first be implemented in the actual shared service, then tested through that same service using isolated world storage.
 
 ## Verification and portability

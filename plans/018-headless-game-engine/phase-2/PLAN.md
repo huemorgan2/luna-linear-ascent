@@ -10,7 +10,7 @@ Add legal-action heuristics, virtual attendance/session schedule, disposable rea
 Serial/parallel identity, same-seed replay, full state and money ledgers, honest censoring, no false proposed mechanics, HTTP job/download/replay lifecycle.
 
 ## Rollback
-Revert phase implementation commit, restart simulator server; retain results.
+After reverting phase 3, run `git revert 8935fb8` and restart only the local simulator server; retain both result directories.
 
 ## Execution status
 Implemented actual-engine action policies, spawned CPU workers, separate schema-v2 runs, default CLI/dashboard, signed game ledgers, full-state replay and synthetic interactive inspector. The world frontier fixture is explicit and recorded; shared-party outcomes are null. Historical proposals remain under /proposal. Full suite: 43 tests passed in 34.667s, including two-CPU identity, complete trace replay and HTTP isolation. Browser and longer-cohort verification follow in phase 3.

@@ -151,6 +151,14 @@ class Handler(BaseHTTPRequestHandler):
             target=self.server.game.directory/(ident+'.json')
             if not target.is_file():return self.json(dict(error='Run not found'),404)
             return self.send_bytes(target.read_bytes(),filename=target.name if path.endswith('.json') else None)
+        if path.startswith('/game-art/'):
+            slug=path.removeprefix('/game-art/').removesuffix('.png')
+            if not re.fullmatch(r'[a-z0-9_-]{1,100}',slug):return self.json(dict(error='Invalid art ID'),400)
+            from plugin_linear_ascent.render import _banner_data_url
+            import base64
+            art=_banner_data_url(slug)
+            if not art:return self.json(dict(error='Art not found'),404)
+            return self.send_bytes(base64.b64decode(art[0].split(',',1)[1]),mime='image/png')
         if path == "/api/defaults":
             return self.json(dict(config=Config().to_dict(), policies=POLICIES, cpus=available_cpus()))
         if path == "/api/status":

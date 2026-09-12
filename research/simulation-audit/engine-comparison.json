@@ -1,0 +1,175 @@
+{
+  "engine_sha256": "3217d52ec623a7b41376921310173bf681573edbe6c9e9d730fccc6a7ae29dae",
+  "pairs": [
+    {
+      "seed": 1601,
+      "before": "20260912T182213Z-3ba602ac",
+      "after": "20260912T182844Z-76f20825",
+      "config": {
+        "players": 12,
+        "days": 30,
+        "seed": 1601,
+        "workers": 0,
+        "max_floor": 100,
+        "minutes_per_day": 30,
+        "sessions_per_day": 3,
+        "attendance": 0.9,
+        "action_seconds": 6,
+        "readiness_trials": 8,
+        "readiness_threshold": 0.8,
+        "probe_every_days": 1,
+        "max_combat_actions": 100,
+        "trace_players": 6,
+        "world_frontier": 0,
+        "policies": [
+          "learner",
+          "tactician",
+          "saver",
+          "rusher",
+          "archer",
+          "mage"
+        ]
+      },
+      "before_runner": "727bee154636c43219d5f6dfd96dc3516321378183584c0f7989e129f10f7bc3",
+      "after_runner": "8707470d8d3e015149aa85f0c0eb14fd2e75a4dff62bcf781fd6e947ad76a17a",
+      "before_hash": "9aa544a47731a87514e9e0bdda91e0918cd44b35046856b0c3a4f23664b3f9d1",
+      "after_hash": "dcfb04f6f5d2437027aeead52c6fb5e0a9b8103f993f009e7c04ed9a281440d5",
+      "after_seconds": 43.1678,
+      "after_max": 5
+    },
+    {
+      "seed": 1602,
+      "before": "20260912T182400Z-a6afbf82",
+      "after": "20260912T182935Z-5430ac5f",
+      "config": {
+        "players": 12,
+        "days": 30,
+        "seed": 1602,
+        "workers": 0,
+        "max_floor": 100,
+        "minutes_per_day": 30,
+        "sessions_per_day": 3,
+        "attendance": 0.9,
+        "action_seconds": 6,
+        "readiness_trials": 8,
+        "readiness_threshold": 0.8,
+        "probe_every_days": 1,
+        "max_combat_actions": 100,
+        "trace_players": 6,
+        "world_frontier": 0,
+        "policies": [
+          "learner",
+          "tactician",
+          "saver",
+          "rusher",
+          "archer",
+          "mage"
+        ]
+      },
+      "before_runner": "727bee154636c43219d5f6dfd96dc3516321378183584c0f7989e129f10f7bc3",
+      "after_runner": "8707470d8d3e015149aa85f0c0eb14fd2e75a4dff62bcf781fd6e947ad76a17a",
+      "before_hash": "930995c827b57b8e958071da6836e2b86b8d0fc815bde61209453bc17b0459a8",
+      "after_hash": "85626e28801cc1b1bbb0db9acf2eaa9075b79d33d39d562f3398ef142f961ac9",
+      "after_seconds": 50.8905,
+      "after_max": 6
+    },
+    {
+      "seed": 1603,
+      "before": "20260912T182451Z-268e4047",
+      "after": "20260912T183033Z-6cd25faa",
+      "config": {
+        "players": 12,
+        "days": 30,
+        "seed": 1603,
+        "workers": 0,
+        "max_floor": 100,
+        "minutes_per_day": 30,
+        "sessions_per_day": 3,
+        "attendance": 0.9,
+        "action_seconds": 6,
+        "readiness_trials": 8,
+        "readiness_threshold": 0.8,
+        "probe_every_days": 1,
+        "max_combat_actions": 100,
+        "trace_players": 6,
+        "world_frontier": 0,
+        "policies": [
+          "learner",
+          "tactician",
+          "saver",
+          "rusher",
+          "archer",
+          "mage"
+        ]
+      },
+      "before_runner": "727bee154636c43219d5f6dfd96dc3516321378183584c0f7989e129f10f7bc3",
+      "after_runner": "8707470d8d3e015149aa85f0c0eb14fd2e75a4dff62bcf781fd6e947ad76a17a",
+      "before_hash": "5cb389aec1a42b91e39fe57dd80b3c5084a815ede1a5e01e2df33ccb9859cac5",
+      "after_hash": "35f6a3ad175ff8da585c39a814e2de30bca2d41a15d94700064dfb69544087f5",
+      "after_seconds": 58.1891,
+      "after_max": 5
+    }
+  ],
+  "policies": {
+    "learner": {
+      "players": 6,
+      "before_median": 3.0,
+      "after_median": 3.0,
+      "mean_paired_floor_gain": 0,
+      "before_health_waits": 465,
+      "after_health_waits": 465,
+      "after_stew_purchases": 0,
+      "unchanged_players": 6
+    },
+    "tactician": {
+      "players": 6,
+      "before_median": 3.0,
+      "after_median": 4.0,
+      "mean_paired_floor_gain": 0.5,
+      "before_health_waits": 459,
+      "after_health_waits": 339,
+      "after_stew_purchases": 6148,
+      "unchanged_players": 0
+    },
+    "saver": {
+      "players": 6,
+      "before_median": 5.0,
+      "after_median": 5.0,
+      "mean_paired_floor_gain": -0.16666666666666666,
+      "before_health_waits": 394,
+      "after_health_waits": 344,
+      "after_stew_purchases": 5899,
+      "unchanged_players": 0
+    },
+    "rusher": {
+      "players": 6,
+      "before_median": 3.0,
+      "after_median": 3.0,
+      "mean_paired_floor_gain": 0,
+      "before_health_waits": 0,
+      "after_health_waits": 0,
+      "after_stew_purchases": 0,
+      "unchanged_players": 6
+    },
+    "archer": {
+      "players": 6,
+      "before_median": 3.5,
+      "after_median": 4.5,
+      "mean_paired_floor_gain": 1.1666666666666667,
+      "before_health_waits": 453,
+      "after_health_waits": 355,
+      "after_stew_purchases": 4986,
+      "unchanged_players": 0
+    },
+    "mage": {
+      "players": 6,
+      "before_median": 4.0,
+      "after_median": 5.0,
+      "mean_paired_floor_gain": 0.6666666666666666,
+      "before_health_waits": 468,
+      "after_health_waits": 383,
+      "after_stew_purchases": 4901,
+      "unchanged_players": 0
+    }
+  }
+}

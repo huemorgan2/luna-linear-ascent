@@ -1,0 +1,52 @@
+{
+  "date": "2026-09-12T18:23:17.980Z",
+  "steps": [
+    {
+      "name": "Actual source",
+      "data": "What runs here\n\nCalls plugin_linear_ascent.engine.core.apply_choice — the same entry point used by worldd.\n\nNo proposed mechanics are injected. The imported revision determines slots, encounters, XP and rewards. Personal progression uses synthetic documents and virtual time. Shared-world database services and warden victories are not simulated.\n\nRead the engine boundary & verification ↗ · Play through the same engine ↓\n\nExact library path & source hash"
+    },
+    {
+      "name": "gate",
+      "data": {
+        "headline": "1 floor stand open",
+        "meters": {
+          "hp": 80,
+          "hp_max": 80,
+          "energy": 24,
+          "energy_max": 25,
+          "xp": 0,
+          "xp_need": 24,
+          "gold": 50,
+          "level": 1,
+          "atk": 8,
+          "dfs": 14,
+          "spd": 5,
+          "name": "Simclimber",
+          "race": "human",
+          "clazz": "blade",
+          "faction": "",
+          "faction_banner": "",
+          "faction_color": "",
+          "faction_members": 0,
+          "faction_online": 0,
+          "factions_total": -1,
+          "line": "blade",
+          "gear": [
+            "gate_jerkin",
+            "gate_buckler",
+            "rusted_sword"
+          ]
+        },
+        "events": [],
+        "rng": 0
+      }
+    }
+  ],
+  "screenshots": [
+    "01-engine-dashboard.png",
+    "failure.png"
+  ],
+  "status": "FAIL",
+  "error": "page.waitForFunction: Timeout 30000ms exceeded.\n    at gameAction (/Users/roy/Documents/my-projects-docs/luna-linear-ascent/simulation/verification/game-walkthrough.mjs:13:233)\n    at async file:///Users/roy/Documents/my-projects-docs/luna-linear-ascent/simulation/verification/game-walkthrough.mjs:18:27",
+  "errors": []
+}
