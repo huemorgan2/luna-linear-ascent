@@ -42,6 +42,13 @@ async def homepage():
     return FileResponse(SITE_DIR / "index.html", media_type="text/html")
 
 
+@router.get("/wiki", include_in_schema=False)
+@router.get("/wiki/", include_in_schema=False)
+async def wiki():
+    """Public field guide; static current roster and labeled research models."""
+    return FileResponse(SITE_DIR / "wiki" / "index.html", media_type="text/html")
+
+
 # The back room: every number the tower runs on, one unlinked page.
 # Data is baked by tools/gen_mechanics.py — rerun it when balance moves.
 

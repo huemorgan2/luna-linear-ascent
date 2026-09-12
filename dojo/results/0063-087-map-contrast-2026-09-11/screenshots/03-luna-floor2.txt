@@ -1,0 +1,1 @@
+QA Luna capture read during the run: the left pane showed the corrected floor-2 map and the right conversation showed the `ascent_scene` tool chip plus Luna's Lampfall description. A later capture showed `ascent_choose · 6` and the tower-gate pane.

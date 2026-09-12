@@ -4,6 +4,14 @@
 
 The game website's `/wiki` replaces the eight illustrative creatures with all **425 authored creatures and 425 distinct images on 100 floors**. The floor slider changes the actual roster and environment. Species keep fixed proposed profiles; future same-animal recolors are limited to three nearby variants. Current HP, attack, defense, speed, body/bite traits and specimen rules come directly from the deployed engine. Draft Power/Magic/Air badges use its pixel icons. Typography is the website's IBM VGA at 16px throughout. Rare uses game Aether teal; Epic uses Violet; Legendary uses gold. Rarity frames differ in both color and pixel outline.
 
+## Weapon drawings by grade
+
+Revision089.3 assigns **64 distinct drawings**: four for every one of the16 families. Grade identity changes the weapon's silhouette, blade or limb construction, handle and focal details. Common is rough and practical; Rare is forged and reinforced; Epic is elaborate or charged; Legendary uses exceptional shapes, suspended cores or radiant structures. Frame color remains an additional cue.
+
+Each weapon has an explicit `artByGrade` record with its asset source and visual description. There is no single-image fallback. Arsenal cards, Forge portraits, acquisition rows and details all resolve that same family-and-grade record. Opening any weapon shows four selectable designs side by side, with a two-column layout on phones. Choosing one updates its source settings and the shared grade controls.
+
+61 portraits are distinct existing game assets. Three new Thunder Maul portraits fill missing Common/Rare/Legendary shapes: wooden mallet, steel hammer-and-beak, and floating split-shard hammer. Epic uses the existing Ironstorm Maul drawing. Original generated PNGs and the exact prompts are preserved under `worldd/static/site/wiki/weapons/` and `worldd/plans/089-game-wiki/phase-3-grade-art/PROMPTS.md`. These are the wiki's proposed item identities for later adoption by game inventory UI. Upgrade level and remaining endurance do not select a different rarity drawing.
+
 ## Source settings
 
 Every family has its own editable acquisition record in `worldd/static/site/wiki/model.json`. Defaults are below; there are 16 families × four grades, all displayed in the wiki.
