@@ -26,4 +26,8 @@ Revert the implementation commit (record its SHA after execution), refresh the l
 
 ## Execution status
 
-Plan recorded before implementation. Pending.
+Implemented and verified: plain-language titles, axes, statistical controls, units, missing results and floor explanations. Fastest-observed line uses existing milestone dates and names the winning player per floor. Existing 45-test suite passes; in-app browser confirms median/average/90%, percentage/count and comparison sentences, and readable narrow tooltips. Evidence: simulation/verification/004/summary.md. No gameplay or simulation calculations changed. Broader desktop/responsive verification continues with plan 020.
+
+## User scope addition during execution
+
+The user asks for the fastest player alongside the median. Add an earliest-player line computed from existing per-player milestone dates, preserving the median and missing values. Name the fastest player and strategy per floor; explain that the identity can change between floors. Verify both lines against saved JSON. Optimization of bot paths is tracked separately in plan 020.
