@@ -94,8 +94,27 @@ def make_data() -> dict:
                 atk=economy.honed_bonus(economy._reference_bonus(gate,'weapon'),economy.reference_hone(gate)),
                 dur=int((Decimal(1300)*(1+Decimal('.025')*(gate-1))).quantize(1,rounding=ROUND_HALF_UP))))
     model=json.loads((OUT/'model.json').read_text())
+    weapon_images = set()
     for w in model['weapons']:
-        w['image']=asset(f"weapons/large/{w['art']}_100x160.png") if (ART/f"weapons/large/{w['art']}_100x160.png").exists() else asset(f"weapons/icons/{w['art']}_30x48.png")
+        if set(w['artByGrade']) != set(model['grades']):
+            raise ValueError(f"Incomplete grade art: {w['id']}")
+        w['images'] = {}
+        for grade, art in w['artByGrade'].items():
+            if art['source'] == 'game':
+                relative = f"weapons/large/{art['slug']}_100x160.png"
+                path, src = ART / relative, asset(relative)
+            elif art['source'] == 'wiki':
+                path = (OUT / art['file']).resolve()
+                if not path.is_relative_to(OUT.resolve()) or not path.is_file():
+                    raise ValueError(f"Missing wiki art: {art['file']}")
+                src = f"/static/site/wiki/{art['file']}?v={model['revision']}"
+            else:
+                raise ValueError(f"Unknown art source: {art['source']}")
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            if digest in weapon_images:
+                raise ValueError(f"Reused weapon drawing: {w['id']} / {grade}")
+            weapon_images.add(digest)
+            w['images'][grade] = dict(src=src, description=art['description'])
     keys=['weapon','sword','shield','armor','shoes','bow','staff','t_armor','t_resist',
           't_wing','t_speed','t_bulwark','t_wrench','heart','coin','aether','shard','pack','quiver',
           'flask','back','run','arrow_up','arrow_down','note','bolt','lock','focus']

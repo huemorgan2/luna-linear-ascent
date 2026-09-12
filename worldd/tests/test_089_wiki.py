@@ -1,5 +1,6 @@
 """The public guide must keep its 425 species and progression tied to the engine."""
 import importlib.util
+import hashlib
 import json
 from pathlib import Path
 
@@ -10,6 +11,24 @@ WORLD = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('gen_wiki', WORLD / 'tools/gen_wiki.py')
 gen = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(gen)
+
+
+def test_every_weapon_grade_has_a_separate_existing_drawing():
+    data = gen.make_data()
+    files, contents = set(), set()
+    for weapon in data['model']['weapons']:
+        assert 'image' not in weapon and 'art' not in weapon
+        assert set(weapon['images']) == set(data['model']['grades'])
+        for grade, image in weapon['images'].items():
+            url = image['src'].split('?')[0]
+            path = (gen.ART / url.removeprefix('/static/laart/')) if url.startswith('/static/laart/') else (gen.OUT / url.removeprefix('/static/site/wiki/'))
+            raw = path.read_bytes()
+            assert raw.startswith(b'\x89PNG\r\n\x1a\n')
+            assert image['description'] == weapon['artByGrade'][grade]['description']
+            assert len(image['description']) > 20
+            files.add(path)
+            contents.add(hashlib.sha256(raw).digest())
+    assert len(files) == len(contents) == 64
 
 
 def test_baked_wiki_matches_deployed_content_and_all_species():
@@ -61,9 +80,14 @@ async def test_public_wiki_routes_assets_and_home_link_need_no_account():
         for route in ('/wiki', '/wiki/'):
             response = await client.get(route)
             assert response.status_code == 200
-            assert 'data-wiki-revision="089.2"' in response.text
+            assert 'data-wiki-revision="089.3"' in response.text
             assert 'set-cookie' not in response.headers
         assert 'href="/wiki"' in (await client.get('/')).text
         for path in ('wiki.mjs', 'wiki.css', 'data.json'):
             assert (await client.get('/static/site/wiki/' + path)).status_code == 200
+        for weapon in gen.make_data()['model']['weapons']:
+            for image in weapon['images'].values():
+                response = await client.get(image['src'])
+                assert response.status_code == 200
+                assert response.headers['content-type'] == 'image/png'
         assert (await client.get('/static/site/fonts/WebPlus_IBM_VGA_8x16.woff')).status_code == 200

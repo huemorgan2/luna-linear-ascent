@@ -1,9 +1,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {acquisition, lootPreview, familyWeight, hitPreview, shieldPreview} from '../../static/site/wiki/wiki.mjs';
+import {acquisition, lootPreview, familyWeight, hitPreview, shieldPreview, weaponArt} from '../../static/site/wiki/wiki.mjs';
 const data=JSON.parse(readFileSync(new URL('../../static/site/wiki/data.json',import.meta.url)));
 const model=data.model;
+
+test('switching grades selects four different drawings with meaningful accessible names',()=>{
+ const urls=new Set();
+ for(const w of model.weapons){
+  for(const grade of model.grades){
+   const art=weaponArt(w,grade);
+   assert(!urls.has(art.src));urls.add(art.src);
+   assert(art.alt.startsWith(`${grade} ${w.name}: `));
+   assert(art.alt.includes(art.description));
+  }
+  assert.throws(()=>weaponArt(w,'Unassigned'),/Missing Unassigned art/);
+ }
+ assert.equal(urls.size,64);
+});
 
 test('all 64 weapon source settings have valid ranks, delivered condition and progression gates',()=>{
  for(let gi=0;gi<4;gi++)for(const w of model.weapons){

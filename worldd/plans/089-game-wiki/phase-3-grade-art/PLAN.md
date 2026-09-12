@@ -34,4 +34,4 @@ Canonical existing art is the vendored game's portraits. New mauls are wiki-owne
 
 ## Execution status
 
-Planned; no implementation edits made yet.
+Implemented and locally verified. 64 distinct PNG drawings and 64 normalized alpha silhouettes; all grade-dependent surfaces share the same lookup. Four targeted Python tests, six Node tests and the full224-test worldd suite pass. All mechanics and acquisition data compare equal to7063488 after excluding revision and art fields. Browser scenario14 passed at desktop and390px; report: `dojo/results/0066-089-weapon-grade-art-2026-09-12/summary.md`. Publication verification pending.

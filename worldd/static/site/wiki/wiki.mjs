@@ -1,6 +1,12 @@
 // Shared, inspectable research calculations; this module never calls game actions.
 export const clamp=(lo,hi,v)=>Math.min(hi,Math.max(lo,v));
 export const price=(base,factor)=>Math.ceil(base*Math.round(factor*100)/100);
+// A drawing belongs to a family AND grade; never silently reuse another grade.
+export function weaponArt(w,grade){
+ const art=w.images[grade];
+ if(!art)throw new Error(`Missing ${grade} art for ${w.id}`);
+ return {...art,alt:`${grade} ${w.name}: ${art.description}`};
+}
 export function hitPreview(w,t,a,gap){
  const channel=w.path==='Staff'?'Magic':w.path==='Bow'?a.channel:'Power';
  const reach=!(w.path==='Blade'&&(t.air||gap>0));
@@ -52,6 +58,7 @@ const $=id=>document.getElementById(id);
 const icon=key=>`<span class="ico" aria-hidden="true" style="--icon:url('${data.icons[key]||data.icons.note}')"></span>`;
 const type=id=>model.types.find(x=>x.id===id);
 const weapon=()=>model.weapons.find(x=>x.id===state.weapon);
+const weaponPortrait=(w,gi,width,height,lazy=false)=>{const a=weaponArt(w,model.grades[gi]);return `<img src="${esc(a.src)}" alt="${esc(a.alt)}" width="${width}" height="${height}" ${lazy?'loading="lazy"':''}>`;};
 const affinityIcon=t=>t.affinity==='Power'?'t_armor':t.affinity==='Magic'?'t_resist':'shard';
 const badges=id=>{const t=type(id);return `<div class="badge-row"><span class="badge aff-${t.affinity.toLowerCase()}">${icon(affinityIcon(t))}${esc(t.affinity)}</span><span class="badge ${t.air?'air':''}">${icon(t.air?'t_wing':'shoes')}${t.air?'Air':'Ground'}</span></div>`;};
 function table(head,rows){return `<table><thead><tr>${head.map(x=>`<th scope="col">${x}</th>`).join('')}</tr></thead><tbody>${rows.map(c=>`<tr>${c.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table>`;}
@@ -97,12 +104,12 @@ function renderHit(){
 }
 function renderWeapons(){
  const g=model.grades[state.grade];
- $('weapon-grid').innerHTML=model.weapons.filter(w=>state.path==='All'||w.path===state.path).map(w=>`<button class="weapon-card rarity-${state.grade}" data-weapon="${w.id}"><img src="${w.image}" alt="" width="48" height="80" loading="lazy"><span class="weapon-copy"><span>${g.toUpperCase()} · ${w.path.toUpperCase()}</span><strong>${w.name}</strong><span>${w.effect}</span><span class="muted">${w.factor}× ATK / ${w.end}× END</span></span></button>`).join('');
+ $('weapon-grid').innerHTML=model.weapons.filter(w=>state.path==='All'||w.path===state.path).map(w=>`<button class="weapon-card rarity-${state.grade}" data-weapon="${w.id}">${weaponPortrait(w,state.grade,60,96,true)}<span class="weapon-copy"><span>${g.toUpperCase()} · ${w.path.toUpperCase()}</span><strong>${w.name}</strong><span>${w.effect}</span><span class="muted">${w.factor}× ATK / ${w.end}× END</span></span></button>`).join('');
 }
 function renderForge(){
  const w=weapon(),s=data.upgrades.find(x=>x.gi===state.grade&&x.level===state.level),g=model.grades[state.grade],a=acquisition(data,w,state.grade);
  $('upgrade-value').textContent='+'+state.level;
- $('forge-weapon').innerHTML=`<div class="forge-weapon rarity-${state.grade}"><img src="${w.image}" alt="" width="60" height="96"><div><h3>${g} +${state.level}</h3><p>${w.name}</p><span>${w.effect} · from +0</span></div></div>`+metrics([['Floor gate',s.floor],['Full-condition ATK bonus',fmt(Math.round(s.atk*w.factor))],['Max endurance',fmt(Math.round(s.dur*w.end))],['Shop delivers','+'+a.cfg.shopLevel+' at Floor '+a.shop.floor],['Monster drop','+'+a.cfg.dropLevel+' · '+a.cfg.dropDurabilityPct+'% endurance']]);
+ $('forge-weapon').innerHTML=`<div class="forge-weapon rarity-${state.grade}">${weaponPortrait(w,state.grade,60,96)}<div><h3>${g} +${state.level}</h3><p>${w.name}</p><span>${w.effect} · from +0</span></div></div>`+metrics([['Floor gate',s.floor],['Full-condition ATK bonus',fmt(Math.round(s.atk*w.factor))],['Max endurance',fmt(Math.round(s.dur*w.end))],['Shop delivers','+'+a.cfg.shopLevel+' at Floor '+a.shop.floor],['Monster drop','+'+a.cfg.dropLevel+' · '+a.cfg.dropDurabilityPct+'% endurance']]);
  $('recipe').innerHTML=`<h3>${state.level===0?'CRAFT +0 IN THE FORGE':'UPGRADE CHARGE TO +'+state.level}</h3>`+metrics([['Gold',icon('coin')+fmt(price(s.gold,w.cost))]])+model.materials[state.grade].map((m,i)=>`<div class="material rarity-${state.grade}">${icon('shard')}<span>${m}</span><span>${fmt(s.q*w.recipe[i])}</span></div>`).join('')+`<div class="forge-link">${icon('t_wrench')}${state.level===20?'MAX LEVEL AFTER THIS UPGRADE':state.level===0?'CRAFT IN THE FORGE':'UPGRADE IN THE FORGE'}</div><p class="muted">An individual step charge, not a shop listing. Shop +${a.cfg.shopLevel} costs ${fmt(a.shopGold)} gold including its earlier levels. See all source settings below.</p>`;
  $('upgrade-table').innerHTML=table(['LEVEL','FLOOR','GOLD / STEP','MATERIAL Q','BASE ATK','BASE END'],data.upgrades.filter(x=>x.gi===state.grade).map(x=>['+'+x.level,x.floor,fmt(x.gold),x.q,fmt(x.atk),fmt(x.dur)]));
  $('upgrade-table-title').textContent=`ALL 21 ${g.toUpperCase()} LEVELS · NEUTRAL REFERENCE`;
@@ -123,9 +130,12 @@ function renderRaid(){
  $('raid-result').innerHTML=`<h3 class="gold">${seconds<=30?'THE GROUP CAN WIN':net<=0?'HEALING WINS':'ENERGY RUNS OUT'}</h3>`+metrics([['Group DPS',fmt(state.players*10*state.efficiency/100)],['Healing / second','300'],['Net DPS',fmt(Math.max(0,net))],['Time to defeat',Number.isFinite(seconds)?seconds.toFixed(1)+' seconds':'No progress']])+`<p>${seconds<=30?'Better preparation makes a smaller group viable.':'The group needs more sustained damage or a longer usable energy window.'}</p>`;
 }
 function openDialog(html){$('detail-content').innerHTML=html;if(!$('detail-dialog').open)$('detail-dialog').showModal();}
+function gradeGallery(w,selected){
+ return `<h3>FOUR GRADES · FOUR DESIGNS</h3><p class="muted">Select a design to see its grade settings.</p><div class="grade-gallery">${model.grades.map((g,gi)=>{const a=weaponArt(w,g);return `<button class="grade-design rarity-${gi}" data-art-weapon="${w.id}" data-art-grade="${gi}" aria-pressed="${gi===selected}" aria-label="View ${g} ${w.name}"><span class="grade-design-name">${g.toUpperCase()}</span>${weaponPortrait(w,gi,80,128)}<span class="grade-design-description">${esc(a.description)}</span><span class="grade-design-state">${gi===selected?'[ SELECTED ]':'[ VIEW GRADE ]'}</span></button>`;}).join('')}</div>`;
+}
 function showWeapon(id){
  const w=model.weapons.find(x=>x.id===id),gi=state.grade,g=model.grades[gi],a=acquisition(data,w,gi),next=data.upgrades.find(x=>x.gi===gi&&x.level===Math.min(20,state.level+1));
- openDialog(`<h2 id="detail-title">${g.toUpperCase()} · ${w.name.toUpperCase()}</h2><div class="dialog-weapon"><img src="${w.image}" alt="${w.name}" width="72" height="120"><div><p>${icon(w.path==='Blade'?'sword':w.path.toLowerCase())}${w.path} · ${w.effect}</p><p>${w.factor}× attack / ${w.end}× endurance</p></div></div><p>${w.description}</p>`+metrics([['Technique recharge',w.cooldown?w.cooldown+' paid actions':'Passive'],['Grade recipe',w.recipe[0]+'A : '+w.recipe[1]+'B'],['Shop',`+${a.cfg.shopLevel} · ${fmt(a.shopNow)}/${fmt(a.shopMax)} END · Floor ${a.shop.floor}`],['Dropped',`+${a.cfg.dropLevel} · ${fmt(a.dropNow)}/${fmt(a.dropMax)} END (${a.cfg.dropDurabilityPct}%)`],['Shop gold',fmt(a.shopGold)],['Forge craft',`+${a.cfg.craftLevel} · ${fmt(a.craftNow)}/${fmt(a.craftMax)} END · Floor ${a.craft.floor}`],['Craft cost',`${fmt(a.craftGold)} gold<br>${model.materials[gi].map((m,i)=>fmt(a.craftQ*w.recipe[i])+' '+m).join('<br>')}`],['Drop sources',`${data.floors.filter(f=>f.floor>=a.findFloor).reduce((n,f)=>n+f.monsters.length,0)} creatures · Floor ${a.findFloor}+ find / ${a.drop.floor}+ equip`]])+`<p class="gold">Watch for: ${w.weakness}</p><div class="stock-demo rarity-${gi}"><h3>EXAMPLE PACK · NEXT UPGRADE +${next.level}</h3>${model.materials[gi].map((m,i)=>{const required=next.q*w.recipe[i],owned=i===0?Math.floor(required*.6):required;return `<div class="stock-row"><div><span>${m}</span><span>${owned} / ${required}</span></div><progress value="${owned}" max="${required}"></progress></div>`;}).join('')}<p class="muted">Illustrative gathered / required amounts, not your inventory.</p></div><div class="action-row"><button class="primary" data-compare="${w.id}">[ COMPARE WEAPON ]</button><button data-forge="${w.id}">[ UPGRADE IN THE FORGE ]</button></div>`);
+ openDialog(`<h2 id="detail-title">${g.toUpperCase()} · ${w.name.toUpperCase()}</h2><div class="dialog-weapon">${weaponPortrait(w,gi,72,120)}<div><p>${icon(w.path==='Blade'?'sword':w.path.toLowerCase())}${w.path} · ${w.effect}</p><p>${w.factor}× attack / ${w.end}× endurance</p></div></div><p>${w.description}</p>`+gradeGallery(w,gi)+metrics([['Technique recharge',w.cooldown?w.cooldown+' paid actions':'Passive'],['Grade recipe',w.recipe[0]+'A : '+w.recipe[1]+'B'],['Shop',`+${a.cfg.shopLevel} · ${fmt(a.shopNow)}/${fmt(a.shopMax)} END · Floor ${a.shop.floor}`],['Dropped',`+${a.cfg.dropLevel} · ${fmt(a.dropNow)}/${fmt(a.dropMax)} END (${a.cfg.dropDurabilityPct}%)`],['Shop gold',fmt(a.shopGold)],['Forge craft',`+${a.cfg.craftLevel} · ${fmt(a.craftNow)}/${fmt(a.craftMax)} END · Floor ${a.craft.floor}`],['Craft cost',`${fmt(a.craftGold)} gold<br>${model.materials[gi].map((m,i)=>fmt(a.craftQ*w.recipe[i])+' '+m).join('<br>')}`],['Drop sources',`${data.floors.filter(f=>f.floor>=a.findFloor).reduce((n,f)=>n+f.monsters.length,0)} creatures · Floor ${a.findFloor}+ find / ${a.drop.floor}+ equip`]])+`<p class="gold">Watch for: ${w.weakness}</p><div class="stock-demo rarity-${gi}"><h3>EXAMPLE PACK · NEXT UPGRADE +${next.level}</h3>${model.materials[gi].map((m,i)=>{const required=next.q*w.recipe[i],owned=i===0?Math.floor(required*.6):required;return `<div class="stock-row"><div><span>${m}</span><span>${owned} / ${required}</span></div><progress value="${owned}" max="${required}"></progress></div>`;}).join('')}<p class="muted">Illustrative gathered / required amounts, not your inventory.</p></div><div class="action-row"><button class="primary" data-compare="${w.id}">[ COMPARE WEAPON ]</button><button data-forge="${w.id}">[ UPGRADE IN THE FORGE ]</button></div>`);
 }
 function specimenStats(m,f,deep,specimen){
  const s=f.specimens[specimen],pre=m.specimenStats?.[specimen];
@@ -158,7 +168,7 @@ function renderLootFormulas(){
 }
 function renderAcquisition(){
  const rows=[];
- for(let gi=0;gi<4;gi++)for(const w of model.weapons){const a=acquisition(data,w,gi);rows.push([`<button class="loot-creature rarity-${gi}" data-source-weapon="${w.id}" data-grade="${gi}"><img src="${w.image}" alt="" width="30" height="48" loading="lazy"><span>${model.grades[gi]}<br>${w.name}</span></button>`,w.effect,'+'+a.cfg.shopLevel,a.shop.floor,`${fmt(a.shopNow)} / ${fmt(a.shopMax)}<br>${a.cfg.shopDurabilityPct}%`,fmt(Math.round(a.shop.atk*w.factor)),fmt(a.shopGold),'+'+a.cfg.dropLevel,`${a.findFloor}+ find<br>${a.drop.floor}+ equip`,`${fmt(a.dropNow)} / ${fmt(a.dropMax)}<br>${a.cfg.dropDurabilityPct}%`,fmt(Math.round(a.drop.atk*w.factor)),`+${a.cfg.craftLevel} · Floor ${a.craft.floor}<br>${fmt(a.craftNow)}/${fmt(a.craftMax)} END · ${a.cfg.craftDurabilityPct}%<br>${fmt(Math.round(a.craft.atk*w.factor))} ATK<br>${fmt(a.craftGold)} gold<br>${model.materials[gi].map((m,i)=>fmt(a.craftQ*w.recipe[i])+' '+m).join('<br>')}`,`Shop / Forge / ${data.floors.filter(f=>f.floor>=a.findFloor).reduce((n,f)=>n+f.monsters.length,0)} hunt creatures<br>${w.path==='Bow'?'Air':w.path==='Staff'?'Ground Magic':'Ground Power'} favored ×3`]);}
+ for(let gi=0;gi<4;gi++)for(const w of model.weapons){const a=acquisition(data,w,gi);rows.push([`<button class="loot-creature rarity-${gi}" data-source-weapon="${w.id}" data-grade="${gi}">${weaponPortrait(w,gi,30,48,true)}<span>${model.grades[gi]}<br>${w.name}</span></button>`,w.effect,'+'+a.cfg.shopLevel,a.shop.floor,`${fmt(a.shopNow)} / ${fmt(a.shopMax)}<br>${a.cfg.shopDurabilityPct}%`,fmt(Math.round(a.shop.atk*w.factor)),fmt(a.shopGold),'+'+a.cfg.dropLevel,`${a.findFloor}+ find<br>${a.drop.floor}+ equip`,`${fmt(a.dropNow)} / ${fmt(a.dropMax)}<br>${a.cfg.dropDurabilityPct}%`,fmt(Math.round(a.drop.atk*w.factor)),`+${a.cfg.craftLevel} · Floor ${a.craft.floor}<br>${fmt(a.craftNow)}/${fmt(a.craftMax)} END · ${a.cfg.craftDurabilityPct}%<br>${fmt(Math.round(a.craft.atk*w.factor))} ATK<br>${fmt(a.craftGold)} gold<br>${model.materials[gi].map((m,i)=>fmt(a.craftQ*w.recipe[i])+' '+m).join('<br>')}`,`Shop / Forge / ${data.floors.filter(f=>f.floor>=a.findFloor).reduce((n,f)=>n+f.monsters.length,0)} hunt creatures<br>${w.path==='Bow'?'Air':w.path==='Staff'?'Ground Magic':'Ground Power'} favored ×3`]);}
  $('acquisition-table').innerHTML=table(['WEAPON / GRADE','POWER','SHOP LEVEL','SHOP FLOOR','SHOP END: NOW / MAX','SHOP ATK','SHOP GOLD','DROP LEVEL','DROP FLOOR','DROP END: NOW / MAX','DROP ATK','FORGE CRAFT: LEVEL / FLOOR / COST','SOURCES / WEIGHT'],rows);
 }
 function setGrade(gi){state.grade=gi;document.querySelectorAll('[name$="grade-choices"]').forEach(x=>x.checked=+x.value===gi);renderWeapons();renderForge();}
@@ -189,6 +199,7 @@ function bind(){
  document.addEventListener('click',event=>{
   const b=event.target.closest('button');if(!b)return;
   if(b.dataset.weapon)showWeapon(b.dataset.weapon);
+  if(b.dataset.artWeapon){setGrade(+b.dataset.artGrade);showWeapon(b.dataset.artWeapon);$('detail-content').querySelector('[aria-pressed="true"]')?.focus({preventScroll:true});}
   if(b.dataset.sourceWeapon){setGrade(+b.dataset.grade);showWeapon(b.dataset.sourceWeapon);}
   if(b.dataset.monster)showMonster(b.dataset.monster,+b.dataset.floor);
   if(b.dataset.compare)chooseWeapon(b.dataset.compare,'matchups');
@@ -200,7 +211,7 @@ function bind(){
  });
 }
 async function init(){
- try{const res=await fetch('/static/site/wiki/data.json?v=089.2');if(!res.ok)throw new Error('Could not load wiki data');data=await res.json();model=data.model;installControls();renderFloor();renderHit();renderWeapons();renderForge();renderShield();renderMovement();renderRaid();renderLoot();bind();$('load-status').hidden=true;$('wiki-content').hidden=false;if(location.hash)document.getElementById(location.hash.slice(1))?.scrollIntoView();}
+ try{const res=await fetch('/static/site/wiki/data.json?v=089.3');if(!res.ok)throw new Error('Could not load wiki data');data=await res.json();model=data.model;installControls();renderFloor();renderHit();renderWeapons();renderForge();renderShield();renderMovement();renderRaid();renderLoot();bind();$('load-status').hidden=true;$('wiki-content').hidden=false;if(location.hash)document.getElementById(location.hash.slice(1))?.scrollIntoView();}
  catch(e){$('load-status').textContent='The field guide could not load. Reload this page to try again.';console.error(e);}
 }
 if(typeof document!=='undefined')init();

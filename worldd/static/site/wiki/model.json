@@ -1,5 +1,5 @@
 {
-  "revision": "089.2",
+  "revision": "089.3",
   "types": [
     {
       "id": "ground-common",
@@ -78,7 +78,6 @@
       "cooldown": 0,
       "description": "The strongest plain blade hit. No status setup or control.",
       "weakness": "Less endurance; no answer to flight.",
-      "art": "seared_cleaver",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -111,6 +110,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "notched_cleaver",
+          "description": "Chipped rectangular chopping blade; plain wrapped handle."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "seared_cleaver",
+          "description": "Forged broad blade with a rounded nose and hooked grip."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "grimcleaver",
+          "description": "Oversized executioner blade with a deep curved cutting edge."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "starfall",
+          "description": "Split comet blade with a blazing outline and forked guard."
         }
       }
     },
@@ -129,7 +150,6 @@
       "cooldown": 3,
       "description": "Venom cut adds 8% source attack for three enemy phases.",
       "weakness": "Venomproof enemies ignore the poison.",
-      "art": "ratcatchers_dirk",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -162,6 +182,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "ratcatchers_dirk",
+          "description": "Narrow needle blade and a small straight guard."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "gatewatch_gladius",
+          "description": "Leaf-point forged blade with a sculpted grip."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "kingsguard_razor",
+          "description": "Long tapered razor with a flared collar and weighted pommel."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "tempest_edge",
+          "description": "Hooked blade encircled by a winding stream of energy."
         }
       }
     },
@@ -180,7 +222,6 @@
       "cooldown": 3,
       "description": "Push two distance steps. Take a bow shot or try to escape next.",
       "weakness": "Steadfast enemies cannot be pushed.",
-      "art": "boarspine_shortsword",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -213,6 +254,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "boarspine_shortsword",
+          "description": "Short single-edged blade with a modest round guard."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "emberquench_blade",
+          "description": "Straight steel blade and wide swept crossguard."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "oathkeeper",
+          "description": "Heavy straight blade with a wing-shaped guard and round pommel."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "dawnbreaker",
+          "description": "Radiant blade crowned by long rays and an ornate guard."
         }
       }
     },
@@ -231,7 +294,6 @@
       "cooldown": 4,
       "description": "Interrupt a windup and skip the next enemy action.",
       "weakness": "Low direct damage; stun recovery prevents locking.",
-      "art": "ironstorm_maul",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -264,6 +326,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "wiki",
+          "file": "weapons/thunder-common.png",
+          "description": "Rough wooden mallet with two raw-iron bands and a rag grip."
+        },
+        "Rare": {
+          "source": "wiki",
+          "file": "weapons/thunder-rare.png",
+          "description": "Steel hammer face and long piercing beak on a reinforced haft."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "ironstorm_maul",
+          "description": "Massive faceted hammer head, braced corners and crackling arcs."
+        },
+        "Legendary": {
+          "source": "wiki",
+          "file": "weapons/thunder-legendary.png",
+          "description": "Two floating shard blocks around a star core; thread-bound haft."
         }
       }
     },
@@ -282,7 +366,6 @@
       "cooldown": 3,
       "description": "An open wound deals 10% source attack for two phases.",
       "weakness": "Bloodless creatures cannot bleed.",
-      "art": "moonwake_saber",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -315,6 +398,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "rusted_sword",
+          "description": "Battered short blade, squared guard and simple wrapped grip."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "wardens_cast_off",
+          "description": "Slender forged blade with a broad curved crossguard."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "thornsong",
+          "description": "Serrated leaf blade with an elaborate thorn-shaped hilt."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "duskrender",
+          "description": "Crescent blade floating in a bright halo above a long grip."
         }
       }
     },
@@ -333,7 +438,6 @@
       "cooldown": 3,
       "description": "Reduce flat defense by 20% for the next two direct hits.",
       "weakness": "Does not remove Power or Magic resistance.",
-      "art": "bloodgroove_falchion",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -366,6 +470,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "iron_sword",
+          "description": "Plain straight iron blade with a narrow bar guard."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "bloodgroove_falchion",
+          "description": "Wide curved steel blade with a deep groove and ring guard."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "emberfang",
+          "description": "Heavy jagged blade with an angular tip and hooked guard."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "night_iron_glaive",
+          "description": "Huge hooked cutting edge around an open crescent of light."
         }
       }
     },
@@ -384,7 +510,6 @@
       "cooldown": 3,
       "description": "A readied shot at distance 2\u20133 adds 20% direct damage.",
       "weakness": "At contact, impact falls to 65%.",
-      "art": "emberflight_longbow",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -417,6 +542,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "green_hazel_bow",
+          "description": "Simple narrow wood limbs with a small wrapped grip."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "emberflight_longbow",
+          "description": "Long reinforced limbs with a substantial forged riser."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "oathstring",
+          "description": "Swept armored limbs and a broad sculpted central brace."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "starshot",
+          "description": "Angular split limbs with floating star-shaped reinforcements."
         }
       }
     },
@@ -435,7 +582,6 @@
       "cooldown": 0,
       "description": "Retains 90% impact at contact, instead of the usual 65%.",
       "weakness": "Lower damage when shooting from safety.",
-      "art": "ashwood_bow",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -468,6 +614,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "ashwood_bow",
+          "description": "Compact curved ash stave with a plain central handhold."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "goblin_notch_bow",
+          "description": "Jointed short limbs and prominent wrapped reinforcement."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "cinderfletch",
+          "description": "Compact carved frame with two open circular limb sockets."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "duskwhisper",
+          "description": "Tightly recurved frame surrounding a bright suspended ring."
         }
       }
     },
@@ -486,7 +654,6 @@
       "cooldown": 3,
       "description": "A recoil shot opens two steps against a movable target.",
       "weakness": "A miss or a steadfast target gives no opening.",
-      "art": "wolfsight_recurve",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -519,6 +686,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "boarhorn_shortbow",
+          "description": "Stocky horn-backed limbs with a thick braced grip."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "wolfsight_recurve",
+          "description": "Strong recurved limbs and a reinforced central riser."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "grimflight",
+          "description": "Deeply curved limbs with bulky armored shoulders."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "hellbarb_bow",
+          "description": "Barbed outer limbs and a flame-shaped open central frame."
         }
       }
     },
@@ -537,7 +726,6 @@
       "cooldown": 3,
       "description": "Pinning shot removes three speed for two phases.",
       "weakness": "Fast flyers remain dangerous even when slowed.",
-      "art": "horncore_bow",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -570,6 +758,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "sinew_backed_bow",
+          "description": "Slender sinew-backed stave with a wrapped midsection."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "horncore_bow",
+          "description": "Smooth opposing curves around a narrow forged grip."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "drakespine_recurve",
+          "description": "Segmented scale-like limbs with heavy pointed tips."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "stormnock",
+          "description": "Forked lightning limbs around an open skeletal riser."
         }
       }
     },
@@ -588,7 +798,6 @@
       "cooldown": 0,
       "description": "Arcane arrows gain 25% impact. Ordinary arrows remain Power.",
       "weakness": "Arcane ammo is costly and bad against flying Power.",
-      "art": "thornstring",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -621,6 +830,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "wardens_castbow",
+          "description": "Plain wood frame with an asymmetric knotted handhold."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "thornstring",
+          "description": "Angular limbs with thorn-shaped projections and a braced grip."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "frosthawk_bow",
+          "description": "Swept carved limbs around a suspended faceted focus."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "gloamreach",
+          "description": "Multiple sweeping crescent limbs around a dark open center."
         }
       }
     },
@@ -639,7 +870,6 @@
       "cooldown": 3,
       "description": "Ignition adds 12% source attack for two phases as Magic.",
       "weakness": "Fireproof enemies ignore the burn.",
-      "art": "ashspire_staff",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -672,6 +902,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "kindling_rod",
+          "description": "A bundle of rough split wood tied into a short rod."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "ashspire_staff",
+          "description": "Tapered forged spike above an angular wrapped grip."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "cinderheart_staff",
+          "description": "Exposed round core under a rising tongue of flame."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "wyrmtongue_staff",
+          "description": "Huge dragon-head crown breathing a bright curling flame."
         }
       }
     },
@@ -690,7 +942,6 @@
       "cooldown": 3,
       "description": "Frostbind removes three speed for two phases.",
       "weakness": "Control buys time; it does not stop an attack.",
-      "art": "frostbrand_staff",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -723,6 +974,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "tallowwood_staff",
+          "description": "Straight wooden staff with a small wrapped grip."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "coalglass_staff",
+          "description": "Smooth loop enclosing a narrow glass focus."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "frostbrand_staff",
+          "description": "Wide circular crystal crown with a finely detailed rim."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "nightwell_staff",
+          "description": "Open asymmetric orb cradle above a segmented haft."
         }
       }
     },
@@ -741,7 +1014,6 @@
       "cooldown": 4,
       "description": "A shock skips one enemy action and interrupts a windup.",
       "weakness": "Bosses share a real-time resilience window.",
-      "art": "stormtwig_staff",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -774,6 +1046,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "stormtwig_staff",
+          "description": "Forked branch crown bound to a plain wooden haft."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "wolfsong_staff",
+          "description": "Faceted capped head on a slim forged staff."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "stormcrown_staff",
+          "description": "Jagged crown intertwined with a spiraling conductor."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "starcaller_staff",
+          "description": "Large bright star core held inside an orbital lattice."
         }
       }
     },
@@ -792,7 +1086,6 @@
       "cooldown": 3,
       "description": "A force wave opens distance before the next enemy pursuit.",
       "weakness": "Steadfast creatures ignore displacement.",
-      "art": "grimspark_staff",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -826,6 +1119,28 @@
           "craftLevel": 0,
           "craftDurabilityPct": 100
         }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "boarhide_stave",
+          "description": "Heavy straight stave lashed with rough diagonal bindings."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "grimspark_staff",
+          "description": "Squared open fork with pointed side prongs."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "oathflame_staff",
+          "description": "Flame focus held inside a ring above a wing-shaped collar."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "kingscourge_staff",
+          "description": "Stacked geometric cores inside a massive angular frame."
+        }
       }
     },
     {
@@ -843,7 +1158,6 @@
       "cooldown": 3,
       "description": "Fracture flat defense by 20% for the next two direct hits.",
       "weakness": "Does not bypass affinity or flight penalties.",
-      "art": "thornweave_staff",
       "acquisition": {
         "Common": {
           "shopLevel": 0,
@@ -876,6 +1190,28 @@
           "dropDurabilityPct": 10,
           "craftLevel": 0,
           "craftDurabilityPct": 100
+        }
+      },
+      "artByGrade": {
+        "Common": {
+          "source": "game",
+          "slug": "ratbone_wand",
+          "description": "Short bone wand with a skull-like cap and jutting splinters."
+        },
+        "Rare": {
+          "source": "game",
+          "slug": "goblin_fetish_staff",
+          "description": "Crooked branching head hung with charms and bindings."
+        },
+        "Epic": {
+          "source": "game",
+          "slug": "silverbough_staff",
+          "description": "Delicate branching lattice wrapped around a cut crystal."
+        },
+        "Legendary": {
+          "source": "game",
+          "slug": "duskbinder_staff",
+          "description": "Large hooked crown, hovering dark core and spiral bindings."
         }
       }
     }
