@@ -33,4 +33,4 @@ Each phase is an isolated commit. Revert phase commits in reverse order; preserv
 
 ## Execution status
 
-Plan written before implementation. Audit evidence gathered; phases not yet executed.
+Phases 1–2 implemented and verified in f6c4c5b and 3ce5675. Phase 3 batch/website implemented; the exploratory matrix was deliberately interrupted after 11/27 member runs when the user clarified that simulations must execute the actual game engine. Saved runs are retained as historical proposal experiments, not real-game forecasts. Phase 4 proposal fight lab is superseded by plan 018's actual-engine inspector. No production balance conclusion or completed-plan claim is made.

@@ -18,4 +18,4 @@ Revert the phase implementation commit recorded below; preserve saved runs and b
 
 ## Execution status
 
-Not started.
+Superseded before implementation: user explicitly requested the actual game libraries instead of a duplicated proposal combat model. Plan 018 replaces this with a real-engine headless runner and inspector.

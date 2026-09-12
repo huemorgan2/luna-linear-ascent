@@ -160,10 +160,11 @@ async function poll() {
  try {
   const j=await api('/api/status'); state.jobRunning=j.status==='running';
   $('run-button').disabled=state.jobRunning; $('progress').hidden=!state.jobRunning; $('progress').value=j.fraction||0;
+  $('study-start').disabled=state.jobRunning;
   if(state.jobRunning) $('job-label').textContent=`${human(j.stage)} ${j.completed??0}/${j.total??'…'} · ${j.workers} CPUs · ${fmt((j.fraction||0)*100,0)}%`;
   if(j.status==='complete') {
    $('job-label').textContent=`Saved · ${fmt(j.seconds)} seconds`;
-   if(j.run_id!==state.loadedJob) { state.loadedJob=j.run_id; await refreshRuns(j.run_id); }
+   if(j.run_id!==state.loadedJob) { state.loadedJob=j.run_id; await refreshRuns(j.run_id); if(j.study_id)await refreshStudies(j.study_id); }
   }
   if(j.status==='error') { $('job-label').textContent='Run failed'; error(j.error); }
  } catch(e) { error(`Server unavailable: ${e.message}`); }
@@ -179,7 +180,28 @@ $('metric-buttons').onclick=e=>{const b=e.target.closest('[data-metric]');if(b){
 $('range-buttons').onclick=e=>{const b=e.target.closest('[data-range]');if(b){state.range=b.dataset.range;for(const el of $('range-buttons').querySelectorAll('button'))el.classList.toggle('active',el===b);renderCharts();}};
 $('floor-slider').oninput=e=>setFloor(e.target.value);$('floor-number').oninput=e=>setFloor(e.target.value);
 let resize;window.addEventListener('resize',()=>{clearTimeout(resize);resize=setTimeout(renderCharts,100);});
-(async()=>{try{setupForm(await api('/api/defaults'));await refreshRuns();poll();}catch(e){error(e.message);}})();
+(async()=>{try{setupForm(await api('/api/defaults'));await refreshRuns();await refreshStudies();poll();}catch(e){error(e.message);}})();
+
+let studySerial=0;
+async function refreshStudies(id) {
+ const {studies}=await api('/api/studies'),selected=id||$('study-select').value;
+ $('study-select').innerHTML=studies.map(s=>`<option value="${s.study_id}">${esc(s.study_id)} · ${s.status} · ${s.variants.length} variants / ${s.seeds.length} seeds</option>`).join('')||'<option value="">No saved studies</option>';
+ if(studies.some(s=>s.study_id===selected))$('study-select').value=selected;
+ if($('study-select').value)await loadStudy($('study-select').value);
+}
+async function loadStudy(id) {
+ const serial=++studySerial,s=await api(`/api/studies/${id}`);if(serial!==studySerial)return;
+ $('study-download').hidden=false;$('study-download').href=`/api/studies/${id}`;$('study-download').download=`${id}.json`;
+ const vs=s.analysis?.variants||{},max=Math.max(1,...Object.values(vs).map(v=>v.median_floor));
+ const bars=Object.entries(vs).map(([k,v])=>`<div><div class="bar-label"><span>${esc(v.name)}</span><span>Floor ${fmt(v.median_floor)} · seed medians ${v.seed_median_range.map(x=>fmt(x)).join('–')}</span></div><div class="bar-track"><span style="width:${100*v.median_floor/max}%"></span></div></div>`).join('');
+ const rows=Object.entries(vs).map(([k,v])=>`<tr><td>${esc(v.name)}</td><td>${v.players} / ${v.runs}</td><td>${fmt(v.median_floor)} / ${v.max_floor}</td><td>${v.broken_final}</td><td>${pct(v.upkeep_income_share)}</td><td>${v.paired.players?`${fmt(v.paired.mean_floor_gain)} vs ${esc(vs[v.parent]?.name||v.parent)}`:'No matched parent'}</td></tr>`).join('');
+ const targets=Object.entries(vs).flatMap(([k,v])=>Object.entries(v.target_floors).map(([f,r])=>`<tr><td>${esc(v.name)}</td><td>${f}</td><td>${r.reached}/${r.players} · ${pct(r.reach_fraction)}</td><td>${fmt(r.population_median)} / ${fmt(r.population_p90)}</td><td>${s.analysis.targets[f].min_days}–${s.analysis.targets[f].max_days} days</td></tr>`)).join('');
+ $('study-detail').innerHTML=`<p class="note">${esc(s.status)} · ${s.completed.length}/${s.jobs.length} saved runs · ${s.jobs[0].config.days} calendar days · ${s.jobs[0].config.minutes_per_day} minutes/day. Seeds: ${s.seeds.join(', ')}.</p><h3>Median final readiness / across all sampled players</h3><div class="bars">${bars||'<p>Waiting for first saved member run.</p>'}</div><div class="table-scroll"><table><thead><tr><th>Variant</th><th>Players / seeds</th><th>Median / max floor</th><th>No working weapon</th><th>Heal + repair / income</th><th>Paired mean floor gain</th></tr></thead><tbody>${rows}</tbody></table></div><p class="chart-note">${esc(s.analysis?.caveat||'Results appear after each member run.')}</p><details><summary>Milestone reach & provisional pacing ranges</summary><p>These ranges are planning assumptions, not approved targets. Missing quantiles mean too few players arrived within the study horizon.</p><div class="table-scroll"><table><thead><tr><th>Variant</th><th>Floor</th><th>Reached</th><th>Population median / P90 days</th><th>Provisional range</th></tr></thead><tbody>${targets}</tbody></table></div></details><details><summary>Strategies, exact settings & member runs</summary><pre>${esc(JSON.stringify({policyMedians:Object.fromEntries(Object.entries(vs).map(([k,v])=>[k,v.policy_medians])),code_sha256:s.code_sha256,input_sha256:s.input_sha256,jobs:s.jobs},null,2))}</pre><div class="study-links">${s.completed.map(r=>`<button data-study-run="${r.run_id}">${esc(r.variant)} · seed ${r.seed}</button>`).join('')}</div></details>`;
+}
+$('study-select').onchange=e=>loadStudy(e.target.value).catch(e=>error(e.message));
+$('study-refresh').onclick=()=>refreshStudies().catch(e=>error(e.message));
+$('study-detail').onclick=e=>{const b=e.target.closest('[data-study-run]');if(b)refreshRuns(b.dataset.studyRun).then(()=>$('run-select').scrollIntoView({behavior:'smooth'})).catch(e=>error(e.message));};
+$('study-start').onclick=async()=>{error();try{if(!$('run-form').reportValidity())return;const seeds=$('study-seeds').value.split(',').map(x=>Number(x.trim()));if(seeds.some(x=>!Number.isInteger(x)))throw Error('Enter integer seeds separated by commas.');await api('/api/studies',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({base:readSettings(),seeds})});$('study-start').disabled=true;}catch(e){error(e.message);}};
 
 function renderDiagnostics() {
  const players=members(), select=$('diagnostic-player'), previous=select.value;

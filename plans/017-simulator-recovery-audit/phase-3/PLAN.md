@@ -18,4 +18,4 @@ Revert the phase implementation commit recorded below; preserve saved runs and b
 
 ## Execution status
 
-Not started.
+Batch CLI, resume validation and website view implemented; 32 tests passed. Study 20260912T175546Z-fef9342c interrupted after 11/27 saved runs on user direction to replace the duplicated model with the actual engine. No horizon extension or pacing recommendation accepted. Superseded by plan 018.

@@ -1,6 +1,6 @@
 # Linear Ascent simulation lab
 
-Run from the game repository on any computer with **Python 3.9 or newer**. No pip installation, game server, database, credentials, LLM or internet connection is needed. The rules snapshot, engine, website and font are all in this folder.
+Run from the game repository on any computer with **Python 3.9 or newer**. No pip installation, game server, database, credentials, LLM or internet connection is needed. The rules snapshot, separate proposal engine, website and font are all in this folder. **This does not run the production game engine.**
 
 ```bash
 python3 simulation/serve.py
@@ -65,3 +65,16 @@ python3 simulation/export_inputs.py --check
 Tests cover seeded replay across CPU counts, resource conservation, censoring, energy charged on enemy entry, partial-haul loss with retained XP, shield leakage, status timing, finite-resource healing wardens and the real HTTP run lifecycle. A separate browser walkthrough records UI evidence under `simulation/verification/001/`.
 
 Source inputs are pinned to game 0.112.0 / wiki 089.3. Re-exporting is an explicit operation with `python3 simulation/export_inputs.py --source /path/to/released-checkout`; a normal run never imports a different live ruleset. This folder does not change production gameplay.
+
+## Audit, recovery and repeated experiments
+
+The website now distinguishes `proposal-v1` (original behavior) and `audited-v2` (source-audited proposal), displays per-player financial and combat diagnostics, and offers controlled study batches.
+
+```bash
+python3 simulation/experiments.py --players 12 --days 120 --seeds 1601,1602,1603
+python3 simulation/experiments.py --resume simulation/studies/YOUR-STUDY.json
+```
+
+All available CPUs are used automatically. Nine variants each run on three seeds; that example creates **27 separate run files** plus a checkpointed study file. Variants execute sequentially to avoid CPU oversubscription. Use `--variants starter,durability` for a smaller named comparison, and increase players/days for a more demanding study. Resuming requires the same simulator source and frozen inputs. Copy `simulation/studies/` **and** `simulation/runs/` to carry studies between computers; neither results folder is committed.
+
+The study view shows matched effects, seed spread, expenses and population reach. The source audit is available through the dashboard. Targets are explicitly provisional; no curve is manufactured to meet them. Source corrections and smarter decisions can change results substantially without establishing production parity.

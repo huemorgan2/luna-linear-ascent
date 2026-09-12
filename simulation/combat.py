@@ -198,7 +198,8 @@ def fight_group(rules, p, floor, enemies, rng, *, probe=False, trace=False, retr
                     result.failure = "no_reachable_weapon_or_ammo"
                     break
             elif not probe and p.hp < max_hp*policy["retreat"] and turn > 0:
-                if rng.random() < min(.9, max(.15, .5+.05*(speed-mspd)+.1*gap)):
+                escape_base,escape_min = (.5,.15) if rules.config.model_revision=="proposal-v1" else (.35,.10)
+                if rng.random() < min(.9, max(escape_min, escape_base+.05*(speed-mspd)+.1*gap)):
                     result.retreated = True
                     result.failure = "health_retreat"
                     break

@@ -13,6 +13,7 @@ from urllib.parse import urlparse
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from simulation.model import Config, POLICIES, ROOT
 from simulation.results import available_cpus, save_run, simulate, validate_run
+from simulation.experiments import run_study,plan,VARIANTS
 
 RUN_ID = re.compile(r"[0-9]{8}T[0-9]{6}Z-[0-9a-f]{8}\Z")
 
@@ -30,14 +31,17 @@ class Jobs:
         with self.lock:
             return dict(self.state)
 
-    def start(self, settings):
-        config = Config.from_dict(settings)
+    def start(self, settings, study=False):
+        config = Config.from_dict(settings.get("base",{}) if study and isinstance(settings,dict) else settings)
+        if study:
+            plan(config.to_dict(),settings.get("seeds",[1601,1602,1603]),settings.get("variants",list(VARIANTS)))
         with self.lock:
             if self.state["status"] == "running":
                 raise RuntimeError("A simulation is already running. Wait for it to finish.")
             self.state = dict(status="running", stage="starting", fraction=0,
                 workers=min(config.workers or available_cpus(), max(config.players, config.max_floor)))
-            self.thread = threading.Thread(target=self._run, args=(config,), name="simulation-run")
+            self.thread = threading.Thread(target=self._study if study else self._run,
+                args=(config,settings) if study else (config,), name="simulation-run")
             self.thread.start()
             return dict(self.state)
 
@@ -53,6 +57,17 @@ class Jobs:
         except Exception as error:
             with self.lock:
                 self.state.update(status="error", error=f"{type(error).__name__}: {error}")
+
+    def _study(self, config, settings):
+        def progress(event):
+            with self.lock:self.state.update(event)
+        try:
+            result,path=run_study(config.to_dict(),settings.get("seeds"),settings.get("variants"),
+                run_directory=self.directory,progress=progress)
+            with self.lock:self.state.update(status="complete",fraction=1,study_id=result["study_id"],
+                run_id=result["completed"][-1]["run_id"],seconds=sum(v["seconds"] for v in result["analysis"]["variants"].values()))
+        except Exception as error:
+            with self.lock:self.state.update(status="error",error=f"{type(error).__name__}: {error}")
 
     def manifest(self):
         rows, errors = [], []
@@ -111,6 +126,19 @@ class Handler(BaseHTTPRequestHandler):
             return self.json(dict(config=Config().to_dict(), policies=POLICIES, cpus=available_cpus()))
         if path == "/api/status":
             return self.json(self.server.jobs.status())
+        if path == "/api/studies":
+            studies=[]
+            for p in sorted((ROOT/"studies").glob("*.json"),reverse=True):
+                try:
+                    data=json.loads(p.read_text());studies.append({k:data.get(k) for k in ("study_id","created_at","status","seeds","variants","analysis")})
+                except (OSError,ValueError):continue
+            return self.json(dict(studies=studies))
+        if path.startswith("/api/studies/"):
+            ident=path.removeprefix("/api/studies/")
+            if not RUN_ID.fullmatch(ident):return self.json(dict(error="Invalid study ID"),400)
+            target=ROOT/"studies"/(ident+".json")
+            if not target.is_file():return self.json(dict(error="Study not found"),404)
+            return self.send_bytes(target.read_bytes())
         if path == "/api/runs":
             return self.json(self.server.jobs.manifest())
         if path.startswith("/api/runs/"):
@@ -128,6 +156,8 @@ class Handler(BaseHTTPRequestHandler):
             "/WebPlus_IBM_VGA_8x16.woff": "WebPlus_IBM_VGA_8x16.woff", "/FONT-LICENSE.txt": "FONT-LICENSE.txt"}
         if path == "/model":
             return self.send_bytes((ROOT / "MODEL.md").read_bytes(), mime="text/plain; charset=utf-8")
+        if path == "/audit":
+            return self.send_bytes((ROOT.parent/"research/simulation-audit/AUDIT.md").read_bytes(),mime="text/plain; charset=utf-8")
         if path in assets:
             target = ROOT / "web" / assets[path]
             mime = mimetypes.guess_type(target.name)[0] or "application/octet-stream"
@@ -140,7 +170,8 @@ class Handler(BaseHTTPRequestHandler):
         origin = self.headers.get("Origin")
         if host not in allowed or (origin and origin != "http://"+host):
             return self.json(dict(error="Run creation requires the local explorer origin"), 403)
-        if urlparse(self.path).path != "/api/runs":
+        route=urlparse(self.path).path
+        if route not in ("/api/runs","/api/studies"):
             return self.json(dict(error="Not found"), 404)
         if self.headers.get("Content-Type", "").split(";")[0] != "application/json":
             return self.json(dict(error="Expected application/json"), 415)
@@ -149,7 +180,7 @@ class Handler(BaseHTTPRequestHandler):
             if not 0 < length <= 65536:
                 return self.json(dict(error="Settings body must be 1–65536 bytes"), 413)
             settings = json.loads(self.rfile.read(length))
-            return self.json(self.server.jobs.start(settings), 202)
+            return self.json(self.server.jobs.start(settings,study=route=="/api/studies"), 202)
         except (ValueError, UnicodeError) as error:
             return self.json(dict(error=str(error)), 400)
         except RuntimeError as error:
