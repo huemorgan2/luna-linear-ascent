@@ -1,5 +1,7 @@
 # Combat expansion — read this first
 
+The next runtime implementation is described in [plan015: weapons, combat and player progression](../../plans/015-weapon-combat-progression/PLAN.md). It has eight ordered phases, a complete Floors1–10 milestone, measurable playability/progression gates, migration safeguards and nine browser scenarios. This is a plan; runtime implementation has not started.
+
 The current visual reference is the [game wiki](https://linearascent.net/wiki), published12 September2026. It contains425 authored creatures, full rarity drop tables, deep-hunt modifiers and64 weapon source settings. See [Wiki loot and sources](WIKI-LOOT-AND-SOURCES.md) for this follow-up; it supersedes the eight-creature prototype.
 
 **Proposal:** 16 weapon families in Common, Rare, Epic and Legendary: **64 variants**, each upgradeable from +0 to +20. Pick a weapon because of what it does, then invest in it. This replaces the earlier suggestion of only one blade, bow and staff per grade.
