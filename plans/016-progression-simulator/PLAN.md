@@ -38,4 +38,4 @@ Each phase adds isolated simulator files. Revert its recorded implementation com
 
 ## Execution status
 
-Plan recorded before implementation. All phases not started.
+Complete, 12 September 2026. Plans were committed before implementation (`097c185`; parallel-extension plan `68fa4d5`). Phase 1: `3352c35`. Phase 2: `8ab97f9`. Phase 3 and final many-CPU support: `576feb9`. All 20 standalone simulator tests, pinned-input validation and the real browser walkthrough pass. Automatic eight-CPU execution was 2.724× faster than serial on the recorded 24-player/120-day benchmark with an identical seeded-result hash. Results, measurements, assumptions and screenshot evidence are recorded in `simulation/verification/001/summary.md`. Production gameplay is unchanged; the model exposes a median floor-6 preparation stall in the initial sample. Start locally with `python3 simulation/serve.py`, or run headless with `python3 simulation/run.py`; both use available CPUs automatically. Changes are committed locally on `codex/016-progression-simulator`; no push, merge or production deploy was performed.

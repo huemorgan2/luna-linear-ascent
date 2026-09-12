@@ -4,7 +4,7 @@
 
 ## Source and execution
 
-- Phase 1: `3352c35`; phase 2: `8ab97f9`. Phase 3 implementation commit is recorded in its PLAN.md after this report is committed.
+- Phase 1: `3352c35`; phase 2: `8ab97f9`. Phase 3 implementation: `576feb9`.
 - Pinned release: game 0.112.0 / wiki 089.3, source `1897edd615682c6a960101adaa5299b986f681df`.
 - Input SHA256: `8d948158ece17a8939789243d45bbca567eb552400c4d667bc612e53c9a36341`.
 - Browser baselines and comparison use identical code SHA256: `4824851925684539997bb49ecd480a08d0aa3cb86f3f7b9349fb66fba07696d7`.

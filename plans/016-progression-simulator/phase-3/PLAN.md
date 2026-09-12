@@ -22,4 +22,4 @@ Stop the local server, revert the recorded phase implementation commit and leave
 
 ## Execution status
 
-Not started.
+Complete. Implementation: `576feb9`. The localhost explorer launches automatic-CPU runs, keeps history, compares runs/cohorts and shows days, coverage, hunt difficulty, finite-energy warden demand, resource pressure and individual decks. Twenty simulator tests pass (3.186 seconds); the input snapshot checks and Python compile check pass. The real in-app browser first action created a 24-player/120-day run in 11.6704 seconds; a one-factor half-HP comparison completed in 4.1276 seconds. Real Chromium screenshots and DOM/JSON comparisons pass at 1440×1080 and 390×844, including tooltip data, missing floor-100 values, download, invalid input, history and focused graph axes. Evidence: `simulation/verification/001/summary.md` and adjacent images/observations. No public deployment or game runtime change. Rollback: stop the local server and `git revert --no-edit 576feb9`; generated runs remain intact.
