@@ -33,3 +33,5 @@ Read the browser DOM and screenshots. Check every encounter image against the ge
 10. Switch the visible table view between Drop chances and Creature parameters. Creature images/names persist. Search remount; inspect the dossier's16 weapon-family probabilities and the staff's3× weight. Clear search and restore all floors.
 11. Open Weapon Sources, confirm64 rows. Legendary Ramguard shows shop+6,4798/4798 END,Floor84; drop+0,449/4486 END (10%),first find50/equip76. Open it and choose Upgrade in the Forge: both rarity controls stay synchronized. Inspect other grades' starting levels and condition.
 12. On phone width, repeat the dossier and loot controls. Tables may scroll internally. Keep all text16px and avoid page overflow. Inspect console errors and loaded asset dimensions.
+
+13. Grade-transition check: each source record must include Forge crafting at+0/full condition on floor1/26/51/76. A Legendary Ramguard can be crafted at76 for gold plus Mythic Threads/Shard Matter, before the +6 shop unlocks at84. The visible source must remove dependence on a rare weapon drop, without granting Floor84 attack at76.

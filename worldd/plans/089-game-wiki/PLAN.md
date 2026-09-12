@@ -47,3 +47,11 @@ Add a full, image-bearing loot/settings section for all 425 hunt creatures and e
 Acquisition settings are per weapon family and source: shop starting levels Common0/Rare2/Epic4/Legendary6, full durability; hunt drops start at0 with Common40%/Rare30%/Epic20%/Legendary10% remaining durability. Shop unlocks at the starting-level gate, so Legendary+6 unlocks at floor84 rather than importing floor84 stats into floor76. Initial shop price includes the grade's acquisition and upgrade charges through the delivered level; do not charge upgrades twice. Show actual starting attack, durability, floor, price, source/eligible monster count and weight for all64 grade variants. Data settings must be editable in the checked-in model and validated by tests.
 
 Deep hunts increase high-grade material and weapon odds; species and specimen factors remain unequal. Explain whether a modifier changes encounter selection, rarity chance, bundle yield or wear. No proposed loot or acquisition setting changes live game drops in this documentation phase. Add browser checks for probabilities changing by floor/hunting mode, 64 acquisition rows and Legendary shop+6 versus drop+0/10% durability.
+
+## Follow-up phase — preserve a reachable grade transition
+
+Post-release source review identified a design gap: Rare+2/Epic+4/Legendary+6 shop gates at28/57/84 would leave new-grade entrants dependent on very rare weapon drops. The existing +0 gold/material recipe needs an explicit source in the settings, rather than an ambiguous acquisition reference. No live economy has changed.
+
+Goal: every grade has a visible Forge-crafted +0/full-condition route at its original floor1/26/51/76, with gold and paired material requirements. Keep shop starting ranks and drop conditions unchanged. Add explicit per-family craft settings, source columns, dossier costs and research guidance. Verify all64 entries, the four transition gates, browser source detail and the full suite. Redeploy the static revision and verify it.
+
+Rollback: revert only this follow-up implementation commit and redeploy693d4f7. No database state or live mechanic changes. Execution status: plan recorded before follow-up edits; verification pending.
