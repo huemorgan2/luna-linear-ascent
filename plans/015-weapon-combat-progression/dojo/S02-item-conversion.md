@@ -6,11 +6,11 @@ Phases 2,7. Isolated one/two/three-slot saves, duplicate old slugs, different ho
 
 ## Scenario
 
-Preview conversion, open owner collection and another player’s profile, apply conversion twice, inspect each location and refund, finish the old fight then start a new hunt. Earn a new item/XP after conversion and rehearse compensation.
+Preview conversion, open owner collection and another player’s profile, apply conversion twice, inspect each location and refund, finish the old fight then start a new hunt. Visit the School: confirm only extra battle-slot lessons disappeared, inspect existing learned mastery, and complete an available non-slot lesson at its defined cost. Earn a new item/XP after conversion and rehearse compensation.
 
 ## Expected behavior
 
-Three slots appear; item instances and ownership remain distinct; recorded fees refund once; XP overflow survives; other profiles cannot edit or expose private bank data. Old fight finishes under its old rules. Compensation preserves later earnings.
+Three slots appear; item instances and ownership remain distinct; recorded fees refund once; XP overflow survives; other profiles cannot edit or expose private bank data. Old fight finishes under its old rules. The School remains accessible, learned mastery survives, and other training still works at its defined cost. Compensation preserves later earnings.
 
 ## Fail conditions
 

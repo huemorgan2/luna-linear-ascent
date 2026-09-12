@@ -100,7 +100,7 @@ HP, ammo, shield/weapon condition, player statuses, cooldowns and group-level re
 | Area | Required follow-through |
 |---|---|
 | Town / map / trails | Group size, known profile mix, danger and material carriers; direct return to the collection; deep route's improved odds and one-per-enemy cost. |
-| School / Guildhall | Remove carry-slot lessons, fees and unlock messages. Keep relevant mastery/training. Explain XP reserve and normal advancement outside battle. |
+| School / Guildhall | Keep the School and its non-slot functions, including weapon mastery and training. Remove only extra battle-slot lessons, fees and unlock messages; preserve learned progress and unrelated pack progression. Explain XP reserve and normal advancement outside battle. |
 | Shop / Forge / pawn / storage / gifts | Instance-aware cards and transactions, actual source +level/condition, deck locks and location rules; prevent selling or upgrading a committed weapon mid-group. |
 | Tips, intro, help and Luna tools | Teach the same three slots, reward boundary and exhaustion rule. Agent suggestions must use actual available actions and never narrate a fourth equipped weapon. |
 | Contracts / weekly / rescue / assist | Per-kill statistics and XP can progress; gold/item-paying objectives from that group become claimable only on a full clear. Extraction abandons the pending haul. |

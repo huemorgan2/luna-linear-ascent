@@ -26,7 +26,7 @@ Read [Player experience](PLAYER-EXPERIENCE.md) for the screens and example hunt,
 
 ## Decisions already given by the user
 
-- Three available weapon slots from the beginning. No School purchase of a fourth slot or of access to the existing three. A player can choose any combination, including specialists.
+- Three available weapon slots from the beginning. Remove only the School lessons, fees and locks that unlock extra battle weapon slots. **Keep the School and its other functions, including weapon mastery and training, and preserve already-earned learning.** A player can choose any three-slot combination, including specialists.
 - Monster groups have at least two members. Group size and composition develop over the tower. Weapon choice must matter across the group.
 - Normal and deep hunts cost **one energy per enemy when its fight begins**. No whole-group prepayment. With two energy against five enemies, the first two are normal and the later three significantly weaker, assuming no regeneration. Leaving avoids charges for unstarted enemies.
 - XP is earned per kill. Gold requires defeating the whole group. This plan recommends putting material/item drops in that same final haul.
