@@ -53,3 +53,5 @@ Deep hunting unlocks on Floor4, costs2 entry energy, excludes frail/feeble creat
 This change serves public reference HTML/CSS/JS, a generated data bundle and a homepage link. No game action, player inventory, drop algorithm, shield behavior, raid or database state is changed. Shared wardens remain a proposal for **continuous healing against concurrent real attacks**, including Floor100; no stored pledge pool is introduced. Mining remains a separate project.
 
 Canonical inputs: `worldd/static/site/wiki/model.json` and the vendored game content/economy. Rebuild with `python worldd/tools/gen_wiki.py`; verify with `--check`. `worldd/plans/089-game-wiki/PLAN.md` records execution and rollback. The former independent Combat Atlas is superseded by the game wiki for this reference.
+
+Editable settings and the implementation are committed on `codex/089-game-wiki` and `main`: [weapon/source model](https://github.com/huemorgan2/luna-linear-ascent/blob/main/worldd/static/site/wiki/model.json). The original research checkout is retained separately so unrelated ongoing changes remain untouched.
