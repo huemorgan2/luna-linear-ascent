@@ -33,8 +33,9 @@ POLICIES = {
 
 @dataclass
 class Config:
-    players: int = 120
-    days: int = 365
+    players: int = 60
+    days: int = 180
+    workers: int = 0
     seed: int = 1601
     max_floor: int = 100
     policies: list = field(default_factory=lambda: list(POLICIES))
@@ -80,7 +81,8 @@ class Config:
             raise ValueError("Unknown settings: " + ", ".join(sorted(unknown)))
         c = cls(**values)
         ranges = {
-            "players": (1, 2000, int), "days": (1, 3650, int), "seed": (0, 2**31-1, int),
+            "players": (1, 100000, int), "days": (1, 3650, int), "seed": (0, 2**31-1, int),
+            "workers": (0, 1024, int),
             "max_floor": (1, 100, int), "minutes_per_day": (1, 240, float),
             "sessions_per_day": (1, 12, int), "attendance": (.1, 1, float),
             "activity_spread": (0, .8, float), "action_seconds": (1, 60, float),
@@ -106,7 +108,7 @@ class Config:
                 raise ValueError(f"{key} must be an integer")
             if not lo <= v <= hi:
                 raise ValueError(f"{key} must be between {lo} and {hi}")
-        if not isinstance(c.policies, list) or not c.policies or any(x not in POLICIES for x in c.policies):
+        if not isinstance(c.policies, list) or not c.policies or any(not isinstance(x, str) or x not in POLICIES for x in c.policies):
             raise ValueError("Select one or more known policies")
         if len(set(c.policies)) != len(c.policies):
             raise ValueError("Policies cannot be duplicated")

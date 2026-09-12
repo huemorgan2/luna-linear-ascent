@@ -21,4 +21,4 @@ Revert the phase implementation commit recorded below with `git revert --no-edit
 
 ## Execution status
 
-Not started.
+Complete. Ten deterministic combat tests pass (0.017 seconds); input export validates 100 floors, 425 species, 16 families and 84 upgrade states against the pinned release hashes. No game/runtime files changed. Implementation commit: `3352c35`. Browser verification applies to the run explorer in phase 3. Rollback: `git revert --no-edit 3352c35`.

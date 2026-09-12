@@ -94,9 +94,12 @@ def choose_attack(rules, p, enemy, gap, rng, exhausted, exposed):
             hit, channel = damage(rules, p, item, enemy, gap, a, exhausted, exposed)
             score = hit
             if policy["tactical"] and item.cooldown == 0 and hit:
-                if w["effect"] in ("Stun", "Knockback"):
+                effect = w["effect"]
+                if w["path"] == "Bow" and a not in ("ordinary", "arcane"):
+                    effect = {"fire":"Burn", "poison":"Poison", "pinning":"Slow", "concussive":"Knockback"}[a]
+                if effect in ("Stun", "Knockback"):
                     score += enemy["atk"]*.22
-                if w["effect"] in ("Poison", "Burn", "Bleed") and enemy["hp"] > hit*1.5:
+                if effect in ("Poison", "Burn", "Bleed") and enemy["hp"] > hit*1.5:
                     score += rules.attack(p, item)*.12
             if not policy["tactical"]:
                 score = rules.attack(p, item) if hit else 0

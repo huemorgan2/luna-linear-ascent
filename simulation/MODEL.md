@@ -33,4 +33,10 @@ Reference party demand uses explicit floor-reference gear and is labeled separat
 
 Report mean/median/P90 **among players who reached a floor**, alongside the fraction who reached it and the count still censored at the run horizon. Full-population median/P90 are null until that fraction reaches the corresponding quantile. Restricted mean time uses the run horizon for censored players and is explicitly a lower-bound horizon statistic, not a forecast of eventual completion. No late-floor line is extrapolated through missing results.
 
+Readiness is checked at session boundaries when the gear/ammunition state changes; condition is bucketed in tenths and ammunition in sets of six to avoid repeating equivalent expensive probes. This can delay detection by a session or small condition changes. No milestone is awarded from a training win alone.
+
 All-zero-energy runs still count. Report XP, rewards and readiness per active minute and calendar day as well as per energy. Separate overall hunt outcomes from the independent readiness probes. Statistical difficulty and resource pressure can be tested quickly; the model does not establish whether real players find the game fun or the interface understandable.
+
+## CPU execution
+
+Runs automatically use available CPU cores (including Linux CPU affinity) with portable spawned worker processes. Players and warden floors are independent work units; results are restored to ID/floor order before aggregation. Random streams depend on seed and logical IDs, never process order or worker count. `--workers 1` forces serial execution and a positive count overrides automatic selection. The semantic digest excludes worker count; execution metadata records it. Tiny runs can be faster serially because processes have startup costs. Scaling is bounded by the number of independent tasks, available memory and serial aggregation; more CPUs do not imply linear speedup.
