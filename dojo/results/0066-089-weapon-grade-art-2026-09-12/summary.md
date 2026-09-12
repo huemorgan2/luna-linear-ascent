@@ -18,4 +18,8 @@ First user action: open `/wiki#arsenal` and switch Common/Rare/Epic/Legendary. E
 
 Screenshots are the inline CUA captures in this task: maul comparison, sword comparison, Legendary arsenal, Legendary Ramguard Forge, Runestring comparison, Ember comparison and mobile Epic/Legendary cards. The browser API returns images in the task rather than local screenshot files; no nonexistent file paths are claimed. Original new sprites and prompts are versioned in the implementation.
 
-Regressions: none found. Publication verification pending.
+Regressions: none found.
+
+## Publication verification
+
+Implementation4e052b1 published to main and explicitly deployed as dep-dail93bm8hqs73db2qb0, live2026-09-12T13:37:07Z. Public linearascent.net browser verified revision089.3, all four loaded maul designs, Legendary selection/source agreement and no console errors. Render origin returned64 distinct PNGs and data.json exactly equal to the checked-in bundle (SHA2562214560346aa9cd8497def472cf73c165681c44bd660282ca85ba5be5be58e38). Health ok:true,db:true,game0.112.0. Complete. Roll back this visual update with `git revert 4e052b1`, push and explicit Render deployment.

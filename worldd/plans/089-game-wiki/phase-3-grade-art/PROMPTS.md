@@ -2,6 +2,14 @@
 
 Generated with the built-in image-generation tool on 12 September 2026. Original outputs are preserved in `worldd/static/site/wiki/weapons/`; no color, crop, recolor or silhouette transformations were applied. Other portraits reuse separate existing game drawings. These assets are the proposed grade identities in the public wiki.
 
+Saved assets (relative to repository root):
+
+- `worldd/static/site/wiki/weapons/thunder-common.png`
+- `worldd/static/site/wiki/weapons/thunder-rare.png`
+- `worldd/static/site/wiki/weapons/thunder-legendary.png`
+
+All three are original992×1586 RGBA PNGs with a transparent background. The wiki displays them at inventory/gallery sizes with pixel rendering.
+
 ## common
 
 Create one production game inventory weapon sprite for Linear Ascent. Portrait 5:8 composition, upright and perfectly centered, entire weapon including handle visible with a generous clear margin. A single isolated weapon, no scene, no hands, no labels, no text, no border. Strict monochrome white-ink pixel art on a genuinely TRANSPARENT background. Classic Macintosh / Playdate 1-bit art: chunky square pixels, dithered shading, hard stepped silhouette, strong top-left light; no smooth gradients, no colored pixels, no photographic rendering. Match a logical 100 by 160 pixel sprite, readable when displayed at 60 by 96. Keep the background transparent and preserve alpha. COMMON Thunder Maul: a rough wooden war mallet with a wide squat cylindrical oak hammer head, two crude raw-iron retaining bands and visible wooden end grain. Thick short crooked wood handle, simple rag-wrapped grip. An unmistakable humble T-shaped hammer, practical and battered, no runes, no glow, no spikes. White marks and sparse ordered dither model the timber and crude metal.
