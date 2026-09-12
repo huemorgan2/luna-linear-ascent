@@ -36,3 +36,5 @@ Plan written before implementation. Investigation confirms carried road heals ar
 
 
 Implementation commits: 69bf1cc (phase 1), 932aa50 (phase 2 plus long-run correction). Phase 3 carries the default profile, dashboard, findings and browser evidence. Revert phase 3 first, then `git revert 932aa50 69bf1cc` to unwind code. Label/fastest-line commit 856f73f can be independently reverted if also rolling back plan 019.
+
+Phase 3 implementation commit: `4a5d3b4`. To roll back all plan-020 code: `git revert 4a5d3b4 932aa50 69bf1cc`, then restart the local simulator. Browser and replay verification passed before closure. No push or production deployment.
