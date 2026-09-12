@@ -26,3 +26,10 @@ Eight fixed examples on every floor; shared silhouette across unrelated species;
 ## Verify
 
 Read the browser DOM and screenshots. Check every encounter image against the generated content data, all425 IDs and100 floors. Verify successful HTTP responses and correct deployed revision after publication. Report failures separately and retest fixes.
+
+## Loot and acquisition extension
+
+9. Open Creature Loot, confirm all425 rows. Filter Floor80 and compare normal/deep common specimens. The master's remount must have about0.05618571% versus0.22474286% Legendary weapon odds. Feeble creatures show unavailable in Deep. Switch to Alpha; its chance rises to0.50567143%. Select runt in Deep: none are eligible. Switch Normal to restore runt outcomes.
+10. Switch the visible table view between Drop chances and Creature parameters. Creature images/names persist. Search remount; inspect the dossier's16 weapon-family probabilities and the staff's3× weight. Clear search and restore all floors.
+11. Open Weapon Sources, confirm64 rows. Legendary Ramguard shows shop+6,4798/4798 END,Floor84; drop+0,449/4486 END (10%),first find50/equip76. Open it and choose Upgrade in the Forge: both rarity controls stay synchronized. Inspect other grades' starting levels and condition.
+12. On phone width, repeat the dossier and loot controls. Tables may scroll internally. Keep all text16px and avoid page overflow. Inspect console errors and loaded asset dimensions.

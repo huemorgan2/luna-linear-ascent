@@ -1,0 +1,1137 @@
+{
+  "revision": "089.1",
+  "types": [
+    {
+      "id": "ground-common",
+      "name": "Ground Common",
+      "affinity": "Common",
+      "air": false,
+      "speed": 5,
+      "power": 1.25,
+      "magic": 1.25,
+      "note": "Soft defenses. Every reachable weapon works."
+    },
+    {
+      "id": "ground-power",
+      "name": "Ground Power",
+      "affinity": "Power",
+      "air": false,
+      "speed": 4,
+      "power": 0.45,
+      "magic": 1.5,
+      "note": "A tough hide. Bring a spell or arcane arrows."
+    },
+    {
+      "id": "ground-magic",
+      "name": "Ground Magic",
+      "affinity": "Magic",
+      "air": false,
+      "speed": 5,
+      "power": 1.5,
+      "magic": 0.45,
+      "note": "Resists spells. Steel and ordinary arrows cut through."
+    },
+    {
+      "id": "air-common",
+      "name": "Air Common",
+      "affinity": "Common",
+      "air": true,
+      "speed": 9,
+      "power": 1.25,
+      "magic": 0.9,
+      "note": "Fragile but fast. A blade cannot reach it."
+    },
+    {
+      "id": "air-power",
+      "name": "Air Power",
+      "affinity": "Power",
+      "air": true,
+      "speed": 10,
+      "power": 1.25,
+      "magic": 0.35,
+      "note": "Draft exception: disperses spells in flight. Ordinary arrows are its counter."
+    },
+    {
+      "id": "air-magic",
+      "name": "Air Magic",
+      "affinity": "Magic",
+      "air": true,
+      "speed": 9,
+      "power": 1.5,
+      "magic": 0.3,
+      "note": "Extremely resistant to magic. Use physical arrows."
+    }
+  ],
+  "weapons": [
+    {
+      "id": "breach",
+      "name": "Breach Cleaver",
+      "path": "Blade",
+      "factor": 1.15,
+      "end": 0.9,
+      "cost": 1.05,
+      "recipe": [
+        1,
+        3
+      ],
+      "effect": "Heavy impact",
+      "cooldown": 0,
+      "description": "The strongest plain blade hit. No status setup or control.",
+      "weakness": "Less endurance; no answer to flight.",
+      "art": "seared_cleaver",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "viper",
+      "name": "Viper Edge",
+      "path": "Blade",
+      "factor": 0.8,
+      "end": 1,
+      "cost": 1.1,
+      "recipe": [
+        1,
+        3
+      ],
+      "effect": "Poison",
+      "cooldown": 3,
+      "description": "Venom cut adds 8% source attack for three enemy phases.",
+      "weakness": "Venomproof enemies ignore the poison.",
+      "art": "ratcatchers_dirk",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "ramguard",
+      "name": "Ramguard Sword",
+      "path": "Blade",
+      "factor": 0.85,
+      "end": 1.2,
+      "cost": 1.15,
+      "recipe": [
+        1,
+        4
+      ],
+      "effect": "Knockback",
+      "cooldown": 3,
+      "description": "Push two distance steps. Take a bow shot or try to escape next.",
+      "weakness": "Steadfast enemies cannot be pushed.",
+      "art": "boarspine_shortsword",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "thunder",
+      "name": "Thunder Maul",
+      "path": "Blade",
+      "factor": 0.75,
+      "end": 0.85,
+      "cost": 1.2,
+      "recipe": [
+        1,
+        4
+      ],
+      "effect": "Stun",
+      "cooldown": 4,
+      "description": "Interrupt a windup and skip the next enemy action.",
+      "weakness": "Low direct damage; stun recovery prevents locking.",
+      "art": "ironstorm_maul",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "briar",
+      "name": "Briar Saber",
+      "path": "Blade",
+      "factor": 0.9,
+      "end": 0.9,
+      "cost": 1.1,
+      "recipe": [
+        2,
+        3
+      ],
+      "effect": "Bleed",
+      "cooldown": 3,
+      "description": "An open wound deals 10% source attack for two phases.",
+      "weakness": "Bloodless creatures cannot bleed.",
+      "art": "moonwake_saber",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "sundering",
+      "name": "Sundering Falchion",
+      "path": "Blade",
+      "factor": 0.85,
+      "end": 1.1,
+      "cost": 1.15,
+      "recipe": [
+        1,
+        4
+      ],
+      "effect": "Expose",
+      "cooldown": 3,
+      "description": "Reduce flat defense by 20% for the next two direct hits.",
+      "weakness": "Does not remove Power or Magic resistance.",
+      "art": "bloodgroove_falchion",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "hawkeye",
+      "name": "Hawkeye Longbow",
+      "path": "Bow",
+      "factor": 1.1,
+      "end": 1,
+      "cost": 1.05,
+      "recipe": [
+        3,
+        1
+      ],
+      "effect": "Cover shot",
+      "cooldown": 3,
+      "description": "A readied shot at distance 2\u20133 adds 20% direct damage.",
+      "weakness": "At contact, impact falls to 65%.",
+      "art": "emberflight_longbow",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "skirmisher",
+      "name": "Skirmisher Bow",
+      "path": "Bow",
+      "factor": 0.9,
+      "end": 1.1,
+      "cost": 1,
+      "recipe": [
+        3,
+        1
+      ],
+      "effect": "Close handling",
+      "cooldown": 0,
+      "description": "Retains 90% impact at contact, instead of the usual 65%.",
+      "weakness": "Lower damage when shooting from safety.",
+      "art": "ashwood_bow",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "recoil",
+      "name": "Recoil Recurve",
+      "path": "Bow",
+      "factor": 0.8,
+      "end": 0.9,
+      "cost": 1.15,
+      "recipe": [
+        4,
+        1
+      ],
+      "effect": "Knockback",
+      "cooldown": 3,
+      "description": "A recoil shot opens two steps against a movable target.",
+      "weakness": "A miss or a steadfast target gives no opening.",
+      "art": "wolfsight_recurve",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "pinning",
+      "name": "Pinning Bow",
+      "path": "Bow",
+      "factor": 0.85,
+      "end": 1,
+      "cost": 1.1,
+      "recipe": [
+        4,
+        1
+      ],
+      "effect": "Slow",
+      "cooldown": 3,
+      "description": "Pinning shot removes three speed for two phases.",
+      "weakness": "Fast flyers remain dangerous even when slowed.",
+      "art": "horncore_bow",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "runestring",
+      "name": "Runestring Bow",
+      "path": "Bow",
+      "factor": 0.9,
+      "end": 0.85,
+      "cost": 1.2,
+      "recipe": [
+        3,
+        2
+      ],
+      "effect": "Arcane focus",
+      "cooldown": 0,
+      "description": "Arcane arrows gain 25% impact. Ordinary arrows remain Power.",
+      "weakness": "Arcane ammo is costly and bad against flying Power.",
+      "art": "thornstring",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "ember",
+      "name": "Ember Staff",
+      "path": "Staff",
+      "factor": 0.85,
+      "end": 1,
+      "cost": 1.1,
+      "recipe": [
+        2,
+        2
+      ],
+      "effect": "Burn",
+      "cooldown": 3,
+      "description": "Ignition adds 12% source attack for two phases as Magic.",
+      "weakness": "Fireproof enemies ignore the burn.",
+      "art": "ashspire_staff",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "frostbind",
+      "name": "Frostbind Staff",
+      "path": "Staff",
+      "factor": 0.8,
+      "end": 1.15,
+      "cost": 1.1,
+      "recipe": [
+        3,
+        2
+      ],
+      "effect": "Slow",
+      "cooldown": 3,
+      "description": "Frostbind removes three speed for two phases.",
+      "weakness": "Control buys time; it does not stop an attack.",
+      "art": "frostbrand_staff",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "stormbell",
+      "name": "Stormbell Staff",
+      "path": "Staff",
+      "factor": 0.75,
+      "end": 0.9,
+      "cost": 1.2,
+      "recipe": [
+        2,
+        3
+      ],
+      "effect": "Stun",
+      "cooldown": 4,
+      "description": "A shock skips one enemy action and interrupts a windup.",
+      "weakness": "Bosses share a real-time resilience window.",
+      "art": "stormtwig_staff",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "repulsor",
+      "name": "Repulsor Staff",
+      "path": "Staff",
+      "factor": 0.8,
+      "end": 1.05,
+      "cost": 1.15,
+      "recipe": [
+        2,
+        3
+      ],
+      "effect": "Knockback",
+      "cooldown": 3,
+      "description": "A force wave opens distance before the next enemy pursuit.",
+      "weakness": "Steadfast creatures ignore displacement.",
+      "art": "grimspark_staff",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    },
+    {
+      "id": "hexglass",
+      "name": "Hexglass Staff",
+      "path": "Staff",
+      "factor": 0.9,
+      "end": 0.9,
+      "cost": 1.15,
+      "recipe": [
+        3,
+        3
+      ],
+      "effect": "Expose",
+      "cooldown": 3,
+      "description": "Fracture flat defense by 20% for the next two direct hits.",
+      "weakness": "Does not bypass affinity or flight penalties.",
+      "art": "thornweave_staff",
+      "acquisition": {
+        "Common": {
+          "shopLevel": 0,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 40
+        },
+        "Rare": {
+          "shopLevel": 2,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 30
+        },
+        "Epic": {
+          "shopLevel": 4,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 20
+        },
+        "Legendary": {
+          "shopLevel": 6,
+          "shopDurabilityPct": 100,
+          "dropLevel": 0,
+          "dropDurabilityPct": 10
+        }
+      }
+    }
+  ],
+  "arrows": [
+    {
+      "id": "ordinary",
+      "name": "Ordinary",
+      "channel": "Power",
+      "impact": 1,
+      "effect": "No added effect",
+      "units": 1
+    },
+    {
+      "id": "arcane",
+      "name": "Arcane",
+      "channel": "Magic",
+      "impact": 1,
+      "effect": "Converts the direct hit to Magic",
+      "units": 2
+    },
+    {
+      "id": "poison",
+      "name": "Poison",
+      "channel": "Power",
+      "impact": 0.9,
+      "effect": "Poison: 8% \u00d7 3 phases",
+      "units": 2
+    },
+    {
+      "id": "fire",
+      "name": "Fire",
+      "channel": "Power",
+      "impact": 0.9,
+      "effect": "Magic burn: 12% \u00d7 2 phases",
+      "units": 3
+    },
+    {
+      "id": "pinning",
+      "name": "Pinning",
+      "channel": "Power",
+      "impact": 0.85,
+      "effect": "Slow: \u22123 speed, 2 phases",
+      "units": 2
+    },
+    {
+      "id": "concussive",
+      "name": "Concussive",
+      "channel": "Power",
+      "impact": 0.8,
+      "effect": "Push: 2 steps",
+      "units": 3
+    }
+  ],
+  "grades": [
+    "Common",
+    "Rare",
+    "Epic",
+    "Legendary"
+  ],
+  "materials": [
+    [
+      "Wood",
+      "Raw Metal"
+    ],
+    [
+      "Hardwood",
+      "Steel"
+    ],
+    [
+      "Meteorite",
+      "Starforged Steel"
+    ],
+    [
+      "Mythic Threads",
+      "Shard Matter"
+    ]
+  ],
+  "effects": [
+    [
+      "Poison",
+      "8% \u00d7 3 phases",
+      "Power",
+      "Venomproof: immune",
+      "One stack per source; refresh duration."
+    ],
+    [
+      "Burn",
+      "12% \u00d7 2 phases",
+      "Magic",
+      "Fireproof: immune",
+      "Flammable takes 1.5\u00d7 burn."
+    ],
+    [
+      "Bleed",
+      "10% \u00d7 2 phases",
+      "Power",
+      "Bloodless: immune",
+      "Refresh, never multiply stacks."
+    ],
+    [
+      "Knockback",
+      "2 distance steps",
+      "Control",
+      "Steadfast: immune",
+      "Suppress pursuit this phase; next action gets an opening."
+    ],
+    [
+      "Stun",
+      "1 enemy action",
+      "Control",
+      "Recovery: 2 phases",
+      "Boss: at most 1 second per 12 seconds, shared."
+    ],
+    [
+      "Slow",
+      "\u22123 speed \u00d7 2 phases",
+      "Control",
+      "Speed floor: 1",
+      "Strongest slow wins; no additive slow stack."
+    ],
+    [
+      "Expose",
+      "\u221220% flat DEF / 2 hits",
+      "Debuff",
+      "Affinity stays intact",
+      "One global state on a boss; never stacks."
+    ]
+  ],
+  "loot": {
+    "materialKnots": [
+      [
+        1,
+        2,
+        0.05,
+        0.001,
+        0
+      ],
+      [
+        2,
+        12,
+        0.08,
+        0.002,
+        0
+      ],
+      [
+        3,
+        25,
+        0.15,
+        0.003,
+        0
+      ],
+      [
+        5,
+        35,
+        0.5,
+        0.005,
+        0
+      ],
+      [
+        10,
+        50,
+        2,
+        0.01,
+        0
+      ],
+      [
+        20,
+        58,
+        10,
+        0.08,
+        0
+      ],
+      [
+        25,
+        60,
+        17,
+        0.2,
+        0
+      ],
+      [
+        26,
+        60,
+        20,
+        0.25,
+        0
+      ],
+      [
+        40,
+        55,
+        50,
+        6,
+        0
+      ],
+      [
+        50,
+        50,
+        60,
+        18,
+        0.01
+      ],
+      [
+        51,
+        48,
+        60,
+        20,
+        0.02
+      ],
+      [
+        60,
+        40,
+        58,
+        40,
+        0.3
+      ],
+      [
+        70,
+        30,
+        50,
+        60,
+        5
+      ],
+      [
+        75,
+        25,
+        45,
+        62,
+        15
+      ],
+      [
+        76,
+        24,
+        44,
+        62,
+        20
+      ],
+      [
+        80,
+        20,
+        40,
+        60,
+        30
+      ],
+      [
+        90,
+        15,
+        30,
+        55,
+        55
+      ],
+      [
+        100,
+        10,
+        25,
+        50,
+        70
+      ]
+    ],
+    "weaponKnots": [
+      [
+        1,
+        0.3,
+        0.002,
+        2e-05,
+        0
+      ],
+      [
+        10,
+        1.2,
+        0.05,
+        0.0001,
+        0
+      ],
+      [
+        25,
+        2.8,
+        0.35,
+        0.001,
+        0
+      ],
+      [
+        26,
+        2.8,
+        0.4,
+        0.002,
+        0
+      ],
+      [
+        50,
+        2.5,
+        1.5,
+        0.1,
+        0.0001
+      ],
+      [
+        51,
+        2.5,
+        1.5,
+        0.12,
+        0.00015
+      ],
+      [
+        70,
+        2.2,
+        1.4,
+        0.5,
+        0.003
+      ],
+      [
+        75,
+        2.2,
+        1.3,
+        0.75,
+        0.02
+      ],
+      [
+        76,
+        2.2,
+        1.3,
+        0.8,
+        0.025
+      ],
+      [
+        90,
+        2,
+        1.1,
+        1.2,
+        0.08
+      ],
+      [
+        100,
+        2,
+        0.9,
+        1.5,
+        0.2
+      ]
+    ],
+    "legendaryDiscoveryFloor": 50,
+    "deepMaterial": [
+      1.15,
+      1.5,
+      2,
+      3
+    ],
+    "deepWeapon": [
+      1.25,
+      1.75,
+      2.5,
+      4
+    ],
+    "specimen": {
+      "runt": 0.5,
+      "common": 1,
+      "tough": 1.35,
+      "alpha": 2.25
+    },
+    "body": {
+      "frail": 0.65,
+      "lean": 0.9,
+      "sturdy": 1.15,
+      "hulking": 1.45
+    },
+    "bite": {
+      "feeble": 0.65,
+      "fierce": 1.2,
+      "savage": 1.5
+    },
+    "materialCapPct": 95,
+    "weaponTotalCapPct": 50,
+    "favoredFamilyWeight": 3,
+    "carrierRatios": {
+      "A": [
+        3,
+        1
+      ],
+      "B": [
+        1,
+        3
+      ],
+      "mixed": [
+        2,
+        2
+      ]
+    },
+    "materialNote": "Independent grade rolls, each awarding a material bundle. Weapon drops are one categorical roll: at most one weapon per kill. All chances are conditional on defeating this exact specimen."
+  }
+}

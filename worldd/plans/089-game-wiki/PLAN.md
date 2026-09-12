@@ -38,7 +38,7 @@ The wiki is public game documentation. Draft combat values must remain visibly d
 
 ## Execution status
 
-Plan committed before implementation. No code changed yet.
+Plan and loot scope committed before their respective implementation. Public wiki, generated425-creature data,64 source settings and research note implemented. Targeted Python3/3 and Node5/5 checks pass; full worldd suite223/223 passes after initializing the pinned plugin submodule. Desktop1440×960 and phone390×844 browser scenarios passed. Production release verification remains pending. See `dojo/results/0065-089-game-wiki-2026-09-12/summary.md`.
 
 ## Scope addition — user follow-up before implementation of loot controls
 
