@@ -1,6 +1,8 @@
 # Combat expansion — read this first
 
-The next runtime implementation is described in [plan015: weapons, combat and player progression](../../plans/015-weapon-combat-progression/PLAN.md). It has eight ordered phases, a complete Floors1–10 milestone, measurable playability/progression gates, migration safeguards and nine browser scenarios. This is a plan; runtime implementation has not started.
+**Latest research: [Three-weapon decks and monster groups](DECKS-AND-MONSTER-GROUPS.md).** Three battle slots are available from the start; School slot purchases are removed. Weapons have deliberately unequal matchups. The recommended hunt is one continuous sequence of at least two enemies, with XP earned per kill and gold/materials/items secured after the complete group. It covers deck choices, floor progression, energy, overflow XP, loot, migration and validation. These are design changes, not live gameplay.
+
+The earlier [plan015: weapons, combat and player progression](../../plans/015-weapon-combat-progression/PLAN.md) has eight phases and nine browser scenarios. Its phases and acceptance gates now need rebasing around groups and three-weapon ownership before execution. Runtime implementation has not started. The research above takes precedence over the earlier single-enemy implementation order below.
 
 The current visual reference is the [game wiki](https://linearascent.net/wiki), published12 September2026. It contains425 authored creatures, full rarity drop tables, deep-hunt modifiers and64 weapon source settings. See [Wiki loot and sources](WIKI-LOOT-AND-SOURCES.md) for this follow-up; it supersedes the eight-creature prototype.
 

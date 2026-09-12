@@ -1,6 +1,16 @@
 # 015 — weapons, combat and player progression
 
-12 September 2026. **Implementation plan; runtime work has not started.** The public wiki is a design reference, not evidence that its combat, loot or Forge rules already run in the game.
+12 September 2026. **Implementation draft requiring a phase rebase; runtime work has not started.** The public wiki is a design reference, not evidence that its combat, loot or Forge rules already run in the game.
+
+## Scope revision — fixed decks and monster groups
+
+The user's subsequent direction changes the foundation: every player has three battle weapon slots from the start, School no longer sells those slots, and ordinary hunts contain groups of at least two enemies. Each kill earns XP; gold requires defeating the whole group. Weapon performance is deliberately unequal across matchups. A specialist deck may greatly outperform a general deck on a suitable route.
+
+Read [Three-weapon decks and monster groups](../../research/combat-atlas/DECKS-AND-MONSTER-GROUPS.md) before executing this plan. It recommends sequential continuous hunts first, committing three weapon instances at entry, carrying resources/cooldowns between enemies, securing materials/items with the final haul, and retaining overflowing kill XP. These additional rules and the candidate group-size/energy tables are research recommendations, not tested or implemented mechanics.
+
+**The original eight phase documents below must be rebased before runtime execution.** In particular, phase 2 needs group state, XP receipts, pending rewards and slot-purchase migration; phase 3 must deliver the complete group loop; phase 5 must measure group completion and ownership of three useful weapons. The research maps all eight phases and their verification requirements. Existing dojo scenarios must be extended for decks, partial rewards, XP overflow and group retries before the affected phases begin.
+
+The acceptance table below is retained as the original planning baseline. Its single-encounter success metric, main-plus-counter spending assumption, material-tail threshold, fixed smart-play improvement range and old pacing envelope are **superseded pending group-level calibration**. They must not be used to equalize weapons, decks, routes or drop chances. Retain the exponential reference, distinct weapon/species assets, Forge/source settings, and continuously healing shared-warden objective. Mining remains separate.
 
 ## Problem, evidence and timeline
 
@@ -140,4 +150,4 @@ Check every local Markdown reference and each phase's Goal/Steps/Verification/Ro
 
 ## Execution status
 
-Planning complete. Phases1–8 are not started. No engine changes, migrations, balance simulations, gameplay dojo or production deployment were performed for this plan.
+Original eight-phase draft recorded; the subsequent deck/group research is complete as a document. Rebasing the phase instructions and scenarios remains outstanding before runtime execution. Phases1–8 are not started. No engine changes, migrations, balance simulations, gameplay dojo or production deployment were performed for this plan or its scope revision.
