@@ -1,5 +1,7 @@
 # Combat expansion — read this first
 
+The current visual reference is the [game wiki](https://linearascent.net/wiki), published12 September2026. It contains425 authored creatures, full rarity drop tables, deep-hunt modifiers and64 weapon source settings. See [Wiki loot and sources](WIKI-LOOT-AND-SOURCES.md) for this follow-up; it supersedes the eight-creature prototype.
+
 **Proposal:** 16 weapon families in Common, Rare, Epic and Legendary: **64 variants**, each upgradeable from +0 to +20. Pick a weapon because of what it does, then invest in it. This replaces the earlier suggestion of only one blade, bow and staff per grade.
 
 The [detailed plan](PLAN.md) contains exact coefficients, material recipes, effect timing, migration work and implementation phases. The [interactive atlas](https://linear-ascent-combat-atlas.vaselin957545.chatgpt.site) lets you explore the proposal. No live game mechanics have changed.
