@@ -1,80 +1,66 @@
-# Linear Ascent simulation lab
+# Linear Ascent / actual-engine simulation
 
-Run from the game repository on any computer with **Python 3.9 or newer**. No pip installation, game server, database, credentials, LLM or internet connection is needed. The rules snapshot, separate proposal engine, website and font are all in this folder. **This does not run the production game engine.**
+The default runner executes the **actual game library**, through the same `core.apply_choice` entry point used by worldd. Bots choose actions; the game calculates the outcomes. It needs no UI, LLM, game account or database for personal play.
+
+From the same repository on any computer:
 
 ```bash
+python3 -m pip install -r simulation/requirements.txt
 python3 simulation/serve.py
 ```
 
-Open **http://127.0.0.1:8766**. Click **Run simulation**. The program automatically detects available CPUs and distributes both players and warden floors across them. Each completed run is saved separately in `simulation/runs/`. Files remain after the server closes; they are intentionally ignored by Git. Copy that folder between computers to inspect their runs in the same website.
+Open [the local dashboard](http://127.0.0.1:8766). It runs on all available CPUs automatically, saves each actual-engine run in `simulation/game-runs/`, graphs readiness/difficulty and lets you inspect/replay real game actions. **Create synthetic player** opens an interactive inspector using the same engine adapter as the bots.
 
-For a headless run using all available CPUs:
-
-```bash
-python3 simulation/run.py --players 600 --days 365 --seed 1601
-```
-
-The default `--workers 0` means automatic. For diagnosis or a deliberate limit, use `--workers 1` (serial) or e.g. `--workers 16`. Automatic detection respects Linux CPU affinity. At most one process per independent task is useful; a tiny run may be faster serially. Progress reports completed players and warden floors. Start with the website's 24-player/120-day study before increasing swarm size and horizon. More players sample chance more thoroughly; more days test later progression. Neither changes the game's rules.
-
-The simulator is a script, so launch it through the supplied CLI or server rather than an unguarded interactive Python cell. Spawned processes work with these entry points. On Windows, use `python` instead of `python3`; the program automatically splits large worker counts across pools to respect Python's 61-worker limit per Windows pool. The actual execution tests were run on macOS; the Windows sharding path has a coded dispatch check, not an on-device benchmark.
-
-## Compare a design change
-
-Use **Use this run's settings**, change one setting, and run again with the same seed and policy list. Select the earlier run under **Compare against**. For example, lower *Group enemy HP ×* to test full-sized enemies in a sequence, or change *Full repair cost share* to test upkeep pressure. These are experiments, not silent changes to the baseline.
-
-The graphs show:
-
-- Calendar days to hunting readiness: reached-player mean and full-population median/P90.
-- Fraction ready at each floor; missing late-floor results remain missing.
-- Actual hunt wins versus fresh reference-equipment normal-group probes.
-- Whole-swarm qualified hunters versus required peers against healing wardens, plus a separate reference-equipment benchmark. Reference gear may fail normal hunting; floor details explicitly identify this.
-- Per-floor policy results, resource pressure and individual final decks.
-
-Use **Focus reached floors** to inspect early progression without compressing it against the full 100-floor axis. **Full tower** restores the complete view, including unreached floors. Warden demand always uses the whole swarm; strategy filters apply to personal progression, hunt outcomes and resources.
-
-Readiness requires seven wins from eight fixed probes by default. Current condition/ammo and owned equipment are retained; health/energy are restored only on disposable probe copies. It is a finite estimate of capability. Reaching a floor once does not establish that a player can afford to hunt it indefinitely. A player's milestone snapshot is not their final-day loadout.
-
-Mean days **among those who succeeded** is not the average completion time of all players. Censored players remain in coverage and horizon-restricted statistics. Open-floor access excludes time waiting for other people to unlock the tower. The complete assumptions and omissions are in [MODEL.md](MODEL.md). Read that before treating a curve as a prediction of live player behavior.
-
-## Saved settings and replay
-
-Each JSON contains full config, provenance/code/input hashes, execution hardware, six heuristic definitions, individual histories, floor aggregates and boss trials. To replay a run:
+For a headless cohort:
 
 ```bash
-python3 -c 'import json; from pathlib import Path; r=json.loads(Path("simulation/runs/YOUR-RUN.json").read_text()); Path("simulation/replay.json").write_text(json.dumps(r["config"]))'
-python3 simulation/run.py --config simulation/replay.json
+python3 simulation/run.py --players 120 --days 120
 ```
 
-Or write a partial config; unspecified settings use model defaults:
+`--workers 0` (default) uses all available CPUs up to the number of players. `--workers 1` forces serial execution; a positive value sets a limit. Spawned processes work on macOS, Linux and Windows. Linux affinity is honored; large Windows worker counts are split across pools. More CPUs do not guarantee linear speedup, especially for small cohorts.
 
-```json
-{"players":600,"days":365,"seed":1601,"group_hp_scale":0.5,"policies":["learner","tactician","farmer","saver","rusher","specialist"]}
+Every run records the exact imported package path/version, source/content hashes, runner hash, settings, policy definitions, player documents and measured outcomes. Source changes during a run are rejected. Saved runs are ignored by Git; copy `simulation/game-runs/` to carry them between computers. The game code itself stays in this same repository and is resolved exactly as worldd resolves it. `ASCENT_GAME_PATH` can select another game package using the existing gamepath mechanism; start a fresh process after changing source.
+
+## What the curves mean
+
+This runs the checked-out game's **current personal rules**. Proposed features do not appear until implemented in that game library. Clock, attendance and bot decisions are synthetic. Default staged world access excludes shared unlock waiting; a positive `--world-frontier N` instead holds the open world at floor N. Full details are in [GAME-ENGINE.md](GAME-ENGINE.md).
+
+Readiness uses disposable real-engine hunt probes with owned condition/training/gear and restored HP/energy. Probes cannot grant resources. Population median/P90 remain missing until enough players arrive; the reached-only mean is conditional on success. These experimental bots do not establish human enjoyment or real demographic averages.
+
+Shared warden victories require worldd's multiplayer database services. The page displays actual library parameters and qualified hunters, but **does not manufacture required-party counts**. Those remain unavailable until the shared service is included in the headless environment.
+
+For a repeated cohort on three seeds (each run uses all available CPUs):
+
+```bash
+python3 simulation/game_study.py --players 12 --days 30 --seeds 1601,1602,1603
 ```
 
-Same inputs/code/config/seed produce identical result hashes across CPU counts. Worker count, runtime and timestamps are excluded from that digest. Cross-Python/architecture floating-point identity is not promised; provenance makes differences inspectable. Keep model code fixed during a run; a source change causes an explicit refusal to save mixed-code results. Keep one CLI run active per available CPU allocation to avoid oversubscription.
+## Replay and inspect
 
-`--output-dir` on the CLI and `--runs-dir` on the server select another results folder. The website accepts one background job at a time. Ctrl-C closes the website and lets an active simulation finish saving before exit. Invalid settings and worker failures are reported without destroying older runs.
+The first six players retain complete action/time/world-input traces by default (`--trace-players N` changes this). Verify a player by replaying those inputs through the actual engine:
+
+```bash
+python3 simulation/run.py --replay simulation/game-runs/YOUR-RUN.json --player 0
+```
+
+The verification compares the complete document, scene and RNG counter. It refuses a different source revision. The same action is available on the website. Other players retain final state, daily summaries and recent actions; increase trace coverage for an investigation.
+
+Use **Use these settings** and keep the same seed to compare activity assumptions or policies. Game balance changes belong in the game library; the actual-engine UI has no duplicate damage, repair-price or drop-rate knobs. JSON configs accept the fields in `GameConfig`; proposal-only knobs are rejected.
+
+## Historical proposals
+
+The earlier separate proposal simulator and saved data remain under [Historical proposal runs](http://127.0.0.1:8766/proposal). It is not the actual game. Its original CLI is now:
+
+```bash
+python3 simulation/proposal_run.py --players 24 --days 120
+```
+
+Its results remain in `simulation/runs/`, exploratory matrices in `simulation/studies/`, and assumptions in [MODEL.md](MODEL.md). They are not relabeled as actual-engine measurements. Plan 017's matrix was stopped when the user clarified the engine-reuse requirement.
 
 ## Verification
 
 ```bash
 python3 -m unittest discover -s simulation/tests -v
-python3 simulation/export_inputs.py --check
 ```
 
-Tests cover seeded replay across CPU counts, resource conservation, censoring, energy charged on enemy entry, partial-haul loss with retained XP, shield leakage, status timing, finite-resource healing wardens and the real HTTP run lifecycle. A separate browser walkthrough records UI evidence under `simulation/verification/001/`.
-
-Source inputs are pinned to game 0.112.0 / wiki 089.3. Re-exporting is an explicit operation with `python3 simulation/export_inputs.py --source /path/to/released-checkout`; a normal run never imports a different live ruleset. This folder does not change production gameplay.
-
-## Audit, recovery and repeated experiments
-
-The website now distinguishes `proposal-v1` (original behavior) and `audited-v2` (source-audited proposal), displays per-player financial and combat diagnostics, and offers controlled study batches.
-
-```bash
-python3 simulation/experiments.py --players 12 --days 120 --seeds 1601,1602,1603
-python3 simulation/experiments.py --resume simulation/studies/YOUR-STUDY.json
-```
-
-All available CPUs are used automatically. Nine variants each run on three seeds; that example creates **27 separate run files** plus a checkpointed study file. Variants execute sequentially to avoid CPU oversubscription. Use `--variants starter,durability` for a smaller named comparison, and increase players/days for a more demanding study. Resuming requires the same simulator source and frozen inputs. Copy `simulation/studies/` **and** `simulation/runs/` to carry studies between computers; neither results folder is committed.
-
-The study view shows matched effects, seed spread, expenses and population reach. The source audit is available through the dashboard. Targets are explicitly provisional; no curve is manufactured to meet them. Source corrections and smarter decisions can change results substantially without establishing production parity.
+Actual-engine tests check direct-core parity, costs, regeneration, deterministic CPU results, immutable probes, source guards and HTTP replay. Browser evidence is under `simulation/verification/003/`. The game loader currently emits pre-existing unclosed-YAML ResourceWarnings; the simulator does not modify that loader.

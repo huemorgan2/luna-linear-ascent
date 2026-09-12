@@ -1,50 +1,42 @@
 #!/usr/bin/env python3
-"""Run a heuristic swarm offline. Example: python3 simulation/run.py --players 120 --days 365"""
+"""Run bots through the actual game engine without its UI."""
 from pathlib import Path
 import argparse
 import json
-import sys
 import statistics
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from simulation.model import Config
-from simulation.results import save_run, simulate
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 
 
 def main():
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--config", type=Path)
-    p.add_argument("--players", type=int)
-    p.add_argument("--days", type=int)
-    p.add_argument("--seed", type=int)
-    p.add_argument("--workers", type=int, help="CPU processes: 0 = available CPUs, 1 = serial, or an explicit count")
-    p.add_argument("--max-floor", type=int)
-    p.add_argument("--output-dir", type=Path)
-    p.add_argument("--quiet", action="store_true")
-    a = p.parse_args()
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--config',type=Path)
+    for name in ('players','days','seed','workers','max-floor','trace-players','world-frontier'):p.add_argument('--'+name,type=int)
+    p.add_argument('--output-dir',type=Path);p.add_argument('--quiet',action='store_true')
+    p.add_argument('--replay',type=Path,help='Verify a recorded actual-engine run player against current engine source')
+    p.add_argument('--player',type=int,default=0)
+    a=p.parse_args()
+    from simulation.game_agents import GameConfig
+    from simulation.game_results import simulate,save
     try:
-        values = json.loads(a.config.read_text()) if a.config else {}
-    except (OSError, ValueError) as error:
-        p.error(str(error))
-    if not isinstance(values, dict):
-        p.error("Config must be a JSON object")
-    for key in ("players", "days", "seed", "max_floor", "workers"):
-        if getattr(a, key) is not None:
-            values[key] = getattr(a, key)
-    try:
-        config = Config.from_dict(values)
-    except ValueError as error:
-        p.error(str(error))
-    def progress(event):
-        if not a.quiet and (event["completed"] % 10 == 0 or event["completed"] == event["total"]):
-            print(f"{event['stage']}: {event['completed']}/{event['total']}", flush=True)
-    data = simulate(config, progress)
-    path = save_run(data, a.output_dir)
-    print(json.dumps(dict(file=str(path), seconds=data["duration_seconds"],
-        deterministic_sha256=data["deterministic_sha256"], players=config.players,
-        workers=data["execution"]["workers"],
-        median_floor=statistics.median(p["ready_floor"] for p in data["players"])), indent=2))
+        if a.replay:
+            from simulation.game_adapter import replay
+            data=json.loads(a.replay.read_text());row=next(x for x in data['players'] if x['id']==a.player)
+            if row['trace'] is None:raise ValueError('This player has no full trace; choose a recorded player')
+            _,report=replay(row['key'],row['trace'],expected_source=data['engine_source']['sha256'],expected_state=row['state_sha256'])
+            print(json.dumps(report,indent=2));sys.exit(0 if report['match'] else 1)
+        values=json.loads(a.config.read_text()) if a.config else {}
+        if not isinstance(values,dict):raise ValueError('Config must be an object')
+        for key in ('players','days','seed','workers','max_floor','trace_players','world_frontier'):
+            if getattr(a,key) is not None:values[key]=getattr(a,key)
+        cfg=GameConfig.from_dict(values)
+        def progress(event):
+            if not a.quiet:print(f"{event['stage']}: {event['completed']}/{event['total']}",flush=True)
+        data=simulate(cfg,progress);path=save(data,a.output_dir)
+        print(json.dumps(dict(file=str(path),seconds=data['duration_seconds'],workers=data['execution']['workers'],
+            engine=data['engine_source']['version'],engine_sha256=data['engine_source']['sha256'],
+            deterministic_sha256=data['deterministic_sha256'],median_floor=statistics.median(x['ready_floor'] for x in data['players'])),indent=2))
+    except (ValueError,OSError,KeyError,StopIteration) as error:p.error(str(error))
 
 
-if __name__ == "__main__":
-    main()
+if __name__=='__main__':main()

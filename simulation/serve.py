@@ -14,6 +14,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from simulation.model import Config, POLICIES, ROOT
 from simulation.results import available_cpus, save_run, simulate, validate_run
 from simulation.experiments import run_study,plan,VARIANTS
+from simulation.game_api import GameAPI
+from simulation.game_agents import GameConfig
+from simulation.game_results import simulate as simulate_game, save as save_game
 
 RUN_ID = re.compile(r"[0-9]{8}T[0-9]{6}Z-[0-9a-f]{8}\Z")
 
@@ -44,6 +47,23 @@ class Jobs:
                 args=(config,settings) if study else (config,), name="simulation-run")
             self.thread.start()
             return dict(self.state)
+
+    def start_game(self, settings, directory):
+        config=GameConfig.from_dict(settings)
+        with self.lock:
+            if self.state['status']=='running':raise RuntimeError('A run is already active')
+            self.state=dict(status='running',backend='actual-game-engine',stage='starting',fraction=0,workers=min(config.workers or available_cpus(),config.players))
+            self.thread=threading.Thread(target=self._game,args=(config,directory))
+            self.thread.start();return dict(self.state)
+
+    def _game(self, config, directory):
+        def progress(event):
+            with self.lock:self.state.update(event)
+        try:
+            result=simulate_game(config,progress);save_game(result,directory)
+            with self.lock:self.state.update(status='complete',fraction=1,run_id=result['run_id'],seconds=result['duration_seconds'])
+        except Exception as error:
+            with self.lock:self.state.update(status='error',error=f'{type(error).__name__}: {error}')
 
     def _run(self, config):
         def progress(event):
@@ -96,8 +116,9 @@ class Jobs:
 class Server(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, address, directory=None):
+    def __init__(self, address, directory=None, game_directory=None):
         self.jobs = Jobs(directory or ROOT / "runs")
+        self.game=GameAPI(Path(game_directory) if game_directory else self.jobs.directory.parent/"game-runs")
         super().__init__(address, Handler)
 
 
@@ -122,6 +143,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = urlparse(self.path).path
+        if path == '/api/game/defaults':return self.json(self.server.game.defaults())
+        if path == '/api/game/runs':return self.json(self.server.game.manifest())
+        if path.startswith('/api/game/runs/'):
+            ident=path.removeprefix('/api/game/runs/').removesuffix('.json')
+            if not RUN_ID.fullmatch(ident):return self.json(dict(error='Invalid run ID'),400)
+            target=self.server.game.directory/(ident+'.json')
+            if not target.is_file():return self.json(dict(error='Run not found'),404)
+            return self.send_bytes(target.read_bytes(),filename=target.name if path.endswith('.json') else None)
         if path == "/api/defaults":
             return self.json(dict(config=Config().to_dict(), policies=POLICIES, cpus=available_cpus()))
         if path == "/api/status":
@@ -152,8 +181,10 @@ class Handler(BaseHTTPRequestHandler):
             if not target.is_file():
                 return self.json(dict(error="Run not found"), 404)
             return self.send_bytes(target.read_bytes(), filename=target.name if download else None)
-        assets = {"/": "index.html", "/index.html": "index.html", "/app.js": "app.js", "/style.css": "style.css",
+        assets = {"/": "index.html", "/index.html": "index.html", "/proposal": "proposal.html", "/game.js": "game.js", "/app.js": "app.js", "/style.css": "style.css",
             "/WebPlus_IBM_VGA_8x16.woff": "WebPlus_IBM_VGA_8x16.woff", "/FONT-LICENSE.txt": "FONT-LICENSE.txt"}
+        if path == "/game-model":
+            return self.send_bytes((ROOT / "GAME-ENGINE.md").read_bytes(),mime="text/plain; charset=utf-8")
         if path == "/model":
             return self.send_bytes((ROOT / "MODEL.md").read_bytes(), mime="text/plain; charset=utf-8")
         if path == "/audit":
@@ -171,7 +202,7 @@ class Handler(BaseHTTPRequestHandler):
         if host not in allowed or (origin and origin != "http://"+host):
             return self.json(dict(error="Run creation requires the local explorer origin"), 403)
         route=urlparse(self.path).path
-        if route not in ("/api/runs","/api/studies"):
+        if route not in ("/api/runs","/api/studies","/api/game/runs","/api/game/inspect","/api/game/replay"):
             return self.json(dict(error="Not found"), 404)
         if self.headers.get("Content-Type", "").split(";")[0] != "application/json":
             return self.json(dict(error="Expected application/json"), 415)
@@ -180,6 +211,11 @@ class Handler(BaseHTTPRequestHandler):
             if not 0 < length <= 65536:
                 return self.json(dict(error="Settings body must be 1–65536 bytes"), 413)
             settings = json.loads(self.rfile.read(length))
+            if route=='/api/game/runs':return self.json(self.server.jobs.start_game(settings,self.server.game.directory),202)
+            if route=='/api/game/inspect':return self.json(self.server.game.inspect(settings))
+            if route=='/api/game/replay':
+                if not isinstance(settings,dict) or not RUN_ID.fullmatch(str(settings.get('run_id',''))):raise ValueError('Invalid replay request')
+                return self.json(self.server.game.verify(settings['run_id'],settings.get('player',0)))
             return self.json(self.server.jobs.start(settings,study=route=="/api/studies"), 202)
         except (ValueError, UnicodeError) as error:
             return self.json(dict(error=str(error)), 400)
@@ -191,8 +227,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=8766)
     parser.add_argument("--runs-dir", type=Path)
+    parser.add_argument("--game-runs-dir",type=Path)
     args = parser.parse_args()
-    server = Server(("127.0.0.1", args.port), args.runs_dir)
+    server = Server(("127.0.0.1", args.port), args.runs_dir, args.game_runs_dir)
     print(f"Simulation lab: http://127.0.0.1:{server.server_port} · {available_cpus()} available CPUs", flush=True)
     try:
         server.serve_forever()

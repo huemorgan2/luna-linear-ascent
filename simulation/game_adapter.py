@@ -52,9 +52,12 @@ def engine_source():
     files = {str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted(root.rglob('*')) if p.is_file() and p.suffix in ('.py','.yaml','.yml','.json')}
     files['@host/gamepath.py'] = hashlib.sha256((REPO/'worldd/app/gamepath.py').read_bytes()).hexdigest()
+    fingerprint=digest(files)
+    if globals().get('_IMPORTED_SHA',fingerprint)!=fingerprint:
+        raise RuntimeError('Game files changed after import; restart the simulator to load that revision')
     from plugin_linear_ascent.version import VERSION
     return dict(engine='plugin_linear_ascent.engine.core.apply_choice',version=VERSION,
-        package_path=str(root),files=files,sha256=digest(files),
+        package_path=str(root),files=files,sha256=fingerprint,
         host='isolated local engine documents; no worldd database or multiplayer services',
         virtual_epoch=EPOCH.isoformat())
 
@@ -96,6 +99,12 @@ class GameSession:
     def legal(self):
         return [o for o in self.scene.options if not o.locked]
 
+    def world_frontier(self, floor):
+        """External world-access fixture, never a combat or reward mutation."""
+        if type(floor) is not int or not 1<=floor<=100:raise ValueError('World frontier must be 1–100')
+        self.doc['unlocked_floor']=max(self.doc['unlocked_floor'],floor)
+        if self.capture:self.trace.append([self.seconds,'@world_frontier',str(floor)])
+
     def state_hash(self):
         return digest(self.doc)
 
@@ -111,7 +120,11 @@ def replay(key, trace, *, expected_source=None, expected_state=None):
     # new_player so replay does not introduce an extra engine read.
     with at_time(0):s.doc=state.new_player(key)
     for seconds,option,text in trace:
-        if option is None:s.look(seconds)
+        if option=='@world_frontier':s.advance(seconds);s.world_frontier(int(text))
+        elif option is None:s.look(seconds)
         else:s.act(option,text,seconds=seconds)
     match=expected_state is None or s.state_hash()==expected_state
     return s,dict(match=match,state_sha256=s.state_hash(),engine_sha256=source['sha256'],actions=len(trace))
+
+
+_IMPORTED_SHA=engine_source()['sha256']

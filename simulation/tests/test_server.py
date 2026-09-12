@@ -14,7 +14,7 @@ from simulation.serve import Jobs, Server
 class ServerTests(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
-        self.server = Server(("127.0.0.1", 0), self.directory.name)
+        self.server = Server(("127.0.0.1", 0), self.directory.name, Path(self.directory.name)/"game")
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
         self.base = f"http://127.0.0.1:{self.server.server_port}"
@@ -41,7 +41,7 @@ class ServerTests(unittest.TestCase):
 
     def test_assets_and_input_errors(self):
         with urlopen(self.base) as response:
-            self.assertIn(b"Run simulation", response.read())
+            self.assertIn(b"Run the actual engine", response.read())
         self.assertGreaterEqual(self.get("/api/defaults")["cpus"], 1)
         for body in ({"players":0}, {"workers":-1}, {"policies":[{}]}, [], {"players":True}, {"unknown":3}):
             with self.assertRaises(HTTPError) as caught:

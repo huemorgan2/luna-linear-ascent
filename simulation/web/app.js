@@ -164,7 +164,7 @@ async function poll() {
   if(state.jobRunning) $('job-label').textContent=`${human(j.stage)} ${j.completed??0}/${j.total??'…'} · ${j.workers} CPUs · ${fmt((j.fraction||0)*100,0)}%`;
   if(j.status==='complete') {
    $('job-label').textContent=`Saved · ${fmt(j.seconds)} seconds`;
-   if(j.run_id!==state.loadedJob) { state.loadedJob=j.run_id; await refreshRuns(j.run_id); if(j.study_id)await refreshStudies(j.study_id); }
+   if(j.backend!=='actual-game-engine' && j.run_id!==state.loadedJob) { state.loadedJob=j.run_id; await refreshRuns(j.run_id); if(j.study_id)await refreshStudies(j.study_id); }
   }
   if(j.status==='error') { $('job-label').textContent='Run failed'; error(j.error); }
  } catch(e) { error(`Server unavailable: ${e.message}`); }

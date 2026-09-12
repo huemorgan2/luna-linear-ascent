@@ -4,3 +4,5 @@ runs/*.json
 !runs/.gitkeep
 replay.json
 studies/*.json
+
+game-runs/*.json
