@@ -19,3 +19,6 @@ Revert this phase's commit after reverting dependent phases; restart only the si
 ## Execution status
 
 Implemented. 51 simulator tests pass (8.481 seconds), including actual medgel/pawn receipts, replay and existing CPU parity. Canary 20260912T193211Z-d17dd06f: 4 players, 3 days, seed 1701, 4 workers, 15.414 seconds. All four qualified for floor 4 within 0.0051–0.0058 days; final character level 2, 59–102 kills, 0–1 deaths. No invalid-action refusal. This combines improved observation and decisions; causal comparisons follow in phase 2. Engine fingerprint remains 3217d52ec623a7b41376921310173bf681573edbe6c9e9d730fccc6a7ae29dae. Historical runs preserved.
+
+
+Longer-run regression: search 20260912T193841Z-1cedebc9 exposed repeated `close_in` refusals when the preferred blade was held in a side slot and the lead was ranged. A direct-core regression failed before the fix. The planner now scores only usable held attack rows; probes fail visibly on refusals and searches disqualify refused/looping decisions. The original 48-trial search is retained with status `invalid`; it cannot support a recommended path. New selection/validation seeds will be used after this correction.

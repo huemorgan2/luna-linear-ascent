@@ -107,6 +107,7 @@ def assess(document,seconds,floor,cfg):
                 option=fight(s)[0]
             else:option=fight_choice(s,'tactician',probe=True)
             s.act(option)
+            if s.scene.refusal:raise RuntimeError('Probe action refused: '+option+': '+s.scene.refusal)
             if any(e['kind']=='kill' for e in s.events):won=True;outcome='win';break
             if not s.doc.get('encounter'):
                 outcome='death_or_retreat';break
@@ -134,7 +135,8 @@ class Agent:
         self.s.act(option,seconds=self.s.seconds+self.cfg.action_seconds)
         self.active+=self.cfg.action_seconds/60;self.actions+=1
         self.counters['actions']+=1
-        if self.s.scene.refusal:self.blocked[self.s.scene.refusal]+=1
+        if self.s.scene.refusal:
+            self.blocked[self.s.scene.refusal]+=1;self.counters['refused_actions']+=1
         for event in self.s.events:
             kind=event['kind'];self.counters[kind]+=1
             self.ledger[kind]+=event.get('gold',0)

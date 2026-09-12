@@ -35,6 +35,18 @@ For a repeated cohort on three seeds (each run uses all available CPUs):
 python3 simulation/game_study.py --players 12 --days 30 --seeds 1601,1602,1603
 ```
 
+## Search for stronger player paths
+
+```bash
+python3 simulation/game_search.py
+```
+
+This tests 18 planner choices (sword/bow/magic focus, levels/training first, three farming margins), then validates the top three on different seeds. All available CPUs run independent trials, with no nested worker pools. Every trial is an ordinary saved actual-engine run. The search report is saved progressively in `simulation/game-searches/`; failures and invalid decisions are visible. The default screening uses 3 players × 7 days × 2 seeds per path; validation uses 6 players × 30 days × 3 fresh seeds per finalist and baseline. Override these with `--screen-players`, `--screen-days`, `--validation-players`, `--validation-days`, `--training-seeds`, `--validation-seeds`, `--finalists`, and `--workers`.
+
+The winner is selected using the whole training population, including unfinished players: highest mean qualified floor, then the accumulated time qualified for each floor. Validation never changes that selection. The historical Mage, corrected Mage and corrected Learner provide matched comparison arms. A bounded search can find better methods; it cannot prove the fastest possible path. Different seeds and a larger cohort are needed before trusting small differences.
+
+The dashboard’s **Stronger player paths** section opens matched strategy graphs and can apply the winning planner settings to the next swarm. Its cyan line shows when half the players can defeat each floor’s monsters; purple shows the earliest observed player, with identity in the tooltip. Saved searches and runs are ignored by Git: copy both directories to inspect those results on another computer, or rerun the commands there.
+
 ## Replay and inspect
 
 The first six players retain complete action/time/world-input traces by default (`--trace-players N` changes this). Verify a player by replaying those inputs through the actual engine:

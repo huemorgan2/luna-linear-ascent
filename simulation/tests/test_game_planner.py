@@ -52,3 +52,14 @@ class PlannerTests(unittest.TestCase):
     def test_planner_config_is_validated(self):
         for cfg in ({'probe_mode':'invented'},{'planner_path':'laser'},{'planner_margin':3},{'planner_growth':'free'}):
             with self.assertRaises(ValueError):GameConfig.from_dict(cfg)
+
+    def test_side_blade_at_range_never_requests_missing_close_in(self):
+        a=self.agent();p=a.s.doc
+        p['held']=['worn_staff','notched_cleaver'];p['gear']['weapon']='worn_staff';p['slots']=2
+        p['training']['blade']=10;p['location']='gate_town';a.s.look();a.s.act('hunt')
+        self.assertNotIn('close_in',legal_actions(a.s))
+        before=deepcopy(p)
+        with at_time(a.s.seconds):action,_=fight(a.s)
+        self.assertEqual(p,before)
+        self.assertIn(action,legal_actions(a.s))
+        a.s.act(action);self.assertFalse(a.s.scene.refusal)

@@ -36,7 +36,11 @@ def weapon_damage(session,slug):
 def fight(session):
     p=session.doc;e=p['encounter'];opts=legal_actions(session)
     held=combat._held_slugs(p)
-    candidates=held+[s for s in p['inventory'] if 'wear_'+s in opts and s in economy.FORGE and economy.FORGE[s].slot=='weapon']
+    # A held side-blade is locked at range while a ranged weapon leads.
+    # Only the lead blade offers close_in; never invent that missing action.
+    usable=[slug for slug in held if ('attack' if slug==p['gear']['weapon'] else 'attack_'+slug) in opts
+            or (slug==p['gear']['weapon'] and 'close_in' in opts)]
+    candidates=usable+[s for s in p['inventory'] if 'wear_'+s in opts and s in economy.FORGE and economy.FORGE[s].slot=='weapon']
     scores={s:weapon_damage(session,s) for s in candidates}
     best=max(candidates,key=lambda s:(scores[s],s in held,s==p['gear']['weapon']))
     if best not in held:return 'wear_'+best,'switch to the visible monster counter'
@@ -45,7 +49,7 @@ def fight(session):
     # A conservative decision estimate using displayed maximum enemy attack.
     # No attack is rolled on a copy and no future random value is inspected.
     if p['hp']<e['atk']*.75 and damage<e['hp'] and 'run' in opts:return 'run','retreat before another likely lethal round'
-    if path_of(best)=='blade' and combat._range_state(p)=='at_range':return 'close_in','close in with the stronger counter'
+    if best==p['gear']['weapon'] and 'close_in' in opts:return 'close_in','close in with the stronger counter'
     if path_of(best)=='bow' and 'treeline_shot' in opts:return 'treeline_shot','use the trained opening shot'
     action='attack' if p['gear']['weapon']==best else 'attack_'+best
     if action in opts:return action,'attack with the best visible damage'

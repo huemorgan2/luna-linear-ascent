@@ -6,3 +6,5 @@ replay.json
 studies/*.json
 
 game-runs/*.json
+
+game-searches/*.json
