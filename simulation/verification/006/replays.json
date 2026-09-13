@@ -1,0 +1,16 @@
+[
+  {
+    "player": 0,
+    "match": true,
+    "state_sha256": "53441ab9ebcb7747c6dad6391a9f67ead6e0cfefdcb68b038a0f2e7eedbc5214",
+    "engine_sha256": "7bab3e04291452164204930b54069ab6775f9b57757aadcd2f1f907c749ee436",
+    "actions": 1530
+  },
+  {
+    "player": 1,
+    "match": true,
+    "state_sha256": "ba27f853b801ce38c0535e50fc3d650675a9d223bdb9ae56051ef5f218ab5584",
+    "engine_sha256": "7bab3e04291452164204930b54069ab6775f9b57757aadcd2f1f907c749ee436",
+    "actions": 2623
+  }
+]
