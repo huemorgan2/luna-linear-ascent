@@ -1,5 +1,5 @@
 """Decisions for the candidate game; no damage, rewards or settlement here."""
-from plugin_linear_ascent.engine import collection,groups,gathering,workshop
+from plugin_linear_ascent.engine import collection,groups,gathering,workshop,quiver,battle_rules
 from .game_adapter import state,economy,core
 
 
@@ -10,15 +10,31 @@ def fight(session,policy,*,probe=False):
         if 'drink_tonic' in opts:return 'drink_tonic'
         return 'flee'
     strikes=[oid for oid in opts if oid.startswith('strike:')]
-    if not strikes:return 'approach' if not m['air'] else 'flee'
     if policy in ('learner','rusher'):
-        return strikes[0]
-    def score(oid):
+        return strikes[0] if strikes else 'approach' if not m['air'] else 'flee'
+    def score(oid,arrow=None):
         item=p['collection'][oid.split(':')[1]];info=collection.stats(item)
-        mult=m['magic' if info['path']=='staff' else 'power']
-        contact=(.9 if item['family']=='skirmisher' else .65) if info['path']=='bow' and m['gap']==0 else 1
-        return info['attack']*mult*contact
-    strike=max(strikes,key=score)
+        channel,factor=battle_rules.impact(collection.families()[item['family']],m['gap'],arrow)
+        mult=battle_rules.affinity(m,channel,focus=info['path']=='staff' and bool(p.get('mastery',{}).get('staff')))
+        return battle_rules.attack(p,item)*factor*mult
+    choices=[]
+    for oid in strikes:
+        item=p['collection'][oid.split(':')[1]]
+        if collection.stats(item)['path']=='bow' and g.get('combat_revision',1)>=2:
+            arrow=quiver.definitions()[quiver.chosen(p,item)]
+            choices.append((score(oid,arrow),oid))
+        else:choices.append((score(oid),oid))
+    for iid in p['deck']:
+        if not iid:continue
+        item=p['collection'][iid]
+        if collection.stats(item)['path']!='bow' or item['durability']<=0:continue
+        for arrow in quiver.definitions().values():
+            action=f"load_arrow:{iid}:{arrow['id']}"
+            if action in opts and arrow['id']!=quiver.chosen(p,item):
+                choices.append((score('strike:'+iid,arrow),action))
+    if not choices:return 'approach' if not m['air'] else 'flee'
+    _,strike=max(choices,key=lambda row:row[0])
+    if strike.startswith('load_arrow:'):return strike
     iid=strike.partition(':')[2];item=p['collection'][iid];skill='skill:'+iid
     if skill in opts:
         family=item['family']
@@ -34,6 +50,7 @@ def navigate(agent,room):
     if p.get('group_result'):return 'group_return'
     if p.get('collection_view'):return 'collection_back'
     if p.get('workshop_view'):return 'shop_back'
+    if p.get('quiver_view'):return None if room=='quiver' else 'arrow_back'
     if p.get('location')=='gathering':return 'gather_extract' if p.get('expedition') else 'gather_back'
     if p.get('movie_floor'):return 'skip'
     if p['location']==room:return None
@@ -51,6 +68,14 @@ def purchase(agent):
         if item['durability']<item['maximum']*.1:
             if gold>=workshop.repair_quote(item):return ('forge','mend:'+iid)
             if item['source']=='starter' and state.energy_now(p)>0:return ('forge','practice:'+iid)
+    for iid in p['deck']:
+        if not iid:continue
+        item=p['collection'][iid]
+        if collection.stats(item)['path']=='bow' and quiver.count(p,item['grade'],'ordinary')<10:
+            q=quiver.quote(item['grade'],'ordinary')
+            if quiver.used(p)+q['count']<=collection.catalog()['quiver']['capacity']:
+                if gold>=q['gold']:return ('quiver','arrow_buy:'+item['grade']+':ordinary')
+                if item['grade']=='Common' and state.energy_now(p)>1:return ('quiver','arrow_practice')
     # Modest training improves accuracy; both counters and a missed hit matter.
     paths=['blade'] if agent.policy in ('learner','rusher') else ['bow','staff','blade']
     for path in paths:
@@ -107,6 +132,7 @@ def decide(agent):
         return 'store:'+iid
     if p.get('collection_view'):return 'collection_back'
     if p.get('workshop_view'):return 'shop_back'
+    if p.get('quiver_view') and (purchase(agent) or ('',''))[0]!='quiver':return 'arrow_back'
     minimum_energy=1 if agent.policy in ('learner','rusher') else 3
     if state.energy_now(p)<minimum_energy:
         agent.blocked['energy_wait']+=1;return None
@@ -120,6 +146,10 @@ def decide(agent):
     plan=purchase(agent)
     if plan:
         room,oid=plan
+        if room=='quiver':
+            if p.get('quiver_view'):return oid
+            if p['location']=='forge':return 'quiver_shop'
+            return navigate(agent,'forge')
         if room=='gather':
             site=gathering.SITES[oid]
             if p['location']=='gathering':

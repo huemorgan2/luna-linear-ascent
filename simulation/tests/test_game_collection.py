@@ -1,6 +1,7 @@
 """The candidate simulator uses the same complete-group transitions as play."""
 from copy import deepcopy
 import unittest
+from unittest.mock import patch
 from simulation.game_adapter import replay,state,at_time
 from simulation.game_agents import GameConfig,Agent,create_character,assess
 from simulation.game_collection import fight,decide
@@ -35,6 +36,38 @@ class CandidateGameTests(unittest.TestCase):
         agent.s.doc['energy_val']=2
         agent.s.doc['gold']=1000
         with at_time(agent.s.seconds):self.assertIsNone(decide(agent))
+
+    def test_probe_from_arrow_shop_matches_camp_without_changing_supplies(self):
+        s=create_character('candidate-quiver-probe',ruleset='collection-v1')
+        s.act('forge');s.act('quiver_shop')
+        self.assertTrue(s.doc['quiver_view'])
+        bow=s.doc['deck'][1]
+        s.doc['quiver']['Common']['arcane']=7
+        s.doc['arrow_choice'][bow]='arcane'
+        before=deepcopy(s.doc)
+        camp=deepcopy(before);camp.pop('quiver_view');camp.update(location='gate_town',floor=1)
+        cfg=GameConfig(ruleset='collection-v1',readiness_trials=4)
+        self.assertEqual(assess(before,0,1,cfg),assess(camp,0,1,cfg))
+        self.assertEqual(s.doc,before)
+        self.assertEqual(before['quiver']['Common']['arcane'],7)
+        self.assertEqual(before['arrow_choice'][bow],'arcane')
+
+    def test_legal_arrow_purchase_triggers_immediate_readiness_check(self):
+        a=Agent(GameConfig(ruleset='collection-v1'),0,'tactician')
+        a.act('forge');a.act('quiver_shop');a.act('arrow_buy:Common:ordinary')
+        self.assertFalse(a.s.scene.refusal)
+        with patch.object(a,'probe') as probe:
+            a.improvement_probe('arrow_buy:Common:ordinary')
+            probe.assert_called_once_with()
+
+    def test_arrow_selection_changes_readiness_signature(self):
+        a=Agent(GameConfig(ruleset='collection-v1'),0,'tactician')
+        with patch('simulation.game_agents.assess',return_value=dict(win_rate=0)) as check:
+            a.probe();a.probe()
+            self.assertEqual(check.call_count,1)
+            a.s.doc['arrow_choice'][a.s.doc['deck'][1]]='arcane'
+            a.probe()
+            self.assertEqual(check.call_count,2)
 
     def test_ruleset_is_explicit_and_legacy_creation_is_unchanged(self):
         legacy=create_character('legacy-explicit')

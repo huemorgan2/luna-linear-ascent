@@ -33,4 +33,4 @@ Before code, commit this document. Each implementation commit records its tests 
 
 ## Execution status
 
-Planned; no phase4 runtime changes executed at this checkpoint.
+Candidate implemented in plugin8b26030/0.115.0, with discovery correction56e1d86/0.115.1. Current test/browser/simulator evidence and remaining gates are recorded in this phase's PLAN.md. Legacy imported weapon contribution remains its original full amount until broken; native purchased/dropped weapons use proportional condition and native starters retain the stated half-contribution floor. This preserves legacy migration value pending phase7. No production change. Phase4 remains in progress until the recorded browser and niche measurements pass.

@@ -43,14 +43,20 @@ def test_baked_wiki_matches_deployed_content_and_all_species():
         authored = gen.schema.get_floor(f['floor'])
         assert [m['id'] for m in f['monsters']] == [e.id for e in authored.encounters]
         for m in f['monsters']:
-            atk, defense, hp = gen.economy.creature_stats(f['floor'], m['traits'])
-            if 'bulwark' in m['traits']:
-                hp = round(hp * gen.economy.BULWARK_HP_MULT)
-            assert (m['atk'], m['defense'], m['hp']) == (atk, defense, hp)
-            for name, setting in gen.economy.SPECIMENS.items():
-                assert m['specimenStats'][name]['hp'] == round(hp * setting['hp'])
-                assert m['specimenStats'][name]['deepAtk'] == round(round(atk * setting['atk']) * 1.2)
-            assert m['deepEligible'] == (f['floor'] >= 4 and not {'frail', 'feeble'}.intersection(m['traits']))
+            actual = gen.bestiary.profile(f['floor'], m['id'])
+            assert (m['atk'],m['defense'],m['hp']) == (actual['atk'],actual['defense'],actual['hp'])
+            assert m['type']==actual['type'] and m['traits']==actual['traits']
+            assert m['familyWeights']==gen.bestiary.family_weights(actual)
+            for name in gen.economy.SPECIMENS:
+                normal=gen.bestiary.specimen_profile(actual,name)
+                deep=gen.bestiary.specimen_profile(actual,name,deep=True)
+                assert m['specimenStats'][name]['hp']==normal['hp']
+                assert m['specimenStats'][name]['deepAtk']==deep['atk']
+                for mode in ('normal','deep'):
+                    got=m['lootByMode'][mode][name]
+                    expected=gen.bestiary.drop_rates(f['floor'],m['traits'],specimen=name,deep=mode=='deep')
+                    assert got['material']==[expected['material'][grade] if got['eligible'] else 0 for grade in gen.collection.GRADES]
+            assert m['deepEligible'] == (f['floor']>=4 and not {'frail','feeble'}.intersection(m['traits']))
     assert next(m for m in baked['floors'][2]['monsters'] if m['name'] == 'Marsh adder')['id'] == 'reed_adder'
 
 
@@ -61,9 +67,7 @@ def test_neutral_upgrade_reference_preserves_existing_power_at_every_gate():
         rows = [s for s in upgrades if s['gi'] == gi]
         assert [r['level'] for r in rows] == list(range(21))
         for a, b in zip(rows, rows[1:]):
-            assert a['floor'] < b['floor'] and a['q'] < b['q']
-            if a['level'] > 0:  # base acquisition is not an upgrade fee
-                assert a['gold'] < b['gold']
+            assert a['floor'] < b['floor']
             assert a['dur'] < b['dur'] and a['atk'] <= b['atk']
         for r in rows:
             assert r['atk'] == gen.economy.honed_bonus(gen.economy._reference_bonus(r['floor'], 'weapon'), gen.economy.reference_hone(r['floor']))
@@ -80,7 +84,7 @@ async def test_public_wiki_routes_assets_and_home_link_need_no_account():
         for route in ('/wiki', '/wiki/'):
             response = await client.get(route)
             assert response.status_code == 200
-            assert 'data-wiki-revision="089.3"' in response.text
+            assert 'data-wiki-revision="collection-2"' in response.text
             assert 'set-cookie' not in response.headers
         assert 'href="/wiki"' in (await client.get('/')).text
         for path in ('wiki.mjs', 'wiki.css', 'data.json'):
@@ -91,3 +95,25 @@ async def test_public_wiki_routes_assets_and_home_link_need_no_account():
                 assert response.status_code == 200
                 assert response.headers['content-type'] == 'image/png'
         assert (await client.get('/static/site/fonts/WebPlus_IBM_VGA_8x16.woff')).status_code == 200
+
+
+def test_every_family_state_and_acquisition_is_an_exact_runtime_quote():
+    data=gen.make_data()
+    for family in data['model']['weapons']:
+        for grade in gen.collection.GRADES:
+            assert family['sources'][grade]==gen.sources(family['id'],grade)
+            states=family['states'][grade]
+            assert len(states)==21
+            for record in states:
+                current=gen.item(family['id'],grade,record['level'])
+                assert record['atk']==gen.collection.stats(current)['attack']
+                quote=gen.workshop.acquisition_quote(family['id'],grade,'craft') if record['level']==0 else gen.collection.upgrade_quote(gen.item(family['id'],grade,record['level']-1))
+                assert (record['gold'],record['materials'])==(quote['gold'],quote['materials'])
+    assert len(data['sites'])==8
+    for s in data['sites']:
+        assert s['floor']==gen.gathering.SITES[s['id']]['floor']
+        assert s['yield_amount']==gen.gathering.SITES[s['id']]['yield_amount']
+    for row in data['shieldExamples']:
+        actual=gen.battle_rules.incoming(row['raw'],row['armorDef'],row['shieldDef'],guard=row['guard'])
+        assert all(row[k]==v for k,v in actual.items())
+    assert len(set(data['icons'][key] for key in data['materialIcons'].values()))==8

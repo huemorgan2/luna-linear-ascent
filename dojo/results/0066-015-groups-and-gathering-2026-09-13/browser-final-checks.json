@@ -1,0 +1,236 @@
+{
+  "captured_at": "2026-09-13T07:36:01.911803+00:00",
+  "baseline_exact_row_unchanged": true,
+  "unacted_accounts_unchanged_since_01145": {
+    "phase3sprout": true,
+    "phase3energy2": true,
+    "phase3energy5": true,
+    "phase3shield": true,
+    "phase3gather": true
+  },
+  "read_reconnect_doc_changed_fields": [
+    "last_seen"
+  ],
+  "read_reconnect_ledger_unchanged": true,
+  "natural_final": {
+    "act_seq": 122,
+    "location": "forge",
+    "floor": 0,
+    "unlocked_floor": 3,
+    "gold": 8,
+    "hp": 58,
+    "xp": 13,
+    "xp_reserve": 0,
+    "energy_val": 1.146876300740744,
+    "energy_ts": "2026-09-13T07:32:22.024080+00:00",
+    "materials": {
+      "Wood": 0,
+      "Raw Metal": 0
+    },
+    "utility_tools": {
+      "pickaxe": {
+        "condition": 119
+      },
+      "wood-axe": {
+        "condition": 91
+      }
+    },
+    "training": {
+      "bow": 1,
+      "blade": 2,
+      "staff": 0
+    },
+    "groups_cleared": 7,
+    "deck": [
+      "2b196ea3c3ee0fc7d4d3a6085c4ea1f5",
+      "ca244e21392326f61e3672473bf2b992",
+      "d7611c55513bb8cdbbccb3c88f65e7ae"
+    ],
+    "collection": {
+      "2b196ea3c3ee0fc7d4d3a6085c4ea1f5": {
+        "id": "2b196ea3c3ee0fc7d4d3a6085c4ea1f5",
+        "grade": "Common",
+        "level": 0,
+        "family": "breach",
+        "source": "starter",
+        "maximum": 1170,
+        "location": "carried",
+        "durability": 1170,
+        "provenance": {
+          "owner": "ascent-change-phase3:owner",
+          "receipt": "migration:held:rusted_sword:0"
+        }
+      },
+      "ca244e21392326f61e3672473bf2b992": {
+        "id": "ca244e21392326f61e3672473bf2b992",
+        "grade": "Common",
+        "level": 1,
+        "family": "hawkeye",
+        "source": "starter",
+        "maximum": 1332,
+        "location": "carried",
+        "durability": 1304,
+        "provenance": {
+          "owner": "ascent-change-phase3:owner",
+          "receipt": "starter:bow"
+        }
+      },
+      "d7611c55513bb8cdbbccb3c88f65e7ae": {
+        "id": "d7611c55513bb8cdbbccb3c88f65e7ae",
+        "grade": "Common",
+        "level": 0,
+        "family": "ember",
+        "source": "starter",
+        "maximum": 1300,
+        "location": "carried",
+        "durability": 1293,
+        "provenance": {
+          "owner": "ascent-change-phase3:owner",
+          "receipt": "starter:staff"
+        }
+      }
+    },
+    "group": null,
+    "expedition": null
+  },
+  "phase3_conversation_user_turns": 25,
+  "phase3_conversation_tool_calls": 143,
+  "intentional_01145_user_turns": 9,
+  "intentional_01145_tool_calls": 29,
+  "natural_upgrade_receipts": [
+    {
+      "id": 97,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "upgrade",
+      "gold": -171,
+      "xp": 0,
+      "note": "ca244e21392326f61e3672473bf2b992:+1",
+      "created_at": "2026-09-13 07:34:14.880359+00:00"
+    }
+  ],
+  "natural_gather_receipts": [
+    {
+      "id": 84,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:1:empty",
+      "created_at": "2026-09-13 07:29:40.631899+00:00"
+    },
+    {
+      "id": 85,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:2:empty",
+      "created_at": "2026-09-13 07:29:43.670714+00:00"
+    },
+    {
+      "id": 86,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:3:empty",
+      "created_at": "2026-09-13 07:29:48.872926+00:00"
+    },
+    {
+      "id": 87,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:4:empty",
+      "created_at": "2026-09-13 07:29:52.231786+00:00"
+    },
+    {
+      "id": 88,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:5:yield",
+      "created_at": "2026-09-13 07:29:55.258924+00:00"
+    },
+    {
+      "id": 89,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:6:yield",
+      "created_at": "2026-09-13 07:29:58.380131+00:00"
+    },
+    {
+      "id": 90,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:7:empty",
+      "created_at": "2026-09-13 07:30:52.788685+00:00"
+    },
+    {
+      "id": 91,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:8:empty",
+      "created_at": "2026-09-13 07:30:55.832572+00:00"
+    },
+    {
+      "id": 92,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:9:yield",
+      "created_at": "2026-09-13 07:30:59.608781+00:00"
+    },
+    {
+      "id": 95,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:2:1:yield",
+      "created_at": "2026-09-13 07:32:22.009684+00:00"
+    }
+  ],
+  "natural_extract_receipts": [
+    {
+      "id": 93,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "gather_extract",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1",
+      "created_at": "2026-09-13 07:31:05.805406+00:00"
+    },
+    {
+      "id": 96,
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "kind": "gather_extract",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:2",
+      "created_at": "2026-09-13 07:33:06.289928+00:00"
+    }
+  ]
+}

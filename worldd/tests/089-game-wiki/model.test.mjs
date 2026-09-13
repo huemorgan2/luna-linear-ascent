@@ -77,11 +77,23 @@ test('all loadouts honor air reach and counters; a bow payload meaningfully chan
  assert(hitPreview(w,t,model.arrows.find(a=>a.id==='ordinary'),2).damage>hitPreview(w,t,model.arrows.find(a=>a.id==='arcane'),2).damage);
 });
 
-test('shield allocation never grants complete protection and only absorbed damage wears it',()=>{
- for(let raw=1;raw<=300;raw++)for(const armor of [0,40,200])for(const shield of [0,80,300])for(const wall of [false,true]){
-  const r=shieldPreview(raw,armor,shield,wall);
-  assert(r.hp>=Math.ceil(raw*.25));
-  assert.equal(r.armor+r.shield+r.hp,raw);
-  assert.equal(r.wear,r.shield);
+test('shield examples preserve the exact engine allocation and proportional wear',()=>{
+ for(let i=0;i<data.shieldExamples.length;i++){
+  const r=shieldPreview(data,i);
+  assert(r.hp>=Math.ceil(r.raw*.25));
+  assert.equal(r.armor+r.shield+r.hp,r.raw);
+  assert.equal(r.wear>0,r.shield>0);
+  if(r.shield>0)assert.equal(r.wear,Math.max(1,Math.ceil(r.shield/Math.max(1,r.shieldDef))));
+ }
+});
+
+test('group percentages combine the specified per-enemy rolls',()=>{
+ for(const floor of data.floors){
+  const example=floor.groupExample;
+  const members=example.names.map(name=>floor.monsters.find(m=>m.name===name));
+  for(const kind of ['material','weapon'])for(let i=0;i<4;i++){
+   const expected=100*(1-members.reduce((product,m)=>product*(1-m.lootByMode.normal.common[kind][i]/100),1));
+   assert(Math.abs(example[kind][i]-expected)<1e-10);
+  }
  }
 });

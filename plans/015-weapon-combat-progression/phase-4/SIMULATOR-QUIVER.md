@@ -27,4 +27,4 @@ Revert the implementation commit's changes to `simulation/game_agents.py` and it
 
 ## Execution status
 
-Reproduced; implementation pending.
+Implemented.17 focused and65 full simulator tests passed. The previously failing eight-player run completed in20.9167seconds on4workers; source-pinned result and findings are in `simulation/verification/008`. Median readyfloor8, fastest floor10 at8days; this misses the reviewed strong-policy target and is not relabeled as good pacing. No player document was reset or replenished by the probe correction.

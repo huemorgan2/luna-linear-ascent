@@ -104,7 +104,7 @@ def assess(document,seconds,floor,cfg):
         p=deepcopy(document)
         p.update(luna_user=f'probe:{cfg.seed}:{floor}:{trial}',encounter=None,location='gate_town',floor=floor,
             unlocked_floor=max(floor,p['unlocked_floor']),rng_counter=0,pending_events=[])
-        for k in ('movie_floor','movie_beat','sleeping','kill_receipt','profile_view','foe_sheet','group','group_result','expedition','collection_view','workshop_view','hunt_offers'):p.pop(k,None)
+        for k in ('movie_floor','movie_beat','sleeping','kill_receipt','profile_view','foe_sheet','group','group_result','expedition','collection_view','workshop_view','quiver_view','hunt_offers'):p.pop(k,None)
         with at_time(seconds):
             p['hp']=state.max_hp(p);p['energy_val']=float(state.energy_cap_of(p));p['energy_ts']=state.now().isoformat()
         s=GameSession(p['luna_user'],seconds=seconds,document=p,capture=False);s.act('hunt')
@@ -305,7 +305,7 @@ class Agent:
         # Recheck only on changes relevant to combat; exact condition and
         # quiver retained. A new day also changes the game's RNG day seed.
         p=self.s.doc
-        signature=digest({k:p.get(k) for k in ('level','gear','hone','training','slots','held','durability','durability_pack','quiver','mastery','collection','deck')})
+        signature=digest({k:p.get(k) for k in ('level','gear','hone','training','slots','held','durability','durability_pack','quiver','arrow_choice','mastery','collection','deck')})
         key=(int(self.s.seconds//86400),signature,self.ready)
         if key==self.probe_key:return
         self.probe_key=key
@@ -321,7 +321,7 @@ class Agent:
 
     def improvement_probe(self,option):
         if self.cfg.probe_mode!='improvements' or in_battle(self.s.doc):return
-        if any(e['kind'] in ('buy','train','levelup','hone','repair','upgrade','craft') for e in self.s.events) or option.startswith(('wear_','unequip_','nock_')):
+        if any(e['kind'] in ('buy','train','levelup','hone','repair','upgrade','craft','arrows') for e in self.s.events) or option.startswith(('wear_','unequip_','nock_')):
             self.probe()
 
     def run(self):
