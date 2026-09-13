@@ -29,3 +29,13 @@ Add Drowned Copse and Bog-Iron Field on floor3, including named gate links. Each
 Tests exercise real core actions, not direct helper-only success paths: roster persistence; 5 enemies/2 energy; retreat after2; illegal IDs; switching; status/cooldown carry; partial shields; kill XP overflow; retry final kill; dawn; deck locks; wrong-location upgrades; exhausted victories; death/recovery; full old pack; gather ambush/extract/retry/loss. Add actual HTTP/local transactions for final settlement. The headless policy must clear complete groups before recording victory/readiness.
 
 Keep the candidate enrollment flag off in production. Revert this phase's commits in reverse order only before candidate writes. After writes, stop new starts and retain readers/settlement for active group/expedition receipts; never overwrite earned ownership with an older document. Append exact commit IDs, run paths and browser evidence to the phase plan before advancement.
+
+## Recovery and legacy bridge decision, 13 September
+
+Candidate group defeats retain the established daily rescue first: one HP at camp, half carried gold (free at level1). Later deaths retain beginner mercy, the published carried-gold loss bands and defense durability loss, then respawn at full health in Roothollow. A pouch Stone of Undying runs after daily rescue eligibility and before those death penalties, once per group. Secured materials, town storage and the Vault remain intact.
+
+For persistent owned weapons, the old random permanent weapon-loss roll becomes a **broken-condition roll** on carried non-starter instances. Ownership, level, identity and sunk upgrade materials survive; repair is required. This deliberate candidate change prevents a death from erasing the user's persistent weapon progression. Record repair losses in simulation; do not represent this as unchanged legacy death behavior. Legacy combat outside candidate groups retains its old rules pending the compatibility audit.
+
+Existing migrated weapons retain their old honing/repair rows until the phase7 conversion review. Hiding those rows stranded returning players with a preserved but non-improvable weapon; keep them usable during the staged rollout. Native weapons use only their material-funded Forge path.
+
+Verification adds daily rescue → second death → in-place stone, preserved secured materials/Vault/storage, paid defensive wear, broken weapon persistence, and once-only death ledger. Rollback is the phase3 rollback above; keep ownership records and disable new group starts rather than replace documents.
