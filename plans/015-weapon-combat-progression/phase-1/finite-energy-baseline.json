@@ -1,0 +1,217 @@
+[
+  {
+    "floor": 1,
+    "entry_options": [
+      "strike",
+      "town"
+    ],
+    "entry_action": "strike",
+    "energy_before": 25,
+    "energy_after_entry": 25,
+    "swings": [
+      {
+        "energy_before": 25,
+        "energy_after": 25,
+        "refusal": ""
+      },
+      {
+        "energy_before": 25,
+        "energy_after": 22,
+        "refusal": ""
+      },
+      {
+        "energy_before": 22,
+        "energy_after": 19,
+        "refusal": ""
+      },
+      {
+        "energy_before": 19,
+        "energy_after": 16,
+        "refusal": ""
+      },
+      {
+        "energy_before": 16,
+        "energy_after": 13,
+        "refusal": ""
+      },
+      {
+        "energy_before": 13,
+        "energy_after": 10,
+        "refusal": ""
+      },
+      {
+        "energy_before": 10,
+        "energy_after": 7,
+        "refusal": ""
+      },
+      {
+        "energy_before": 7,
+        "energy_after": 4,
+        "refusal": ""
+      },
+      {
+        "energy_before": 4,
+        "energy_after": 1,
+        "refusal": ""
+      },
+      {
+        "energy_before": 1,
+        "energy_after": 1,
+        "refusal": "Can't attack \u2014 not enough energy (\u26a1 3 needed)"
+      }
+    ],
+    "hp_left": 46,
+    "energy_left": 1,
+    "effects_emitted": []
+  },
+  {
+    "floor": 10,
+    "entry_options": [
+      "boss_commit",
+      "town"
+    ],
+    "entry_action": "boss_commit",
+    "energy_before": 25,
+    "energy_after_entry": 20,
+    "swings": [],
+    "hp_left": 895,
+    "energy_left": 20,
+    "effects_emitted": [
+      "boss_commit"
+    ]
+  },
+  {
+    "floor": 31,
+    "entry_options": [
+      "strike",
+      "town"
+    ],
+    "entry_action": "strike",
+    "energy_before": 28,
+    "energy_after_entry": 28,
+    "swings": [
+      {
+        "energy_before": 28,
+        "energy_after": 28,
+        "refusal": ""
+      },
+      {
+        "energy_before": 28,
+        "energy_after": 25,
+        "refusal": ""
+      },
+      {
+        "energy_before": 25,
+        "energy_after": 22,
+        "refusal": ""
+      },
+      {
+        "energy_before": 22,
+        "energy_after": 19,
+        "refusal": ""
+      },
+      {
+        "energy_before": 19,
+        "energy_after": 16,
+        "refusal": ""
+      },
+      {
+        "energy_before": 16,
+        "energy_after": 13,
+        "refusal": ""
+      },
+      {
+        "energy_before": 13,
+        "energy_after": 10,
+        "refusal": ""
+      },
+      {
+        "energy_before": 10,
+        "energy_after": 7,
+        "refusal": ""
+      },
+      {
+        "energy_before": 7,
+        "energy_after": 4,
+        "refusal": ""
+      },
+      {
+        "energy_before": 4,
+        "energy_after": 1,
+        "refusal": ""
+      },
+      {
+        "energy_before": 1,
+        "energy_after": 1,
+        "refusal": "Can't attack \u2014 not enough energy (\u26a1 3 needed)"
+      }
+    ],
+    "hp_left": 125047,
+    "energy_left": 1,
+    "effects_emitted": []
+  },
+  {
+    "floor": 50,
+    "entry_options": [
+      "boss_commit",
+      "town"
+    ],
+    "entry_action": "boss_commit",
+    "energy_before": 29,
+    "energy_after_entry": 24,
+    "swings": [],
+    "hp_left": 1116128,
+    "energy_left": 24,
+    "effects_emitted": [
+      "boss_commit"
+    ]
+  },
+  {
+    "floor": 99,
+    "entry_options": [
+      "strike",
+      "town"
+    ],
+    "entry_action": "strike",
+    "energy_before": 34,
+    "energy_after_entry": 34,
+    "swings": [
+      {
+        "energy_before": 34,
+        "energy_after": 34,
+        "refusal": ""
+      },
+      {
+        "energy_before": 34,
+        "energy_after": 31,
+        "refusal": ""
+      },
+      {
+        "energy_before": 31,
+        "energy_after": 28,
+        "refusal": ""
+      }
+    ],
+    "hp_left": 1,
+    "energy_left": 28,
+    "effects_emitted": [
+      "warden_strike"
+    ]
+  },
+  {
+    "floor": 100,
+    "entry_options": [
+      "boss_commit",
+      "town"
+    ],
+    "entry_action": "boss_commit",
+    "energy_before": 34,
+    "energy_after_entry": 29,
+    "swings": [],
+    "hp_left": 503569976892,
+    "energy_left": 29,
+    "effects_emitted": [
+      "boss_commit"
+    ]
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "same_scene_id_sent_twice": "s0",
+  "initial_gold": 1000,
+  "after_gold": 250,
+  "after_bank": 750,
+  "expected_gold_after_one_action": 500,
+  "bug_reproduced": true
+}
