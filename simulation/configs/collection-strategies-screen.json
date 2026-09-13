@@ -1,0 +1,1 @@
+{"ruleset": "collection-v1", "players": 12, "days": 10, "workers": 0, "max_floor": 30, "seed": 32001, "readiness_trials": 4, "trace_players": 2, "planner_path": "bow", "planner_growth": "levels", "planner_margin": 1, "policies": ["learner", "tactician", "planner", "investor", "random", "saver"], "readiness_policy": "planner"}

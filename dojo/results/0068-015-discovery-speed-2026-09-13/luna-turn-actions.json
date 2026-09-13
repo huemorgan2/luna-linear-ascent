@@ -1,0 +1,88 @@
+[
+  {
+    "instruction": "show me the arrows I can use with this bow",
+    "start": "2026-09-13T11:05:50.105018+00:00",
+    "calls": [
+      {
+        "at": "2026-09-13T11:05:52.795868+00:00",
+        "name": "ascent_character",
+        "arguments": {}
+      }
+    ],
+    "reply": "**Your arrow types (Common grade):**\n\n1. **Ordinary** (Power channel)\n   - You own: **100**\n   - Effect: No added effect, full damage\n   - Currently selected on Hawkeye Longbow\n\n2. **Arcane** (Magic channel)\n   - You own: **20**\n   - Effect: Converts the direct hit to Magic damage\n   - Great against Magic-weak enemies\n\n**Other arrows available at Forge (not owned yet):**\n- Poison (Power, 90% impact + 8%\u00d73 poison) \u2014 10 gold per 20\n- Fire (Power, 90% impact + 12%\u00d72 burn) \u2014 15 gold per 20\n- Pinning (Power, 85% impact + slow) \u2014 10 gold per 20\n- Concussive (Power, 80% impact + push) \u2014 15 gold per 20\n\nAll arrows consume one per accepted shot (including misses). You can switch payloads for free during a fight before shooting.",
+    "end": "2026-09-13T11:06:00.622189+00:00"
+  },
+  {
+    "instruction": "Open my current Arrows drawer so I can see these arrows. Take at most one game action and stop. Do not buy, travel, hunt, or shoot.",
+    "start": "2026-09-13T11:06:36.807728+00:00",
+    "calls": [
+      {
+        "at": "2026-09-13T11:06:39.031274+00:00",
+        "name": "ascent_arrows",
+        "arguments": {}
+      }
+    ],
+    "reply": "Arrows drawer open \u2014 all six types shown with current stock and Forge prices.",
+    "end": "2026-09-13T11:06:41.101358+00:00"
+  },
+  {
+    "instruction": "Go back from the weapon collection to the current camp. Exactly one game action, then stop. Do not hunt yet.",
+    "start": "2026-09-13T11:08:32.806507+00:00",
+    "calls": [
+      {
+        "at": "2026-09-13T11:08:35.301642+00:00",
+        "name": "ascent_choose",
+        "arguments": {
+          "option": "1"
+        }
+      }
+    ],
+    "reply": "Back at camp.",
+    "end": "2026-09-13T11:08:36.832178+00:00"
+  },
+  {
+    "instruction": "Open one ordinary hunt preview from this floor 1 camp. Exactly one game action, then stop. Do not shoot, attack, start an enemy, or buy anything.",
+    "start": "2026-09-13T11:08:58.322982+00:00",
+    "calls": [
+      {
+        "at": "2026-09-13T11:09:01.048033+00:00",
+        "name": "ascent_choose",
+        "arguments": {
+          "option": "1"
+        }
+      }
+    ],
+    "reply": "Group open \u2014 grey wolf and hedgerow rat.",
+    "end": "2026-09-13T11:09:02.998133+00:00"
+  },
+  {
+    "instruction": "Select the owned Common Arcane arrows for my Hawkeye Longbow in this preview. Exactly one game action, then stop. Do not shoot or start either enemy.",
+    "start": "2026-09-13T11:09:28.408703+00:00",
+    "calls": [
+      {
+        "at": "2026-09-13T11:09:32.014572+00:00",
+        "name": "ascent_choose",
+        "arguments": {
+          "option": "11"
+        }
+      }
+    ],
+    "reply": "Arcane loaded \u2014 twenty shots left.",
+    "end": "2026-09-13T11:09:34.118445+00:00"
+  },
+  {
+    "instruction": "Leave this unstarted hunt preview now. Exactly one game action, then stop. Do not shoot, attack, open another hunt, or buy anything.",
+    "start": "2026-09-13T11:09:54.992376+00:00",
+    "calls": [
+      {
+        "at": "2026-09-13T11:09:58.405724+00:00",
+        "name": "ascent_choose",
+        "arguments": {
+          "option": "9"
+        }
+      }
+    ],
+    "reply": "Back at camp.",
+    "end": "2026-09-13T11:10:00.278985+00:00"
+  }
+]

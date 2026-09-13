@@ -33,3 +33,11 @@ Follow the [parent plan](../PLAN.md) and its ownership map. No new production ru
 ## Execution status
 
 Not started. Rewritten for the three-weapon/group design on12 September2026; authorized for implementation by the subsequent user request. This document is not evidence that runtime changes or tests have run.
+
+## Implementation checkpoint13September2026
+
+Phase4 gateclosed69d0352; executing committedaa3c579policyplan. New game_strategy decisions compare actual owned/source-aware weapons, real training/mastery, body growth, armor/shield honing and repair, paid ammo, affordable floor1 road recovery, claims/storage and named resource routes. Investor collects actual stubs and withdraws for concrete work, preserving35%wealth preference; this is a policy allocation, not a change to Vaultreturns. Seeded Experimenter makes legal random combat choices. New shared-public-stat scorer considers direct damage, source effects/control, reachable targets and available ammunition; no futureRNG or hiddenrewards. Readiness_policy records whether oldTactician or preparedPlanner drives disposable probes.
+
+First12player10dayrun010 completed35.2342seconds on8CPUs. BothPlanner andInvestor pairs reached10 (4.339–6.335days), versusordinary/weak5–9. Median8. Allrecordsretained. This sample does not prove investoradvantage: Planner was faster. No gamecoefficientchanged. Source/runnerfiles recorded. First70fullsimulatorchecks pass17.258seconds; subsequent scoredcombat/reserve/sale changes require final rerun. Bounded search now screens16decks/growth/route/investment configurations, freezes winners before untouchedseedvalidation, and refuses to rank invalid/looping decisions. Broader horizons/curves/actualeconomytuning and browserS13 remain.
+
+Correction checkpoint: serial/automatic parity failure traced to unordered navigation while sleeping, corrected under8f666ac. All72simulatorchecks pass20.999s including actual trace replay and short-visit activity. The16candidate/21trial firstsearch remains explicitly UNTRUSTED; no coefficient tuned from it. Fresh search follows. Phase5 remains active.

@@ -1,0 +1,174 @@
+{
+  "completed_at": "2026-09-13T11:14:36.892845+00:00",
+  "natural_resources_unchanged": {
+    "gold": true,
+    "hp": true,
+    "xp": true,
+    "energy_val": true,
+    "energy_ts": true,
+    "quiver": true,
+    "collection": true,
+    "deck": true,
+    "utility_tools": true,
+    "materials": true,
+    "ledger": true
+  },
+  "natural_changed_fields": [
+    "arrow_choice",
+    "scene_summary",
+    "rng_counter",
+    "hunt_offers",
+    "act_seq",
+    "observed_at"
+  ],
+  "reread_changed_fields": [
+    "observed_at"
+  ],
+  "protected_rows": [
+    {
+      "tenant": "ascent-change-baseline",
+      "player": "owner",
+      "doc_hash": "04c9492a36a5b1a2493fec377f4c6a23",
+      "after_hash": "04c9492a36a5b1a2493fec377f4c6a23",
+      "unchanged": true
+    },
+    {
+      "tenant": "web",
+      "player": "phase3energy2",
+      "doc_hash": "7588621f2a1d08ad7c6385730785bd2f",
+      "after_hash": "7588621f2a1d08ad7c6385730785bd2f",
+      "unchanged": true
+    },
+    {
+      "tenant": "web",
+      "player": "phase3energy5",
+      "doc_hash": "10a0b01b5680ba8d30b65e732429fc8f",
+      "after_hash": "10a0b01b5680ba8d30b65e732429fc8f",
+      "unchanged": true
+    },
+    {
+      "tenant": "web",
+      "player": "phase3gather",
+      "doc_hash": "652a44c5302997e33fb355b4a01b19bc",
+      "after_hash": "652a44c5302997e33fb355b4a01b19bc",
+      "unchanged": true
+    },
+    {
+      "tenant": "web",
+      "player": "phase3mobile",
+      "doc_hash": "fb3c1175f63824ebb5f8f46f6d5e03fd",
+      "after_hash": "fb3c1175f63824ebb5f8f46f6d5e03fd",
+      "unchanged": true
+    },
+    {
+      "tenant": "web",
+      "player": "phase3shield",
+      "doc_hash": "c5fd9406e817f147308ea5c9f7392f43",
+      "after_hash": "c5fd9406e817f147308ea5c9f7392f43",
+      "unchanged": true
+    },
+    {
+      "tenant": "web",
+      "player": "phase3sprout",
+      "doc_hash": "d350ea564b30b083d98021808e8af92f",
+      "after_hash": "d350ea564b30b083d98021808e8af92f",
+      "unchanged": true
+    },
+    {
+      "tenant": "web",
+      "player": "phase4arcane002",
+      "doc_hash": "96b6205ee8ad6ea3df592357968dec2d",
+      "after_hash": "96b6205ee8ad6ea3df592357968dec2d",
+      "unchanged": true
+    },
+    {
+      "tenant": "web",
+      "player": "phase4fire002",
+      "doc_hash": "201fc95f61cd2a2e8dd851e35eaf4c71",
+      "after_hash": "201fc95f61cd2a2e8dd851e35eaf4c71",
+      "unchanged": true
+    },
+    {
+      "tenant": "web",
+      "player": "phase4poison002",
+      "doc_hash": "a4efbdf560c34fed3c79c2c0a2afd724",
+      "after_hash": "a4efbdf560c34fed3c79c2c0a2afd724",
+      "unchanged": true
+    },
+    {
+      "tenant": "web",
+      "player": "qacollectionfixture",
+      "doc_hash": "8ccb98103c122372c99eddcea77449e8",
+      "after_hash": "8ccb98103c122372c99eddcea77449e8",
+      "unchanged": true
+    }
+  ],
+  "luna_tool_calls_per_turn": [
+    {
+      "instruction": "show me the arrows I can use with this bow",
+      "calls": 1,
+      "names": [
+        "ascent_character"
+      ]
+    },
+    {
+      "instruction": "Open my current Arrows drawer so I can see these arrows. Take at most one game action and stop. Do not buy, travel, hunt, or shoot.",
+      "calls": 1,
+      "names": [
+        "ascent_arrows"
+      ]
+    },
+    {
+      "instruction": "Go back from the weapon collection to the current camp. Exactly one game action, then stop. Do not hunt yet.",
+      "calls": 1,
+      "names": [
+        "ascent_choose"
+      ]
+    },
+    {
+      "instruction": "Open one ordinary hunt preview from this floor 1 camp. Exactly one game action, then stop. Do not shoot, attack, start an enemy, or buy anything.",
+      "calls": 1,
+      "names": [
+        "ascent_choose"
+      ]
+    },
+    {
+      "instruction": "Select the owned Common Arcane arrows for my Hawkeye Longbow in this preview. Exactly one game action, then stop. Do not shoot or start either enemy.",
+      "calls": 1,
+      "names": [
+        "ascent_choose"
+      ]
+    },
+    {
+      "instruction": "Leave this unstarted hunt preview now. Exactly one game action, then stop. Do not shoot, attack, open another hunt, or buy anything.",
+      "calls": 1,
+      "names": [
+        "ascent_choose"
+      ]
+    }
+  ],
+  "escape": {
+    "roll": 2642,
+    "normal_counterfactual_threshold": 2000,
+    "slowed_actual_threshold": 2900,
+    "actual_result": {
+      "id": "group:1",
+      "xp": 0,
+      "won": false,
+      "haul": {
+        "gold": 0,
+        "weapons": [],
+        "materials": {}
+      },
+      "count": 2,
+      "floor": 1,
+      "kills": 0,
+      "energy": 1,
+      "events": [],
+      "escaped": true,
+      "exhausted": 0
+    },
+    "unslowed_escape_executed": false
+  },
+  "owned_browser_closed": true
+}

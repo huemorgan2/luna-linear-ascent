@@ -1,0 +1,1 @@
+This first search completed before the CPU parity correction. It is diagnostic only: unordered sleeping-navigation fallback could vary across processes. Keep all 21 raw trials, but do not use these rankings to tune the game or claim a strongest strategy. See phase-5/POLICIES-AND-MEASUREMENTS.md.

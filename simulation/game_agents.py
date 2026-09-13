@@ -17,6 +17,8 @@ POLICIES = {
  'archer':dict(name='Archer',color='#a9c783',path='bow',retreat=.25,description='Buys and trains bows, favors the engine’s treeline shot when available.'),
  'mage':dict(name='Mage',color='#c9a6ec',path='staff',retreat=.25,description='Buys and trains staves, uses the engine’s magic attacks and repairs.'),
  'planner':dict(name='Planner',color='#e8af70',path='staff',retreat=.25,description='Uses counters, carried healing, spare sales and sleep between visits; strategy settings are recorded in the run.'),
+ 'investor':dict(name='Investor',color='#80b8ef',path='bow',retreat=.25,description='Prepares counters and defenses, collects Vault returns and releases savings for concrete upgrades.'),
+ 'random':dict(name='Experimenter',color='#e08fb1',path='blade',retreat=0,description='Makes seeded random legal combat choices, with ordinary preparation and the same time budget.'),
 }
 
 @dataclass
@@ -41,10 +43,14 @@ class GameConfig:
     planner_path:str='staff'
     planner_growth:str='levels'
     planner_margin:int=2
+    collection_deck:tuple=('breach','hawkeye','ember')
+    collection_gather:bool=True
+    collection_investment:float=.35
+    readiness_policy:str='tactician'
     policies:tuple=('learner','tactician','saver','archer','mage','planner')
 
     def to_dict(self):
-        d=asdict(self);d['policies']=list(self.policies);return d
+        d=asdict(self);d['policies']=list(self.policies);d['collection_deck']=list(self.collection_deck);return d
 
     @classmethod
     def from_dict(cls,values):
@@ -56,12 +62,17 @@ class GameConfig:
         if c.probe_mode not in ('session','improvements'):raise ValueError('probe_mode must be session or improvements')
         if c.planner_path not in ('blade','bow','staff'):raise ValueError('planner_path must be blade, bow or staff')
         if c.planner_growth not in ('levels','training'):raise ValueError('planner_growth must be levels or training')
+        from plugin_linear_ascent.engine import collection
+        if type(c.collection_gather) is not bool:raise ValueError('collection_gather must be boolean')
+        if c.readiness_policy not in ('tactician','planner'):raise ValueError('readiness_policy must be tactician or planner')
+        if not isinstance(c.collection_deck,(list,tuple)) or len(c.collection_deck)!=3 or any(f not in collection.families() for f in c.collection_deck):raise ValueError('collection_deck requires three real weapon families')
+        c.collection_deck=tuple(c.collection_deck)
         ints=dict(players=(1,100000),days=(1,3650),seed=(0,2147483647),workers=(0,4096),max_floor=(1,100),
             sessions_per_day=(1,12),readiness_trials=(2,32),probe_every_days=(1,30),max_combat_actions=(10,500),trace_players=(0,100),world_frontier=(0,100),planner_margin=(0,2))
         for k,(lo,hi) in ints.items():
             x=getattr(c,k)
             if type(x) is not int or not lo<=x<=hi:raise ValueError(f'{k} must be an integer {lo}–{hi}')
-        for k,lo,hi in [('minutes_per_day',1,240),('attendance',.1,1),('action_seconds',1,60),('readiness_threshold',.5,1)]:
+        for k,lo,hi in [('minutes_per_day',1,240),('attendance',.1,1),('action_seconds',1,60),('readiness_threshold',.5,1),('collection_investment',0,.8)]:
             x=getattr(c,k)
             if isinstance(x,bool) or not isinstance(x,(float,int)) or not math.isfinite(x) or not lo<=x<=hi:raise ValueError(f'{k} must be {lo}–{hi}')
         if not isinstance(c.policies,(list,tuple)) or not c.policies or any(not isinstance(k,str) or k not in POLICIES for k in c.policies) or len(set(c.policies))!=len(c.policies):raise ValueError('Select distinct known strategies')
@@ -112,7 +123,10 @@ def assess(document,seconds,floor,cfg):
         enemy=deepcopy(in_battle(s.doc));won=False;outcome='action_limit'
         for action in range(cfg.max_combat_actions):
             if s.doc.get('group'):
-                option=fight_choice(s,'tactician',probe=True)
+                if cfg.readiness_policy=='planner':
+                    from .game_strategy import combat_choice
+                    option=combat_choice(s,probe=True)
+                else:option=fight_choice(s,'tactician',probe=True)
             elif cfg.probe_mode=='improvements':
                 from .game_planner import fight
                 option=fight(s)[0]
@@ -137,6 +151,7 @@ class Agent:
         self.timeline=[];self.active=0.;self.actions=0;self.goal=None;self.queue=[];self.target=1;self.end=0;self.last_probe=None
         self.recent=[];self.attempt=None;self.probe_key=None;self.last_win=None
         self.route_history={};self.planner_notes=Counter();self.last_decision_reason='';self.probe_checks=0
+        self.vault_visit=-1
         self.sync_frontier(cfg.world_frontier or 1)
 
     def sync_frontier(self,floor):
@@ -254,6 +269,9 @@ class Agent:
         # scene may describe a room the player has already returned to.
         if not in_battle(self.s.doc):self.s.look()
         if self.cfg.ruleset=='collection-v1':
+            if self.policy in ('planner','investor','random'):
+                from .game_strategy import decide
+                return decide(self)
             from .game_collection import decide
             return decide(self)
         if self.policy=='planner':
@@ -340,7 +358,8 @@ class Agent:
                 while self.s.seconds+self.cfg.action_seconds<=self.end:
                     # Reserve actual action time for the planner's between-visit
                     # rest. The game still charges every navigation/sleep action.
-                    if self.policy=='planner' and not in_battle(self.s.doc) and self.end-self.s.seconds<=6*self.cfg.action_seconds:break
+                    reserve_actions=6 if self.cfg.ruleset=='legacy' else min(10,self.cfg.minutes_per_day*60/self.cfg.sessions_per_day/self.cfg.action_seconds/2)
+                    if self.policy in ('planner','investor','random') and not in_battle(self.s.doc) and self.end-self.s.seconds<=reserve_actions*self.cfg.action_seconds:break
                     with at_time(self.s.seconds):option=self.step()
                     if option is None:break
                     before=(self.s.doc['location'],option)
@@ -354,9 +373,11 @@ class Agent:
                         if repeated>2:self.blocked['refusal_loop']+=1;break
                 # No fabricated end-of-session heal. Sleep and bank use
                 # ordinary game choices within the remaining activity budget.
-                if (visit==self.cfg.sessions_per_day-1 or self.policy=='planner') and not in_battle(self.s.doc):
+                if (visit==self.cfg.sessions_per_day-1 or self.policy in ('planner','investor','random')) and not in_battle(self.s.doc) and not self.s.doc.get('sleeping'):
                     self.s.look()
                     sequence=['vault','deposit_all'] if self.policy=='saver' else []
+                    if self.policy=='investor' and visit==self.cfg.sessions_per_day-1 and self.s.doc['gold']>=20:
+                        sequence=['vault','deposit_half']
                     sequence+=['sleep_menu','sleep_fields']
                     for action in sequence:
                         for _ in range(4):

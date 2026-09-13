@@ -48,6 +48,7 @@ def fight(session,policy,*,probe=False):
 def navigate(agent,room):
     p=agent.s.doc;opts={o.id for o in agent.s.legal()}
     if p.get('group_result'):return 'group_return'
+    if p.get('sleeping'):return 'wake'
     if p.get('collection_view'):return 'collection_back'
     if p.get('workshop_view'):return 'shop_back'
     if p.get('quiver_view'):return None if room=='quiver' else 'arrow_back'
@@ -57,7 +58,7 @@ def navigate(agent,room):
     if room in opts:return room
     if 'town' in opts:return 'town'
     if 'back' in opts:return 'back'
-    return next(iter(opts),None)
+    return None  # No arbitrary UI action is a route to the requested room.
 
 
 def purchase(agent):
