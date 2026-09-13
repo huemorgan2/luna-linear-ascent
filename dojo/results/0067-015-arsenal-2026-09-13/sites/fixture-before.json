@@ -1,0 +1,1411 @@
+{
+  "settings": {
+    "floor": 80,
+    "level": 30,
+    "grade": "Legendary",
+    "weapon_level": 4,
+    "families": [
+      "breach",
+      "hawkeye",
+      "ember"
+    ],
+    "training": {
+      "blade": 6,
+      "bow": 6,
+      "staff": 6
+    },
+    "gear": {
+      "weapon": "starfall",
+      "shield": "gloamguard",
+      "armor": "gloamshroud_mail",
+      "shoes": "stormstep_greaves",
+      "charm": null
+    },
+    "hp": 9838164516,
+    "energy": 20,
+    "gold": 1631022235,
+    "ordinary_arrows": 100
+  },
+  "doc": {
+    "version": 11,
+    "luna_user": "web:phase4site",
+    "stage": "playing",
+    "name": "Phase4Site",
+    "race": "human",
+    "level": 30,
+    "xp": 0,
+    "hp": 9838164516,
+    "gold": 1631023735,
+    "bank": 0,
+    "bank_day": 1,
+    "floor": 0,
+    "location": "gate",
+    "gear": {
+      "weapon": "starfall",
+      "shield": "gloamguard",
+      "armor": "gloamshroud_mail",
+      "shoes": "stormstep_greaves",
+      "charm": null
+    },
+    "hone": {
+      "shield": 0,
+      "armor": 0
+    },
+    "charm_slot": false,
+    "quiver": {
+      "Legendary": {
+        "ordinary": 100
+      }
+    },
+    "oil": {},
+    "charm_dur": 0,
+    "durability": {
+      "weapon": 3481,
+      "armor": 3738,
+      "shield": 3738,
+      "shoes": 2600
+    },
+    "durability_pack": {},
+    "inventory": {},
+    "energy_ts": "2026-01-02T06:00:00+00:00",
+    "energy_val": 20,
+    "lodged_until_day": -1,
+    "last_seen": "2026-09-13T10:49:54.131878+00:00",
+    "news_day": 1,
+    "rng_counter": 1,
+    "scene": {
+      "eyebrow": "FLOOR 80 \u00b7 THE GLOOM \u00b7 HORNSEND",
+      "headline": "Hornsend",
+      "support": "The fire is small but honest. Beyond the wire, the wilds.",
+      "shard_note": "",
+      "workshop": null,
+      "collection": {
+        "material_icons": {
+          "Wood": "mat_wood",
+          "Raw Metal": "mat_raw_metal",
+          "Hardwood": "mat_hardwood",
+          "Steel": "mat_steel",
+          "Meteorite": "mat_meteorite",
+          "Starforged Steel": "mat_starsteel",
+          "Mythic Threads": "mat_threads",
+          "Shard Matter": "mat_shard"
+        },
+        "material_grades": {
+          "Wood": "Common",
+          "Raw Metal": "Common",
+          "Hardwood": "Rare",
+          "Steel": "Rare",
+          "Meteorite": "Epic",
+          "Starforged Steel": "Epic",
+          "Mythic Threads": "Legendary",
+          "Shard Matter": "Legendary"
+        },
+        "quiver": {
+          "stock": {
+            "Legendary": {
+              "ordinary": 100
+            }
+          },
+          "used": 100,
+          "capacity": 400,
+          "choices": {},
+          "types": [
+            {
+              "id": "ordinary",
+              "name": "Ordinary",
+              "channel": "Power",
+              "impact": 1,
+              "effect": "No added effect",
+              "units": 1,
+              "status": "",
+              "offers": [
+                {
+                  "grade": "Common",
+                  "arrow": "ordinary",
+                  "floor": 1,
+                  "count": 20,
+                  "gold": 5,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Rare",
+                  "arrow": "ordinary",
+                  "floor": 26,
+                  "count": 20,
+                  "gold": 1324,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Epic",
+                  "arrow": "ordinary",
+                  "floor": 51,
+                  "count": 20,
+                  "gold": 350325,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Legendary",
+                  "arrow": "ordinary",
+                  "floor": 76,
+                  "count": 20,
+                  "gold": 92730154,
+                  "owned": 100,
+                  "unlocked": true
+                }
+              ]
+            },
+            {
+              "id": "arcane",
+              "name": "Arcane",
+              "channel": "Magic",
+              "impact": 1,
+              "effect": "Converts the direct hit to Magic",
+              "units": 2,
+              "status": "",
+              "offers": [
+                {
+                  "grade": "Common",
+                  "arrow": "arcane",
+                  "floor": 1,
+                  "count": 20,
+                  "gold": 10,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Rare",
+                  "arrow": "arcane",
+                  "floor": 26,
+                  "count": 20,
+                  "gold": 2647,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Epic",
+                  "arrow": "arcane",
+                  "floor": 51,
+                  "count": 20,
+                  "gold": 700650,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Legendary",
+                  "arrow": "arcane",
+                  "floor": 76,
+                  "count": 20,
+                  "gold": 185460308,
+                  "owned": 0,
+                  "unlocked": true
+                }
+              ]
+            },
+            {
+              "id": "poison",
+              "name": "Poison",
+              "channel": "Power",
+              "impact": 0.9,
+              "effect": "Poison: 8% \u00d7 3 phases",
+              "units": 2,
+              "status": "poison",
+              "offers": [
+                {
+                  "grade": "Common",
+                  "arrow": "poison",
+                  "floor": 1,
+                  "count": 20,
+                  "gold": 10,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Rare",
+                  "arrow": "poison",
+                  "floor": 26,
+                  "count": 20,
+                  "gold": 2647,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Epic",
+                  "arrow": "poison",
+                  "floor": 51,
+                  "count": 20,
+                  "gold": 700650,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Legendary",
+                  "arrow": "poison",
+                  "floor": 76,
+                  "count": 20,
+                  "gold": 185460308,
+                  "owned": 0,
+                  "unlocked": true
+                }
+              ]
+            },
+            {
+              "id": "fire",
+              "name": "Fire",
+              "channel": "Power",
+              "impact": 0.9,
+              "effect": "Magic burn: 12% \u00d7 2 phases",
+              "units": 3,
+              "status": "burn",
+              "offers": [
+                {
+                  "grade": "Common",
+                  "arrow": "fire",
+                  "floor": 1,
+                  "count": 20,
+                  "gold": 15,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Rare",
+                  "arrow": "fire",
+                  "floor": 26,
+                  "count": 20,
+                  "gold": 3971,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Epic",
+                  "arrow": "fire",
+                  "floor": 51,
+                  "count": 20,
+                  "gold": 1050974,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Legendary",
+                  "arrow": "fire",
+                  "floor": 76,
+                  "count": 20,
+                  "gold": 278190462,
+                  "owned": 0,
+                  "unlocked": true
+                }
+              ]
+            },
+            {
+              "id": "pinning",
+              "name": "Pinning",
+              "channel": "Power",
+              "impact": 0.85,
+              "effect": "Slow: \u22123 speed, 2 phases",
+              "units": 2,
+              "status": "slow",
+              "offers": [
+                {
+                  "grade": "Common",
+                  "arrow": "pinning",
+                  "floor": 1,
+                  "count": 20,
+                  "gold": 10,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Rare",
+                  "arrow": "pinning",
+                  "floor": 26,
+                  "count": 20,
+                  "gold": 2647,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Epic",
+                  "arrow": "pinning",
+                  "floor": 51,
+                  "count": 20,
+                  "gold": 700650,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Legendary",
+                  "arrow": "pinning",
+                  "floor": 76,
+                  "count": 20,
+                  "gold": 185460308,
+                  "owned": 0,
+                  "unlocked": true
+                }
+              ]
+            },
+            {
+              "id": "concussive",
+              "name": "Concussive",
+              "channel": "Power",
+              "impact": 0.8,
+              "effect": "Push: 2 steps",
+              "units": 3,
+              "status": "push",
+              "offers": [
+                {
+                  "grade": "Common",
+                  "arrow": "concussive",
+                  "floor": 1,
+                  "count": 20,
+                  "gold": 15,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Rare",
+                  "arrow": "concussive",
+                  "floor": 26,
+                  "count": 20,
+                  "gold": 3971,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Epic",
+                  "arrow": "concussive",
+                  "floor": 51,
+                  "count": 20,
+                  "gold": 1050974,
+                  "owned": 0,
+                  "unlocked": true
+                },
+                {
+                  "grade": "Legendary",
+                  "arrow": "concussive",
+                  "floor": 76,
+                  "count": 20,
+                  "gold": 278190462,
+                  "owned": 0,
+                  "unlocked": true
+                }
+              ]
+            }
+          ],
+          "bows": [
+            {
+              "id": "8c02fe3658aa6281ac16b32383a802d0",
+              "name": "Hawkeye Longbow",
+              "grade": "Legendary",
+              "selected": "ordinary",
+              "selected_name": "Ordinary",
+              "remaining": 100
+            }
+          ],
+          "finite": true,
+          "arrows_per_accepted_shot": 1,
+          "miss_consumes_arrow": true,
+          "replenishment": "Buy bundles of20 at the Forge arrow supplies rack. Match the bow grade.",
+          "selection": "During a group, choose a stocked payload on the bow card for free before shooting."
+        },
+        "resource_sites": [
+          {
+            "key": "drowned-copse",
+            "name": "Drowned Copse",
+            "floor": 3,
+            "material": "Wood",
+            "tool": "wood-axe",
+            "tool_name": "Wood axe",
+            "price": 35,
+            "yield_pct": 58,
+            "yield_amount": 2,
+            "ambush_pct": 5,
+            "condition": 100,
+            "preferred": "bow",
+            "description": "Cut driftwood beneath the drowned canopy. Wings stir overhead.",
+            "available": true,
+            "entry_action": "gather_site:drowned-copse",
+            "tool_sold_here": true,
+            "entry_requires_tool": false,
+            "gather_requires_tool": true,
+            "route": "Tower gate \u2192 floor 3 camp \u2192 Drowned Copse"
+          },
+          {
+            "key": "bog-iron-field",
+            "name": "Bog-Iron Field",
+            "floor": 3,
+            "material": "Raw Metal",
+            "tool": "pickaxe",
+            "tool_name": "Iron pickaxe",
+            "price": 45,
+            "yield_pct": 47,
+            "yield_amount": 2,
+            "ambush_pct": 4,
+            "condition": 120,
+            "preferred": "blade",
+            "description": "Break iron from the wet earth. Arcane creatures guard the exposed seams.",
+            "available": true,
+            "entry_action": "gather_site:bog-iron-field",
+            "tool_sold_here": true,
+            "entry_requires_tool": false,
+            "gather_requires_tool": true,
+            "route": "Tower gate \u2192 floor 3 camp \u2192 Bog-Iron Field"
+          },
+          {
+            "key": "tempered-scrap-seam",
+            "name": "Tempered Scrap Seam",
+            "floor": 18,
+            "material": "Steel",
+            "tool": "hardened-pickaxe",
+            "tool_name": "Hardened pickaxe",
+            "price": 1422,
+            "yield_pct": 52,
+            "yield_amount": 3,
+            "ambush_pct": 5,
+            "condition": 140,
+            "preferred": "blade",
+            "description": "Prise tempered steel from buried machinery. Magic-bound remnants guard the seam.",
+            "ambush_size": 2,
+            "roster": [
+              {
+                "floor": 17,
+                "id": "heat_haunt",
+                "weight": 7
+              },
+              {
+                "floor": 18,
+                "id": "blind_digger",
+                "weight": 2
+              },
+              {
+                "floor": 18,
+                "id": "winch_crawler",
+                "weight": 2
+              },
+              {
+                "floor": 19,
+                "id": "breach_crow",
+                "weight": 1
+              }
+            ],
+            "available": true,
+            "entry_action": "gather_site:tempered-scrap-seam",
+            "tool_sold_here": true,
+            "entry_requires_tool": false,
+            "gather_requires_tool": true,
+            "route": "Tower gate \u2192 floor 18 camp \u2192 Tempered Scrap Seam"
+          },
+          {
+            "key": "buried-heartwood-grove",
+            "name": "Buried Heartwood Grove",
+            "floor": 25,
+            "material": "Hardwood",
+            "tool": "steel-wood-axe",
+            "tool_name": "Steel wood axe",
+            "price": 5930,
+            "yield_pct": 61,
+            "yield_amount": 3,
+            "ambush_pct": 6,
+            "condition": 160,
+            "preferred": "bow",
+            "description": "Cut dense roots beside the processional forest. Moths and wisps circle the old canopy.",
+            "ambush_size": 2,
+            "roster": [
+              {
+                "floor": 23,
+                "id": "lamp_moth",
+                "weight": 5
+              },
+              {
+                "floor": 25,
+                "id": "bell_wisp",
+                "weight": 5
+              },
+              {
+                "floor": 25,
+                "id": "procession_wight",
+                "weight": 1
+              },
+              {
+                "floor": 25,
+                "id": "coffin_bearer",
+                "weight": 1
+              }
+            ],
+            "available": true,
+            "entry_action": "gather_site:buried-heartwood-grove",
+            "tool_sold_here": true,
+            "entry_requires_tool": false,
+            "gather_requires_tool": true,
+            "route": "Tower gate \u2192 floor 25 camp \u2192 Buried Heartwood Grove"
+          },
+          {
+            "key": "starforge-slag-beds",
+            "name": "Starforge Slag Beds",
+            "floor": 45,
+            "material": "Starforged Steel",
+            "tool": "heat-kit",
+            "tool_name": "Heat-resistant kit",
+            "price": 697950,
+            "yield_pct": 49,
+            "yield_amount": 4,
+            "ambush_pct": 5,
+            "condition": 180,
+            "preferred": "blade",
+            "description": "Sift hot steel from cooled slag. Rune-marked salamanders stalk the beds.",
+            "ambush_size": 3,
+            "roster": [
+              {
+                "floor": 43,
+                "id": "slag_salamander",
+                "weight": 6
+              },
+              {
+                "floor": 47,
+                "id": "scar_salamander",
+                "weight": 6
+              },
+              {
+                "floor": 43,
+                "id": "clinker_hound",
+                "weight": 2
+              },
+              {
+                "floor": 43,
+                "id": "cinder_bat",
+                "weight": 1
+              }
+            ],
+            "available": true,
+            "entry_action": "gather_site:starforge-slag-beds",
+            "tool_sold_here": true,
+            "entry_requires_tool": false,
+            "gather_requires_tool": true,
+            "route": "Tower gate \u2192 floor 45 camp \u2192 Starforge Slag Beds"
+          },
+          {
+            "key": "fallen-star-crater",
+            "name": "Fallen-Star Crater",
+            "floor": 55,
+            "material": "Meteorite",
+            "tool": "impact-pick",
+            "tool_name": "Impact pick",
+            "price": 5131709,
+            "yield_pct": 57,
+            "yield_amount": 4,
+            "ambush_pct": 7,
+            "condition": 200,
+            "preferred": "bow",
+            "description": "Split starstone on the crater rim. Ravens and quarry hunters shelter in the broken rock.",
+            "ambush_size": 3,
+            "roster": [
+              {
+                "floor": 54,
+                "id": "gorge_raven",
+                "weight": 6
+              },
+              {
+                "floor": 56,
+                "id": "quarry_crow",
+                "weight": 6
+              },
+              {
+                "floor": 56,
+                "id": "quarry_troll",
+                "weight": 2
+              },
+              {
+                "floor": 54,
+                "id": "crevasse_wight",
+                "weight": 1
+              }
+            ],
+            "available": true,
+            "entry_action": "gather_site:fallen-star-crater",
+            "tool_sold_here": true,
+            "entry_requires_tool": false,
+            "gather_requires_tool": true,
+            "route": "Tower gate \u2192 floor 55 camp \u2192 Fallen-Star Crater"
+          },
+          {
+            "key": "shard-fissure",
+            "name": "Shard Fissure",
+            "floor": 70,
+            "material": "Shard Matter",
+            "tool": "shard-extractor",
+            "tool_name": "Shard extractor",
+            "price": 204192689,
+            "yield_pct": 43,
+            "yield_amount": 5,
+            "ambush_pct": 6,
+            "condition": 220,
+            "preferred": "blade",
+            "description": "Lift shards from a singing fracture. Bound gales and pressure ghosts gather at its mouth.",
+            "ambush_size": 3,
+            "roster": [
+              {
+                "floor": 69,
+                "id": "pressure_ghast",
+                "weight": 6
+              },
+              {
+                "floor": 70,
+                "id": "bottled_gale",
+                "weight": 6
+              },
+              {
+                "floor": 70,
+                "id": "livery_harpy",
+                "weight": 2
+              },
+              {
+                "floor": 70,
+                "id": "court_champion",
+                "weight": 1
+              }
+            ],
+            "available": true,
+            "entry_action": "gather_site:shard-fissure",
+            "tool_sold_here": true,
+            "entry_requires_tool": false,
+            "gather_requires_tool": true,
+            "route": "Tower gate \u2192 floor 70 camp \u2192 Shard Fissure"
+          },
+          {
+            "key": "mythic-loom-hollow",
+            "name": "Mythic Loom Hollow",
+            "floor": 80,
+            "material": "Mythic Threads",
+            "tool": "harvesting-shears",
+            "tool_name": "Harvesting shears",
+            "price": 1630022235,
+            "yield_pct": 54,
+            "yield_amount": 5,
+            "ambush_pct": 8,
+            "condition": 240,
+            "preferred": "bow",
+            "description": "Take threads from abandoned sky-nests. Pale scavengers keep watch above the hollow.",
+            "ambush_size": 3,
+            "roster": [
+              {
+                "floor": 79,
+                "id": "stand_crow",
+                "weight": 6
+              },
+              {
+                "floor": 81,
+                "id": "outwork_crow",
+                "weight": 6
+              },
+              {
+                "floor": 80,
+                "id": "first_whip",
+                "weight": 2
+              },
+              {
+                "floor": 81,
+                "id": "gate_knight",
+                "weight": 1
+              }
+            ],
+            "available": true,
+            "entry_action": "gather_site:mythic-loom-hollow",
+            "tool_sold_here": true,
+            "entry_requires_tool": false,
+            "gather_requires_tool": true,
+            "route": "Tower gate \u2192 floor 80 camp \u2192 Mythic Loom Hollow"
+          }
+        ],
+        "pack_used": 0,
+        "pack_cap": 6,
+        "claims": [],
+        "deck": [
+          "0acc3a5cbc4e889b3e17534091c2b514",
+          "8c02fe3658aa6281ac16b32383a802d0",
+          "9d70dd6ef1f6a889b99c7552c4adaea0"
+        ],
+        "items": [
+          {
+            "id": "0acc3a5cbc4e889b3e17534091c2b514",
+            "family": "breach",
+            "grade": "Legendary",
+            "level": 4,
+            "durability": 3481,
+            "maximum": 3481,
+            "source": "craft",
+            "attack": 5462934019,
+            "floor": 80,
+            "path": "blade",
+            "name": "Breach Cleaver",
+            "current_attack": 5462934019,
+            "location": "carried",
+            "image": "weapons/large/starfall_100x160.png",
+            "effect": "Heavy impact",
+            "description": "The strongest plain blade hit. No status setup or control.",
+            "quote": {
+              "level": 5,
+              "floor": 81,
+              "gold": 65065548204,
+              "materials": {
+                "Mythic Threads": 46,
+                "Shard Matter": 138
+              }
+            },
+            "can_afford": false,
+            "selected": true,
+            "active": true
+          },
+          {
+            "id": "8c02fe3658aa6281ac16b32383a802d0",
+            "family": "hawkeye",
+            "grade": "Legendary",
+            "level": 4,
+            "durability": 3868,
+            "maximum": 3868,
+            "source": "craft",
+            "attack": 5225415149,
+            "floor": 80,
+            "path": "bow",
+            "name": "Hawkeye Longbow",
+            "current_attack": 5225415149,
+            "location": "carried",
+            "image": "weapons/large/starshot_100x160.png",
+            "effect": "Cover shot",
+            "description": "A readied shot at distance 2\u20133 adds 20% direct damage.",
+            "quote": {
+              "level": 5,
+              "floor": 81,
+              "gold": 65065548204,
+              "materials": {
+                "Mythic Threads": 138,
+                "Shard Matter": 46
+              }
+            },
+            "can_afford": false,
+            "selected": true,
+            "active": false
+          },
+          {
+            "id": "9d70dd6ef1f6a889b99c7552c4adaea0",
+            "family": "ember",
+            "grade": "Legendary",
+            "level": 4,
+            "durability": 3868,
+            "maximum": 3868,
+            "source": "craft",
+            "attack": 4037820797,
+            "floor": 80,
+            "path": "staff",
+            "name": "Ember Staff",
+            "current_attack": 4037820797,
+            "location": "carried",
+            "image": "weapons/large/wyrmtongue_staff_100x160.png",
+            "effect": "Burn",
+            "description": "Ignition adds 12% source attack for two phases as Magic.",
+            "quote": {
+              "level": 5,
+              "floor": 81,
+              "gold": 68163907642,
+              "materials": {
+                "Mythic Threads": 92,
+                "Shard Matter": 92
+              }
+            },
+            "can_afford": false,
+            "selected": true,
+            "active": false
+          },
+          {
+            "id": "7e8aebdaedddea04ca1167231ca37012",
+            "family": "breach",
+            "grade": "Common",
+            "level": 0,
+            "durability": 1170,
+            "maximum": 1170,
+            "source": "starter",
+            "attack": 9,
+            "floor": 1,
+            "path": "blade",
+            "name": "Breach Cleaver",
+            "current_attack": 9,
+            "location": "storage",
+            "image": "weapons/large/notched_cleaver_100x160.png",
+            "effect": "Heavy impact",
+            "description": "The strongest plain blade hit. No status setup or control.",
+            "quote": {
+              "level": 1,
+              "floor": 2,
+              "gold": 171,
+              "materials": {
+                "Wood": 2,
+                "Raw Metal": 6
+              }
+            },
+            "can_afford": false,
+            "selected": false,
+            "active": false
+          },
+          {
+            "id": "f9dad78c3038e99eaaefa17c7ad486a0",
+            "family": "ember",
+            "grade": "Common",
+            "level": 0,
+            "durability": 1300,
+            "maximum": 1300,
+            "source": "starter",
+            "attack": 7,
+            "floor": 1,
+            "path": "staff",
+            "name": "Ember Staff",
+            "current_attack": 7,
+            "location": "storage",
+            "image": "weapons/large/kindling_rod_100x160.png",
+            "effect": "Burn",
+            "description": "Ignition adds 12% source attack for two phases as Magic.",
+            "quote": {
+              "level": 1,
+              "floor": 2,
+              "gold": 179,
+              "materials": {
+                "Wood": 4,
+                "Raw Metal": 4
+              }
+            },
+            "can_afford": false,
+            "selected": false,
+            "active": false
+          },
+          {
+            "id": "b03dee5ba9133594937adbb2b68e2109",
+            "family": "hawkeye",
+            "grade": "Common",
+            "level": 0,
+            "durability": 1300,
+            "maximum": 1300,
+            "source": "starter",
+            "attack": 9,
+            "floor": 1,
+            "path": "bow",
+            "name": "Hawkeye Longbow",
+            "current_attack": 9,
+            "location": "storage",
+            "image": "weapons/large/green_hazel_bow_100x160.png",
+            "effect": "Cover shot",
+            "description": "A readied shot at distance 2\u20133 adds 20% direct damage.",
+            "quote": {
+              "level": 1,
+              "floor": 2,
+              "gold": 171,
+              "materials": {
+                "Wood": 6,
+                "Raw Metal": 2
+              }
+            },
+            "can_afford": false,
+            "selected": false,
+            "active": false
+          }
+        ],
+        "locked": false,
+        "materials": {},
+        "gold": 1631022235,
+        "xp_reserve": 0,
+        "selected": null,
+        "screen": false
+      },
+      "group": null,
+      "expedition": null,
+      "combat_events": [],
+      "body_lines": [],
+      "options": [
+        {
+          "id": "hunt",
+          "label": "Hunt a monster group",
+          "hint": "1 energy per enemy when it begins",
+          "aether": false,
+          "locked": false
+        },
+        {
+          "id": "hunt_deep",
+          "label": "Hunt deep \u2014 off the lit paths",
+          "hint": "1 energy per enemy \u00b7 better material and weapon drops",
+          "aether": false,
+          "locked": false
+        },
+        {
+          "id": "gather_site:mythic-loom-hollow",
+          "label": "Mythic Loom Hollow",
+          "hint": "Collect Mythic Threads \u00b7 Harvesting shears sold here \u00b7 1630022235 gold",
+          "aether": false,
+          "locked": false
+        },
+        {
+          "id": "keep",
+          "label": "The Warden's keep \u2014 The Pale Huntsman",
+          "hint": "3 \u26a1 a swing",
+          "aether": false,
+          "locked": false
+        },
+        {
+          "id": "gate",
+          "label": "The Tower Gate",
+          "hint": "change floors from here",
+          "aether": false,
+          "locked": false
+        },
+        {
+          "id": "town",
+          "label": "Return to Roothollow",
+          "hint": "",
+          "aether": false,
+          "locked": false
+        },
+        {
+          "id": "collection",
+          "label": "Weapon collection",
+          "hint": "your three battle slots",
+          "aether": false,
+          "locked": false
+        }
+      ],
+      "option_badges": {},
+      "option_danger": [],
+      "option_nest": [],
+      "option_section": {},
+      "meters": {
+        "hp": 9838164516,
+        "hp_max": 9838164516,
+        "energy": 20,
+        "energy_max": 32,
+        "xp": 0,
+        "xp_need": 3944,
+        "gold": 1631022235,
+        "level": 30,
+        "atk": 5462940065,
+        "dfs": 4216315337,
+        "spd": 10,
+        "name": "Simclimber",
+        "race": "human",
+        "clazz": "blade",
+        "faction": "",
+        "faction_banner": "",
+        "faction_color": "",
+        "faction_members": 0,
+        "faction_online": 0,
+        "factions_total": -1,
+        "line": "blade",
+        "gear": [
+          "gloamshroud_mail",
+          "stormstep_greaves",
+          "gloamguard",
+          "starfall",
+          "starshot",
+          "wyrmtongue_staff"
+        ],
+        "xp_reserve": 0
+      },
+      "event_kind": "",
+      "banner": "",
+      "banner_variant": "",
+      "banner_ink": "",
+      "fx": "",
+      "scene_id": "s12",
+      "awaits_text": "",
+      "inventory": [],
+      "pack_slots": 6,
+      "tally": [],
+      "notices": [],
+      "ask": null,
+      "gallery": [],
+      "paper": null,
+      "strip": null,
+      "enemy": null,
+      "option_art": {
+        "hunt": "huntsman",
+        "hunt_deep": "huntsman",
+        "keep": "warden_080"
+      },
+      "grid": false,
+      "npc": null,
+      "activity": "",
+      "location": "gate_town",
+      "players_here": [],
+      "players_title": "",
+      "players_total": 0,
+      "refusal": "",
+      "kill3d": null,
+      "labs": [],
+      "arena": null,
+      "map": null,
+      "foe_sheet": null,
+      "slots": [
+        {
+          "key": "charm",
+          "side": "left",
+          "row": 0,
+          "label": "charm / potion",
+          "kind": "charm",
+          "state": "locked",
+          "lock_text": "Locked \u2014 the charm pouch. School, level 9: 400 XP and a fee. Holds one charm or potion.",
+          "slug": "",
+          "name": "",
+          "icon": "lock",
+          "count": 0
+        },
+        {
+          "key": "armor",
+          "side": "left",
+          "row": 1,
+          "label": "armour",
+          "kind": "armor",
+          "state": "filled",
+          "lock_text": "",
+          "slug": "gloamshroud_mail",
+          "name": "Gloamshroud Mail",
+          "icon": "armor",
+          "count": 1,
+          "equipped": true,
+          "stat_name": "DEF",
+          "stat_val": 2459514929,
+          "dur": 1.0,
+          "dur_left": 1532277800767,
+          "dur_max": 1532277800767,
+          "lead": false,
+          "acts": [
+            {
+              "opt": "unequip_armor",
+              "label": "Move to the pack",
+              "hint": "the Gloamshroud Mail rides in the pack \u2014 it does nothing there"
+            }
+          ]
+        },
+        {
+          "key": "shoes",
+          "side": "left",
+          "row": 2,
+          "label": "boots",
+          "kind": "shoes",
+          "state": "filled",
+          "lock_text": "",
+          "slug": "stormstep_greaves",
+          "name": "Stormstep Greaves",
+          "icon": "shoes",
+          "count": 1,
+          "equipped": true,
+          "stat_name": "DEF",
+          "stat_val": 0,
+          "dur": 1.0,
+          "dur_left": 2600,
+          "dur_max": 2600,
+          "lead": false,
+          "acts": [
+            {
+              "opt": "unequip_shoes",
+              "label": "Move to the pack",
+              "hint": "the Stormstep Greaves rides in the pack \u2014 it does nothing there"
+            }
+          ]
+        },
+        {
+          "key": "shield",
+          "side": "right",
+          "row": 0,
+          "label": "shield",
+          "kind": "shield",
+          "state": "filled",
+          "lock_text": "",
+          "slug": "gloamguard",
+          "name": "Gloamguard",
+          "icon": "shield",
+          "count": 1,
+          "equipped": true,
+          "stat_name": "DEF",
+          "stat_val": 1756796377,
+          "dur": 1.0,
+          "dur_left": 87839818850,
+          "dur_max": 87839818850,
+          "lead": false,
+          "acts": [
+            {
+              "opt": "unequip_shield",
+              "label": "Move to the pack",
+              "hint": "the Gloamguard rides in the pack \u2014 it does nothing there"
+            }
+          ]
+        },
+        {
+          "key": "weapon",
+          "side": "right",
+          "row": 1,
+          "label": "weapon",
+          "kind": "weapon",
+          "state": "filled",
+          "lock_text": "",
+          "slug": "",
+          "name": "Breach Cleaver",
+          "icon": "sword",
+          "count": 1,
+          "equipped": true,
+          "stat_name": "ATK",
+          "stat_val": 5462934019,
+          "dur": 1.0,
+          "dur_left": 3481,
+          "dur_max": 3481,
+          "lead": true,
+          "acts": [
+            {
+              "opt": "inspect:0acc3a5cbc4e889b3e17534091c2b514",
+              "label": "View weapon",
+              "hint": "collection and upgrades"
+            }
+          ],
+          "why": "",
+          "instance_id": "0acc3a5cbc4e889b3e17534091c2b514",
+          "grade": "Legendary",
+          "level": 4
+        },
+        {
+          "key": "weapon2",
+          "side": "right",
+          "row": 2,
+          "label": "weapon 2",
+          "kind": "weapon",
+          "state": "filled",
+          "lock_text": "",
+          "slug": "",
+          "name": "Hawkeye Longbow",
+          "icon": "bow",
+          "count": 1,
+          "equipped": true,
+          "stat_name": "ATK",
+          "stat_val": 5225415149,
+          "lead": false,
+          "acts": [
+            {
+              "opt": "inspect:8c02fe3658aa6281ac16b32383a802d0",
+              "label": "View weapon",
+              "hint": "collection and upgrades"
+            }
+          ],
+          "why": "",
+          "instance_id": "8c02fe3658aa6281ac16b32383a802d0",
+          "grade": "Legendary",
+          "level": 4,
+          "dur": 1.0,
+          "dur_left": 3868,
+          "dur_max": 3868
+        },
+        {
+          "key": "weapon3",
+          "side": "right",
+          "row": 3,
+          "label": "weapon 3",
+          "kind": "weapon",
+          "state": "filled",
+          "lock_text": "",
+          "slug": "",
+          "name": "Ember Staff",
+          "icon": "staff",
+          "count": 1,
+          "equipped": true,
+          "stat_name": "ATK",
+          "stat_val": 4037820797,
+          "lead": false,
+          "acts": [
+            {
+              "opt": "inspect:9d70dd6ef1f6a889b99c7552c4adaea0",
+              "label": "View weapon",
+              "hint": "collection and upgrades"
+            }
+          ],
+          "why": "",
+          "instance_id": "9d70dd6ef1f6a889b99c7552c4adaea0",
+          "grade": "Legendary",
+          "level": 4,
+          "dur": 1.0,
+          "dur_left": 3868,
+          "dur_max": 3868
+        }
+      ],
+      "figure3d": null,
+      "avatar": null,
+      "lift": ""
+    },
+    "encounter": null,
+    "unlocked_floor": 80,
+    "flags": {},
+    "daily": {
+      "day": 255,
+      "pvp_used": 0,
+      "energy_cell": false,
+      "death_save": false,
+      "dawn_healed": false,
+      "night_yield": null
+    },
+    "sidekick": {
+      "insight": 1,
+      "carried": null
+    },
+    "telemetry_day": 1,
+    "training": {
+      "blade": 6,
+      "bow": 6,
+      "staff": 6
+    },
+    "slots": 3,
+    "held": [
+      "starfall",
+      "starshot",
+      "wyrmtongue_staff"
+    ],
+    "labs": {},
+    "born_ruleset": "collection-v1",
+    "pack_slots": 6,
+    "act_seq": 12,
+    "intro_step": 9,
+    "collection": {
+      "7e8aebdaedddea04ca1167231ca37012": {
+        "id": "7e8aebdaedddea04ca1167231ca37012",
+        "family": "breach",
+        "grade": "Common",
+        "level": 0,
+        "source": "starter",
+        "provenance": {
+          "receipt": "migration:held:rusted_sword:0",
+          "owner": "prepared-v2:late-browser:80"
+        },
+        "location": "storage",
+        "durability": 1170,
+        "maximum": 1170
+      },
+      "b03dee5ba9133594937adbb2b68e2109": {
+        "id": "b03dee5ba9133594937adbb2b68e2109",
+        "family": "hawkeye",
+        "grade": "Common",
+        "level": 0,
+        "source": "starter",
+        "provenance": {
+          "receipt": "starter:bow",
+          "owner": "prepared-v2:late-browser:80"
+        },
+        "location": "storage",
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "f9dad78c3038e99eaaefa17c7ad486a0": {
+        "id": "f9dad78c3038e99eaaefa17c7ad486a0",
+        "family": "ember",
+        "grade": "Common",
+        "level": 0,
+        "source": "starter",
+        "provenance": {
+          "receipt": "starter:staff",
+          "owner": "prepared-v2:late-browser:80"
+        },
+        "location": "storage",
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "0acc3a5cbc4e889b3e17534091c2b514": {
+        "id": "0acc3a5cbc4e889b3e17534091c2b514",
+        "family": "breach",
+        "grade": "Legendary",
+        "level": 4,
+        "source": "craft",
+        "provenance": {
+          "receipt": "",
+          "owner": "prepared-v2:late-browser:80"
+        },
+        "location": "carried",
+        "durability": 3481,
+        "maximum": 3481
+      },
+      "8c02fe3658aa6281ac16b32383a802d0": {
+        "id": "8c02fe3658aa6281ac16b32383a802d0",
+        "family": "hawkeye",
+        "grade": "Legendary",
+        "level": 4,
+        "source": "craft",
+        "provenance": {
+          "receipt": "",
+          "owner": "prepared-v2:late-browser:80"
+        },
+        "location": "carried",
+        "durability": 3868,
+        "maximum": 3868
+      },
+      "9d70dd6ef1f6a889b99c7552c4adaea0": {
+        "id": "9d70dd6ef1f6a889b99c7552c4adaea0",
+        "family": "ember",
+        "grade": "Legendary",
+        "level": 4,
+        "source": "craft",
+        "provenance": {
+          "receipt": "",
+          "owner": "prepared-v2:late-browser:80"
+        },
+        "location": "carried",
+        "durability": 3868,
+        "maximum": 3868
+      }
+    },
+    "deck": [
+      "0acc3a5cbc4e889b3e17534091c2b514",
+      "8c02fe3658aa6281ac16b32383a802d0",
+      "9d70dd6ef1f6a889b99c7552c4adaea0"
+    ],
+    "active_weapon": "0acc3a5cbc4e889b3e17534091c2b514",
+    "item_sequence": 6,
+    "item_receipts": {
+      "migration:held:rusted_sword:0": "7e8aebdaedddea04ca1167231ca37012",
+      "starter:bow": "b03dee5ba9133594937adbb2b68e2109",
+      "starter:staff": "f9dad78c3038e99eaaefa17c7ad486a0"
+    },
+    "group": null,
+    "expedition": null,
+    "xp_reserve": 0,
+    "materials": {},
+    "utility_tools": {},
+    "ruleset": "collection-v1",
+    "collection_migration": {
+      "id": "collection-v1",
+      "status": "applied",
+      "legacy": {
+        "held": [
+          "rusted_sword"
+        ],
+        "gear": {
+          "weapon": "rusted_sword",
+          "shield": "gate_buckler",
+          "armor": "gate_jerkin",
+          "shoes": null,
+          "charm": null
+        },
+        "inventory": {},
+        "durability": {
+          "weapon": 1300
+        },
+        "durability_pack": {},
+        "hone": {
+          "shield": 0,
+          "armor": 0
+        },
+        "oil": {},
+        "slots": 1
+      },
+      "refund": {
+        "gold": 0,
+        "xp": 0,
+        "basis": "recorded receipts"
+      },
+      "count": 1
+    },
+    "starter_deck_received": true,
+    "quiver_enrollment": "quiver-v1",
+    "arrow_choice": {},
+    "interest_due": [],
+    "groups_cleared": 1,
+    "qa_fixture": "Declared late-site web fixture; no natural-progression claim"
+  }
+}

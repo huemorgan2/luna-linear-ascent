@@ -1,0 +1,109 @@
+Bow legally fires from the gap preserved by Push. Next Rust hound should retain its declared Near arrival.
+
+GAME
+SCORE
+COMMUNITY
+FLOOR 2 · HUNT
+Rust h
+× Shellback tortoise
+Power resisted · 5
+2 Rust hound
+ Common
+ Ground
+ 5 speed
+
+Traits: lean
+
+8 ATK · 1 DEF · Power ×1.25 · Magic ×1.25
+
+Drop chances for this enemy
+ 29 / 29 HP
+Contact
+Near
+Far
+Cover
+
+WAITING · 1 energy when this enemy begins
+
+3 XP kept · 13 gold pending
+Ramguard Sword +0
+Blade · 7 ATK
+1559/1560
+Hawkeye Longbow +0
+Bow · 9 ATK
+1298/1300
+Ember Staff +0
+Staff · 7 ATK
+1300/1300
+1 Ramguard Sword
+Move to contact first
+2 Knockback · Ramguard Sword
+Move to contact first
+3 Hawkeye Longbow
+Fire · Power · 2 left
+4 Cover shot · Hawkeye Longbow
+Adds 20% at Far (2) or Cover (3). No bonus at this distance.
+5 Ember Staff
+Staff strike
+6 Burn · Ember Staff
+Ignition adds 12% source attack for two phases as Magic.
+7 Close in
+Near
+8 Pull back
+Speed decides the opening
+9 Guard
+Stronger shield absorption; some damage gets through
+10 Leave and lose the pending haul
+Keep earned XP
+17 Weapon collection
+your three battle slots
+Common Hawkeye Longbow
+
+Choose arrows · selection is free
+
+11 Ordinary
+8 left · Power
+12 Arcane
+4 left · Magic
+13 Poison
+4 left · Power
+14 Fire
+2 left · Power
+15 Pinning
+4 left · Power
+16 Concussive
+4 left · Power
+
+Power resisted — 5 damage
+
+Shellback tortoise defeated. +3 XP kept; haul pending.
+
+phase4fire002
+HUMAN BOW
+LEVEL 1
+COINS  200
+HP 77/80
+▓▓▓▓▓▓▓▓▓▓
+ 24/25
+▓▓▓▓▓▓▓▓▓▓
+XP 0/24
+░░░░░░░░░░
+LEVEL UP — XP 3/24 + ◈ 60 — the Guildhall levels you up
+✕
+ATK 12
+DEF 14
+SPD 5
+PACK 3/6
+JOIN A FACTION
+no faction flies yet — be the first
+found your own
+level 4
+CONNECT GMAIL TO RECOVER THIS PLAYER.
+SOUND ON
+MUSIC ON
+▶
+PLAYING
+4
+FEEDBACK
+LABS
+ADMIN

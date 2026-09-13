@@ -1,0 +1,458 @@
+[
+  {
+    "fixture": "phase4fire002",
+    "kind": "request",
+    "time": "2026-09-13T10:51:28.837Z",
+    "body": {
+      "option": "load_arrow:255880743b05b064b09b63fdb954a992:fire",
+      "scene_id": "s0",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "response",
+    "time": "2026-09-13T10:51:28.886Z",
+    "status": 200,
+    "scene_id": "s1",
+    "headline": "Shellback tortoise · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "request",
+    "time": "2026-09-13T10:51:37.385Z",
+    "body": {
+      "option": "strike:255880743b05b064b09b63fdb954a992",
+      "scene_id": "s1",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "response",
+    "time": "2026-09-13T10:51:37.414Z",
+    "status": 200,
+    "scene_id": "s2",
+    "headline": "Shellback tortoise · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "request",
+    "time": "2026-09-13T10:51:48.219Z",
+    "body": {
+      "option": "guard",
+      "scene_id": "s2",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "response",
+    "time": "2026-09-13T10:51:48.252Z",
+    "status": 200,
+    "scene_id": "s3",
+    "headline": "Shellback tortoise · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "request",
+    "time": "2026-09-13T10:51:57.717Z",
+    "body": {
+      "option": "skill:ad5b0db0651a48aafb6c70ebae2b548f",
+      "scene_id": "s3",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "response",
+    "time": "2026-09-13T10:51:57.746Z",
+    "status": 200,
+    "scene_id": "s4",
+    "headline": "Shellback tortoise · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "request",
+    "time": "2026-09-13T10:52:13.334Z",
+    "body": {
+      "option": "strike:255880743b05b064b09b63fdb954a992",
+      "scene_id": "s4",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "response",
+    "time": "2026-09-13T10:52:13.367Z",
+    "status": 200,
+    "scene_id": "s5",
+    "headline": "Rust hound · enemy 2 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "request",
+    "time": "2026-09-13T10:52:30.436Z",
+    "body": {
+      "option": "load_arrow:c8a2cdaa16710bb65fbf16d5f3908721:arcane",
+      "scene_id": "s0",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "response",
+    "time": "2026-09-13T10:52:30.480Z",
+    "status": 200,
+    "scene_id": "s1",
+    "headline": "The lamp-eater · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4arcane002-stale-tab",
+    "kind": "request",
+    "time": "2026-09-13T10:52:30.535Z",
+    "body": {
+      "option": "strike:c8a2cdaa16710bb65fbf16d5f3908721",
+      "scene_id": "s0",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4arcane002-stale-tab",
+    "kind": "response",
+    "time": "2026-09-13T10:52:30.571Z",
+    "status": 200,
+    "scene_id": "s1",
+    "headline": "The lamp-eater · enemy 1 of 2",
+    "refusal": "That choice belongs to an earlier scene. Choose from the current scene."
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "request",
+    "time": "2026-09-13T10:52:37.766Z",
+    "body": {
+      "option": "strike:c8a2cdaa16710bb65fbf16d5f3908721",
+      "scene_id": "s1",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "response",
+    "time": "2026-09-13T10:52:37.797Z",
+    "status": 200,
+    "scene_id": "s2",
+    "headline": "The lamp-eater · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "request",
+    "time": "2026-09-13T10:52:46.517Z",
+    "body": {
+      "option": "strike:c8a2cdaa16710bb65fbf16d5f3908721",
+      "scene_id": "s2",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "response",
+    "time": "2026-09-13T10:52:46.546Z",
+    "status": 200,
+    "scene_id": "s3",
+    "headline": "The lamp-eater · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "request",
+    "time": "2026-09-13T10:52:59.536Z",
+    "body": {
+      "option": "strike:c8a2cdaa16710bb65fbf16d5f3908721",
+      "scene_id": "s3",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "response",
+    "time": "2026-09-13T10:52:59.561Z",
+    "status": 200,
+    "scene_id": "s4",
+    "headline": "The lamp-eater · enemy 1 of 2",
+    "refusal": "No arrows of the selected type remain. Select another payload or weapon."
+  },
+  {
+    "fixture": "phase4poison002",
+    "kind": "request",
+    "time": "2026-09-13T10:53:08.933Z",
+    "body": {
+      "option": "skill:2e94687274f8ed9754e4fd04a020379a",
+      "scene_id": "s0",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4poison002",
+    "kind": "response",
+    "time": "2026-09-13T10:53:08.972Z",
+    "status": 200,
+    "scene_id": "s1",
+    "headline": "Feral boar · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4poison002",
+    "kind": "request",
+    "time": "2026-09-13T10:53:23.134Z",
+    "body": {
+      "option": "strike:27b55c7bd5ef88d12d230fcff387c752",
+      "scene_id": "s1",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4poison002",
+    "kind": "response",
+    "time": "2026-09-13T10:53:23.162Z",
+    "status": 200,
+    "scene_id": "s2",
+    "headline": "Feral boar · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4poison002",
+    "kind": "request",
+    "time": "2026-09-13T10:53:38.832Z",
+    "body": {
+      "option": "strike:27b55c7bd5ef88d12d230fcff387c752",
+      "scene_id": "s2",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4poison002",
+    "kind": "response",
+    "time": "2026-09-13T10:53:38.861Z",
+    "status": 200,
+    "scene_id": "s3",
+    "headline": "Feral boar · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "request",
+    "time": "2026-09-13T10:53:39.034Z",
+    "body": {
+      "option": "strike:f84a5499ce69fa3f32574fb633600e0f",
+      "scene_id": "s4",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "response",
+    "time": "2026-09-13T10:53:39.065Z",
+    "status": 200,
+    "scene_id": "s5",
+    "headline": "The lamp-eater · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4poison002",
+    "kind": "request",
+    "time": "2026-09-13T10:53:49.116Z",
+    "body": {
+      "option": "strike:27b55c7bd5ef88d12d230fcff387c752",
+      "scene_id": "s3",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4poison002",
+    "kind": "response",
+    "time": "2026-09-13T10:53:49.150Z",
+    "status": 200,
+    "scene_id": "s4",
+    "headline": "Grey wolf · enemy 2 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "request",
+    "time": "2026-09-13T10:53:49.266Z",
+    "body": {
+      "option": "collection",
+      "scene_id": "s5",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "response",
+    "time": "2026-09-13T10:53:49.344Z",
+    "status": 200,
+    "scene_id": "s6",
+    "headline": "Three weapons. Your choice.",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "request",
+    "time": "2026-09-13T10:54:15.101Z",
+    "body": {
+      "option": "inspect:42aee1066902026f7890be55ded38d56",
+      "scene_id": "s6",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "request",
+    "time": "2026-09-13T10:54:15.116Z",
+    "body": {
+      "option": "strike:15955cc57a50f358f7b5006d647119cf",
+      "scene_id": "s5",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "response",
+    "time": "2026-09-13T10:54:15.136Z",
+    "status": 200,
+    "scene_id": "s7",
+    "headline": "Three weapons. Your choice.",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "response",
+    "time": "2026-09-13T10:54:15.150Z",
+    "status": 200,
+    "scene_id": "s6",
+    "headline": "The lamp-eater · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "request",
+    "time": "2026-09-13T10:54:25.682Z",
+    "body": {
+      "option": "strike:15955cc57a50f358f7b5006d647119cf",
+      "scene_id": "s6",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "response",
+    "time": "2026-09-13T10:54:25.712Z",
+    "status": 200,
+    "scene_id": "s7",
+    "headline": "Lamp newt · enemy 2 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "request",
+    "time": "2026-09-13T10:54:40.733Z",
+    "body": {
+      "option": "collection_back",
+      "scene_id": "s7",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "response",
+    "time": "2026-09-13T10:54:40.766Z",
+    "status": 200,
+    "scene_id": "s8",
+    "headline": "Rust hound · enemy 2 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "request",
+    "time": "2026-09-13T10:54:40.885Z",
+    "body": {
+      "option": "strike:ad5b0db0651a48aafb6c70ebae2b548f",
+      "scene_id": "s8",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "response",
+    "time": "2026-09-13T10:54:40.909Z",
+    "status": 200,
+    "scene_id": "s9",
+    "headline": "Rust hound · enemy 2 of 2",
+    "refusal": "Close to contact first"
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "request",
+    "time": "2026-09-13T10:54:41.051Z",
+    "body": {
+      "option": "strike:15955cc57a50f358f7b5006d647119cf",
+      "scene_id": "s7",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "response",
+    "time": "2026-09-13T10:54:41.074Z",
+    "status": 200,
+    "scene_id": "s8",
+    "headline": "Lamp newt · enemy 2 of 2",
+    "refusal": "A blade cannot reach a flyer"
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "request",
+    "time": "2026-09-13T10:55:05.582Z",
+    "body": {
+      "option": "load_arrow:255880743b05b064b09b63fdb954a992:arcane",
+      "scene_id": "s9",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4fire002",
+    "kind": "response",
+    "time": "2026-09-13T10:55:05.614Z",
+    "status": 200,
+    "scene_id": "s10",
+    "headline": "Rust hound · enemy 2 of 2",
+    "refusal": ""
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "request",
+    "time": "2026-09-13T10:55:05.716Z",
+    "body": {
+      "option": "load_arrow:c8a2cdaa16710bb65fbf16d5f3908721:ordinary",
+      "scene_id": "s8",
+      "mode": "pane"
+    }
+  },
+  {
+    "fixture": "phase4arcane002",
+    "kind": "response",
+    "time": "2026-09-13T10:55:05.747Z",
+    "status": 200,
+    "scene_id": "s9",
+    "headline": "Lamp newt · enemy 2 of 2",
+    "refusal": ""
+  }
+]

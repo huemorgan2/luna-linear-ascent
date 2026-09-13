@@ -1,0 +1,178 @@
+Owned collection shows three cells, Wood6/RawMetal2 in material drawer, and all six arrow types outside those cells.
+
+GAME
+SCORE
+COMMUNITY
+YOUR WEAPON COLLECTION
+Three weapons. Your choice.
+Choose any three weapons before a hunt. Each weapon keeps its own level and condition.
+
+Pack 3 / 6 · town storage stays in Roothollow
+
+1
+Ramguard Sword +0
+2
+Hawkeye Longbow +0
+3
+Ember Staff +0
+Upgrade materials
+Wood
+6
+Raw Metal
+2
+Hardwood
+0
+Steel
+0
+Meteorite
+0
+Starforged Steel
+0
+Mythic Threads
+0
+Shard Matter
+0
+Arrows · 26 / 400
+
+One arrow per shot, including a miss. Match the arrow grade to your bow.
+
+Hawkeye Longbow: Common Fire · 2 left
+
+Ordinary
+Power
+No added effect
+Common: 8
+Rare: 0
+Epic: 0
+Legendary: 0
+Arcane
+Magic
+Converts the direct hit to Magic
+Common: 4
+Rare: 0
+Epic: 0
+Legendary: 0
+Poison
+Power
+Poison: 8% × 3 phases
+Common: 4
+Rare: 0
+Epic: 0
+Legendary: 0
+Fire
+Power
+Magic burn: 12% × 2 phases
+Common: 2
+Rare: 0
+Epic: 0
+Legendary: 0
+Pinning
+Power
+Slow: −3 speed, 2 phases
+Common: 4
+Rare: 0
+Epic: 0
+Legendary: 0
+Concussive
+Power
+Push: 2 steps
+Common: 4
+Rare: 0
+Epic: 0
+Legendary: 0
+
+Buy bundles of 20 at the Forge arrow supplies rack. Choose a stocked payload on your bow during a group; selecting it is free.
+
+Ramguard Sword
+Common +0 · Blade
+ 7 ATK now / 7 full
+1,559 / 1,560 condition
+Knockback
+In your deck
+Hawkeye Longbow
+Common +0 · Bow
+ 9 ATK now / 9 full
+1,298 / 1,300 condition
+Cover shot
+In your deck
+Ember Staff
+Common +0 · Staff
+ 7 ATK now / 7 full
+1,300 / 1,300 condition
+Burn
+In your deck
+Breach Cleaver
+Common +0 · Blade
+ 9 ATK now / 9 full
+1,170 / 1,170 condition
+Heavy impact
+In your collection
+Ember Staff
+Common +0 · Staff
+ 7 ATK now / 7 full
+1,300 / 1,300 condition
+Burn
+In your collection
+Hawkeye Longbow
+Common +0 · Bow
+ 9 ATK now / 9 full
+1,300 / 1,300 condition
+Cover shot
+In your collection
+Your weapons stay committed until this fight or expedition ends.
+1
+Back
+2
+Hawkeye Longbow · Common +0
+1298/1300 condition · view weapon
+3
+Breach Cleaver · Common +0
+1170/1170 condition · view weapon
+4
+Ember Staff · Common +0
+1300/1300 condition · view weapon
+5
+Ramguard Sword · Common +0
+1559/1560 condition · view weapon
+6
+Ember Staff · Common +0
+1300/1300 condition · view weapon
+7
+Hawkeye Longbow · Common +0
+1300/1300 condition · view weapon
+PLAYERS NOW IN THE GROUP
+Phase3Shield
+L1
+phase4arcane002
+L1
+phase4poison002
+L1
+phase4fire002
+HUMAN BOW
+LEVEL 1
+COINS  200
+HP 77/80
+▓▓▓▓▓▓▓▓▓▓
+ 24/25
+▓▓▓▓▓▓▓▓▓▓
+XP 3/24
+▓░░░░░░░░░
+LEVEL UP — XP 3/24 + ◈ 60 — the Guildhall levels you up
+✕
+ATK 12
+DEF 14
+SPD 5
+PACK 3/6
+JOIN A FACTION
+no faction flies yet — be the first
+found your own
+level 4
+CONNECT GMAIL TO RECOVER THIS PLAYER.
+SOUND ON
+MUSIC ON
+▶
+PLAYING
+4
+FEEDBACK
+LABS
+ADMIN

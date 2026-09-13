@@ -1,0 +1,58 @@
+[
+  {
+    "tenant": "ascent-change-baseline",
+    "player": "owner",
+    "doc_hash": "04c9492a36a5b1a2493fec377f4c6a23",
+    "after_hash": "04c9492a36a5b1a2493fec377f4c6a23",
+    "unchanged": true
+  },
+  {
+    "tenant": "web",
+    "player": "phase3energy2",
+    "doc_hash": "7588621f2a1d08ad7c6385730785bd2f",
+    "after_hash": "7588621f2a1d08ad7c6385730785bd2f",
+    "unchanged": true
+  },
+  {
+    "tenant": "web",
+    "player": "phase3energy5",
+    "doc_hash": "10a0b01b5680ba8d30b65e732429fc8f",
+    "after_hash": "10a0b01b5680ba8d30b65e732429fc8f",
+    "unchanged": true
+  },
+  {
+    "tenant": "web",
+    "player": "phase3gather",
+    "doc_hash": "652a44c5302997e33fb355b4a01b19bc",
+    "after_hash": "652a44c5302997e33fb355b4a01b19bc",
+    "unchanged": true
+  },
+  {
+    "tenant": "web",
+    "player": "phase3mobile",
+    "doc_hash": "fb3c1175f63824ebb5f8f46f6d5e03fd",
+    "after_hash": "fb3c1175f63824ebb5f8f46f6d5e03fd",
+    "unchanged": true
+  },
+  {
+    "tenant": "web",
+    "player": "phase3shield",
+    "doc_hash": "c5fd9406e817f147308ea5c9f7392f43",
+    "after_hash": "c5fd9406e817f147308ea5c9f7392f43",
+    "unchanged": true
+  },
+  {
+    "tenant": "web",
+    "player": "phase3sprout",
+    "doc_hash": "d350ea564b30b083d98021808e8af92f",
+    "after_hash": "d350ea564b30b083d98021808e8af92f",
+    "unchanged": true
+  },
+  {
+    "tenant": "web",
+    "player": "qacollectionfixture",
+    "doc_hash": "8ccb98103c122372c99eddcea77449e8",
+    "after_hash": "8ccb98103c122372c99eddcea77449e8",
+    "unchanged": true
+  }
+]

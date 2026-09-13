@@ -1,0 +1,114 @@
+Ramguard pushes from Contact; inspect persistent Far gap for next bow action, and second/final burn tick.
+
+GAME
+SCORE
+COMMUNITY
+FLOOR 2 · HUNT
+Shellback tortoise · enemy 1 of 2i
+XP after each kill. Secure the gold and items by defeating the whole group.
+1 Shellback tortoise
+2 Rust hound
+ Power resisted · 5
+ Power
+ Ground
+ 4 speed
+
+Traits: hulking, armoured
+
+8 ATK · 2 DEF · Power ×0.45 · Magic ×1.5
+
+Drop chances for this enemy
+ 5 / 19 HP
+Contact
+Near
+Far
+Cover
+
+ENERGY PAID · normal strength
+
+0 XP kept · 0 gold pending
+Ramguard Sword +0
+Blade · 7 ATK
+1559/1560
+Hawkeye Longbow +0
+Bow · 9 ATK
+1299/1300
+Ember Staff +0
+Staff · 7 ATK
+1300/1300
+1 Ramguard Sword
+Move to contact first
+2 Knockback · Ramguard Sword
+Move to contact first
+3 Hawkeye Longbow
+Fire · Power · 3 left
+4 Cover shot · Hawkeye Longbow
+Adds 20% at Far (2) or Cover (3). Bonus applies here.
+5 Ember Staff
+Staff strike
+6 Burn · Ember Staff
+Ignition adds 12% source attack for two phases as Magic.
+7 Close in
+Far
+8 Pull back
+Speed decides the opening
+9 Guard
+Stronger shield absorption; some damage gets through
+10 Try to escape
+Keep earned XP
+17 Weapon collection
+your three battle slots
+Common Hawkeye Longbow
+
+Choose arrows · selection is free
+
+11 Ordinary
+8 left · Power
+12 Arcane
+4 left · Magic
+13 Poison
+4 left · Power
+14 Fire
+3 left · Power
+15 Pinning
+4 left · Power
+16 Concussive
+4 left · Power
+
+Power resisted — 5 damage
+
+Push applied
+
+2 Magic damage
+
+Pushed back — room for your next action
+
+phase4fire002
+HUMAN BLADE
+LEVEL 1
+COINS  200
+HP 77/80
+▓▓▓▓▓▓▓▓▓▓
+ 24/25
+▓▓▓▓▓▓▓▓▓▓
+XP 0/24
+░░░░░░░░░░
+LEVEL UP — XP 0/24 + ◈ 60 — the Guildhall levels you up
+✕
+ATK 10
+DEF 14
+SPD 5
+PACK 3/6
+JOIN A FACTION
+no faction flies yet — be the first
+found your own
+level 4
+CONNECT GMAIL TO RECOVER THIS PLAYER.
+SOUND ON
+MUSIC ON
+▶
+PLAYING
+4
+FEEDBACK
+LABS
+ADMIN

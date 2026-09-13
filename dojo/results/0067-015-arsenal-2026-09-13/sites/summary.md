@@ -1,0 +1,7 @@
+# Floor80 resource place,13 September2026
+
+Prepared browser fixture, not natural progression. Separate local database ascent_change_phase4_sites on5433, worldd8862, plugin56e1d86/0.115.1. Browser clicks and authoritative ledger agree: buy Harvesting shears for1,630,022,235gold, six1-energy attempts, two yields of5MythicThreads, no ambush. Initial32energy becomes26 plus elapsed passive regeneration; tool240→234. Extract once:10Threads secured, no extra gold, expedition cleared. Reload still10Threads; ledger8 is the sole extraction receipt. Full immutable before/after records accompany screenshots. No earned player reset.
+
+Fixture limitation: preparation used the simulation January clock; the first September read applied one normal1500gold login award and filled energy32. This is observed setup, not a natural route or a hidden grant after play. Net gold after tool purchase is1,001,500. No ambush or late combat is claimed by this six-attempt browser sample; seeded matrix experiments cover those outcomes separately.
+
+PASS: actual site/tool/material/energy/extraction flow. Main inspected extraction and drawer screenshots. FAIL discovery: Tower Gate omitted named places (camp includes it).0.115.2 fix/recheck pending. Long raw prices/stats were hard to scan; tool price separators corrected in0.115.2, general late-number presentation remains release polish.

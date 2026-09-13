@@ -1,0 +1,1 @@
+Completed exact reply: recognizes Ordinary100 and capacity400 but says no other types available yet. Partial discovery; exact six-type gate fails.

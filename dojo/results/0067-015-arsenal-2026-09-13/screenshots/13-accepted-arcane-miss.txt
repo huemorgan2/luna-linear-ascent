@@ -1,0 +1,104 @@
+Declared seeded rank0 shot misses: one Arcane and one bow condition spent; no resistance popup on miss.
+
+GAME
+SCORE
+COMMUNITY
+FLOOR 4 · HUNT
+The lamp-
+1 The lamp-eater
+2 Lamp newt
+ Magic
+ Ground
+ 5 speed
+
+Traits: sturdy, magic_resist
+
+13 ATK · 2 DEF · Power ×1.5 · Magic ×0.45
+
+Drop chances for this enemy
+ 45 / 45 HP
+Contact
+Near
+Far
+Cover
+
+ENERGY PAID · normal strength
+
+0 XP kept · 0 gold pending
+Breach Cleaver +0
+Blade · 9 ATK
+1170/1170
+Runestring Bow +0
+Bow · 7 ATK
+1104/1105
+Ember Staff +0
+Staff · 7 ATK
+1300/1300
+1 Breach Cleaver
+Move to contact first
+2 Runestring Bow
+Arcane · Magic · 1 left
+3 Ember Staff
+Staff strike
+4 Burn · Ember Staff
+Ignition adds 12% source attack for two phases as Magic.
+5 Close in
+Near
+6 Pull back
+Speed decides the opening
+7 Guard
+Stronger shield absorption; some damage gets through
+8 Try to escape
+Keep earned XP
+15 Weapon collection
+your three battle slots
+Common Runestring Bow
+
+Choose arrows · selection is free
+
+9 Ordinary
+8 left · Power
+10 Arcane
+1 left · Magic
+11 Poison
+0 left · Power
+12 Fire
+0 left · Power
+13 Pinning
+0 left · Power
+14 Concussive
+0 left · Power
+
+Runestring Bow missed
+
+The lamp-eater closes to near
+
+phase4arcane002
+HUMAN BOW
+LEVEL 1
+COINS  200
+HP 80/80
+▓▓▓▓▓▓▓▓▓▓
+ 25/25
+██████████
+XP 0/24
+░░░░░░░░░░
+LEVEL UP — XP 0/24 + ◈ 60 — the Guildhall levels you up
+✕
+ATK 10
+DEF 14
+SPD 5
+PACK 3/6
+JOIN A FACTION
+no faction flies yet — be the first
+found your own
+level 4
+CONNECT GMAIL TO RECOVER THIS PLAYER.
+SOUND ON
+MUSIC ON
+▶
+PLAYING
+4
+FEEDBACK
+LABS
+ADMIN

@@ -1,0 +1,111 @@
+Final poison phase after a bow action: inspect kill attribution to applying blade and Cover arrival of next wolf.
+
+GAME
+SCORE
+COMMUNITY
+FLOOR 1 · HUNT
+Grey wolf · enemy 2 of 2i
+XP 
+× Feral boar
+2 Grey wolf
+ Common
+ Ground
+ 5 speed
+
+Traits: none
+
+6 ATK · 1 DEF · Power ×1.25 · Magic ×1.25
+
+Drop chances for this enemy
+ 18 / 18 HP
+Contact
+Near
+Far
+Cover
+
+WAITING · 1 energy when this enemy begins
+
+2 XP kept · 19 gold pending
+Viper Edge +0
+Blade · 6 ATK
+1299/1300
+Hawkeye Longbow +0
+Bow · 9 ATK
+1297/1300
+Repulsor Staff +0
+Staff · 6 ATK
+1365/1365
+1 Viper Edge
+Move to contact first
+2 Poison · Viper Edge
+Move to contact first
+3 Hawkeye Longbow
+Ordinary · Power · 5 left
+4 Cover shot · Hawkeye Longbow
+Adds 20% at Far (2) or Cover (3). Bonus applies here.
+5 Repulsor Staff
+Staff strike
+6 Knockback · Repulsor Staff
+A force wave opens distance before the next enemy pursuit.
+7 Close in
+Cover
+8 Pull back
+Speed decides the opening
+9 Guard
+Stronger shield absorption; some damage gets through
+10 Leave and lose the pending haul
+Keep earned XP
+17 Weapon collection
+your three battle slots
+Common Hawkeye Longbow
+
+Choose arrows · selection is free
+
+11 Ordinary
+5 left · Power
+12 Arcane
+2 left · Magic
+13 Poison
+4 left · Power
+14 Fire
+2 left · Power
+15 Pinning
+2 left · Power
+16 Concussive
+2 left · Power
+
+7 Power damage
+
+1 Power damage
+
+Feral boar defeated. +2 XP kept; haul pending.
+
+phase4poison002
+HUMAN BOW
+LEVEL 1
+COINS  200
+HP 74/80
+▓▓▓▓▓▓▓▓▓░
+ 24/25
+▓▓▓▓▓▓▓▓▓▓
+XP 0/24
+░░░░░░░░░░
+LEVEL UP — XP 2/24 + ◈ 60 — the Guildhall levels you up
+✕
+ATK 12
+DEF 14
+SPD 5
+PACK 3/6
+JOIN A FACTION
+no faction flies yet — be the first
+found your own
+level 4
+CONNECT GMAIL TO RECOVER THIS PLAYER.
+SOUND ON
+MUSIC ON
+▶
+PLAYING
+4
+FEEDBACK
+LABS
+ADMIN

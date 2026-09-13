@@ -1,0 +1,893 @@
+[
+  {
+    "name": "phase4fire002",
+    "floor": 2,
+    "roster": [
+      "shellback_tortoise",
+      "marsh_wolf"
+    ],
+    "families": [
+      "ramguard",
+      "hawkeye",
+      "ember"
+    ],
+    "ranks": {
+      "blade": 10,
+      "bow": 10,
+      "staff": 10
+    },
+    "stock": {
+      "ordinary": 8,
+      "arcane": 4,
+      "poison": 4,
+      "fire": 4,
+      "pinning": 4,
+      "concussive": 4
+    },
+    "hp": 80,
+    "gold": 200,
+    "energy": 25.0,
+    "materials": {
+      "Wood": 6,
+      "Raw Metal": 2
+    },
+    "deck": [
+      "ad5b0db0651a48aafb6c70ebae2b548f",
+      "255880743b05b064b09b63fdb954a992",
+      "8b31f7c8fbf0c0bbb7f3275ccbd8f1bd"
+    ],
+    "collection": {
+      "42aee1066902026f7890be55ded38d56": {
+        "id": "42aee1066902026f7890be55ded38d56",
+        "family": "breach",
+        "grade": "Common",
+        "level": 0,
+        "source": "starter",
+        "provenance": {
+          "receipt": "migration:held:rusted_shiv:0",
+          "owner": "web:phase4fire002"
+        },
+        "location": "carried",
+        "durability": 1170,
+        "maximum": 1170
+      },
+      "e7f8b3d7d7610c2e0dab94a112522e80": {
+        "id": "e7f8b3d7d7610c2e0dab94a112522e80",
+        "family": "hawkeye",
+        "grade": "Common",
+        "level": 0,
+        "source": "starter",
+        "provenance": {
+          "receipt": "starter:bow",
+          "owner": "web:phase4fire002"
+        },
+        "location": "carried",
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "de5f8f32917a9bbb6602d9e283a30877": {
+        "id": "de5f8f32917a9bbb6602d9e283a30877",
+        "family": "ember",
+        "grade": "Common",
+        "level": 0,
+        "source": "starter",
+        "provenance": {
+          "receipt": "starter:staff",
+          "owner": "web:phase4fire002"
+        },
+        "location": "carried",
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "ad5b0db0651a48aafb6c70ebae2b548f": {
+        "id": "ad5b0db0651a48aafb6c70ebae2b548f",
+        "family": "ramguard",
+        "grade": "Common",
+        "level": 0,
+        "source": "craft",
+        "provenance": {
+          "receipt": "declared-fixture:phase4fire002:ramguard",
+          "owner": "web:phase4fire002"
+        },
+        "location": "carried",
+        "durability": 1560,
+        "maximum": 1560
+      },
+      "255880743b05b064b09b63fdb954a992": {
+        "id": "255880743b05b064b09b63fdb954a992",
+        "family": "hawkeye",
+        "grade": "Common",
+        "level": 0,
+        "source": "craft",
+        "provenance": {
+          "receipt": "declared-fixture:phase4fire002:hawkeye",
+          "owner": "web:phase4fire002"
+        },
+        "location": "carried",
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "8b31f7c8fbf0c0bbb7f3275ccbd8f1bd": {
+        "id": "8b31f7c8fbf0c0bbb7f3275ccbd8f1bd",
+        "family": "ember",
+        "grade": "Common",
+        "level": 0,
+        "source": "craft",
+        "provenance": {
+          "receipt": "declared-fixture:phase4fire002:ember",
+          "owner": "web:phase4fire002"
+        },
+        "location": "carried",
+        "durability": 1300,
+        "maximum": 1300
+      }
+    },
+    "group": {
+      "id": "group:1",
+      "offer": "2:trail:",
+      "floor": 2,
+      "deep": false,
+      "site": "",
+      "members": [
+        {
+          "id": "shellback_tortoise",
+          "name": "Shellback tortoise",
+          "floor": 2,
+          "image": "creatures/shellback_tortoise_320x112.png",
+          "type": "ground-power",
+          "affinity": "Power",
+          "air": false,
+          "speed": 4,
+          "hp": 19,
+          "hp_max": 19,
+          "atk": 8,
+          "defense": 2,
+          "power": 0.45,
+          "magic": 1.5,
+          "traits": [
+            "hulking",
+            "armoured"
+          ],
+          "note": "A tough hide. Bring a spell or arcane arrows.",
+          "lore": "Grown door-broad in the flooded drift, shell crusted to rust-plate. It holds the narrow ways like a gate.",
+          "weight": 2,
+          "specimen": "runt",
+          "rates": {
+            "material": {
+              "Common": 8.7,
+              "Rare": 0.057999999999999996,
+              "Epic": 0.00145,
+              "Legendary": 0
+            },
+            "weapon": {
+              "Common": 0.29,
+              "Rare": 0.005316666666666667,
+              "Epic": 2.0944444444444445e-05,
+              "Legendary": 0
+            }
+          },
+          "bundles": {
+            "Common": {
+              "Wood": 2,
+              "Raw Metal": 2
+            },
+            "Rare": {
+              "Hardwood": 2,
+              "Steel": 2
+            },
+            "Epic": {
+              "Meteorite": 2,
+              "Starforged Steel": 2
+            },
+            "Legendary": {
+              "Mythic Threads": 2,
+              "Shard Matter": 2
+            }
+          },
+          "started": false,
+          "paid": false,
+          "exhausted": false,
+          "killed": false,
+          "gap": 2,
+          "effects": [],
+          "stun_recovery": 0,
+          "arrival_gap": 2,
+          "reward_revision": "bundles-1",
+          "rewards": {
+            "gold": 13,
+            "xp": 3,
+            "materials": {},
+            "weapon": null
+          },
+          "instance": "group:1:enemy:0"
+        },
+        {
+          "id": "marsh_wolf",
+          "name": "Rust hound",
+          "floor": 2,
+          "image": "creatures/marsh_wolf_320x112.png",
+          "type": "ground-common",
+          "affinity": "Common",
+          "air": false,
+          "speed": 5,
+          "hp": 29,
+          "hp_max": 29,
+          "atk": 8,
+          "defense": 1,
+          "power": 1.25,
+          "magic": 1.25,
+          "traits": [
+            "lean"
+          ],
+          "note": "Soft defenses. Every reachable weapon works.",
+          "lore": "Iron-scale coats it and its jaws lock half-open. The packs still run the rails, hauling nothing.",
+          "weight": 3,
+          "specimen": "tough",
+          "rates": {
+            "material": {
+              "Common": 14.580000000000002,
+              "Rare": 0.09720000000000001,
+              "Epic": 0.0024300000000000003,
+              "Legendary": 0
+            },
+            "weapon": {
+              "Common": 0.486,
+              "Rare": 0.008910000000000001,
+              "Epic": 3.5100000000000006e-05,
+              "Legendary": 0
+            }
+          },
+          "bundles": {
+            "Common": {
+              "Wood": 2,
+              "Raw Metal": 2
+            },
+            "Rare": {
+              "Hardwood": 2,
+              "Steel": 2
+            },
+            "Epic": {
+              "Meteorite": 2,
+              "Starforged Steel": 2
+            },
+            "Legendary": {
+              "Mythic Threads": 2,
+              "Shard Matter": 2
+            }
+          },
+          "started": false,
+          "paid": false,
+          "exhausted": false,
+          "killed": false,
+          "gap": 1,
+          "effects": [],
+          "stun_recovery": 0,
+          "arrival_gap": 1,
+          "reward_revision": "bundles-1",
+          "rewards": {
+            "gold": 23,
+            "xp": 5,
+            "materials": {},
+            "weapon": null
+          },
+          "instance": "group:1:enemy:1"
+        }
+      ],
+      "index": 0,
+      "committed": false,
+      "deck": [],
+      "cooldowns": {},
+      "haul": {
+        "gold": 0,
+        "materials": {},
+        "weapons": []
+      },
+      "xp": 0,
+      "energy": 0,
+      "events": [],
+      "event_sequence": 0,
+      "life_used": false,
+      "revision": "collection-v1",
+      "combat_revision": 2,
+      "turn": 0
+    },
+    "rng_counter": 114,
+    "world_day": 255,
+    "provenance": "NEW declared QA fixture; not natural progression. Core new_player/migrate/mint/quiver/rolled_member/open_group/current_scene. Actual creature stats and rewards untouched. Arrival gaps explicitly seeded.",
+    "rollback": "Retain at stop; cleanup only exact new player and its own receipts after explicit cleanup request. Never restore an existing player document."
+  },
+  {
+    "name": "phase4arcane002",
+    "floor": 4,
+    "roster": [
+      "lamp_eater",
+      "glare_moth"
+    ],
+    "families": [
+      "breach",
+      "runestring",
+      "ember"
+    ],
+    "ranks": {
+      "blade": 10,
+      "bow": 0,
+      "staff": 10
+    },
+    "stock": {
+      "ordinary": 8,
+      "arcane": 2,
+      "poison": 0,
+      "fire": 0,
+      "pinning": 0,
+      "concussive": 0
+    },
+    "hp": 80,
+    "gold": 200,
+    "energy": 25.0,
+    "materials": {
+      "Wood": 6,
+      "Raw Metal": 2
+    },
+    "deck": [
+      "15955cc57a50f358f7b5006d647119cf",
+      "c8a2cdaa16710bb65fbf16d5f3908721",
+      "f84a5499ce69fa3f32574fb633600e0f"
+    ],
+    "collection": {
+      "2fafcf857d3c6333be0cdf80a823f9d4": {
+        "id": "2fafcf857d3c6333be0cdf80a823f9d4",
+        "family": "breach",
+        "grade": "Common",
+        "level": 0,
+        "source": "starter",
+        "provenance": {
+          "receipt": "migration:held:rusted_shiv:0",
+          "owner": "web:phase4arcane002"
+        },
+        "location": "carried",
+        "durability": 1170,
+        "maximum": 1170
+      },
+      "bf17d60a0e30996da5670e47aca53ee4": {
+        "id": "bf17d60a0e30996da5670e47aca53ee4",
+        "family": "hawkeye",
+        "grade": "Common",
+        "level": 0,
+        "source": "starter",
+        "provenance": {
+          "receipt": "starter:bow",
+          "owner": "web:phase4arcane002"
+        },
+        "location": "carried",
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "d1f87acc34f6712a18965064f76ce438": {
+        "id": "d1f87acc34f6712a18965064f76ce438",
+        "family": "ember",
+        "grade": "Common",
+        "level": 0,
+        "source": "starter",
+        "provenance": {
+          "receipt": "starter:staff",
+          "owner": "web:phase4arcane002"
+        },
+        "location": "carried",
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "15955cc57a50f358f7b5006d647119cf": {
+        "id": "15955cc57a50f358f7b5006d647119cf",
+        "family": "breach",
+        "grade": "Common",
+        "level": 0,
+        "source": "craft",
+        "provenance": {
+          "receipt": "declared-fixture:phase4arcane002:breach",
+          "owner": "web:phase4arcane002"
+        },
+        "location": "carried",
+        "durability": 1170,
+        "maximum": 1170
+      },
+      "c8a2cdaa16710bb65fbf16d5f3908721": {
+        "id": "c8a2cdaa16710bb65fbf16d5f3908721",
+        "family": "runestring",
+        "grade": "Common",
+        "level": 0,
+        "source": "craft",
+        "provenance": {
+          "receipt": "declared-fixture:phase4arcane002:runestring",
+          "owner": "web:phase4arcane002"
+        },
+        "location": "carried",
+        "durability": 1105,
+        "maximum": 1105
+      },
+      "f84a5499ce69fa3f32574fb633600e0f": {
+        "id": "f84a5499ce69fa3f32574fb633600e0f",
+        "family": "ember",
+        "grade": "Common",
+        "level": 0,
+        "source": "craft",
+        "provenance": {
+          "receipt": "declared-fixture:phase4arcane002:ember",
+          "owner": "web:phase4arcane002"
+        },
+        "location": "carried",
+        "durability": 1300,
+        "maximum": 1300
+      }
+    },
+    "group": {
+      "id": "group:1",
+      "offer": "4:trail:",
+      "floor": 4,
+      "deep": false,
+      "site": "",
+      "members": [
+        {
+          "id": "lamp_eater",
+          "name": "The lamp-eater",
+          "floor": 4,
+          "image": "creatures/lamp_eater_320x112.png",
+          "type": "ground-magic",
+          "affinity": "Magic",
+          "air": false,
+          "speed": 5,
+          "hp": 45,
+          "hp_max": 45,
+          "atk": 13,
+          "defense": 2,
+          "power": 1.5,
+          "magic": 0.45,
+          "traits": [
+            "sturdy",
+            "magic_resist"
+          ],
+          "note": "Resists spells. Steel and ordinary arrows cut through.",
+          "lore": "The black lichen that drinks light, gathered into a slow crawling shape. Nothing living is in it.",
+          "weight": 1,
+          "specimen": "common",
+          "rates": {
+            "material": {
+              "Common": 34.5,
+              "Rare": 0.3737499999999999,
+              "Epic": 0.0046,
+              "Legendary": 0
+            },
+            "weapon": {
+              "Common": 0.6899999999999998,
+              "Rare": 0.0207,
+              "Epic": 5.3666666666666666e-05,
+              "Legendary": 0
+            }
+          },
+          "bundles": {
+            "Common": {
+              "Wood": 1,
+              "Raw Metal": 3
+            },
+            "Rare": {
+              "Hardwood": 1,
+              "Steel": 3
+            },
+            "Epic": {
+              "Meteorite": 1,
+              "Starforged Steel": 3
+            },
+            "Legendary": {
+              "Mythic Threads": 1,
+              "Shard Matter": 3
+            }
+          },
+          "started": false,
+          "paid": false,
+          "exhausted": false,
+          "killed": false,
+          "gap": 2,
+          "effects": [],
+          "stun_recovery": 0,
+          "arrival_gap": 2,
+          "reward_revision": "bundles-1",
+          "rewards": {
+            "gold": 27,
+            "xp": 11,
+            "materials": {},
+            "weapon": null
+          },
+          "instance": "group:1:enemy:0"
+        },
+        {
+          "id": "glare_moth",
+          "name": "Lamp newt",
+          "floor": 4,
+          "image": "creatures/glare_moth_320x112.png",
+          "type": "air-common",
+          "affinity": "Common",
+          "air": true,
+          "speed": 9,
+          "hp": 36,
+          "hp_max": 36,
+          "atk": 13,
+          "defense": 2,
+          "power": 1.25,
+          "magic": 0.9,
+          "traits": [
+            "frail",
+            "fly",
+            "flammable"
+          ],
+          "note": "Fragile but fast. A blade cannot reach it.",
+          "lore": "It slept in lamplight once. Hand-span and starving now, it smothers any flame.",
+          "weight": 2,
+          "specimen": "tough",
+          "rates": {
+            "material": {
+              "Common": 26.325000000000003,
+              "Rare": 0.2851875,
+              "Epic": 0.00351,
+              "Legendary": 0
+            },
+            "weapon": {
+              "Common": 0.5265,
+              "Rare": 0.015795000000000003,
+              "Epic": 4.0950000000000006e-05,
+              "Legendary": 0
+            }
+          },
+          "bundles": {
+            "Common": {
+              "Wood": 3,
+              "Raw Metal": 1
+            },
+            "Rare": {
+              "Hardwood": 3,
+              "Steel": 1
+            },
+            "Epic": {
+              "Meteorite": 3,
+              "Starforged Steel": 1
+            },
+            "Legendary": {
+              "Mythic Threads": 3,
+              "Shard Matter": 1
+            }
+          },
+          "started": false,
+          "paid": false,
+          "exhausted": false,
+          "killed": false,
+          "gap": 0,
+          "effects": [],
+          "stun_recovery": 0,
+          "arrival_gap": 0,
+          "reward_revision": "bundles-1",
+          "rewards": {
+            "gold": 32,
+            "xp": 13,
+            "materials": {},
+            "weapon": null
+          },
+          "instance": "group:1:enemy:1"
+        }
+      ],
+      "index": 0,
+      "committed": false,
+      "deck": [],
+      "cooldowns": {},
+      "haul": {
+        "gold": 0,
+        "materials": {},
+        "weapons": []
+      },
+      "xp": 0,
+      "energy": 0,
+      "events": [],
+      "event_sequence": 0,
+      "life_used": false,
+      "revision": "collection-v1",
+      "combat_revision": 2,
+      "turn": 0
+    },
+    "rng_counter": 1007,
+    "world_day": 255,
+    "provenance": "NEW declared QA fixture; not natural progression. Core new_player/migrate/mint/quiver/rolled_member/open_group/current_scene. Actual creature stats and rewards untouched. Arrival gaps explicitly seeded.",
+    "rollback": "Retain at stop; cleanup only exact new player and its own receipts after explicit cleanup request. Never restore an existing player document."
+  },
+  {
+    "name": "phase4poison002",
+    "floor": 1,
+    "roster": [
+      "feral_boar",
+      "grey_wolf"
+    ],
+    "families": [
+      "viper",
+      "hawkeye",
+      "repulsor"
+    ],
+    "ranks": {
+      "blade": 10,
+      "bow": 0,
+      "staff": 0
+    },
+    "stock": {
+      "ordinary": 8,
+      "arcane": 2,
+      "poison": 4,
+      "fire": 2,
+      "pinning": 2,
+      "concussive": 2
+    },
+    "hp": 80,
+    "gold": 200,
+    "energy": 25.0,
+    "materials": {
+      "Wood": 6,
+      "Raw Metal": 2
+    },
+    "deck": [
+      "2e94687274f8ed9754e4fd04a020379a",
+      "27b55c7bd5ef88d12d230fcff387c752",
+      "ffb3924d22dc3f5faf84c19ab86c1712"
+    ],
+    "collection": {
+      "13db7fa06ab00ec4fdc9b0b8bac376a2": {
+        "id": "13db7fa06ab00ec4fdc9b0b8bac376a2",
+        "family": "breach",
+        "grade": "Common",
+        "level": 0,
+        "source": "starter",
+        "provenance": {
+          "receipt": "migration:held:rusted_shiv:0",
+          "owner": "web:phase4poison002"
+        },
+        "location": "carried",
+        "durability": 1170,
+        "maximum": 1170
+      },
+      "ddfca8959c4b13ea1a11994474a2e77b": {
+        "id": "ddfca8959c4b13ea1a11994474a2e77b",
+        "family": "hawkeye",
+        "grade": "Common",
+        "level": 0,
+        "source": "starter",
+        "provenance": {
+          "receipt": "starter:bow",
+          "owner": "web:phase4poison002"
+        },
+        "location": "carried",
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "2735da1d18b4a894f62bbdafa906c6a2": {
+        "id": "2735da1d18b4a894f62bbdafa906c6a2",
+        "family": "ember",
+        "grade": "Common",
+        "level": 0,
+        "source": "starter",
+        "provenance": {
+          "receipt": "starter:staff",
+          "owner": "web:phase4poison002"
+        },
+        "location": "carried",
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "2e94687274f8ed9754e4fd04a020379a": {
+        "id": "2e94687274f8ed9754e4fd04a020379a",
+        "family": "viper",
+        "grade": "Common",
+        "level": 0,
+        "source": "craft",
+        "provenance": {
+          "receipt": "declared-fixture:phase4poison002:viper",
+          "owner": "web:phase4poison002"
+        },
+        "location": "carried",
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "27b55c7bd5ef88d12d230fcff387c752": {
+        "id": "27b55c7bd5ef88d12d230fcff387c752",
+        "family": "hawkeye",
+        "grade": "Common",
+        "level": 0,
+        "source": "craft",
+        "provenance": {
+          "receipt": "declared-fixture:phase4poison002:hawkeye",
+          "owner": "web:phase4poison002"
+        },
+        "location": "carried",
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "ffb3924d22dc3f5faf84c19ab86c1712": {
+        "id": "ffb3924d22dc3f5faf84c19ab86c1712",
+        "family": "repulsor",
+        "grade": "Common",
+        "level": 0,
+        "source": "craft",
+        "provenance": {
+          "receipt": "declared-fixture:phase4poison002:repulsor",
+          "owner": "web:phase4poison002"
+        },
+        "location": "carried",
+        "durability": 1365,
+        "maximum": 1365
+      }
+    },
+    "group": {
+      "id": "group:1",
+      "offer": "1:trail:",
+      "floor": 1,
+      "deep": false,
+      "site": "",
+      "members": [
+        {
+          "id": "feral_boar",
+          "name": "Feral boar",
+          "floor": 1,
+          "image": "creatures/feral_boar_320x112.png",
+          "type": "ground-common",
+          "affinity": "Common",
+          "air": false,
+          "speed": 5,
+          "hp": 29,
+          "hp_max": 29,
+          "atk": 7,
+          "defense": 1,
+          "power": 1.25,
+          "magic": 1.25,
+          "traits": [
+            "sturdy",
+            "fierce"
+          ],
+          "note": "Soft defenses. Every reachable weapon works.",
+          "lore": "Sty stock gone wild in two generations. It charges first and decides why later.",
+          "weight": 3,
+          "specimen": "tough",
+          "rates": {
+            "material": {
+              "Common": 3.726,
+              "Rare": 0.09315000000000001,
+              "Epic": 0.001863,
+              "Legendary": 0
+            },
+            "weapon": {
+              "Common": 0.5589,
+              "Rare": 0.003726,
+              "Epic": 3.7260000000000006e-05,
+              "Legendary": 0
+            }
+          },
+          "bundles": {
+            "Common": {
+              "Wood": 2,
+              "Raw Metal": 2
+            },
+            "Rare": {
+              "Hardwood": 2,
+              "Steel": 2
+            },
+            "Epic": {
+              "Meteorite": 2,
+              "Starforged Steel": 2
+            },
+            "Legendary": {
+              "Mythic Threads": 2,
+              "Shard Matter": 2
+            }
+          },
+          "started": false,
+          "paid": false,
+          "exhausted": false,
+          "killed": false,
+          "gap": 0,
+          "effects": [],
+          "stun_recovery": 0,
+          "arrival_gap": 0,
+          "reward_revision": "bundles-1",
+          "rewards": {
+            "gold": 19,
+            "xp": 2,
+            "materials": {},
+            "weapon": null
+          },
+          "instance": "group:1:enemy:0"
+        },
+        {
+          "id": "grey_wolf",
+          "name": "Grey wolf",
+          "floor": 1,
+          "image": "creatures/grey_wolf_320x112.png",
+          "type": "ground-common",
+          "affinity": "Common",
+          "air": false,
+          "speed": 5,
+          "hp": 18,
+          "hp_max": 18,
+          "atk": 6,
+          "defense": 1,
+          "power": 1.25,
+          "magic": 1.25,
+          "traits": [],
+          "note": "Soft defenses. Every reachable weapon works.",
+          "lore": "Farm dogs once kept them past the fences. The dogs are gone; the wolves remember the gap in the third hedge.",
+          "weight": 3,
+          "specimen": "common",
+          "rates": {
+            "material": {
+              "Common": 2.0,
+              "Rare": 0.05,
+              "Epic": 0.001,
+              "Legendary": 0
+            },
+            "weapon": {
+              "Common": 0.3,
+              "Rare": 0.002,
+              "Epic": 2e-05,
+              "Legendary": 0
+            }
+          },
+          "bundles": {
+            "Common": {
+              "Wood": 2,
+              "Raw Metal": 2
+            },
+            "Rare": {
+              "Hardwood": 2,
+              "Steel": 2
+            },
+            "Epic": {
+              "Meteorite": 2,
+              "Starforged Steel": 2
+            },
+            "Legendary": {
+              "Mythic Threads": 2,
+              "Shard Matter": 2
+            }
+          },
+          "started": false,
+          "paid": false,
+          "exhausted": false,
+          "killed": false,
+          "gap": 3,
+          "effects": [],
+          "stun_recovery": 0,
+          "arrival_gap": 3,
+          "reward_revision": "bundles-1",
+          "rewards": {
+            "gold": 16,
+            "xp": 2,
+            "materials": {},
+            "weapon": null
+          },
+          "instance": "group:1:enemy:1"
+        }
+      ],
+      "index": 0,
+      "committed": false,
+      "deck": [],
+      "cooldowns": {},
+      "haul": {
+        "gold": 0,
+        "materials": {},
+        "weapons": []
+      },
+      "xp": 0,
+      "energy": 0,
+      "events": [],
+      "event_sequence": 0,
+      "life_used": false,
+      "revision": "collection-v1",
+      "combat_revision": 2,
+      "turn": 0
+    },
+    "rng_counter": 114,
+    "world_day": 255,
+    "provenance": "NEW declared QA fixture; not natural progression. Core new_player/migrate/mint/quiver/rolled_member/open_group/current_scene. Actual creature stats and rewards untouched. Arrival gaps explicitly seeded.",
+    "rollback": "Retain at stop; cleanup only exact new player and its own receipts after explicit cleanup request. Never restore an existing player document."
+  }
+]

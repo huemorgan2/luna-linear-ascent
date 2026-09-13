@@ -1,0 +1,1 @@
+Intermediate streaming reply acknowledges arrow stock after reading old result; final verdict uses screenshot02.

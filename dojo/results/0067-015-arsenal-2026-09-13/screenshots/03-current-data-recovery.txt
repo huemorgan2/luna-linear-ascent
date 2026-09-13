@@ -1,0 +1,1 @@
+Separate explicit-refresh reply correctly lists Ordinary, Arcane, Poison, Fire, Pinning, Concussive with stock/effects/prices; HP58, energy5, gold8.

@@ -1,0 +1,79 @@
+{
+  "name": "Phase4Site",
+  "floor": 80,
+  "location": "gate_town",
+  "gold": 1001500,
+  "hp": 9838164516,
+  "energy_val": 26.129003479629628,
+  "energy_ts": "2026-09-13T11:00:19.745954+00:00",
+  "materials": {
+    "Mythic Threads": 10
+  },
+  "utility_tools": {
+    "harvesting-shears": {
+      "condition": 234
+    }
+  },
+  "expedition": null,
+  "group": null,
+  "act_seq": 24,
+  "rng_counter": 13,
+  "ledger": [
+    {
+      "id": 1,
+      "kind": "gather_tool",
+      "gold": -1630022235,
+      "xp": 0,
+      "note": "harvesting-shears"
+    },
+    {
+      "id": 2,
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:1:empty"
+    },
+    {
+      "id": 3,
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:2:empty"
+    },
+    {
+      "id": 4,
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:3:yield"
+    },
+    {
+      "id": 5,
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:4:empty"
+    },
+    {
+      "id": 6,
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:5:yield"
+    },
+    {
+      "id": 7,
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1:6:empty"
+    },
+    {
+      "id": 8,
+      "kind": "gather_extract",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1"
+    }
+  ]
+}

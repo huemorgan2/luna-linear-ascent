@@ -1,0 +1,110 @@
+Viper poison applies at Contact; first action must have direct impact only and no poison tick.
+
+GAME
+SCORE
+COMMUNITY
+FLOOR 1 · HUNT
+Fer
+1 Feral boar
+2 Grey wolf
+ Common
+ Ground
+ 5 speed
+
+Traits: sturdy, fierce
+
+7 ATK · 1 DEF · Power ×1.25 · Magic ×1.25
+
+Drop chances for this enemy
+ 17 / 29 HP
+Contact
+Near
+Far
+Cover
+
+ENERGY PAID · normal strength
+
+0 XP kept · 0 gold pending
+Viper Edge +0
+Blade · 6 ATK
+1299/1300
+Hawkeye Longbow +0
+Bow · 9 ATK
+1300/1300
+Repulsor Staff +0
+Staff · 6 ATK
+1365/1365
+1 Viper Edge
+Blade strike
+2 Poison · Viper Edge
+Ready in 3 enemy phases
+3 Hawkeye Longbow
+Ordinary · Power · 8 left
+4 Cover shot · Hawkeye Longbow
+Adds 20% at Far (2) or Cover (3). No bonus at this distance.
+5 Repulsor Staff
+Staff strike
+6 Knockback · Repulsor Staff
+A force wave opens distance before the next enemy pursuit.
+7 Close in
+Contact
+8 Pull back
+Speed decides the opening
+9 Guard
+Stronger shield absorption; some damage gets through
+10 Try to escape
+Keep earned XP
+17 Weapon collection
+your three battle slots
+Common Hawkeye Longbow
+
+Choose arrows · selection is free
+
+11 Ordinary
+8 left · Power
+12 Arcane
+2 left · Magic
+13 Poison
+4 left · Power
+14 Fire
+2 left · Power
+15 Pinning
+2 left · Power
+16 Concussive
+2 left · Power
+
+12 Power damage
+
+Poison applied
+
+2 HP lost; shield absorbed 3
+
+phase4poison002
+HUMAN BLADE
+LEVEL 1
+COINS  200
+HP 80/80
+██████████
+ 25/25
+██████████
+XP 0/24
+░░░░░░░░░░
+LEVEL UP — XP 0/24 + ◈ 60 — the Guildhall levels you up
+✕
+ATK 9
+DEF 14
+SPD 5
+PACK 3/6
+JOIN A FACTION
+no faction flies yet — be the first
+found your own
+level 4
+CONNECT GMAIL TO RECOVER THIS PLAYER.
+SOUND ON
+MUSIC ON
+▶
+PLAYING
+4
+FEEDBACK
+LABS
+ADMIN

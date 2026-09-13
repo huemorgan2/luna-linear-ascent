@@ -1,0 +1,106 @@
+Physical blade click at Contact against actual Air enemy is refused; reach is not distance alone.
+
+GAME
+SCORE
+COMMUNITY
+FLOOR 4 · HUNT
+Lamp newt · enemy 2 of 2i
+XP after each kill. Secure the gold and items by defeating the whole group.
+× The lamp-eater
+2 Lamp newt
+ Common
+ Air
+ 9 speed
+
+Traits: frail, fly, flammable
+
+13 ATK · 2 DEF · Power ×1.25 · Magic ×0.9
+
+Drop chances for this enemy
+ 36 / 36 HP
+Contact
+Near
+Far
+Cover
+
+WAITING · 1 energy when this enemy begins
+
+11 XP kept · 27 gold pending
+Breach Cleaver +0
+Blade · 9 ATK
+1168/1170
+Runestring Bow +0
+Bow · 7 ATK
+1103/1105
+Ember Staff +0
+Staff · 7 ATK
+1299/1300
+1 Breach Cleaver
+Cannot reach a flying enemy
+2 Runestring Bow
+Selected arrows empty — choose another payload
+3 Ember Staff
+Staff strike
+4 Burn · Ember Staff
+Ignition adds 12% source attack for two phases as Magic.
+5 Close in
+Contact
+6 Pull back
+Speed decides the opening
+7 Guard
+Stronger shield absorption; some damage gets through
+8 Leave and lose the pending haul
+Keep earned XP
+15 Weapon collection
+your three battle slots
+Common Runestring Bow
+
+Choose arrows · selection is free
+
+9 Ordinary
+8 left · Power
+10 Arcane
+0 left · Magic
+11 Poison
+0 left · Power
+12 Fire
+0 left · Power
+13 Pinning
+0 left · Power
+14 Concussive
+0 left · Power
+
+14 Power damage
+
+The lamp-eater defeated. +11 XP kept; haul pending.
+
+phase4arcane002
+HUMAN BLADE
+LEVEL 1
+COINS  200
+HP 64/80
+▓▓▓▓▓▓▓▓░░
+ 24/25
+▓▓▓▓▓▓▓▓▓▓
+XP 11/24
+▓▓▓▓▓░░░░░
+LEVEL UP — XP 11/24 + ◈ 60 — the Guildhall levels you up
+✕
+ATK 12
+DEF 14
+SPD 5
+PACK 3/6
+JOIN A FACTION
+no faction flies yet — be the first
+found your own
+level 4
+CONNECT GMAIL TO RECOVER THIS PLAYER.
+SOUND ON
+MUSIC ON
+▶
+PLAYING
+4
+FEEDBACK
+LABS
+ADMIN
+A blade cannot reach a flyer
