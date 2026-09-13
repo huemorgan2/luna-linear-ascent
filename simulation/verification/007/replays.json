@@ -1,0 +1,18 @@
+[
+  {
+    "player": 0,
+    "policy": "learner",
+    "match": true,
+    "state_sha256": "bf80c185234c5c728a9ebba7508e03f230b5b44e06592789ac1362ecb1482eea",
+    "engine_sha256": "79692d78ed522316ae518f5e0c30677945cb2a811c826ff55bb3e71574d7c95d",
+    "actions": 1055
+  },
+  {
+    "player": 1,
+    "policy": "tactician",
+    "match": true,
+    "state_sha256": "19ac6985bc65ca48553c9d3b50a0c6a5cf81857a61eba0de251595eb6b567d6e",
+    "engine_sha256": "79692d78ed522316ae518f5e0c30677945cb2a811c826ff55bb3e71574d7c95d",
+    "actions": 2313
+  }
+]

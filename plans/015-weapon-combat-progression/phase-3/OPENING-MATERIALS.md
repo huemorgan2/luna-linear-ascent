@@ -19,3 +19,11 @@ Focused exact tests: every carrier awards both quantities at floor/grade boundar
 ## Rollback
 
 Revert the recorded bundle/yield commit, vendor and restart only ownedQA processes. Keep all previously earned materials, old/new pending reward snapshots and receipts. Newly introduced optional public fields must remain readable by old clients. Disabling the candidate enrollment flag does not convert existing players or undo earned progress. No production operation.
+
+## Candidate checkpoint
+
+Plugin c062bee/0.114.4 restored bundles/two-unitnewexpeditions and narrow CSS.69focused tests passed; full1511passed/8knownlegacyfailures/4skips/1xfail in90.92s; simulator62passed54.00s; HTTP8passed7.75s. The following guidance-only e029396/0.114.5 changes scene metadata, not economic outcomes;70focused and6candidateCPU/replaychecks passed, full1512passed/8samelegacyfailures/4skips/1xfail102.78s. Service-wide followup is running.
+
+Measurements are in simulation/verification/007. Three of8 now reach10within10days (previouslyzero); the fast repeated-policy target stillmissed.64preparedroute trials each show Wood2.666× and RawMetal1.787× securedtargetunits perpaidenergy versus hunting, includingambushenergy. Those units cost the sites' ordinarytoolprice and give muchlessgold; no forcedequalreturn. Oldpendingrewards andoldactiveexpeditionone-unitrules are separately tested, never enlarged on reread. Currentnatural browserplayer remainsungifted and willrechecknewexpedition/Forge.
+
+Exact reversal before restartingcandidateQA: revert e029396 then c062bee inplugin, vendor/restartownedQA. AftercurrentnewQA writes, retainreaders andold/newexpedition snapshots; prior earnedmaterialamounts remainvalid. Never restorepre-experimentplayerdocuments overearnedstate.
