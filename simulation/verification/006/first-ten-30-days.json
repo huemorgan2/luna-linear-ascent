@@ -1,0 +1,6341 @@
+{
+  "run_id": "20260913T065818Z-255953a9",
+  "created_at": "2026-09-13T06:58:18.993089+00:00",
+  "duration_seconds": 21.8336,
+  "config": {
+    "ruleset": "collection-v1",
+    "players": 8,
+    "days": 30,
+    "seed": 31001,
+    "workers": 4,
+    "max_floor": 10,
+    "minutes_per_day": 30,
+    "sessions_per_day": 3,
+    "attendance": 0.9,
+    "action_seconds": 6,
+    "readiness_trials": 4,
+    "readiness_threshold": 0.8,
+    "probe_every_days": 1,
+    "max_combat_actions": 100,
+    "trace_players": 8,
+    "world_frontier": 0,
+    "probe_mode": "improvements",
+    "planner_path": "staff",
+    "planner_growth": "levels",
+    "planner_margin": 2,
+    "policies": [
+      "learner",
+      "tactician",
+      "saver",
+      "planner"
+    ]
+  },
+  "engine_source": {
+    "engine": "plugin_linear_ascent.engine.core.apply_choice",
+    "version": "0.114.2",
+    "package_path": "/private/tmp/ascent-change-everything/worldd/vendor/plugin_linear_ascent",
+    "files": {
+      "__init__.py": "39a22196727584a9082a61448149a67499a5fce11029705b55d6417456c8506b",
+      "backend/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "backend/base.py": "de1bca1322e23843e548c874bcc717b7b07b97f96b9fd6a68833c663151bd87b",
+      "backend/local.py": "f4bc149e8a2e0c9ff91987fc9ec66ba0c32bb80c01b303096ed037876eab9911",
+      "backend/remote.py": "931ce41642dc2ff33e1c4d22ba93e66c207e95dd28fc7d6ac32795e5f7922c87",
+      "collection_view.py": "734a072c0640b00e683d77e6b24a98c2f956406e5f870bcd4e4f96a670db31a8",
+      "colors.py": "a69f07d96272323ae916f0fe7bbe11523b54eec9aeb2d6b5b406411aeb32a2ed",
+      "content/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "content/collection.json": "bf045ed74df2d9e20df75e47cd316ff0a82a5f62e0a2e26f132f047a5ad32d96",
+      "content/floors/floor_001.yaml": "496ec947460999afd610687b7b7626d61f8fc69d6bd98596f7706a803178145f",
+      "content/floors/floor_002.yaml": "68455339b3ef2389e5c4ebf9ce74cceb8c9ee93b29b6a1dcbfb08f674e573e0d",
+      "content/floors/floor_003.yaml": "c4fb3aac7cf705452d4d893fd76bc454e12b6e47877050ff9ea9d327617cc233",
+      "content/floors/floor_004.yaml": "88f5102b9a50b2e983a786bed1f817a7c7980ad844ec3dc8c3ffe05c1deb87ab",
+      "content/floors/floor_005.yaml": "f1a550fd556d05fdc1be8daa6ec4e6b0b4c118d66ffbe7fbd542aa6976b5fd90",
+      "content/floors/floor_006.yaml": "b1c8791a6e053ce32322b2fda6179c9ab3121f6a8961ee2b8389f82134397ee6",
+      "content/floors/floor_007.yaml": "9b910732aa34f8463c4a9fdee3ff74a7d9389f0707a7cbb3497df18b9b69a892",
+      "content/floors/floor_008.yaml": "860cb224dd3bbcbd194b148c74eb08148b3a3b6b660484f789b0a7bfcf118101",
+      "content/floors/floor_009.yaml": "8e4dc553e054d9687e1e62b28d3032b4628862f4a39e1d50e0072ef878e5d672",
+      "content/floors/floor_010.yaml": "e4297e69901cdd944684a31052c4d2b5f7f6caa30660da42174a6a1810371a9c",
+      "content/floors/floor_011.yaml": "54fc1eb8578154b7e29bdf347782498b011e44aca945ab0933f0bae30ed573e0",
+      "content/floors/floor_012.yaml": "a856bd32380c17210219adbf85fe7bd2ec7011a5d8b48a409d73d877dca124ab",
+      "content/floors/floor_013.yaml": "b24d214d6e67445073be75ff327adca6c84310ad0e28afb65595d328c52059f8",
+      "content/floors/floor_014.yaml": "a9e7970684f88f27afb9353524dae042c37cef786eb941fef2c0919aab812559",
+      "content/floors/floor_015.yaml": "2cc32c0bf663bdd6d31d036e9418fcfb0e064d3f391e39b4f861dfdf835a9c15",
+      "content/floors/floor_016.yaml": "0cb52dbbbfbbe530b900ceca151a5b3a2a3e18e20ddaae9c7e9c3b3d9097367e",
+      "content/floors/floor_017.yaml": "93f11e93b060fe117224f0e7084c36e2aaa3bcd38cd371414f25e94cbffd865e",
+      "content/floors/floor_018.yaml": "ef15c1d8eb3402bba32b334baae74e82de5ede7ba6ce84a9100adc64c89e5355",
+      "content/floors/floor_019.yaml": "ce1442d6e2e753dac621fde88ecabaa3650ee3661ec1bfa984638d3220fe3e78",
+      "content/floors/floor_020.yaml": "4b913336d251ca609eff77648510b4d0ef636dd00f91c451223324eaf02889ad",
+      "content/floors/floor_021.yaml": "2cdf65f7a0e0b2d157e0812d7eb5bf9f07af7f34e9fc1e899a9534981d61602c",
+      "content/floors/floor_022.yaml": "47507c5f46df382e11c5bfadede71d418f45b9758d9e35432e1ad2e38b8bcb60",
+      "content/floors/floor_023.yaml": "5d057f498392763d1632b9aac6f9ce4fd0474f63523e5e9094298fa8040d466b",
+      "content/floors/floor_024.yaml": "fa780a92f332fbab330dcc44548064a8e1c6ddb7470a42b60e432b705f55838d",
+      "content/floors/floor_025.yaml": "a7e50bd90a294ddc0bf87a5c281a0a616c24265e57a71f8397b8db7861fdc31f",
+      "content/floors/floor_026.yaml": "fa6881e997591e2c66f720e655c0879a11e87556ec630447aa1031a04c1835e6",
+      "content/floors/floor_027.yaml": "d9a9a4105dbbbb86e6bbdcf3d2e7a94ef383e8d9bb0315b4851d18cc35e9d49b",
+      "content/floors/floor_028.yaml": "2cbbfb149c6e28a7d5ebd09337c42f07f164bec823d7a6f08af4610a84e503ed",
+      "content/floors/floor_029.yaml": "21cbd27c545347baced0171e97f10bbe8c63f00a0b30b5eb0046f3281bf51a2a",
+      "content/floors/floor_030.yaml": "5e7a8487d992298e5f295d504f3836ce8ae95b8fe4b63b1fb64925766768d624",
+      "content/floors/floor_031.yaml": "992acee20bf95328d11aadf30d27c279aaeb9c6193993c60d08f29f11b7b1e23",
+      "content/floors/floor_032.yaml": "70291661667901285d52343883532fc8d5820dcc335936e6698d7a865b8e182a",
+      "content/floors/floor_033.yaml": "da215f5358ba94f43b4da6fc3a906752386e4c3e95dbce2fbe3235fee8d27eec",
+      "content/floors/floor_034.yaml": "ddb20cd76f8070854a6c7a9bc193c42750a370fbfcbbeaf79cf7f9c0ccf82a85",
+      "content/floors/floor_035.yaml": "1d554418e4f81e8a52e9c02a96f506a4e5fc64595739756548989ee63a693abe",
+      "content/floors/floor_036.yaml": "b23d54e45e057ab20666c92099703a6eb1ec941e80378c937f2054b56c32e74a",
+      "content/floors/floor_037.yaml": "30c0b26274921b0e1d987ef17b5296ba58d129081a02aa4aeec742d2a1f080fc",
+      "content/floors/floor_038.yaml": "2cde27be568f86ad741aaa32ac220035832e8403b57ecd4a234eb5ebe1a9a507",
+      "content/floors/floor_039.yaml": "b960ec42487df585cc37247ddf22ca8a02873c0b86f5121481cca65977ea7126",
+      "content/floors/floor_040.yaml": "b3f7ac3913a280b3a7e058a711c1e33a440fd1bcabd7a81d031b0a157797f62a",
+      "content/floors/floor_041.yaml": "8b7a616d4ae493aaa26c32c10722da99de3a89d239c04c94553b4bbdab33d448",
+      "content/floors/floor_042.yaml": "48bd73a31b53a8944f887284b153570be3223e935c8d76cb6f9362a4f14af97b",
+      "content/floors/floor_043.yaml": "294814f2641864f04806372bd0b51588ed6eeb84e01c49aa802eac2203473395",
+      "content/floors/floor_044.yaml": "93f7b69e6e658762dc10375309471a5af31c2767200ac4b55625d7888ca1f50c",
+      "content/floors/floor_045.yaml": "7b8d1f7a9db1bc969a7b9ff376fa9534ac9beaeafb33284475ea8ab452505dfd",
+      "content/floors/floor_046.yaml": "c4969768c202557820bdaac9a865fe6c94f778bd70f3cf2a6a9561f8a7c00db0",
+      "content/floors/floor_047.yaml": "3286e9458f699436947fc0e2970a896fb169855bfa7818cab5ef95bf98420226",
+      "content/floors/floor_048.yaml": "306aab66898c62da0b9940ab502a5c7d3d7d89a824e63ddcc07944af103e3a58",
+      "content/floors/floor_049.yaml": "77594f54c9395d89700f22ce6dd1dec36807ed257e414eb912c15f2f625eeefd",
+      "content/floors/floor_050.yaml": "8d5f978580f9c5bb8c84cd6a987a515031082ed9749ecab9d60a0c1995019282",
+      "content/floors/floor_051.yaml": "02677feb2606a04b213e3a7e74d6892a274d71ef94554a24c028ac025e133386",
+      "content/floors/floor_052.yaml": "f84c209f689c172a36fb66de95007a3008684210590c18d22886606ed22374ce",
+      "content/floors/floor_053.yaml": "4c230bda27c213d2f55ca0630ad36d4c74409f2c70f8db114d753e6eaeb908fe",
+      "content/floors/floor_054.yaml": "0a155038337c7aa0d808d80fd51f2d85452bc518cb608818f0e03e2414be50cb",
+      "content/floors/floor_055.yaml": "ec3a456339a8ae1f9420671aabfca6c618f1dad6bfd6de4734b29ea938c4a53a",
+      "content/floors/floor_056.yaml": "ac89e530c8ce7194dfa96234a0d24385fcc4121ba4b154853d516cc0095467b4",
+      "content/floors/floor_057.yaml": "c1838eb614ca964d632ba22312147643a579001e70d6ba6627b6ae20c1aebac4",
+      "content/floors/floor_058.yaml": "370b1beef6d61adfd0be1d4353c28048bdcbec6b648ce12fd2bc8c83bd479d1f",
+      "content/floors/floor_059.yaml": "15d6a197158d1f637dbb56d86e2fb7b630242cf85beaba7352cbc602b66b1dde",
+      "content/floors/floor_060.yaml": "241a359ef515b15f4678d54634a1e52b5713eb7fca826f09047357f94861249e",
+      "content/floors/floor_061.yaml": "a3c4c9c53a1ebed7f70acef3c8e11c48fb8e2fbfbc566d19d73dfe1b92bfc7f7",
+      "content/floors/floor_062.yaml": "ab7cba6356a9c0b60a7aa5c3136bb967c13e576b1ac57180af6d85464d9dbfa5",
+      "content/floors/floor_063.yaml": "77adcd663c52a3f1b461a977f635d989137ced864a3eb5f30fe80550d26c9cd6",
+      "content/floors/floor_064.yaml": "e01e297692b209c27536736e1db44efe39492579676aa76ed517bca6b43427e0",
+      "content/floors/floor_065.yaml": "3f282ed03d414e30679df6914afe7fe94f7f1d50c0be4adf4a24d7ca78e6ea1f",
+      "content/floors/floor_066.yaml": "01ab15c4deef32dd9e703517938d2797824fb41b803e3df84b9f8131bbac52a3",
+      "content/floors/floor_067.yaml": "90f73f7cd4fe5103690d4777c95410241a4cdc08bb90dd3df7790224b7d515d5",
+      "content/floors/floor_068.yaml": "4efe3403112792b4d3ca9d98807921ff3136183f96940e5840a11f2d07cbae27",
+      "content/floors/floor_069.yaml": "80cc33b41d2c751ada9bed9e06a0b6de04ecd77dd26c69f36e35fc8e71216528",
+      "content/floors/floor_070.yaml": "57e6ac1e5d4404a4fb7666610a156e76e7c26339bbab8d3460c39315f7bafd61",
+      "content/floors/floor_071.yaml": "fdb6535e41ec8544b4062292333227c6fea6e5438e99988db56ebc31cd5b3301",
+      "content/floors/floor_072.yaml": "d2956047982dfac0ce5ae8084a3efd19882c2dc98907455f1f009e0a0386ed6b",
+      "content/floors/floor_073.yaml": "fe23d3563b5052609d5b9eb7451bb5fb6b7fd809ce27c61f5bcfea7bdb9b01c1",
+      "content/floors/floor_074.yaml": "e788c3ef513742a6032eb119f60a19a751da0f7e63b53f1da90ea8de7e440252",
+      "content/floors/floor_075.yaml": "f3dfeea2e794c46663476ba1a6b17dbe12c360d4dd2f94ff5588406817eb41cd",
+      "content/floors/floor_076.yaml": "f75f093076686e7d50403d2cd926390499b24a118c9507efbb9be682e24f6e8f",
+      "content/floors/floor_077.yaml": "cc4231d4fd806327dc779a34ee7fd78a0c256fb2f9d378f2e3a8d55031dd1d8c",
+      "content/floors/floor_078.yaml": "a7c207b197e4e61e1e809ed51a4d003b75742052c37589a066d2ca46dc3f8750",
+      "content/floors/floor_079.yaml": "a8725d3d8cd0e0c8e989f25fe472f759e1a6dd7602ab54628d1430ce1b74dd53",
+      "content/floors/floor_080.yaml": "ac98102e0bc51fee0610c29bd0f3ad37b302763b06ac8b50fa35c1bcb63b3eb1",
+      "content/floors/floor_081.yaml": "d3ea6aea4fc2794804187fdbbb3ed6f61302a2b38f2955e71a8326d2d852d1de",
+      "content/floors/floor_082.yaml": "ea64c8778a7b6f6c5c78016f9c74fd94f84aeefe8c223cead3aef40cbbe49d86",
+      "content/floors/floor_083.yaml": "4a90f0892dc4e71c37561941f0a53cf5a9127218a7b2fd33859920c48f8d9af1",
+      "content/floors/floor_084.yaml": "0587db081f2458dd366c27fdf99f3bd7eb70d3f70871ce77a23e7460fff79c62",
+      "content/floors/floor_085.yaml": "5a254f8db33f7c8a6929ddea9a0488fe12828fdb50e1547299e0092f027b1026",
+      "content/floors/floor_086.yaml": "b94812e153100de269217e226829e3aa4657ff165f16a498259a3191ab01de3e",
+      "content/floors/floor_087.yaml": "6f4a2f55efd2d732c46ed176abe8807fb10aa66c30dad306453230bc32e715a5",
+      "content/floors/floor_088.yaml": "238d1471cce2c1ba3c72806b2efb8bfc8a68de4dd6e9c841dcf184f6cfe7e0c7",
+      "content/floors/floor_089.yaml": "ec7c424cba48b3481e98235fa589ce118914a10226fad637fbc261526f3f380c",
+      "content/floors/floor_090.yaml": "2f9e60744ed7bac27b49b0afef8ada0f52ee9cba5855e154fb8ff299a2ccfc84",
+      "content/floors/floor_091.yaml": "4fb5cdf863f719e0289d14bfd216349d82a23e9db99aecb0c9ff05b2a18f97e0",
+      "content/floors/floor_092.yaml": "b8fcfb5abb1add8e4dca0249f447213fc7f09b6e59882204aed61c2c529a62cf",
+      "content/floors/floor_093.yaml": "c2c02704d749ad5963c9898bba483b4368754371271fbe7eadfe41f9030d3421",
+      "content/floors/floor_094.yaml": "2d89511cd2e2ed49cdcb50f8e862d225f653a5aa43ca4d857dcb9941af6c2866",
+      "content/floors/floor_095.yaml": "443653c059895efd69a3135f452fc4ed20ddca3077f5d56a78c975669c456e5b",
+      "content/floors/floor_096.yaml": "f789936b7e26c5a2867db4aa9d4eac9ae1988cfd1c7cb2dbfe555f5662833058",
+      "content/floors/floor_097.yaml": "d9c36490b83633ce1c00e9de9a14747cf23303df1254521de3385cd90b21ce74",
+      "content/floors/floor_098.yaml": "233b1549a61a119aa68b0c480e0357d90c4948b457a7b114af683bae8f319c81",
+      "content/floors/floor_099.yaml": "00aff204462a0aa5ca27614dc32a5761c8dbe927d8b99b4d23a37b5c50c21dba",
+      "content/floors/floor_100.yaml": "c96474df7f7bec2b34dbb12c1e89bc9d10b476683af0d6194f0caa400d9a8fe4",
+      "content/schema.py": "aea7a3ec45e715926ff74f78bbeb29ee5f632def36f83121868694e5fca3aaa5",
+      "economy.py": "28e9700cbd4c7c9cfd63b630b546e1c4aca855d385c6fb653f1da183199c07ab",
+      "engine/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "engine/arena.py": "3dcc8e303e286f20c96c4d69060ac48b941a9846be3fd51dc44fdde24d388407",
+      "engine/bestiary.py": "8e5a1ea53eac68b76c41c2d0078260f93267b6513164076fdc79a92075de53d5",
+      "engine/collection.py": "499ac163f6e085153fed7a909753463d927c67ff5eb8bc1e28c4a7417d6e9e2e",
+      "engine/combat.py": "9b2d5ad1d0b3851abb56e932436ddcfff00ca7061ed8f3ad5395fafdda5e2260",
+      "engine/contracts.py": "e93e61ed4bf4e379409c44633c2f3af29e44815969aeaca241bfcf577e741eb5",
+      "engine/core.py": "573a0c2b1847e7adcf84c46df0d493d9a8c50a34068b3f9835175be7fe1b8b63",
+      "engine/figure3d.py": "c44157456daee2ddd898bcb6258bffc31fadd2066f7f1526659167e9659c82ac",
+      "engine/floormap.py": "ce8f271dc53e7b79d2d1f53e3d9ec70f3e5d29857d05c27be076d5911f229bbd",
+      "engine/gathering.py": "52ea747ea5228117d9c435b2c920cb365c4cf3da8f1fb5128166e1fea809878a",
+      "engine/groups.py": "ced61a663c9a31c2fc20e315b4adf355b2ae9ea746481b770a56b84a7c8737ef",
+      "engine/hall.py": "5ee063ad708352e814732af8b5ad61242f654f54e65c91649341f36093e1620d",
+      "engine/labs.py": "d3f0089e3fec878c37f94d152dc9a1862e9d8d8077744091c119cac8c4211e9d",
+      "engine/names.py": "b01fa345ce4bdddd7caf1f11537385423c404897fae857619dd8f17dd5329cbb",
+      "engine/notices.py": "fc0cd5ece304aaf361ea3dc1c6890155d8a192fda8771c09d052017567d9b7df",
+      "engine/presence.py": "b4bb594c14846df49ccda7b194847897ef6a255efe5c58cd4a04be9bb6850af3",
+      "engine/profile.py": "dba42c11f3aa1224299c833c75c3261d2c5a3837254376d1274813f9f772ef7b",
+      "engine/rng.py": "173fc1016cd00d33bbb8e8c3430732218f8e0febcf98f3dc287fbf48fbad4fc0",
+      "engine/scene.py": "cc457dd52d58eb6c39d05b67b1dd33cffdc555b7f773f53ce45d056ed69ec2db",
+      "engine/social.py": "0612ba3a99e975bdb72360069b622c122be3fb7a14fed3aede086cc142dd858d",
+      "engine/state.py": "6a841323afecbab2b63e7a94817607ff9e85354a296c63d0fe671c300baef58a",
+      "engine/tips.py": "30c5d0caec8f40813193d6aeed8a33e87a0b04b1cc05a1d139b2531d07b12c4d",
+      "engine/weekly.py": "eef708636640ff5fb46c5433ff8977a2425dd27bf56a838cb578c4a2c45ab788",
+      "engine/workshop.py": "987b9a0ea5d6c3622e43dea0c34b0e59e4b9a15f3d5c5782f19a27bf73e1f6e5",
+      "group_view.py": "00681b881c4e746fd926ef9fe272107f6c4e4c82172adbdb7dbd35f5cea38962",
+      "icons.py": "de5ed81cd3cde39a958ff228524f87a35f23aa310c8c6e908fecc0872e11f824",
+      "pane.py": "04c3fd9e43d6353653c2f94984853afa0a5131f3e2e32533a6bacc01993fc6de",
+      "plugin.py": "b0f66a37f66cf50b30e9c7334b5acbbd063806c99454df1fc10d63a1b9f2793b",
+      "render.py": "f2947a5ad522c20c543fdc79cd265c3fd80300c8c8cde52c9ab77c2de96062c2",
+      "routes.py": "1ab1fba89866f436d9b2c2ebd9de2f445581a63601193981ce13941b898d1abe",
+      "runtime.py": "396414675b6fbf250181fe5de84e9546e48af4b14ef7257a73c705a45c16e1bb",
+      "sfx.py": "6b98003a42a951699eba0929102ae0c3fbbb084a95a56cd91426789bc1dcaf18",
+      "sheet.py": "d26e11ed08456f99c914b0ca7caaf9b3fc462a780ca6472d0b04a1fe0da13b20",
+      "unlocks.py": "73d70317e9b4ea6d51d4cf8be0ad6094021695605cf1cb842261f0256898c06b",
+      "version.py": "a0b992eb2b907acdd397318719c3d40dba51b9edd9c387ed715eb47417eaf79f",
+      "workshop_view.py": "a25475ab5784ddcbeed947b1e3fdccb32fdb752f65e610bdfb727651bb374f35",
+      "@host/gamepath.py": "b2b5b61a74fcb1f8f35413f32e1455b53b087e524e5cd882b7542695afc9b11e"
+    },
+    "sha256": "70a945b88ab05801b7fbabba3f3d92da3159fc600d61dcf0362df085d75ae6db",
+    "host": "isolated local engine documents; no worldd database or multiplayer services",
+    "virtual_epoch": "2026-01-02T06:00:00+00:00"
+  },
+  "runner_sha256": "6622464afbc3c950eba7c15eeb3f7151511a74275e11df9164893e62c9aa2767",
+  "code_commit": "5130bac17e8e3bc681a4fff17d3220269497bd0f",
+  "deterministic_sha256": "4d76bdaf3884c1570f66023053f2e989a993f70c713cd5d268d7d2b3db5f7cf7",
+  "execution": {
+    "workers": 4,
+    "available_cpus": 8,
+    "python": "3.12.13",
+    "platform": "Darwin"
+  },
+  "floors": [
+    {
+      "floor": 1,
+      "players": 8,
+      "reached": 8,
+      "censored": 0,
+      "reach_fraction": 1.0,
+      "mean_days": 0.125,
+      "median_days": 0.0,
+      "p90_days": 0.2999999999999998,
+      "population_median": 0.0,
+      "population_p90": 1.0,
+      "restricted_mean_days": 0.125,
+      "mean_active_minutes": 0.0,
+      "probe_win_rate": 1.0,
+      "hunting": {
+        "attempts": 28,
+        "wins": 28,
+        "kills": 56,
+        "deaths": 0,
+        "actions": 125,
+        "gold": 880,
+        "xp": 100
+      },
+      "policies": {
+        "learner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.5,
+          "median_days": 0.5,
+          "p90_days": 0.9,
+          "population_median": 0.0,
+          "population_p90": 1.0,
+          "restricted_mean_days": 0.5,
+          "mean_active_minutes": 0.0,
+          "probe_win_rate": 1.0
+        },
+        "tactician": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.0,
+          "median_days": 0.0,
+          "p90_days": 0.0,
+          "population_median": 0.0,
+          "population_p90": 0.0,
+          "restricted_mean_days": 0.0,
+          "mean_active_minutes": 0.0,
+          "probe_win_rate": 1.0
+        },
+        "saver": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.0,
+          "median_days": 0.0,
+          "p90_days": 0.0,
+          "population_median": 0.0,
+          "population_p90": 0.0,
+          "restricted_mean_days": 0.0,
+          "mean_active_minutes": 0.0,
+          "probe_win_rate": 1.0
+        },
+        "planner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.0,
+          "median_days": 0.0,
+          "p90_days": 0.0,
+          "population_median": 0.0,
+          "population_p90": 0.0,
+          "restricted_mean_days": 0.0,
+          "mean_active_minutes": 0.0,
+          "probe_win_rate": 1.0
+        }
+      },
+      "warden": {
+        "name": "Warden Brackjaw",
+        "shared_hp": 426,
+        "quorum": null,
+        "regen_fraction_per_hour": 0.0,
+        "required_players": null,
+        "status": "Not measured: shared-world PostgreSQL services are not executed"
+      }
+    },
+    {
+      "floor": 2,
+      "players": 8,
+      "reached": 8,
+      "censored": 0,
+      "reach_fraction": 1.0,
+      "mean_days": 0.125,
+      "median_days": 0.0,
+      "p90_days": 0.2999999999999998,
+      "population_median": 0.0,
+      "population_p90": 1.0,
+      "restricted_mean_days": 0.125,
+      "mean_active_minutes": 0.0,
+      "probe_win_rate": 1.0,
+      "hunting": {
+        "attempts": 116,
+        "wins": 116,
+        "kills": 232,
+        "deaths": 0,
+        "actions": 572,
+        "gold": 4341,
+        "xp": 933
+      },
+      "policies": {
+        "learner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.5,
+          "median_days": 0.5,
+          "p90_days": 0.9,
+          "population_median": 0.0,
+          "population_p90": 1.0,
+          "restricted_mean_days": 0.5,
+          "mean_active_minutes": 0.0,
+          "probe_win_rate": 1.0
+        },
+        "tactician": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.0,
+          "median_days": 0.0,
+          "p90_days": 0.0,
+          "population_median": 0.0,
+          "population_p90": 0.0,
+          "restricted_mean_days": 0.0,
+          "mean_active_minutes": 0.0,
+          "probe_win_rate": 1.0
+        },
+        "saver": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.0,
+          "median_days": 0.0,
+          "p90_days": 0.0,
+          "population_median": 0.0,
+          "population_p90": 0.0,
+          "restricted_mean_days": 0.0,
+          "mean_active_minutes": 0.0,
+          "probe_win_rate": 1.0
+        },
+        "planner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.0,
+          "median_days": 0.0,
+          "p90_days": 0.0,
+          "population_median": 0.0,
+          "population_p90": 0.0,
+          "restricted_mean_days": 0.0,
+          "mean_active_minutes": 0.0,
+          "probe_win_rate": 1.0
+        }
+      },
+      "warden": {
+        "name": "Warden Rustmaw",
+        "shared_hp": 538,
+        "quorum": null,
+        "regen_fraction_per_hour": 0.0,
+        "required_players": null,
+        "status": "Not measured: shared-world PostgreSQL services are not executed"
+      }
+    },
+    {
+      "floor": 3,
+      "players": 8,
+      "reached": 8,
+      "censored": 0,
+      "reach_fraction": 1.0,
+      "mean_days": 0.125,
+      "median_days": 0.0,
+      "p90_days": 0.2999999999999998,
+      "population_median": 0.0,
+      "population_p90": 1.0,
+      "restricted_mean_days": 0.125,
+      "mean_active_minutes": 0.0,
+      "probe_win_rate": 1.0,
+      "hunting": {
+        "attempts": 99,
+        "wins": 99,
+        "kills": 198,
+        "deaths": 0,
+        "actions": 367,
+        "gold": 1103,
+        "xp": 1398
+      },
+      "policies": {
+        "learner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.5,
+          "median_days": 0.5,
+          "p90_days": 0.9,
+          "population_median": 0.0,
+          "population_p90": 1.0,
+          "restricted_mean_days": 0.5,
+          "mean_active_minutes": 0.0,
+          "probe_win_rate": 1.0
+        },
+        "tactician": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.0,
+          "median_days": 0.0,
+          "p90_days": 0.0,
+          "population_median": 0.0,
+          "population_p90": 0.0,
+          "restricted_mean_days": 0.0,
+          "mean_active_minutes": 0.0,
+          "probe_win_rate": 1.0
+        },
+        "saver": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.0,
+          "median_days": 0.0,
+          "p90_days": 0.0,
+          "population_median": 0.0,
+          "population_p90": 0.0,
+          "restricted_mean_days": 0.0,
+          "mean_active_minutes": 0.0,
+          "probe_win_rate": 1.0
+        },
+        "planner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.0,
+          "median_days": 0.0,
+          "p90_days": 0.0,
+          "population_median": 0.0,
+          "population_p90": 0.0,
+          "restricted_mean_days": 0.0,
+          "mean_active_minutes": 0.0,
+          "probe_win_rate": 1.0
+        }
+      },
+      "warden": {
+        "name": "Warden Sedgeback",
+        "shared_hp": 636,
+        "quorum": null,
+        "regen_fraction_per_hour": 0.0,
+        "required_players": null,
+        "status": "Not measured: shared-world PostgreSQL services are not executed"
+      }
+    },
+    {
+      "floor": 4,
+      "players": 8,
+      "reached": 8,
+      "censored": 0,
+      "reach_fraction": 1.0,
+      "mean_days": 0.875390625,
+      "median_days": 1.0,
+      "p90_days": 1.0,
+      "population_median": 1.0,
+      "population_p90": 1.0,
+      "restricted_mean_days": 0.875390625,
+      "mean_active_minutes": 15.55,
+      "probe_win_rate": 1.0,
+      "hunting": {
+        "attempts": 110,
+        "wins": 106,
+        "kills": 264,
+        "deaths": 4,
+        "actions": 759,
+        "gold": 7174,
+        "xp": 2979
+      },
+      "policies": {
+        "learner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.6667708333333333,
+          "median_days": 0.6667708333333333,
+          "p90_days": 0.9333541666666667,
+          "population_median": 0.3335416666666667,
+          "population_p90": 1.0,
+          "restricted_mean_days": 0.6667708333333333,
+          "mean_active_minutes": 5.14999999999999,
+          "probe_win_rate": 1.0
+        },
+        "tactician": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 1.0,
+          "median_days": 1.0,
+          "p90_days": 1.0,
+          "population_median": 1.0,
+          "population_p90": 1.0,
+          "restricted_mean_days": 1.0,
+          "mean_active_minutes": 18.9,
+          "probe_win_rate": 1.0
+        },
+        "saver": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 1.0,
+          "median_days": 1.0,
+          "p90_days": 1.0,
+          "population_median": 1.0,
+          "population_p90": 1.0,
+          "restricted_mean_days": 1.0,
+          "mean_active_minutes": 15.549999999999962,
+          "probe_win_rate": 1.0
+        },
+        "planner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.8347916666666666,
+          "median_days": 0.8347916666666666,
+          "p90_days": 0.9669583333333334,
+          "population_median": 0.6695833333333333,
+          "population_p90": 1.0,
+          "restricted_mean_days": 0.8347916666666666,
+          "mean_active_minutes": 22.60000000000005,
+          "probe_win_rate": 1.0
+        }
+      },
+      "warden": {
+        "name": "Warden Palegleam",
+        "shared_hp": 769,
+        "quorum": null,
+        "regen_fraction_per_hour": 0.0,
+        "required_players": null,
+        "status": "Not measured: shared-world PostgreSQL services are not executed"
+      }
+    },
+    {
+      "floor": 5,
+      "players": 8,
+      "reached": 8,
+      "censored": 0,
+      "reach_fraction": 1.0,
+      "mean_days": 1.1259201388888889,
+      "median_days": 1.0,
+      "p90_days": 1.7668125000000001,
+      "population_median": 1.0,
+      "population_p90": 2.0,
+      "restricted_mean_days": 1.1259201388888889,
+      "mean_active_minutes": 20.712500000000038,
+      "probe_win_rate": 1.0,
+      "hunting": {
+        "attempts": 102,
+        "wins": 98,
+        "kills": 249,
+        "deaths": 4,
+        "actions": 899,
+        "gold": 7789,
+        "xp": 3582
+      },
+      "policies": {
+        "learner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.8354513888888888,
+          "median_days": 0.8354513888888888,
+          "p90_days": 1.2369791666666667,
+          "population_median": 0.3335416666666667,
+          "population_p90": 1.337361111111111,
+          "restricted_mean_days": 0.8354513888888888,
+          "mean_active_minutes": 13.049999999999969,
+          "probe_win_rate": 1.0
+        },
+        "tactician": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 1.0,
+          "median_days": 1.0,
+          "p90_days": 1.0,
+          "population_median": 1.0,
+          "population_p90": 1.0,
+          "restricted_mean_days": 1.0,
+          "mean_active_minutes": 18.9,
+          "probe_win_rate": 1.0
+        },
+        "saver": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 1.8334375,
+          "median_days": 1.8334375,
+          "p90_days": 1.9666875,
+          "population_median": 1.666875,
+          "population_p90": 2.0,
+          "restricted_mean_days": 1.8334375,
+          "mean_active_minutes": 28.300000000000132,
+          "probe_win_rate": 1.0
+        },
+        "planner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 0.8347916666666666,
+          "median_days": 0.8347916666666666,
+          "p90_days": 0.9669583333333334,
+          "population_median": 0.6695833333333333,
+          "population_p90": 1.0,
+          "restricted_mean_days": 0.8347916666666666,
+          "mean_active_minutes": 22.60000000000005,
+          "probe_win_rate": 1.0
+        }
+      },
+      "warden": {
+        "name": "Warden Sumplock",
+        "shared_hp": 927,
+        "quorum": null,
+        "regen_fraction_per_hour": 0.0,
+        "required_players": null,
+        "status": "Not measured: shared-world PostgreSQL services are not executed"
+      }
+    },
+    {
+      "floor": 6,
+      "players": 8,
+      "reached": 8,
+      "censored": 0,
+      "reach_fraction": 1.0,
+      "mean_days": 1.834184027777778,
+      "median_days": 1.8341666666666665,
+      "p90_days": 2.1015069444444445,
+      "population_median": 1.6683333333333332,
+      "population_p90": 2.3333333333333335,
+      "restricted_mean_days": 1.834184027777778,
+      "mean_active_minutes": 32.26250000000019,
+      "probe_win_rate": 1.0,
+      "hunting": {
+        "attempts": 432,
+        "wins": 296,
+        "kills": 827,
+        "deaths": 135,
+        "actions": 4123,
+        "gold": 27793,
+        "xp": 15695
+      },
+      "policies": {
+        "learner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 2.0001736111111112,
+          "median_days": 2.0001736111111112,
+          "p90_days": 2.266701388888889,
+          "population_median": 1.6670138888888888,
+          "population_p90": 2.3333333333333335,
+          "restricted_mean_days": 2.0001736111111112,
+          "mean_active_minutes": 27.000000000000114,
+          "probe_win_rate": 1.0
+        },
+        "tactician": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 1.833923611111111,
+          "median_days": 1.833923611111111,
+          "p90_days": 1.9667847222222221,
+          "population_median": 1.6678472222222223,
+          "population_p90": 2.0,
+          "restricted_mean_days": 1.833923611111111,
+          "mean_active_minutes": 33.55000000000021,
+          "probe_win_rate": 1.0
+        },
+        "saver": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 2.001076388888889,
+          "median_days": 2.001076388888889,
+          "p90_days": 2.0019375,
+          "population_median": 2.0,
+          "population_p90": 2.002152777777778,
+          "restricted_mean_days": 2.001076388888889,
+          "mean_active_minutes": 32.15000000000019,
+          "probe_win_rate": 1.0
+        },
+        "planner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 1.5015625,
+          "median_days": 1.5015625,
+          "p90_days": 1.6349791666666667,
+          "population_median": 1.3347916666666666,
+          "population_p90": 1.6683333333333332,
+          "restricted_mean_days": 1.5015625,
+          "mean_active_minutes": 36.35000000000025,
+          "probe_win_rate": 1.0
+        }
+      },
+      "warden": {
+        "name": "Warden Duskspin",
+        "shared_hp": 1361,
+        "quorum": null,
+        "regen_fraction_per_hour": 0.0,
+        "required_players": null,
+        "status": "Not measured: shared-world PostgreSQL services are not executed"
+      }
+    },
+    {
+      "floor": 7,
+      "players": 8,
+      "reached": 7,
+      "censored": 1,
+      "reach_fraction": 0.875,
+      "mean_days": 7.239166666666667,
+      "median_days": 3.6675,
+      "p90_days": 14.134875000000008,
+      "population_median": 3.6675,
+      "population_p90": null,
+      "restricted_mean_days": 10.084270833333333,
+      "mean_active_minutes": 92.65714285714202,
+      "probe_win_rate": 1.0,
+      "hunting": {
+        "attempts": 453,
+        "wins": 373,
+        "kills": 992,
+        "deaths": 62,
+        "actions": 3378,
+        "gold": 43674,
+        "xp": 23034
+      },
+      "policies": {
+        "learner": {
+          "players": 2,
+          "reached": 1,
+          "censored": 1,
+          "reach_fraction": 0.5,
+          "mean_days": 29.33395833333333,
+          "median_days": 29.33395833333333,
+          "p90_days": 29.33395833333333,
+          "population_median": 29.33395833333333,
+          "population_p90": null,
+          "restricted_mean_days": 29.666979166666664,
+          "mean_active_minutes": 262.9999999999913,
+          "probe_win_rate": 1.0
+        },
+        "tactician": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 3.3343402777777778,
+          "median_days": 3.3343402777777778,
+          "p90_days": 3.6008680555555554,
+          "population_median": 3.0011805555555555,
+          "population_p90": 3.6675,
+          "restricted_mean_days": 3.3343402777777778,
+          "mean_active_minutes": 58.95000000000057,
+          "probe_win_rate": 1.0
+        },
+        "saver": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 4.0010763888888885,
+          "median_days": 4.0010763888888885,
+          "p90_days": 4.0019375,
+          "population_median": 4.0,
+          "population_p90": 4.002152777777778,
+          "restricted_mean_days": 4.0010763888888885,
+          "mean_active_minutes": 63.000000000000625,
+          "probe_win_rate": 1.0
+        },
+        "planner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 3.3346875000000002,
+          "median_days": 3.3346875000000002,
+          "p90_days": 3.3349375,
+          "population_median": 3.334375,
+          "population_p90": 3.335,
+          "restricted_mean_days": 3.3346875000000002,
+          "mean_active_minutes": 70.85000000000025,
+          "probe_win_rate": 1.0
+        }
+      },
+      "warden": {
+        "name": "Warden Applewrath",
+        "shared_hp": 1799,
+        "quorum": null,
+        "regen_fraction_per_hour": 0.0,
+        "required_players": null,
+        "status": "Not measured: shared-world PostgreSQL services are not executed"
+      }
+    },
+    {
+      "floor": 8,
+      "players": 8,
+      "reached": 6,
+      "censored": 2,
+      "reach_fraction": 0.75,
+      "mean_days": 4.167002314814815,
+      "median_days": 4.0,
+      "p90_days": 4.501006944444445,
+      "population_median": 4.0,
+      "population_p90": null,
+      "restricted_mean_days": 10.62525173611111,
+      "mean_active_minutes": 72.3833333333335,
+      "probe_win_rate": 1.0,
+      "hunting": {
+        "attempts": 412,
+        "wins": 411,
+        "kills": 1032,
+        "deaths": 1,
+        "actions": 2049,
+        "gold": 58438,
+        "xp": 29303
+      },
+      "policies": {
+        "learner": {
+          "players": 2,
+          "reached": 0,
+          "censored": 2,
+          "reach_fraction": 0.0,
+          "mean_days": null,
+          "median_days": null,
+          "p90_days": null,
+          "population_median": null,
+          "population_p90": null,
+          "restricted_mean_days": 30.0,
+          "mean_active_minutes": null,
+          "probe_win_rate": null
+        },
+        "tactician": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 4.0,
+          "median_days": 4.0,
+          "p90_days": 4.0,
+          "population_median": 4.0,
+          "population_p90": 4.0,
+          "restricted_mean_days": 4.0,
+          "mean_active_minutes": 66.75000000000048,
+          "probe_win_rate": 1.0
+        },
+        "saver": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 4.501006944444445,
+          "median_days": 4.501006944444445,
+          "p90_days": 4.634201388888889,
+          "population_median": 4.334513888888889,
+          "population_p90": 4.6675,
+          "restricted_mean_days": 4.501006944444445,
+          "mean_active_minutes": 70.75000000000026,
+          "probe_win_rate": 1.0
+        },
+        "planner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 4.0,
+          "median_days": 4.0,
+          "p90_days": 4.0,
+          "population_median": 4.0,
+          "population_p90": 4.0,
+          "restricted_mean_days": 4.0,
+          "mean_active_minutes": 79.64999999999975,
+          "probe_win_rate": 1.0
+        }
+      },
+      "warden": {
+        "name": "Warden Cinderhide",
+        "shared_hp": 2436,
+        "quorum": null,
+        "regen_fraction_per_hour": 0.0,
+        "required_players": null,
+        "status": "Not measured: shared-world PostgreSQL services are not executed"
+      }
+    },
+    {
+      "floor": 9,
+      "players": 8,
+      "reached": 6,
+      "censored": 2,
+      "reach_fraction": 0.75,
+      "mean_days": 12.777939814814815,
+      "median_days": 12.0,
+      "p90_days": 17.0,
+      "population_median": 12.0,
+      "population_p90": null,
+      "restricted_mean_days": 17.08345486111111,
+      "mean_active_minutes": 198.11666666666056,
+      "probe_win_rate": 1.0,
+      "hunting": {
+        "attempts": 577,
+        "wins": 555,
+        "kills": 1416,
+        "deaths": 16,
+        "actions": 3109,
+        "gold": 90240,
+        "xp": 45804
+      },
+      "policies": {
+        "learner": {
+          "players": 2,
+          "reached": 0,
+          "censored": 2,
+          "reach_fraction": 0.0,
+          "mean_days": null,
+          "median_days": null,
+          "p90_days": null,
+          "population_median": null,
+          "population_p90": null,
+          "restricted_mean_days": 30.0,
+          "mean_active_minutes": null,
+          "probe_win_rate": null
+        },
+        "tactician": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 13.333819444444444,
+          "median_days": 13.333819444444444,
+          "p90_days": 16.26676388888889,
+          "population_median": 9.667638888888888,
+          "population_p90": 17.0,
+          "restricted_mean_days": 13.333819444444444,
+          "mean_active_minutes": 205.24999999999386,
+          "probe_win_rate": 1.0
+        },
+        "saver": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 14.5,
+          "median_days": 14.5,
+          "p90_days": 16.5,
+          "population_median": 12.0,
+          "population_p90": 17.0,
+          "restricted_mean_days": 14.5,
+          "mean_active_minutes": 175.7999999999943,
+          "probe_win_rate": 1.0
+        },
+        "planner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 10.5,
+          "median_days": 10.5,
+          "p90_days": 11.7,
+          "population_median": 9.0,
+          "population_p90": 12.0,
+          "restricted_mean_days": 10.5,
+          "mean_active_minutes": 213.2999999999935,
+          "probe_win_rate": 1.0
+        }
+      },
+      "warden": {
+        "name": "Warden Glarefang",
+        "shared_hp": 3484,
+        "quorum": null,
+        "regen_fraction_per_hour": 0.0,
+        "required_players": null,
+        "status": "Not measured: shared-world PostgreSQL services are not executed"
+      }
+    },
+    {
+      "floor": 10,
+      "players": 8,
+      "reached": 6,
+      "censored": 2,
+      "reach_fraction": 0.75,
+      "mean_days": 15.5559375,
+      "median_days": 14.000104166666667,
+      "p90_days": 19.333437500000002,
+      "population_median": 14.000208333333333,
+      "population_p90": null,
+      "restricted_mean_days": 19.166953125,
+      "mean_active_minutes": 224.69999999999405,
+      "probe_win_rate": 1.0,
+      "hunting": {
+        "attempts": 0,
+        "wins": 0,
+        "kills": 0,
+        "deaths": 0,
+        "actions": 0,
+        "gold": 0,
+        "xp": 0
+      },
+      "policies": {
+        "learner": {
+          "players": 2,
+          "reached": 0,
+          "censored": 2,
+          "reach_fraction": 0.0,
+          "mean_days": null,
+          "median_days": null,
+          "p90_days": null,
+          "population_median": null,
+          "population_p90": null,
+          "restricted_mean_days": 30.0,
+          "mean_active_minutes": null,
+          "probe_win_rate": null
+        },
+        "tactician": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 16.000104166666667,
+          "median_days": 16.000104166666667,
+          "p90_days": 18.400020833333333,
+          "population_median": 13.000208333333333,
+          "population_p90": 19.0,
+          "restricted_mean_days": 16.000104166666667,
+          "mean_active_minutes": 234.4499999999943,
+          "probe_win_rate": 1.0
+        },
+        "saver": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 16.833437500000002,
+          "median_days": 16.833437500000002,
+          "p90_days": 19.1001875,
+          "population_median": 14.0,
+          "population_p90": 19.666875,
+          "restricted_mean_days": 16.833437500000002,
+          "mean_active_minutes": 203.6999999999927,
+          "probe_win_rate": 1.0
+        },
+        "planner": {
+          "players": 2,
+          "reached": 2,
+          "censored": 0,
+          "reach_fraction": 1.0,
+          "mean_days": 13.834270833333333,
+          "median_days": 13.834270833333333,
+          "p90_days": 13.967020833333333,
+          "population_median": 13.668333333333333,
+          "population_p90": 14.000208333333333,
+          "restricted_mean_days": 13.834270833333333,
+          "mean_active_minutes": 235.94999999999516,
+          "probe_win_rate": 1.0
+        }
+      },
+      "warden": {
+        "name": "Gnarl, the Goblin King",
+        "shared_hp": 4727,
+        "quorum": 2,
+        "regen_fraction_per_hour": 0.0,
+        "required_players": null,
+        "status": "Not measured: shared-world PostgreSQL services are not executed"
+      }
+    }
+  ],
+  "boundaries": {
+    "resolver": "Actual imported core; no duplicated game math",
+    "world_access": "External readiness fixture: open the next floor after qualifying. Shared-world waiting excluded.",
+    "probes": "Disposable copies; owned gear/condition/training, restored HP/energy, test-floor access. No player rewards. Mode: improvements",
+    "recovery": "Actual sleep between planner visits; social/PvP ambushes are absent from this personal-state experiment.",
+    "multiplayer": "Worldd database services, social interactions and shared warden victory are not run. Required-party counts remain null.",
+    "mechanics": "Actual collection-v1 engine: three weapons, sequential groups, per-enemy energy, delayed haul, Forge upgrades and named gathering sites. Shared warden redesign not yet measured.",
+    "activity": "Heuristic choices and scheduled attendance are experimental inputs, not real player demographics.",
+    "trace": "Complete action/time/world-fixture inputs saved for the first trace_players players. Other players retain final state, summary and recent actions."
+  },
+  "players": [
+    {
+      "id": 0,
+      "policy": "learner",
+      "ready_floor": 6,
+      "counters": {
+        "actions": 2506,
+        "enemy_start": 284,
+        "kill": 210,
+        "earned_gold": 5377,
+        "earned_xp": 3509,
+        "group_clear": 69,
+        "levelup": 4,
+        "heal": 43,
+        "buy": 1,
+        "train": 1,
+        "upgrade": 4,
+        "death": 74,
+        "group_defeat": 74,
+        "stew": 254,
+        "strongbox": 3
+      },
+      "gold_ledger": {
+        "enemy_start": 0,
+        "kill": 0,
+        "group_clear": 5377,
+        "levelup": -530,
+        "heal": -3586,
+        "buy": -200,
+        "train": -89,
+        "upgrade": -743,
+        "death": -880,
+        "group_defeat": 0,
+        "stew": -508,
+        "strongbox": 1110
+      },
+      "bottlenecks": {
+        "energy_wait": 1,
+        "health_wait": 62
+      },
+      "timeline": [
+        {
+          "day": 1,
+          "ready_floor": 5,
+          "level": 3,
+          "gold": 4,
+          "bank": 0,
+          "active_minutes": 29.50000000000015,
+          "actions": 295
+        },
+        {
+          "day": 3,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 33.80000000000021,
+          "actions": 338
+        },
+        {
+          "day": 4,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 136,
+          "bank": 0,
+          "active_minutes": 63.80000000000064,
+          "actions": 638
+        },
+        {
+          "day": 5,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 93.79999999999895,
+          "actions": 938
+        },
+        {
+          "day": 6,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 94.6999999999989,
+          "actions": 947
+        },
+        {
+          "day": 7,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 96.89999999999877,
+          "actions": 969
+        },
+        {
+          "day": 8,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 107.39999999999817,
+          "actions": 1074
+        },
+        {
+          "day": 9,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 110.99999999999797,
+          "actions": 1110
+        },
+        {
+          "day": 11,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 112.89999999999786,
+          "actions": 1129
+        },
+        {
+          "day": 12,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 142.89999999999617,
+          "actions": 1429
+        },
+        {
+          "day": 13,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 143.8999999999961,
+          "actions": 1439
+        },
+        {
+          "day": 14,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 149.3999999999958,
+          "actions": 1494
+        },
+        {
+          "day": 15,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 6,
+          "bank": 0,
+          "active_minutes": 179.3999999999941,
+          "actions": 1794
+        },
+        {
+          "day": 16,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 182.49999999999392,
+          "actions": 1825
+        },
+        {
+          "day": 17,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 184.99999999999378,
+          "actions": 1850
+        },
+        {
+          "day": 18,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 186.89999999999367,
+          "actions": 1869
+        },
+        {
+          "day": 19,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 194.49999999999324,
+          "actions": 1945
+        },
+        {
+          "day": 20,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 195.99999999999315,
+          "actions": 1960
+        },
+        {
+          "day": 21,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 198.09999999999303,
+          "actions": 1981
+        },
+        {
+          "day": 22,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 6,
+          "bank": 0,
+          "active_minutes": 228.09999999999133,
+          "actions": 2281
+        },
+        {
+          "day": 23,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 229.09999999999127,
+          "actions": 2291
+        },
+        {
+          "day": 24,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 230.79999999999117,
+          "actions": 2308
+        },
+        {
+          "day": 25,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 233.29999999999103,
+          "actions": 2333
+        },
+        {
+          "day": 26,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 238.09999999999076,
+          "actions": 2381
+        },
+        {
+          "day": 27,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 239.69999999999067,
+          "actions": 2397
+        },
+        {
+          "day": 28,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 245.8999999999903,
+          "actions": 2459
+        },
+        {
+          "day": 29,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 250.59999999999005,
+          "actions": 2506
+        }
+      ],
+      "milestones": [
+        {
+          "floor": 1,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 2,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Kobold digger / Shellback tortoise",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "The Seep / Kobold digger",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Rust hound / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Kobold digger / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 3,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mire boar / Marsh adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Mire boar / Drowned lantern",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Mire boar / Fence-wire pike",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Mire boar / Mire boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 4,
+          "day": 0.3335416666666667,
+          "active_minutes": 10.29999999999998,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Glade-wight / Wick-owl",
+                "type": "group",
+                "outcome": "win",
+                "actions": 15
+              },
+              {
+                "monster": "The lamp-eater / Wick-owl",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Wick-owl / Lamp newt / Dusk-hare",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              },
+              {
+                "monster": "Pale stag / Glade-wight",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              }
+            ]
+          }
+        },
+        {
+          "floor": 5,
+          "day": 0.3335416666666667,
+          "active_minutes": 10.29999999999998,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Sump lamprey / Blind cave-fish",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Drift courser / Blind cave-fish / Blind cave-fish",
+                "type": "group",
+                "outcome": "win",
+                "actions": 19
+              },
+              {
+                "monster": "Bilge kobold / Drowned-miner husk",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              },
+              {
+                "monster": "Drowned-miner husk / Sump-crawler",
+                "type": "group",
+                "outcome": "win",
+                "actions": 15
+              }
+            ]
+          }
+        },
+        {
+          "floor": 6,
+          "day": 2.3333333333333335,
+          "active_minutes": 33.500000000000206,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Grave-rat / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Guano vole / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Grave-rat / Guano vole",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Vault boar / Grave-rat / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 21
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "policy": "tactician",
+      "ready_floor": 10,
+      "counters": {
+        "actions": 4092,
+        "enemy_start": 744,
+        "kill": 711,
+        "earned_gold": 33946,
+        "earned_xp": 16958,
+        "group_clear": 286,
+        "train": 7,
+        "buy": 4,
+        "levelup": 10,
+        "gather_tool": 4,
+        "gather": 258,
+        "gather_extract": 54,
+        "upgrade": 26,
+        "heal": 71,
+        "group_escape": 6,
+        "stew": 358,
+        "death": 27,
+        "group_defeat": 27,
+        "strongbox": 3
+      },
+      "gold_ledger": {
+        "enemy_start": 0,
+        "kill": 0,
+        "group_clear": 33457,
+        "train": -451,
+        "buy": -1170,
+        "levelup": -7070,
+        "gather_tool": -101,
+        "gather": 0,
+        "gather_extract": 489,
+        "upgrade": -15200,
+        "heal": -8157,
+        "group_escape": 0,
+        "stew": -716,
+        "death": -2116,
+        "group_defeat": 0,
+        "strongbox": 2000
+      },
+      "bottlenecks": {
+        "energy_wait": 68,
+        "health_wait": 5
+      },
+      "timeline": [
+        {
+          "day": 1,
+          "ready_floor": 3,
+          "level": 2,
+          "gold": 181,
+          "bank": 0,
+          "active_minutes": 18.9,
+          "actions": 189
+        },
+        {
+          "day": 2,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 200,
+          "bank": 0,
+          "active_minutes": 34.200000000000216,
+          "actions": 342
+        },
+        {
+          "day": 3,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 165,
+          "bank": 0,
+          "active_minutes": 53.900000000000496,
+          "actions": 539
+        },
+        {
+          "day": 4,
+          "ready_floor": 7,
+          "level": 5,
+          "gold": 95,
+          "bank": 0,
+          "active_minutes": 68.80000000000037,
+          "actions": 688
+        },
+        {
+          "day": 5,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 302,
+          "bank": 0,
+          "active_minutes": 86.89999999999934,
+          "actions": 869
+        },
+        {
+          "day": 6,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 125,
+          "bank": 0,
+          "active_minutes": 104.19999999999835,
+          "actions": 1042
+        },
+        {
+          "day": 7,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 109.89999999999803,
+          "actions": 1099
+        },
+        {
+          "day": 8,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 194,
+          "bank": 0,
+          "active_minutes": 134.59999999999664,
+          "actions": 1346
+        },
+        {
+          "day": 9,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 140,
+          "bank": 0,
+          "active_minutes": 158.49999999999528,
+          "actions": 1585
+        },
+        {
+          "day": 10,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 233,
+          "bank": 0,
+          "active_minutes": 176.99999999999423,
+          "actions": 1770
+        },
+        {
+          "day": 11,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 236,
+          "bank": 0,
+          "active_minutes": 198.799999999993,
+          "actions": 1988
+        },
+        {
+          "day": 12,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 212.8999999999922,
+          "actions": 2129
+        },
+        {
+          "day": 13,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 537,
+          "bank": 0,
+          "active_minutes": 232.49999999999108,
+          "actions": 2325
+        },
+        {
+          "day": 14,
+          "ready_floor": 8,
+          "level": 7,
+          "gold": 644,
+          "bank": 0,
+          "active_minutes": 246.69999999999027,
+          "actions": 2467
+        },
+        {
+          "day": 15,
+          "ready_floor": 8,
+          "level": 7,
+          "gold": 693,
+          "bank": 0,
+          "active_minutes": 255.89999999998975,
+          "actions": 2559
+        },
+        {
+          "day": 16,
+          "ready_floor": 8,
+          "level": 7,
+          "gold": 665,
+          "bank": 0,
+          "active_minutes": 264.7999999999917,
+          "actions": 2648
+        },
+        {
+          "day": 18,
+          "ready_floor": 9,
+          "level": 8,
+          "gold": 707,
+          "bank": 0,
+          "active_minutes": 279.49999999999505,
+          "actions": 2795
+        },
+        {
+          "day": 20,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 838,
+          "bank": 0,
+          "active_minutes": 297.2999999999991,
+          "actions": 2973
+        },
+        {
+          "day": 21,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 137,
+          "bank": 0,
+          "active_minutes": 323.50000000000506,
+          "actions": 3235
+        },
+        {
+          "day": 22,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 1111,
+          "bank": 0,
+          "active_minutes": 335.40000000000776,
+          "actions": 3354
+        },
+        {
+          "day": 23,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 1100,
+          "bank": 0,
+          "active_minutes": 345.30000000001,
+          "actions": 3453
+        },
+        {
+          "day": 24,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 357.5000000000128,
+          "actions": 3575
+        },
+        {
+          "day": 25,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 1192,
+          "bank": 0,
+          "active_minutes": 368.5000000000153,
+          "actions": 3685
+        },
+        {
+          "day": 27,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 1471,
+          "bank": 0,
+          "active_minutes": 381.00000000001813,
+          "actions": 3810
+        },
+        {
+          "day": 28,
+          "ready_floor": 10,
+          "level": 11,
+          "gold": 736,
+          "bank": 0,
+          "active_minutes": 391.60000000002054,
+          "actions": 3916
+        },
+        {
+          "day": 29,
+          "ready_floor": 10,
+          "level": 11,
+          "gold": 1498,
+          "bank": 0,
+          "active_minutes": 399.20000000002227,
+          "actions": 3992
+        },
+        {
+          "day": 30,
+          "ready_floor": 10,
+          "level": 11,
+          "gold": 1465,
+          "bank": 0,
+          "active_minutes": 409.20000000002454,
+          "actions": 4092
+        }
+      ],
+      "milestones": [
+        {
+          "floor": 1,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 2,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Kobold digger / Shellback tortoise",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "The Seep / Kobold digger",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Rust hound / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Kobold digger / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 3,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mire boar / Marsh adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Mire boar / Drowned lantern",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Mire boar / Fence-wire pike",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Mire boar / Mire boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 4,
+          "day": 1.0,
+          "active_minutes": 18.9,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Dusk-hare / The lamp-eater",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Glade-wight / The lamp-eater",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Dusk-hare / Pale stag / Lamp newt",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Wick-owl / The lamp-eater / Lamp newt",
+                "type": "group",
+                "outcome": "win",
+                "actions": 21
+              }
+            ]
+          }
+        },
+        {
+          "floor": 5,
+          "day": 1.0,
+          "active_minutes": 18.9,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Sump-crawler / Bilge kobold / Drowned-miner husk",
+                "type": "group",
+                "outcome": "win",
+                "actions": 18
+              },
+              {
+                "monster": "Drowned-miner husk / Blind cave-fish",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Drift courser / Drift courser",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              },
+              {
+                "monster": "Sump-crawler / Drift courser",
+                "type": "group",
+                "outcome": "win",
+                "actions": 16
+              }
+            ]
+          }
+        },
+        {
+          "floor": 6,
+          "day": 1.6678472222222223,
+          "active_minutes": 31.60000000000018,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Guano vole / Guano vole / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Cave broodling / Sentinel spider / Guano vole",
+                "type": "group",
+                "outcome": "win",
+                "actions": 15
+              },
+              {
+                "monster": "Vault boar / Vault boar / Cave broodling",
+                "type": "group",
+                "outcome": "win",
+                "actions": 15
+              },
+              {
+                "monster": "Vault boar / Vault boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 13
+              }
+            ]
+          }
+        },
+        {
+          "floor": 7,
+          "day": 3.0011805555555555,
+          "active_minutes": 55.60000000000052,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mouse-tide / Orchard wolf / Orchard wolf",
+                "type": "group",
+                "outcome": "win",
+                "actions": 13
+              },
+              {
+                "monster": "Mouse-tide / Cider-mad boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Windfall dormouse / Orchard hare / Windfall dormouse",
+                "type": "group",
+                "outcome": "win",
+                "actions": 18
+              },
+              {
+                "monster": "Mouse-tide / Windfall dormouse / Cider-mad boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              }
+            ]
+          }
+        },
+        {
+          "floor": 8,
+          "day": 4.0,
+          "active_minutes": 68.80000000000037,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Glass-hare / Glass-hare / Dune adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              },
+              {
+                "monster": "Glass-hare / Ashline jackal",
+                "type": "group",
+                "outcome": "win",
+                "actions": 12
+              },
+              {
+                "monster": "Ashline jackal / Ash salamander",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              },
+              {
+                "monster": "Cinder vulture / Dune adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              }
+            ]
+          }
+        },
+        {
+          "floor": 9,
+          "day": 17.0,
+          "active_minutes": 264.7999999999917,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Glare vole / Bog-cotton hare / Bog-cotton hare",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Bog-cotton hare / Pylon adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Glare vole / Bog-cotton hare",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Night-shrew / Shadow-line wolf / Pylon adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              }
+            ]
+          }
+        },
+        {
+          "floor": 10,
+          "day": 19.0,
+          "active_minutes": 279.49999999999505,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Goblin guard / Banner-kite",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Courier-hound / Parade-horse / Goblin guard",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              },
+              {
+                "monster": "Banner-broken wolf / Courier-hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Courier-hound / Banner-kite / Goblin guard",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "policy": "saver",
+      "ready_floor": 10,
+      "counters": {
+        "actions": 3825,
+        "enemy_start": 993,
+        "kill": 992,
+        "earned_gold": 46591,
+        "earned_xp": 22666,
+        "group_clear": 406,
+        "buy": 9,
+        "train": 7,
+        "gather_tool": 2,
+        "gather": 133,
+        "gather_extract": 28,
+        "deposit": 30,
+        "levelup": 10,
+        "upgrade": 27,
+        "heal": 26,
+        "strongbox": 3,
+        "death": 1,
+        "group_defeat": 1,
+        "stew": 4,
+        "repair": 1
+      },
+      "gold_ledger": {
+        "enemy_start": 0,
+        "kill": 0,
+        "group_clear": 46472,
+        "buy": -3940,
+        "train": -489,
+        "gather_tool": -80,
+        "gather": 0,
+        "gather_extract": 119,
+        "deposit": -18183,
+        "levelup": -7070,
+        "upgrade": -16659,
+        "heal": -2269,
+        "strongbox": 2145,
+        "death": -7,
+        "group_defeat": 0,
+        "stew": -8,
+        "repair": -81
+      },
+      "bottlenecks": {
+        "energy_wait": 89,
+        "health_wait": 1
+      },
+      "timeline": [
+        {
+          "day": 1,
+          "ready_floor": 3,
+          "level": 1,
+          "gold": 0,
+          "bank": 171,
+          "active_minutes": 14.899999999999963,
+          "actions": 149
+        },
+        {
+          "day": 2,
+          "ready_floor": 5,
+          "level": 2,
+          "gold": 0,
+          "bank": 320,
+          "active_minutes": 30.20000000000016,
+          "actions": 302
+        },
+        {
+          "day": 3,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 0,
+          "bank": 513,
+          "active_minutes": 43.50000000000035,
+          "actions": 435
+        },
+        {
+          "day": 4,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 652,
+          "active_minutes": 60.800000000000594,
+          "actions": 608
+        },
+        {
+          "day": 5,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 0,
+          "bank": 817,
+          "active_minutes": 75.49999999999999,
+          "actions": 755
+        },
+        {
+          "day": 6,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 0,
+          "bank": 1138,
+          "active_minutes": 90.89999999999911,
+          "actions": 909
+        },
+        {
+          "day": 7,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 0,
+          "bank": 1369,
+          "active_minutes": 106.59999999999822,
+          "actions": 1066
+        },
+        {
+          "day": 8,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 0,
+          "bank": 1609,
+          "active_minutes": 116.59999999999765,
+          "actions": 1166
+        },
+        {
+          "day": 9,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 0,
+          "bank": 1993,
+          "active_minutes": 130.59999999999687,
+          "actions": 1306
+        },
+        {
+          "day": 10,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 0,
+          "bank": 2415,
+          "active_minutes": 145.09999999999604,
+          "actions": 1451
+        },
+        {
+          "day": 11,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 0,
+          "bank": 2976,
+          "active_minutes": 160.29999999999518,
+          "actions": 1603
+        },
+        {
+          "day": 12,
+          "ready_floor": 8,
+          "level": 7,
+          "gold": 0,
+          "bank": 3307,
+          "active_minutes": 173.29999999999444,
+          "actions": 1733
+        },
+        {
+          "day": 13,
+          "ready_floor": 9,
+          "level": 7,
+          "gold": 0,
+          "bank": 3696,
+          "active_minutes": 187.49999999999363,
+          "actions": 1875
+        },
+        {
+          "day": 14,
+          "ready_floor": 9,
+          "level": 7,
+          "gold": 0,
+          "bank": 4253,
+          "active_minutes": 198.399999999993,
+          "actions": 1984
+        },
+        {
+          "day": 15,
+          "ready_floor": 10,
+          "level": 7,
+          "gold": 0,
+          "bank": 4254,
+          "active_minutes": 209.49999999999238,
+          "actions": 2095
+        },
+        {
+          "day": 16,
+          "ready_floor": 10,
+          "level": 7,
+          "gold": 0,
+          "bank": 4470,
+          "active_minutes": 225.1999999999915,
+          "actions": 2252
+        },
+        {
+          "day": 17,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 0,
+          "bank": 4887,
+          "active_minutes": 242.09999999999053,
+          "actions": 2421
+        },
+        {
+          "day": 18,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 0,
+          "bank": 5327,
+          "active_minutes": 257.09999999998996,
+          "actions": 2571
+        },
+        {
+          "day": 19,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 0,
+          "bank": 6462,
+          "active_minutes": 269.8999999999929,
+          "actions": 2699
+        },
+        {
+          "day": 20,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 0,
+          "bank": 7469,
+          "active_minutes": 281.4999999999955,
+          "actions": 2815
+        },
+        {
+          "day": 21,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 0,
+          "bank": 8241,
+          "active_minutes": 293.19999999999817,
+          "actions": 2932
+        },
+        {
+          "day": 22,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 0,
+          "bank": 9132,
+          "active_minutes": 304.0000000000006,
+          "actions": 3040
+        },
+        {
+          "day": 23,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 0,
+          "bank": 10553,
+          "active_minutes": 312.90000000000265,
+          "actions": 3129
+        },
+        {
+          "day": 24,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 0,
+          "bank": 11283,
+          "active_minutes": 323.40000000000504,
+          "actions": 3234
+        },
+        {
+          "day": 25,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 0,
+          "bank": 11867,
+          "active_minutes": 332.8000000000072,
+          "actions": 3328
+        },
+        {
+          "day": 26,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 0,
+          "bank": 12635,
+          "active_minutes": 343.9000000000097,
+          "actions": 3439
+        },
+        {
+          "day": 27,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 0,
+          "bank": 13065,
+          "active_minutes": 353.80000000001195,
+          "actions": 3538
+        },
+        {
+          "day": 28,
+          "ready_floor": 10,
+          "level": 11,
+          "gold": 0,
+          "bank": 13905,
+          "active_minutes": 364.6000000000144,
+          "actions": 3646
+        },
+        {
+          "day": 29,
+          "ready_floor": 10,
+          "level": 11,
+          "gold": 0,
+          "bank": 15973,
+          "active_minutes": 373.20000000001636,
+          "actions": 3732
+        },
+        {
+          "day": 30,
+          "ready_floor": 10,
+          "level": 11,
+          "gold": 0,
+          "bank": 18183,
+          "active_minutes": 382.5000000000185,
+          "actions": 3825
+        }
+      ],
+      "milestones": [
+        {
+          "floor": 1,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 2,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Kobold digger / Shellback tortoise",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "The Seep / Kobold digger",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Rust hound / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Kobold digger / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 3,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mire boar / Marsh adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Mire boar / Drowned lantern",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Mire boar / Fence-wire pike",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Mire boar / Mire boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 4,
+          "day": 1.0,
+          "active_minutes": 14.899999999999963,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Dusk-hare / The lamp-eater",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Glade-wight / The lamp-eater",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Dusk-hare / Pale stag / Lamp newt",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Wick-owl / The lamp-eater / Lamp newt",
+                "type": "group",
+                "outcome": "win",
+                "actions": 20
+              }
+            ]
+          }
+        },
+        {
+          "floor": 5,
+          "day": 1.666875,
+          "active_minutes": 25.600000000000094,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Sump-crawler / Bilge kobold / Drowned-miner husk",
+                "type": "group",
+                "outcome": "win",
+                "actions": 18
+              },
+              {
+                "monster": "Drowned-miner husk / Blind cave-fish",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Drift courser / Drift courser",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Sump-crawler / Drift courser",
+                "type": "group",
+                "outcome": "win",
+                "actions": 15
+              }
+            ]
+          }
+        },
+        {
+          "floor": 6,
+          "day": 2.002152777777778,
+          "active_minutes": 33.3000000000002,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Grave-rat / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Guano vole / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Grave-rat / Guano vole",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Vault boar / Grave-rat / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 19
+              }
+            ]
+          }
+        },
+        {
+          "floor": 7,
+          "day": 4.002152777777778,
+          "active_minutes": 63.90000000000064,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mouse-tide / Orchard hare / Orchard wolf",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Orchard hare / Orchard wolf / Mouse-tide",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              },
+              {
+                "monster": "Orchard hare / Mouse-tide",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Mouse-tide / Windfall dormouse",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              }
+            ]
+          }
+        },
+        {
+          "floor": 8,
+          "day": 4.334513888888889,
+          "active_minutes": 67.90000000000042,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Glass-hare / Glass-hare / Dune adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Glass-hare / Ashline jackal",
+                "type": "group",
+                "outcome": "win",
+                "actions": 12
+              },
+              {
+                "monster": "Ashline jackal / Ash salamander",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              },
+              {
+                "monster": "Cinder vulture / Dune adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              }
+            ]
+          }
+        },
+        {
+          "floor": 9,
+          "day": 12.0,
+          "active_minutes": 173.29999999999444,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Glare vole / Night-shrew",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Shadow-line wolf / Glare vole / Glare vole",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Pylon adder / Glare vole",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Shadow-line wolf / Night-shrew",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              }
+            ]
+          }
+        },
+        {
+          "floor": 10,
+          "day": 14.0,
+          "active_minutes": 198.399999999993,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Goblin guard / Banner-kite / Goblin guard",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Banner-broken wolf / Courier-hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Banner-kite / Courier-hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Parade-horse / Courier-hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "policy": "planner",
+      "ready_floor": 10,
+      "counters": {
+        "actions": 4942,
+        "enemy_start": 985,
+        "kill": 941,
+        "earned_gold": 47273,
+        "earned_xp": 23918,
+        "group_clear": 369,
+        "train": 7,
+        "buy": 5,
+        "levelup": 13,
+        "gather_tool": 4,
+        "gather": 391,
+        "gather_extract": 77,
+        "upgrade": 27,
+        "heal": 54,
+        "death": 34,
+        "group_defeat": 34,
+        "stew": 148,
+        "group_escape": 10,
+        "strongbox": 3,
+        "repair": 1
+      },
+      "gold_ledger": {
+        "enemy_start": 0,
+        "kill": 0,
+        "group_clear": 46498,
+        "train": -427,
+        "buy": -1660,
+        "levelup": -17500,
+        "gather_tool": -101,
+        "gather": 0,
+        "gather_extract": 775,
+        "upgrade": -16659,
+        "heal": -6434,
+        "death": -2398,
+        "group_defeat": 0,
+        "stew": -296,
+        "group_escape": 0,
+        "strongbox": 2145,
+        "repair": -81
+      },
+      "bottlenecks": {
+        "energy_wait": 76,
+        "health_wait": 1
+      },
+      "timeline": [
+        {
+          "day": 1,
+          "ready_floor": 5,
+          "level": 2,
+          "gold": 194,
+          "bank": 0,
+          "active_minutes": 25.000000000000085,
+          "actions": 250
+        },
+        {
+          "day": 2,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 204,
+          "bank": 0,
+          "active_minutes": 41.40000000000032,
+          "actions": 414
+        },
+        {
+          "day": 3,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 233,
+          "bank": 0,
+          "active_minutes": 61.1000000000006,
+          "actions": 611
+        },
+        {
+          "day": 4,
+          "ready_floor": 7,
+          "level": 5,
+          "gold": 256,
+          "bank": 0,
+          "active_minutes": 74.60000000000004,
+          "actions": 746
+        },
+        {
+          "day": 5,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 51,
+          "bank": 0,
+          "active_minutes": 97.09999999999876,
+          "actions": 971
+        },
+        {
+          "day": 6,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 174,
+          "bank": 0,
+          "active_minutes": 123.89999999999723,
+          "actions": 1239
+        },
+        {
+          "day": 7,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 49,
+          "bank": 0,
+          "active_minutes": 152.19999999999564,
+          "actions": 1522
+        },
+        {
+          "day": 8,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 84,
+          "bank": 0,
+          "active_minutes": 180.39999999999404,
+          "actions": 1804
+        },
+        {
+          "day": 9,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 297,
+          "bank": 0,
+          "active_minutes": 201.59999999999283,
+          "actions": 2016
+        },
+        {
+          "day": 10,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 379,
+          "bank": 0,
+          "active_minutes": 225.0999999999915,
+          "actions": 2251
+        },
+        {
+          "day": 11,
+          "ready_floor": 8,
+          "level": 7,
+          "gold": 209,
+          "bank": 0,
+          "active_minutes": 246.99999999999025,
+          "actions": 2470
+        },
+        {
+          "day": 12,
+          "ready_floor": 8,
+          "level": 7,
+          "gold": 713,
+          "bank": 0,
+          "active_minutes": 265.49999999999187,
+          "actions": 2655
+        },
+        {
+          "day": 13,
+          "ready_floor": 9,
+          "level": 7,
+          "gold": 762,
+          "bank": 0,
+          "active_minutes": 277.19999999999453,
+          "actions": 2772
+        },
+        {
+          "day": 14,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 319,
+          "bank": 0,
+          "active_minutes": 288.29999999999706,
+          "actions": 2883
+        },
+        {
+          "day": 15,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 690,
+          "bank": 0,
+          "active_minutes": 302.70000000000033,
+          "actions": 3027
+        },
+        {
+          "day": 16,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 894,
+          "bank": 0,
+          "active_minutes": 321.4000000000046,
+          "actions": 3214
+        },
+        {
+          "day": 17,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 870,
+          "bank": 0,
+          "active_minutes": 332.9000000000072,
+          "actions": 3329
+        },
+        {
+          "day": 18,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 424,
+          "bank": 0,
+          "active_minutes": 345.6000000000101,
+          "actions": 3456
+        },
+        {
+          "day": 19,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 234,
+          "bank": 0,
+          "active_minutes": 361.70000000001374,
+          "actions": 3617
+        },
+        {
+          "day": 20,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 1077,
+          "bank": 0,
+          "active_minutes": 375.900000000017,
+          "actions": 3759
+        },
+        {
+          "day": 21,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 607,
+          "bank": 0,
+          "active_minutes": 392.00000000002063,
+          "actions": 3920
+        },
+        {
+          "day": 22,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 685,
+          "bank": 0,
+          "active_minutes": 403.6000000000233,
+          "actions": 4036
+        },
+        {
+          "day": 24,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 794,
+          "bank": 0,
+          "active_minutes": 416.8000000000263,
+          "actions": 4168
+        },
+        {
+          "day": 25,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 1685,
+          "bank": 0,
+          "active_minutes": 428.50000000002893,
+          "actions": 4285
+        },
+        {
+          "day": 26,
+          "ready_floor": 10,
+          "level": 11,
+          "gold": 1165,
+          "bank": 0,
+          "active_minutes": 442.8000000000322,
+          "actions": 4428
+        },
+        {
+          "day": 27,
+          "ready_floor": 10,
+          "level": 12,
+          "gold": 1667,
+          "bank": 0,
+          "active_minutes": 456.80000000003537,
+          "actions": 4568
+        },
+        {
+          "day": 28,
+          "ready_floor": 10,
+          "level": 13,
+          "gold": 2060,
+          "bank": 0,
+          "active_minutes": 469.3000000000382,
+          "actions": 4693
+        },
+        {
+          "day": 29,
+          "ready_floor": 10,
+          "level": 14,
+          "gold": 774,
+          "bank": 0,
+          "active_minutes": 481.1000000000409,
+          "actions": 4811
+        },
+        {
+          "day": 30,
+          "ready_floor": 10,
+          "level": 14,
+          "gold": 3912,
+          "bank": 0,
+          "active_minutes": 494.2000000000439,
+          "actions": 4942
+        }
+      ],
+      "milestones": [
+        {
+          "floor": 1,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 2,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Kobold digger / Shellback tortoise",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "The Seep / Kobold digger",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Rust hound / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Kobold digger / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 3,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mire boar / Marsh adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Mire boar / Drowned lantern",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Mire boar / Fence-wire pike",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Mire boar / Mire boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 4,
+          "day": 0.6695833333333333,
+          "active_minutes": 23.20000000000006,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Glade-wight / Wick-owl",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              },
+              {
+                "monster": "The lamp-eater / Wick-owl",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Wick-owl / Lamp newt / Dusk-hare",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Pale stag / Glade-wight",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              }
+            ]
+          }
+        },
+        {
+          "floor": 5,
+          "day": 0.6695833333333333,
+          "active_minutes": 23.20000000000006,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Sump lamprey / Blind cave-fish",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Drift courser / Blind cave-fish / Blind cave-fish",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              },
+              {
+                "monster": "Bilge kobold / Drowned-miner husk",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              },
+              {
+                "monster": "Drowned-miner husk / Sump-crawler",
+                "type": "group",
+                "outcome": "win",
+                "actions": 15
+              }
+            ]
+          }
+        },
+        {
+          "floor": 6,
+          "day": 1.6683333333333332,
+          "active_minutes": 38.90000000000028,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Guano vole / Guano vole / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Cave broodling / Sentinel spider / Guano vole",
+                "type": "group",
+                "outcome": "win",
+                "actions": 15
+              },
+              {
+                "monster": "Vault boar / Vault boar / Cave broodling",
+                "type": "group",
+                "outcome": "win",
+                "actions": 15
+              },
+              {
+                "monster": "Vault boar / Vault boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 13
+              }
+            ]
+          }
+        },
+        {
+          "floor": 7,
+          "day": 3.335,
+          "active_minutes": 68.00000000000041,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mouse-tide / Orchard wolf / Orchard wolf",
+                "type": "group",
+                "outcome": "win",
+                "actions": 12
+              },
+              {
+                "monster": "Mouse-tide / Cider-mad boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Windfall dormouse / Orchard hare / Windfall dormouse",
+                "type": "group",
+                "outcome": "win",
+                "actions": 20
+              },
+              {
+                "monster": "Mouse-tide / Windfall dormouse / Cider-mad boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              }
+            ]
+          }
+        },
+        {
+          "floor": 8,
+          "day": 4.0,
+          "active_minutes": 74.60000000000004,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Glass-hare / Glass-hare / Dune adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Glass-hare / Ashline jackal",
+                "type": "group",
+                "outcome": "win",
+                "actions": 12
+              },
+              {
+                "monster": "Ashline jackal / Ash salamander",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              },
+              {
+                "monster": "Cinder vulture / Dune adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              }
+            ]
+          }
+        },
+        {
+          "floor": 9,
+          "day": 12.0,
+          "active_minutes": 265.49999999999187,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Glare vole / Night-shrew",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Shadow-line wolf / Glare vole / Glare vole",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Pylon adder / Glare vole",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Shadow-line wolf / Night-shrew",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              }
+            ]
+          }
+        },
+        {
+          "floor": 10,
+          "day": 13.668333333333333,
+          "active_minutes": 286.09999999999656,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Courier-hound / Goblin guard",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Banner-broken wolf / Courier-hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Banner-kite / Goblin guard / Parade-horse",
+                "type": "group",
+                "outcome": "win",
+                "actions": 12
+              },
+              {
+                "monster": "Parade-horse / Banner-kite",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "policy": "learner",
+      "ready_floor": 7,
+      "counters": {
+        "actions": 2790,
+        "enemy_start": 353,
+        "kill": 283,
+        "earned_gold": 8216,
+        "earned_xp": 5071,
+        "death": 70,
+        "group_defeat": 70,
+        "heal": 41,
+        "group_clear": 92,
+        "levelup": 5,
+        "train": 1,
+        "buy": 1,
+        "stew": 330,
+        "strongbox": 3,
+        "upgrade": 7
+      },
+      "gold_ledger": {
+        "enemy_start": 0,
+        "kill": 0,
+        "death": -2291,
+        "group_defeat": 0,
+        "heal": -3809,
+        "group_clear": 8216,
+        "levelup": -910,
+        "train": -69,
+        "buy": -200,
+        "stew": -660,
+        "strongbox": 1110,
+        "upgrade": -1487
+      },
+      "bottlenecks": {
+        "energy_wait": 4,
+        "health_wait": 63
+      },
+      "timeline": [
+        {
+          "day": 2,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 142,
+          "bank": 0,
+          "active_minutes": 30.000000000000156,
+          "actions": 300
+        },
+        {
+          "day": 3,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 54,
+          "bank": 0,
+          "active_minutes": 57.20000000000054,
+          "actions": 572
+        },
+        {
+          "day": 4,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 59.500000000000576,
+          "actions": 595
+        },
+        {
+          "day": 5,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 61.4000000000006,
+          "actions": 614
+        },
+        {
+          "day": 6,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 63.50000000000063,
+          "actions": 635
+        },
+        {
+          "day": 7,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 65.50000000000055,
+          "actions": 655
+        },
+        {
+          "day": 8,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 70.10000000000029,
+          "actions": 701
+        },
+        {
+          "day": 9,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 72.60000000000015,
+          "actions": 726
+        },
+        {
+          "day": 10,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 74.20000000000006,
+          "actions": 742
+        },
+        {
+          "day": 11,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 80.29999999999971,
+          "actions": 803
+        },
+        {
+          "day": 12,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 81.89999999999962,
+          "actions": 819
+        },
+        {
+          "day": 13,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 83.29999999999954,
+          "actions": 833
+        },
+        {
+          "day": 14,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 84.99999999999945,
+          "actions": 850
+        },
+        {
+          "day": 15,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 87.39999999999931,
+          "actions": 874
+        },
+        {
+          "day": 16,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 72,
+          "bank": 0,
+          "active_minutes": 117.3999999999976,
+          "actions": 1174
+        },
+        {
+          "day": 17,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 120.69999999999742,
+          "actions": 1207
+        },
+        {
+          "day": 18,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 123.19999999999727,
+          "actions": 1232
+        },
+        {
+          "day": 20,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 132.79999999999674,
+          "actions": 1328
+        },
+        {
+          "day": 21,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 134.49999999999665,
+          "actions": 1345
+        },
+        {
+          "day": 22,
+          "ready_floor": 6,
+          "level": 6,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 139.69999999999635,
+          "actions": 1397
+        },
+        {
+          "day": 23,
+          "ready_floor": 6,
+          "level": 6,
+          "gold": 214,
+          "bank": 0,
+          "active_minutes": 169.69999999999465,
+          "actions": 1697
+        },
+        {
+          "day": 24,
+          "ready_floor": 6,
+          "level": 6,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 175.49999999999432,
+          "actions": 1755
+        },
+        {
+          "day": 25,
+          "ready_floor": 6,
+          "level": 6,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 179.59999999999408,
+          "actions": 1796
+        },
+        {
+          "day": 26,
+          "ready_floor": 6,
+          "level": 6,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 185.29999999999376,
+          "actions": 1853
+        },
+        {
+          "day": 27,
+          "ready_floor": 6,
+          "level": 6,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 192.69999999999334,
+          "actions": 1927
+        },
+        {
+          "day": 28,
+          "ready_floor": 6,
+          "level": 6,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 222.69999999999163,
+          "actions": 2227
+        },
+        {
+          "day": 29,
+          "ready_floor": 6,
+          "level": 6,
+          "gold": 122,
+          "bank": 0,
+          "active_minutes": 252.09999999998996,
+          "actions": 2521
+        },
+        {
+          "day": 30,
+          "ready_floor": 7,
+          "level": 6,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 278.99999999999494,
+          "actions": 2790
+        }
+      ],
+      "milestones": [
+        {
+          "floor": 1,
+          "day": 1.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 2,
+          "day": 1.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Rust hound / Kobold digger",
+                "type": "group",
+                "outcome": "win",
+                "actions": 3
+              },
+              {
+                "monster": "Shellback tortoise / The Seep",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Shellback tortoise / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Shellback tortoise / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              }
+            ]
+          }
+        },
+        {
+          "floor": 3,
+          "day": 1.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Marsh adder / Fence-wire pike",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Marsh wolf / Marsh adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Marsh adder / Drowned lantern",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Marsh adder / Marsh wolf",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              }
+            ]
+          }
+        },
+        {
+          "floor": 4,
+          "day": 1.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Dusk-hare / The lamp-eater",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Glade-wight / The lamp-eater",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Dusk-hare / Pale stag / Lamp newt",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Wick-owl / The lamp-eater / Lamp newt",
+                "type": "group",
+                "outcome": "win",
+                "actions": 20
+              }
+            ]
+          }
+        },
+        {
+          "floor": 5,
+          "day": 1.337361111111111,
+          "active_minutes": 15.79999999999996,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Sump-crawler / Bilge kobold / Drowned-miner husk",
+                "type": "group",
+                "outcome": "win",
+                "actions": 18
+              },
+              {
+                "monster": "Drowned-miner husk / Blind cave-fish",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Drift courser / Drift courser",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              },
+              {
+                "monster": "Sump-crawler / Drift courser",
+                "type": "group",
+                "outcome": "win",
+                "actions": 18
+              }
+            ]
+          }
+        },
+        {
+          "floor": 6,
+          "day": 1.6670138888888888,
+          "active_minutes": 20.50000000000002,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Guano vole / Guano vole / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Cave broodling / Sentinel spider / Guano vole",
+                "type": "group",
+                "outcome": "win",
+                "actions": 15
+              },
+              {
+                "monster": "Vault boar / Vault boar / Cave broodling",
+                "type": "group",
+                "outcome": "win",
+                "actions": 18
+              },
+              {
+                "monster": "Vault boar / Vault boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              }
+            ]
+          }
+        },
+        {
+          "floor": 7,
+          "day": 29.33395833333333,
+          "active_minutes": 262.9999999999913,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Orchard hare / Windfall dormouse",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Mouse-tide / Cider-mad boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Windfall dormouse / Windfall dormouse",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Cider-mad boar / Orchard wolf",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "policy": "tactician",
+      "ready_floor": 10,
+      "counters": {
+        "actions": 3593,
+        "enemy_start": 619,
+        "kill": 609,
+        "earned_gold": 29562,
+        "earned_xp": 14601,
+        "group_clear": 244,
+        "train": 7,
+        "buy": 8,
+        "levelup": 9,
+        "gather_tool": 5,
+        "gather": 425,
+        "gather_extract": 89,
+        "upgrade": 27,
+        "heal": 39,
+        "death": 6,
+        "group_defeat": 6,
+        "stew": 170,
+        "group_escape": 4,
+        "strongbox": 3
+      },
+      "gold_ledger": {
+        "enemy_start": 0,
+        "kill": 0,
+        "group_clear": 28640,
+        "train": -424,
+        "buy": -3130,
+        "levelup": -5030,
+        "gather_tool": -113,
+        "gather": 0,
+        "gather_extract": 922,
+        "upgrade": -16659,
+        "heal": -4886,
+        "death": -354,
+        "group_defeat": 0,
+        "stew": -340,
+        "group_escape": 0,
+        "strongbox": 2145
+      },
+      "bottlenecks": {
+        "energy_wait": 75,
+        "health_wait": 7
+      },
+      "timeline": [
+        {
+          "day": 1,
+          "ready_floor": 3,
+          "level": 2,
+          "gold": 179,
+          "bank": 0,
+          "active_minutes": 18.9,
+          "actions": 189
+        },
+        {
+          "day": 2,
+          "ready_floor": 5,
+          "level": 3,
+          "gold": 95,
+          "bank": 0,
+          "active_minutes": 35.500000000000234,
+          "actions": 355
+        },
+        {
+          "day": 3,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 139,
+          "bank": 0,
+          "active_minutes": 51.60000000000046,
+          "actions": 516
+        },
+        {
+          "day": 4,
+          "ready_floor": 7,
+          "level": 5,
+          "gold": 222,
+          "bank": 0,
+          "active_minutes": 64.7000000000006,
+          "actions": 647
+        },
+        {
+          "day": 5,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 1,
+          "bank": 0,
+          "active_minutes": 75.39999999999999,
+          "actions": 754
+        },
+        {
+          "day": 6,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 148,
+          "bank": 0,
+          "active_minutes": 93.79999999999895,
+          "actions": 938
+        },
+        {
+          "day": 7,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 214,
+          "bank": 0,
+          "active_minutes": 112.49999999999788,
+          "actions": 1125
+        },
+        {
+          "day": 8,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 120.59999999999742,
+          "actions": 1206
+        },
+        {
+          "day": 9,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 387,
+          "bank": 0,
+          "active_minutes": 133.19999999999672,
+          "actions": 1332
+        },
+        {
+          "day": 10,
+          "ready_floor": 9,
+          "level": 7,
+          "gold": 479,
+          "bank": 0,
+          "active_minutes": 149.3999999999958,
+          "actions": 1494
+        },
+        {
+          "day": 11,
+          "ready_floor": 9,
+          "level": 7,
+          "gold": 357,
+          "bank": 0,
+          "active_minutes": 166.39999999999483,
+          "actions": 1664
+        },
+        {
+          "day": 12,
+          "ready_floor": 9,
+          "level": 7,
+          "gold": 630,
+          "bank": 0,
+          "active_minutes": 178.39999999999415,
+          "actions": 1784
+        },
+        {
+          "day": 13,
+          "ready_floor": 9,
+          "level": 7,
+          "gold": 721,
+          "bank": 0,
+          "active_minutes": 189.09999999999354,
+          "actions": 1891
+        },
+        {
+          "day": 14,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 200.79999999999288,
+          "actions": 2008
+        },
+        {
+          "day": 15,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 0,
+          "bank": 0,
+          "active_minutes": 202.99999999999275,
+          "actions": 2030
+        },
+        {
+          "day": 16,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 382,
+          "bank": 0,
+          "active_minutes": 232.99999999999105,
+          "actions": 2330
+        },
+        {
+          "day": 17,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 648,
+          "bank": 0,
+          "active_minutes": 242.99999999999048,
+          "actions": 2430
+        },
+        {
+          "day": 18,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 892,
+          "bank": 0,
+          "active_minutes": 253.3999999999899,
+          "actions": 2534
+        },
+        {
+          "day": 19,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 782,
+          "bank": 0,
+          "active_minutes": 262.9999999999913,
+          "actions": 2630
+        },
+        {
+          "day": 20,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 1031,
+          "bank": 0,
+          "active_minutes": 270.499999999993,
+          "actions": 2705
+        },
+        {
+          "day": 21,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 1192,
+          "bank": 0,
+          "active_minutes": 284.1999999999961,
+          "actions": 2842
+        },
+        {
+          "day": 22,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 1271,
+          "bank": 0,
+          "active_minutes": 294.9999999999986,
+          "actions": 2950
+        },
+        {
+          "day": 23,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 657,
+          "bank": 0,
+          "active_minutes": 303.4000000000005,
+          "actions": 3034
+        },
+        {
+          "day": 24,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 926,
+          "bank": 0,
+          "active_minutes": 314.8000000000031,
+          "actions": 3148
+        },
+        {
+          "day": 25,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 255,
+          "bank": 0,
+          "active_minutes": 324.1000000000052,
+          "actions": 3241
+        },
+        {
+          "day": 26,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 681,
+          "bank": 0,
+          "active_minutes": 334.2000000000075,
+          "actions": 3342
+        },
+        {
+          "day": 28,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 1481,
+          "bank": 0,
+          "active_minutes": 344.3000000000098,
+          "actions": 3443
+        },
+        {
+          "day": 29,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 1529,
+          "bank": 0,
+          "active_minutes": 351.20000000001136,
+          "actions": 3512
+        },
+        {
+          "day": 30,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 821,
+          "bank": 0,
+          "active_minutes": 359.3000000000132,
+          "actions": 3593
+        }
+      ],
+      "milestones": [
+        {
+          "floor": 1,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 2,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Kobold digger / Shellback tortoise",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "The Seep / Kobold digger",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Rust hound / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Kobold digger / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 3,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mire boar / Marsh adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Mire boar / Drowned lantern",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Mire boar / Fence-wire pike",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Mire boar / Mire boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 4,
+          "day": 1.0,
+          "active_minutes": 18.9,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Dusk-hare / The lamp-eater",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Glade-wight / The lamp-eater",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Dusk-hare / Pale stag / Lamp newt",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Wick-owl / The lamp-eater / Lamp newt",
+                "type": "group",
+                "outcome": "win",
+                "actions": 21
+              }
+            ]
+          }
+        },
+        {
+          "floor": 5,
+          "day": 1.0,
+          "active_minutes": 18.9,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Sump-crawler / Bilge kobold / Drowned-miner husk",
+                "type": "group",
+                "outcome": "win",
+                "actions": 18
+              },
+              {
+                "monster": "Drowned-miner husk / Blind cave-fish",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Drift courser / Drift courser",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              },
+              {
+                "monster": "Sump-crawler / Drift courser",
+                "type": "group",
+                "outcome": "win",
+                "actions": 16
+              }
+            ]
+          }
+        },
+        {
+          "floor": 6,
+          "day": 2.0,
+          "active_minutes": 35.500000000000234,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Grave-rat / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Guano vole / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Grave-rat / Guano vole",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Vault boar / Grave-rat / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 16
+              }
+            ]
+          }
+        },
+        {
+          "floor": 7,
+          "day": 3.6675,
+          "active_minutes": 62.300000000000615,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mouse-tide / Orchard wolf / Orchard wolf",
+                "type": "group",
+                "outcome": "win",
+                "actions": 12
+              },
+              {
+                "monster": "Mouse-tide / Cider-mad boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Windfall dormouse / Orchard hare / Windfall dormouse",
+                "type": "group",
+                "outcome": "win",
+                "actions": 20
+              },
+              {
+                "monster": "Mouse-tide / Windfall dormouse / Cider-mad boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              }
+            ]
+          }
+        },
+        {
+          "floor": 8,
+          "day": 4.0,
+          "active_minutes": 64.7000000000006,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Glass-hare / Glass-hare / Dune adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Glass-hare / Ashline jackal",
+                "type": "group",
+                "outcome": "win",
+                "actions": 12
+              },
+              {
+                "monster": "Ashline jackal / Ash salamander",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              },
+              {
+                "monster": "Cinder vulture / Dune adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              }
+            ]
+          }
+        },
+        {
+          "floor": 9,
+          "day": 9.667638888888888,
+          "active_minutes": 145.699999999996,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Shadow-line wolf / Shadow-line wolf / Pylon adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Night-shrew / Flicker-wight",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Shadow-line wolf / Pylon adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Pylon adder / Shadow-line wolf / Bog-cotton hare",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              }
+            ]
+          }
+        },
+        {
+          "floor": 10,
+          "day": 13.000208333333333,
+          "active_minutes": 189.39999999999353,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Courier-hound / Goblin guard",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Banner-broken wolf / Courier-hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Banner-kite / Goblin guard / Parade-horse",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              },
+              {
+                "monster": "Parade-horse / Banner-kite",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "policy": "saver",
+      "ready_floor": 10,
+      "counters": {
+        "actions": 3269,
+        "enemy_start": 740,
+        "kill": 739,
+        "earned_gold": 32614,
+        "earned_xp": 15670,
+        "group_clear": 305,
+        "buy": 5,
+        "train": 7,
+        "gather_tool": 3,
+        "gather": 226,
+        "gather_extract": 50,
+        "deposit": 24,
+        "levelup": 9,
+        "upgrade": 25,
+        "heal": 23,
+        "death": 1,
+        "group_defeat": 1,
+        "stew": 6,
+        "strongbox": 3
+      },
+      "gold_ledger": {
+        "enemy_start": 0,
+        "kill": 0,
+        "group_clear": 32243,
+        "buy": -1420,
+        "train": -507,
+        "gather_tool": -92,
+        "gather": 0,
+        "gather_extract": 371,
+        "deposit": -12638,
+        "levelup": -5030,
+        "upgrade": -13808,
+        "heal": -1994,
+        "death": -13,
+        "group_defeat": 0,
+        "stew": -12,
+        "strongbox": 2000
+      },
+      "bottlenecks": {
+        "energy_wait": 71,
+        "health_wait": 2
+      },
+      "timeline": [
+        {
+          "day": 1,
+          "ready_floor": 3,
+          "level": 1,
+          "gold": 0,
+          "bank": 251,
+          "active_minutes": 16.19999999999996,
+          "actions": 162
+        },
+        {
+          "day": 2,
+          "ready_floor": 4,
+          "level": 2,
+          "gold": 0,
+          "bank": 327,
+          "active_minutes": 31.00000000000017,
+          "actions": 310
+        },
+        {
+          "day": 3,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 0,
+          "bank": 327,
+          "active_minutes": 44.600000000000364,
+          "actions": 446
+        },
+        {
+          "day": 4,
+          "ready_floor": 6,
+          "level": 4,
+          "gold": 0,
+          "bank": 563,
+          "active_minutes": 62.10000000000061,
+          "actions": 621
+        },
+        {
+          "day": 5,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 0,
+          "bank": 812,
+          "active_minutes": 76.19999999999995,
+          "actions": 762
+        },
+        {
+          "day": 7,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 0,
+          "bank": 969,
+          "active_minutes": 93.49999999999896,
+          "actions": 935
+        },
+        {
+          "day": 9,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 0,
+          "bank": 1292,
+          "active_minutes": 109.59999999999805,
+          "actions": 1096
+        },
+        {
+          "day": 11,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 0,
+          "bank": 1547,
+          "active_minutes": 129.19999999999695,
+          "actions": 1292
+        },
+        {
+          "day": 12,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 0,
+          "bank": 1952,
+          "active_minutes": 142.4999999999962,
+          "actions": 1425
+        },
+        {
+          "day": 13,
+          "ready_floor": 8,
+          "level": 7,
+          "gold": 0,
+          "bank": 2075,
+          "active_minutes": 154.99999999999548,
+          "actions": 1550
+        },
+        {
+          "day": 15,
+          "ready_floor": 8,
+          "level": 8,
+          "gold": 0,
+          "bank": 2643,
+          "active_minutes": 167.79999999999475,
+          "actions": 1678
+        },
+        {
+          "day": 16,
+          "ready_floor": 8,
+          "level": 8,
+          "gold": 0,
+          "bank": 3226,
+          "active_minutes": 178.29999999999416,
+          "actions": 1783
+        },
+        {
+          "day": 18,
+          "ready_floor": 9,
+          "level": 8,
+          "gold": 0,
+          "bank": 3924,
+          "active_minutes": 191.4999999999934,
+          "actions": 1915
+        },
+        {
+          "day": 19,
+          "ready_floor": 9,
+          "level": 8,
+          "gold": 0,
+          "bank": 4580,
+          "active_minutes": 202.0999999999928,
+          "actions": 2021
+        },
+        {
+          "day": 20,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 0,
+          "bank": 5119,
+          "active_minutes": 213.49999999999216,
+          "actions": 2135
+        },
+        {
+          "day": 21,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 0,
+          "bank": 5676,
+          "active_minutes": 222.29999999999166,
+          "actions": 2223
+        },
+        {
+          "day": 22,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 0,
+          "bank": 6552,
+          "active_minutes": 230.99999999999116,
+          "actions": 2310
+        },
+        {
+          "day": 23,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 0,
+          "bank": 7399,
+          "active_minutes": 246.2999999999903,
+          "actions": 2463
+        },
+        {
+          "day": 24,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 0,
+          "bank": 8229,
+          "active_minutes": 258.29999999999023,
+          "actions": 2583
+        },
+        {
+          "day": 25,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 0,
+          "bank": 9386,
+          "active_minutes": 270.59999999999303,
+          "actions": 2706
+        },
+        {
+          "day": 26,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 0,
+          "bank": 10232,
+          "active_minutes": 283.2999999999959,
+          "actions": 2833
+        },
+        {
+          "day": 27,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 0,
+          "bank": 11123,
+          "active_minutes": 294.5999999999985,
+          "actions": 2946
+        },
+        {
+          "day": 28,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 0,
+          "bank": 11451,
+          "active_minutes": 306.6000000000012,
+          "actions": 3066
+        },
+        {
+          "day": 29,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 0,
+          "bank": 12031,
+          "active_minutes": 316.7000000000035,
+          "actions": 3167
+        },
+        {
+          "day": 30,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 0,
+          "bank": 12638,
+          "active_minutes": 326.90000000000583,
+          "actions": 3269
+        }
+      ],
+      "milestones": [
+        {
+          "floor": 1,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 2,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Kobold digger / Shellback tortoise",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "The Seep / Kobold digger",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Rust hound / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Kobold digger / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 3,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mire boar / Marsh adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Mire boar / Drowned lantern",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Mire boar / Fence-wire pike",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Mire boar / Mire boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 4,
+          "day": 1.0,
+          "active_minutes": 16.19999999999996,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Dusk-hare / The lamp-eater",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Glade-wight / The lamp-eater",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Dusk-hare / Pale stag / Lamp newt",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Wick-owl / The lamp-eater / Lamp newt",
+                "type": "group",
+                "outcome": "win",
+                "actions": 20
+              }
+            ]
+          }
+        },
+        {
+          "floor": 5,
+          "day": 2.0,
+          "active_minutes": 31.00000000000017,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Bilge kobold / Sump lamprey",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Drowned-miner husk / Drift courser",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Sump lamprey / Drift courser / Bilge kobold",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Blind cave-fish / Sump lamprey / Drowned-miner husk",
+                "type": "group",
+                "outcome": "win",
+                "actions": 13
+              }
+            ]
+          }
+        },
+        {
+          "floor": 6,
+          "day": 2.0,
+          "active_minutes": 31.00000000000017,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Grave-rat / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Guano vole / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Grave-rat / Guano vole",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Vault boar / Grave-rat / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 17
+              }
+            ]
+          }
+        },
+        {
+          "floor": 7,
+          "day": 4.0,
+          "active_minutes": 62.10000000000061,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mouse-tide / Orchard hare / Orchard wolf",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Orchard hare / Orchard wolf / Mouse-tide",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              },
+              {
+                "monster": "Orchard hare / Mouse-tide",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Mouse-tide / Windfall dormouse",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              }
+            ]
+          }
+        },
+        {
+          "floor": 8,
+          "day": 4.6675,
+          "active_minutes": 73.6000000000001,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Glass-hare / Glass-hare / Dune adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              },
+              {
+                "monster": "Glass-hare / Ashline jackal",
+                "type": "group",
+                "outcome": "win",
+                "actions": 12
+              },
+              {
+                "monster": "Ashline jackal / Ash salamander",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              },
+              {
+                "monster": "Cinder vulture / Dune adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              }
+            ]
+          }
+        },
+        {
+          "floor": 9,
+          "day": 17.0,
+          "active_minutes": 178.29999999999416,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Glare vole / Bog-cotton hare / Bog-cotton hare",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Bog-cotton hare / Pylon adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Glare vole / Bog-cotton hare",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Night-shrew / Shadow-line wolf / Pylon adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 12
+              }
+            ]
+          }
+        },
+        {
+          "floor": 10,
+          "day": 19.666875,
+          "active_minutes": 208.9999999999924,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Goblin guard / Banner-kite",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Courier-hound / Parade-horse / Goblin guard",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              },
+              {
+                "monster": "Banner-broken wolf / Courier-hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Courier-hound / Banner-kite / Goblin guard",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "policy": "planner",
+      "ready_floor": 10,
+      "counters": {
+        "actions": 4212,
+        "enemy_start": 795,
+        "kill": 781,
+        "earned_gold": 41161,
+        "earned_xp": 20435,
+        "group_clear": 311,
+        "train": 7,
+        "buy": 8,
+        "heal": 37,
+        "levelup": 12,
+        "gather_tool": 5,
+        "gather": 370,
+        "gather_extract": 73,
+        "upgrade": 27,
+        "group_escape": 5,
+        "death": 9,
+        "group_defeat": 9,
+        "stew": 130,
+        "strongbox": 3
+      },
+      "gold_ledger": {
+        "enemy_start": 0,
+        "kill": 0,
+        "group_clear": 40529,
+        "train": -451,
+        "buy": -3580,
+        "heal": -4802,
+        "levelup": -13100,
+        "gather_tool": -113,
+        "gather": 0,
+        "gather_extract": 632,
+        "upgrade": -16659,
+        "group_escape": 0,
+        "death": -2366,
+        "group_defeat": 0,
+        "stew": -260,
+        "strongbox": 2145
+      },
+      "bottlenecks": {
+        "energy_wait": 63,
+        "health_wait": 1
+      },
+      "timeline": [
+        {
+          "day": 1,
+          "ready_floor": 3,
+          "level": 2,
+          "gold": 90,
+          "bank": 0,
+          "active_minutes": 22.000000000000043,
+          "actions": 220
+        },
+        {
+          "day": 2,
+          "ready_floor": 6,
+          "level": 3,
+          "gold": 155,
+          "bank": 0,
+          "active_minutes": 47.3000000000004,
+          "actions": 473
+        },
+        {
+          "day": 3,
+          "ready_floor": 6,
+          "level": 5,
+          "gold": 148,
+          "bank": 0,
+          "active_minutes": 68.60000000000038,
+          "actions": 686
+        },
+        {
+          "day": 4,
+          "ready_floor": 7,
+          "level": 5,
+          "gold": 308,
+          "bank": 0,
+          "active_minutes": 84.69999999999946,
+          "actions": 847
+        },
+        {
+          "day": 5,
+          "ready_floor": 8,
+          "level": 5,
+          "gold": 66,
+          "bank": 0,
+          "active_minutes": 105.59999999999827,
+          "actions": 1056
+        },
+        {
+          "day": 6,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 99,
+          "bank": 0,
+          "active_minutes": 129.69999999999692,
+          "actions": 1297
+        },
+        {
+          "day": 8,
+          "ready_floor": 8,
+          "level": 6,
+          "gold": 467,
+          "bank": 0,
+          "active_minutes": 146.39999999999597,
+          "actions": 1464
+        },
+        {
+          "day": 9,
+          "ready_floor": 8,
+          "level": 7,
+          "gold": 526,
+          "bank": 0,
+          "active_minutes": 161.09999999999513,
+          "actions": 1611
+        },
+        {
+          "day": 10,
+          "ready_floor": 9,
+          "level": 7,
+          "gold": 611,
+          "bank": 0,
+          "active_minutes": 173.29999999999444,
+          "actions": 1733
+        },
+        {
+          "day": 11,
+          "ready_floor": 9,
+          "level": 7,
+          "gold": 701,
+          "bank": 0,
+          "active_minutes": 185.49999999999375,
+          "actions": 1855
+        },
+        {
+          "day": 15,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 100,
+          "bank": 0,
+          "active_minutes": 207.1999999999925,
+          "actions": 2072
+        },
+        {
+          "day": 17,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 171,
+          "bank": 0,
+          "active_minutes": 234.79999999999094,
+          "actions": 2348
+        },
+        {
+          "day": 19,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 779,
+          "bank": 0,
+          "active_minutes": 258.4999999999903,
+          "actions": 2585
+        },
+        {
+          "day": 20,
+          "ready_floor": 10,
+          "level": 8,
+          "gold": 853,
+          "bank": 0,
+          "active_minutes": 274.0999999999938,
+          "actions": 2741
+        },
+        {
+          "day": 21,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 651,
+          "bank": 0,
+          "active_minutes": 295.9999999999988,
+          "actions": 2960
+        },
+        {
+          "day": 22,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 1154,
+          "bank": 0,
+          "active_minutes": 310.80000000000217,
+          "actions": 3108
+        },
+        {
+          "day": 23,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 1098,
+          "bank": 0,
+          "active_minutes": 324.1000000000052,
+          "actions": 3241
+        },
+        {
+          "day": 24,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 1214,
+          "bank": 0,
+          "active_minutes": 336.8000000000081,
+          "actions": 3368
+        },
+        {
+          "day": 25,
+          "ready_floor": 10,
+          "level": 9,
+          "gold": 1246,
+          "bank": 0,
+          "active_minutes": 348.7000000000108,
+          "actions": 3487
+        },
+        {
+          "day": 26,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 1497,
+          "bank": 0,
+          "active_minutes": 364.2000000000143,
+          "actions": 3642
+        },
+        {
+          "day": 27,
+          "ready_floor": 10,
+          "level": 10,
+          "gold": 1611,
+          "bank": 0,
+          "active_minutes": 378.1000000000175,
+          "actions": 3781
+        },
+        {
+          "day": 28,
+          "ready_floor": 10,
+          "level": 11,
+          "gold": 2049,
+          "bank": 0,
+          "active_minutes": 392.90000000002084,
+          "actions": 3929
+        },
+        {
+          "day": 29,
+          "ready_floor": 10,
+          "level": 12,
+          "gold": 2689,
+          "bank": 0,
+          "active_minutes": 407.40000000002414,
+          "actions": 4074
+        },
+        {
+          "day": 30,
+          "ready_floor": 10,
+          "level": 13,
+          "gold": 2325,
+          "bank": 0,
+          "active_minutes": 421.2000000000273,
+          "actions": 4212
+        }
+      ],
+      "milestones": [
+        {
+          "floor": 1,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 5
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Grey wolf / Feral boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 2,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Kobold digger / Shellback tortoise",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "The Seep / Kobold digger",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Rust hound / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Kobold digger / Rust hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 3,
+          "day": 0.0,
+          "active_minutes": 0.0,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mire boar / Marsh adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              },
+              {
+                "monster": "Mire boar / Drowned lantern",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Mire boar / Fence-wire pike",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Mire boar / Mire boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 4
+              }
+            ]
+          }
+        },
+        {
+          "floor": 4,
+          "day": 1.0,
+          "active_minutes": 22.000000000000043,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Dusk-hare / The lamp-eater",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Glade-wight / The lamp-eater",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Dusk-hare / Pale stag / Lamp newt",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Wick-owl / The lamp-eater / Lamp newt",
+                "type": "group",
+                "outcome": "win",
+                "actions": 21
+              }
+            ]
+          }
+        },
+        {
+          "floor": 5,
+          "day": 1.0,
+          "active_minutes": 22.000000000000043,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Sump-crawler / Bilge kobold / Drowned-miner husk",
+                "type": "group",
+                "outcome": "win",
+                "actions": 17
+              },
+              {
+                "monster": "Drowned-miner husk / Blind cave-fish",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Drift courser / Drift courser",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              },
+              {
+                "monster": "Sump-crawler / Drift courser",
+                "type": "group",
+                "outcome": "win",
+                "actions": 16
+              }
+            ]
+          }
+        },
+        {
+          "floor": 6,
+          "day": 1.3347916666666666,
+          "active_minutes": 33.80000000000021,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Guano vole / Guano vole / Grave-rat",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Cave broodling / Sentinel spider / Guano vole",
+                "type": "group",
+                "outcome": "win",
+                "actions": 15
+              },
+              {
+                "monster": "Vault boar / Vault boar / Cave broodling",
+                "type": "group",
+                "outcome": "win",
+                "actions": 15
+              },
+              {
+                "monster": "Vault boar / Vault boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 13
+              }
+            ]
+          }
+        },
+        {
+          "floor": 7,
+          "day": 3.334375,
+          "active_minutes": 73.70000000000009,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Mouse-tide / Orchard wolf / Orchard wolf",
+                "type": "group",
+                "outcome": "win",
+                "actions": 12
+              },
+              {
+                "monster": "Mouse-tide / Cider-mad boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 8
+              },
+              {
+                "monster": "Windfall dormouse / Orchard hare / Windfall dormouse",
+                "type": "group",
+                "outcome": "win",
+                "actions": 20
+              },
+              {
+                "monster": "Mouse-tide / Windfall dormouse / Cider-mad boar",
+                "type": "group",
+                "outcome": "win",
+                "actions": 14
+              }
+            ]
+          }
+        },
+        {
+          "floor": 8,
+          "day": 4.0,
+          "active_minutes": 84.69999999999946,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Glass-hare / Glass-hare / Dune adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Glass-hare / Ashline jackal",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              },
+              {
+                "monster": "Ashline jackal / Ash salamander",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Cinder vulture / Dune adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              }
+            ]
+          }
+        },
+        {
+          "floor": 9,
+          "day": 9.0,
+          "active_minutes": 161.09999999999513,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Shadow-line wolf / Shadow-line wolf / Pylon adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Night-shrew / Flicker-wight",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Shadow-line wolf / Pylon adder",
+                "type": "group",
+                "outcome": "win",
+                "actions": 6
+              },
+              {
+                "monster": "Pylon adder / Shadow-line wolf / Bog-cotton hare",
+                "type": "group",
+                "outcome": "win",
+                "actions": 11
+              }
+            ]
+          }
+        },
+        {
+          "floor": 10,
+          "day": 14.000208333333333,
+          "active_minutes": 185.79999999999373,
+          "assessment": {
+            "win_rate": 1.0,
+            "wins": 4,
+            "trials": 4,
+            "failures": {
+              "win": 4
+            },
+            "samples": [
+              {
+                "monster": "Goblin guard / Banner-kite / Goblin guard",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              },
+              {
+                "monster": "Banner-broken wolf / Courier-hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 7
+              },
+              {
+                "monster": "Banner-kite / Courier-hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 9
+              },
+              {
+                "monster": "Parade-horse / Courier-hound",
+                "type": "group",
+                "outcome": "win",
+                "actions": 10
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Eight-player diagnostic only; max evaluated floor10. No100-floor pacing claim.",
+    "The saver deposits but does not collect/reinvest interest or withdraw investment cash.",
+    "Natural readiness is sampled with restored HP/energy on a disposable clone; not a shared-world unlock."
+  ]
+}
