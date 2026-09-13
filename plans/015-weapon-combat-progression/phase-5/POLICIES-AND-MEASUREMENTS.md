@@ -25,3 +25,9 @@ Dojo S13: navigate actual saved-run dashboard, hover first/late/missing floors, 
 ## Rollback
 
 Revert phase5 policy/display commits in reverse order and rerun recorded seeds againstfa3e16c/e44998d. Keep all run files and source hashes; no production change, no earned document reset. Gameplay tuning separately reversible with persisted quote/group compatibility specified before edits. This plan is not proof of completed policy coverage or pacing.
+
+## Parallel reproducibility incident — before the corrective edit
+
+The first new serial/automatic-CPU check fails (parity-diagnostic.json). The first differing choice is between visits while still sleeping: navigation falls back to next(iter(set(options))). Separate Python processes randomize set iteration, so one opens/closes Collection repeatedly while another wakes and sleeps. This is policy host behavior, not different combat outcomes or a game engine defect. The ten-action rest reserve also displaced useful actions in the legacy planner and exhausted a 40-second short visit.
+
+Corrective steps: replace arbitrary collection navigation with explicit wake/back routes and no unsupported fallback; preserve six legacy reserve actions, bound the candidate reserve by half the visit budget; skip redundant rest if already sleeping; sort effect accumulation. Add sleeping-navigation, short-visit, and serial/automatic-CPU replay checks. Preserve the already-started search as diagnostic only and rerun after parity passes. Rollback: revert only these host policy edits, retain both diagnostic reports, and stop using old search rankings. No earned game documents or game coefficients change.
