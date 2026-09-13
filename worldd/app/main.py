@@ -155,6 +155,7 @@ class ActIn(BaseModel):
     option: str = Field(default="", max_length=64)
     text: str = Field(default="", max_length=64)
     idem: str = Field(default="", max_length=64)
+    scene_id: str = Field(default="", max_length=64)
 
 
 @app.post("/v1/scene")
@@ -170,7 +171,7 @@ async def v1_act(body: ActIn,
                  tenant: str = Depends(auth.verify_tenant)) -> dict:
     from . import game
     scene = await game.run_act(tenant, body.player, body.option.strip(),
-                               body.text.strip(), body.idem)
+                               body.text.strip(), body.idem, expected_scene=body.scene_id)
     return {"scene": scene}
 
 

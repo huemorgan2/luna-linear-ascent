@@ -7,6 +7,7 @@ from the same object. Content never contains markup.
 
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass, field, fields
 
 
@@ -82,6 +83,7 @@ class Meters:
     # Empty = not sent (older engine): the finisher falls back to family
     # models.
     gear: list[str] = field(default_factory=list)
+    xp_reserve: int = 0
 
 
 @dataclass
@@ -282,6 +284,25 @@ class Scene:
                     and (sl.get("name") or sl.get("slug"))]
             if worn:
                 lines.append("wears: " + ", ".join(worn[:7]))
+        if self.collection:
+            c = self.collection
+            owned = {i["id"]: i for i in c.get("items", [])}
+            lines.append("Three battle weapons (fixed for a fight or expedition):")
+            for n, iid in enumerate(c.get("deck", []), 1):
+                item = owned.get(iid)
+                lines.append(f"  {n}: " + (f"{item['name']} {item['grade']} +{item['level']} · "
+                    f"ATK {item['attack']} · condition {item['durability']}/{item['maximum']}"
+                    if item else "Empty"))
+            if c.get("screen"):
+                for item in c.get("items", []):
+                    lines.append(f"{item['name']} · {item['grade']} +{item['level']} · "
+                        f"ATK {item['attack']} · {item['durability']}/{item['maximum']} condition · "
+                        f"{item['effect']} · inspect:{item['id']}")
+                    q = item.get("quote")
+                    if q:
+                        materials = ", ".join(f"{c.get('materials', {}).get(k, 0)}/{n} {k}"
+                                               for k, n in q["materials"].items())
+                        lines.append(f"Forge +{q['level']}: {q['gold']} gold; {materials}")
         # 027: the notice board reads as words on every surface — the card
         # draws it, the agent says it.
         for nt in self.notices:
@@ -381,11 +402,18 @@ class Scene:
                 f"HP {m.hp}/{m.hp_max}   ⚡ {m.energy}/{m.energy_max}   "
                 f"XP {m.xp}/{m.xp_need}   LV {m.level}   gold {m.gold}"
                 f"{stats}")
+            if m.xp_reserve:
+                lines.append(f"Saved XP beyond this level's bar: {m.xp_reserve}")
         # 010.1: ⚡/🔒 are one-character markers for the HTML renderer's
         # 1-bit glyphs; the text surface (the agent reads this) speaks in
         # words so no emoji ever leaks into a chat reply.
         return ("\n".join(lines)
                 .replace("⚡", "energy").replace("🔒", "locked"))
+
+    collection: dict | None = None
+    group: dict | None = None
+    expedition: dict | None = None
+    combat_events: list[dict] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
@@ -393,6 +421,10 @@ class Scene:
             "headline": self.headline,
             "support": self.support,
             "shard_note": self.shard_note,
+            "collection": self.collection,
+            "group": self.group,
+            "expedition": self.expedition,
+            "combat_events": self.combat_events,
             "body_lines": self.body_lines,
             "options": [
                 {"id": o.id, "label": o.label, "hint": o.hint,
@@ -496,6 +528,10 @@ class Scene:
             paper=(dict(d["paper"]) if d.get("paper") else None),
             strip=(dict(d["strip"]) if d.get("strip") else None),
             enemy=(dict(d["enemy"]) if d.get("enemy") else None),
+            collection=deepcopy(d.get("collection")),
+            group=deepcopy(d.get("group")),
+            expedition=deepcopy(d.get("expedition")),
+            combat_events=deepcopy(d.get("combat_events") or []),
             option_art=dict(d.get("option_art") or {}),
             grid=bool(d.get("grid", False)),
             npc=(dict(d["npc"]) if d.get("npc") else None),

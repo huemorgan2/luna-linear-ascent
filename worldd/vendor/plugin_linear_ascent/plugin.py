@@ -51,6 +51,19 @@ def _is_transient_db(exc: BaseException) -> bool:
     return any(sig in text for sig in _TRANSIENT_DB)
 
 
+def _widen_local_ledger(conn):
+    """Widen existing local ledgers without rewriting their history."""
+    from sqlalchemy import text
+    if conn.dialect.name != "postgresql":
+        return
+    for column in ("gold", "xp"):
+        kind = conn.execute(text("SELECT udt_name FROM information_schema.columns "
+            "WHERE table_schema=current_schema() AND table_name='ascent_ledger' "
+            "AND column_name=:column"), {"column": column}).scalar()
+        if kind == "int4":
+            conn.execute(text(f"ALTER TABLE ascent_ledger ALTER COLUMN {column} TYPE BIGINT"))
+
+
 async def _ensure_local_tables(ctx: PluginContext) -> bool:
     """Create the plugin's own tables, riding out a restarting database.
 
@@ -67,6 +80,7 @@ async def _ensure_local_tables(ctx: PluginContext) -> bool:
             async with ctx.engine.begin() as conn:
                 for table in Base.metadata.sorted_tables:
                     await conn.run_sync(table.create, checkfirst=True)
+                await conn.run_sync(_widen_local_ledger)
             return True
         except Exception as e:  # noqa: BLE001 — load must survive any of them
             last = e
@@ -89,8 +103,9 @@ _SHARED_RULES = (
     "ascent_choose and you only relay what its result says. METERS: "
     "there is NO mana in this world — never say the word. The XP bar is "
     "experience inside the current level. It fills by fighting up to the "
-    "bar for the next level — surplus goes nowhere; it is burned by "
-    "honing, spells, and mending. "
+    "bar for the next level. If a reserve is shown, it is earned XP "
+    "available for spending after the bar fills. Use the current scene "
+    "for costs, rewards and the three-weapon collection. "
     "LEVELS ARE BOUGHT, never automatic: a full XP bar plus a gold fee "
     "at the Guildhall's Train option (first level ◈ 200, rising with "
     "level). Nothing refills XP but fighting. "
@@ -108,7 +123,12 @@ _SHARED_RULES = (
     "or after about six actions. The player can ALSO click options "
     "directly on the card — the game advances without you seeing it, so "
     "if their words reference something not in your last scene, call "
-    "ascent_scene to re-sync before choosing."
+    "ascent_scene to re-sync before choosing. The game may have changed "
+    "since earlier chat messages: trust its current scene and sheet. "
+    "When weapon_collection is present, its screen DOES exist: open it "
+    "with ascent_choose(option='collection'); inspect and assign exact "
+    "weapon instances using the returned options. Never deny a feature "
+    "from memory without checking the current scene."
 )
 
 _GUIDE_RULES = (
@@ -328,7 +348,8 @@ class LinearAscentPlugin(LunaPlugin):
                 description=(
                     "Linear Ascent: submit the player's choice for the "
                     "current scene. Pass `option` as the option id OR the "
-                    "number the player typed (e.g. '2'). Some scenes wait "
+                    "number the player typed (e.g. '2'). To open the weapon "
+                    "collection use option collection when its action is present. Some scenes wait "
                     "for a TYPED chat reply instead (marked '⌨ waiting for "
                     "a typed chat reply' — usernames, banner names, "
                     "fees, dues, donation amounts, letters): for those "
@@ -364,7 +385,9 @@ class LinearAscentPlugin(LunaPlugin):
                 name="ascent_character",
                 description=(
                     "Linear Ascent: the player's character sheet — stats, "
-                    "gear, gold, meters, frontier floor. Read-only."),
+                    "gear, weapon collection, gold, meters, frontier floor. Read-only. "
+                    "To OPEN or manage the weapon collection screen, use "
+                    "ascent_choose with option collection; this sheet alone does not open it."),
                 parameters={"type": "object", "properties": {},
                             "required": []},
                 policy="auto_approve", risk_level="low"),

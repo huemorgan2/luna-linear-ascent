@@ -177,13 +177,14 @@ async def pane_scene(ident: tuple = Depends(_identity)) -> dict:
 
 @router.post("/play/api/act")
 async def act(body: ActIn, ident: tuple = Depends(_identity)) -> dict:
-    # no idem: a browser click never auto-retries; the row lock plus the
-    # engine's stale-option answer already make double-clicks harmless
     player, display = ident
     from . import game
+    import hashlib
+    idem = (hashlib.sha256(json.dumps([body.scene_id, body.option, body.text]).encode()).hexdigest()
+            if body.scene_id else "")
     scene = await game.run_act(WEB_TENANT, player, body.option.strip(),
-                               body.text.strip(), "",
-                               display_name=display)
+                               body.text.strip(), idem,
+                               display_name=display, expected_scene=body.scene_id)
     return _card(scene)
 
 

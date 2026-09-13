@@ -40,6 +40,12 @@ def _stamp(p: dict, scene: Scene) -> Scene:
     scene.inventory = _pack_strip(p)
     scene.slots = _slot_map(p)                      # 069: the gear map
     scene.pack_slots = pack_cap(p)
+    from . import collection
+    if collection.enabled(p):
+        collection.capture_legacy_wear(p)
+        scene.collection = collection.payload(p)
+        if not p.get("collection_view") and not any(o.id == "collection" for o in scene.options):
+            scene.options.append(Option("collection", "Weapon collection", "your three battle slots"))
     if (not scene.notices and not scene.enemy
             and p.get("location") in _NOTICE_ROOMS):
         scene.notices = notices.pending(p)
@@ -178,6 +184,27 @@ def _slot_map(p: dict) -> list[dict]:
                          "armor": "armor", "shoes": "shoes",
                          "charm": "luck_charm"}.get(sl.kind, "pack")
         out.append(d)
+    if p.get("ruleset") == "collection-v1":
+        from . import collection
+        cells = iter(p["deck"])
+        for sl in out:
+            if sl["kind"] != "weapon":
+                continue
+            iid = next(cells, None)
+            item = p["collection"].get(iid)
+            sl.update(state="filled" if item else "empty", lock_text="", acts=[], why="")
+            if item:
+                info = collection.stats(item)
+                sl.update(instance_id=iid, name=info["name"], grade=item["grade"], level=item["level"],
+                          slug=item.get("legacy", {}).get("slug", ""), count=1,
+                          stat_name="ATK", stat_val=info["attack"], dur=item["durability"] / item["maximum"],
+                          dur_left=item["durability"], dur_max=item["maximum"], icon="sword" if info["path"] == "blade" else info["path"],
+                          lead=iid == p.get("active_weapon"),
+                          acts=[dict(opt="inspect:" + iid, label="View weapon", hint="collection and upgrades")])
+            else:
+                for k in ("name", "slug"):
+                    sl[k] = ""
+                sl["count"] = 0
     return out
 
 
@@ -302,6 +329,15 @@ def _unequip(p: dict, key: str) -> Scene:
     (the lead pointer moves to the first blade left), a bow's quiver
     returns to the pack with it, oil on that blade is lost, worn steel
     carries its wear along; the shield's and armour's honing resets."""
+    from . import collection
+    if collection.enabled(p) and key in economy.WEAPON_SLOT_KEYS:
+        try:
+            collection.set_slot(p, economy.WEAPON_SLOT_KEYS.index(key), None)
+        except ValueError as exc:
+            result = _build_scene(p)
+            result.refusal = str(exc)
+            return result
+        return _build_scene(p)
     s_lock = economy.slot_lock(p, key)
     slug = economy.slot_item(p, key)
     if s_lock or not slug:
@@ -637,12 +673,28 @@ def current_scene(p: dict) -> Scene:
     return _stamp(p, _build_scene(p))
 
 
-def apply_choice(p: dict, option_id: str, text: str = "") -> Scene:
+def apply_choice(p: dict, option_id: str, text: str = "", *, expected_scene: str = "") -> Scene:
     from . import social
+    if expected_scene and expected_scene != f"s{p.get('act_seq', 0)}":
+        from copy import deepcopy
+        scene = current_scene(deepcopy(p))
+        scene.refusal = "That choice belongs to an earlier scene. Choose from the current scene."
+        return scene
     state.ensure_current(p)
     state.touch_daily(p)
     p["last_seen"] = state.now().isoformat()
     p["act_seq"] = p.get("act_seq", 0) + 1
+    from . import collection
+    if collection.enabled(p) and option_id.isdigit():
+        from copy import deepcopy
+        view_doc = deepcopy(p)
+        options = _stamp(view_doc, _build_scene(view_doc)).options
+        index = int(option_id) - 1
+        if 0 <= index < len(options):
+            option_id = options[index].id
+    handled = collection.handle(p, option_id)
+    if handled is not None:
+        return _stamp(p, handled)
 
     if p["stage"] == "creation_name" and text and not option_id:
         return _stamp(p, _creation_set_name(p, text))
@@ -1018,6 +1070,9 @@ def _maybe_present(p: dict) -> Scene | None:
 # ── Scene builder (by stage/location) ────────────────────────────────────
 
 def _build_scene(p: dict) -> Scene:
+    if p.get("collection_view") and p.get("ruleset") == "collection-v1":
+        from . import collection
+        return collection.scene(p)
     if p["stage"] == "intro":
         return _intro_scene(p)
     if p["stage"] == "creation_race":
@@ -2039,6 +2094,17 @@ def _gear_purchase(p: dict, g, scene_fn) -> Scene:
                        "The Vault pays interest for a reason."
         s.refusal = f"Can't buy this — not enough gold (◈ {price:,} needed)"
         return s
+    from . import collection
+    if collection.enabled(p) and g.slot == "weapon":
+        if collection.locked(p):
+            result = scene_fn(p)
+            result.refusal = "Finish the fight or expedition before buying weapons"
+            return result
+        item = collection.receive_legacy(p, g.slug, fresh=True)
+        p["gold"] -= price
+        combat._ledger(p, "buy", gold=-price, note=g.slug)
+        p.update(collection_view=True, collection_selected=item["id"])
+        return collection.scene(p)
     old = p["gear"].get(g.slot)
     if old == g.slug:
         # 019: a spare of the piece you wear — straight to the pack,
@@ -2171,6 +2237,13 @@ def _wear_from_pack(p: dict, slug: str, scene_fn) -> Scene:
     if slug in economy.CHARM_KINDS and slug not in economy.FORGE:
         return _wear_charm(p, slug, scene_fn)
     g = economy.FORGE.get(slug)
+    from . import collection
+    if collection.enabled(p) and g and g.slot == "weapon":
+        collection.import_legacy_stock(p)
+        p["collection_view"] = True
+        result = collection.scene(p)
+        result.shard_note = "Choose the individual weapon and its slot in your collection."
+        return result
     if not g or (p.get("inventory") or {}).get(slug, 0) <= 0:
         return scene_fn(p)
     req = _wear_level_req(slug)
@@ -2249,6 +2322,18 @@ def _basic_buy(p: dict, slug: str, scene_fn) -> Scene:
     goes into a free carry slot if one is open, else into the pack
     (promote it on the road)."""
     g = economy.FORGE[slug]
+    from . import collection
+    if collection.enabled(p):
+        price = economy.BASIC_WEAPON_PRICE
+        if collection.locked(p) or p["gold"] < price:
+            result = scene_fn(p)
+            result.refusal = "Finish the fight first" if collection.locked(p) else f"You need {price} gold"
+            return result
+        item = collection.receive_legacy(p, slug, fresh=True)
+        p["gold"] -= price
+        combat._ledger(p, "buy", gold=-price, note=slug)
+        p.update(collection_view=True, collection_selected=item["id"])
+        return collection.scene(p)
     owned = set(combat._held_slugs(p)) | set(p.get("inventory") or {})
     if slug in owned:
         s = scene_fn(p)
@@ -3700,6 +3785,9 @@ def _school_scene(p: dict) -> Scene:
     slots = int(p.get("slots", 1))
     carry = (f"✥ CARRY — {slots} weapon "
              f"slot{'s' if slots != 1 else ''}")
+    if p.get("ruleset") == "collection-v1":
+        carry = "WEAPON COLLECTION — three battle slots, always available"
+        lines.append(f"Available XP: {state.xp_total(p):,} · {p.get('xp_reserve', 0):,} saved beyond this level's bar")
     if slots == 1:
         carry += (f" · 2nd slot — {economy.CARRY2_XP} XP + "
                   f"◈ {economy.CARRY2_GOLD}")
@@ -3790,14 +3878,14 @@ def _school_charm(p: dict) -> Scene:
                f"you're level {level}.")
     xp = economy.CHARM_SLOT_XP
     gold = economy.charm_slot_gold(max(1, p["unlocked_floor"]))
-    if p["xp"] < xp:
+    if state.xp_total(p) < xp:
         return _school_refuse(
             p, f"The pouch wants {xp} XP — your bar holds {p['xp']}.")
     if p["gold"] < gold:
         return _school_refuse(
             p, f"The pouch's fee is ◈ {gold} — you carry "
                f"◈ {p['gold']:,}.")
-    p["xp"] -= xp
+    state.spend_xp(p, xp)
     p["gold"] -= gold
     p["charm_slot"] = True
     combat._ledger(p, "train", gold=-gold, xp=-xp, note="charm pouch")
@@ -3826,7 +3914,7 @@ def _school_train(p: dict, path: str) -> Scene:
     nxt = r + 1
     xp = economy.train_xp_cost(nxt, _school_discounted(p, path))
     gold = economy.train_gold(nxt, max(1, p["unlocked_floor"]))
-    if p["xp"] < xp:
+    if state.xp_total(p) < xp:
         return _school_refuse(
             p, f"Rank {nxt} {path} wants {xp} XP — your bar holds "
                f"{p['xp']}. Kills fill it.")
@@ -3834,7 +3922,7 @@ def _school_train(p: dict, path: str) -> Scene:
         return _school_refuse(
             p, f"The instructor's fee is ◈ {gold} — you carry "
                f"◈ {p['gold']:,}.")
-    p["xp"] -= xp
+    state.spend_xp(p, xp)
     p["gold"] -= gold
     p["training"][path] = nxt
     combat._ledger(p, "train", gold=-gold, xp=-xp, note=f"{path} {nxt}")
@@ -3872,11 +3960,11 @@ def _school_mastery(p: dict, path: str) -> Scene:
     if (p.get("mastery") or {}).get(path):
         return _school_refuse(
             p, "Already studied — the master has no second lesson.")
-    if p["xp"] < economy.MASTERY_XP:
+    if state.xp_total(p) < economy.MASTERY_XP:
         return _school_refuse(
             p, f"The study wants {economy.MASTERY_XP} XP — your bar "
                f"holds {p['xp']}.")
-    p["xp"] -= economy.MASTERY_XP
+    state.spend_xp(p, economy.MASTERY_XP)
     p.setdefault("mastery", {})[path] = True
     combat._ledger(p, "train", xp=-economy.MASTERY_XP,
                    note=f"mastery {path}")
@@ -3888,6 +3976,8 @@ def _school_mastery(p: dict, path: str) -> Scene:
 
 
 def _school_carry(p: dict, oid: str) -> Scene:
+    if p.get("ruleset") == "collection-v1":
+        return _school_refuse(p, "Three weapon slots are already yours. The School teaches weapon skills.")
     slots = int(p.get("slots", 1))
     if oid == "buy_carry2":
         if slots != 1:
@@ -3906,7 +3996,7 @@ def _school_carry(p: dict, oid: str) -> Scene:
                    f"{int(p.get('level', 1))}.")
         xp, gold = economy.CARRY3_XP, economy.carry3_gold(
             max(1, p["unlocked_floor"]))
-    if p["xp"] < xp:
+    if state.xp_total(p) < xp:
         return _school_refuse(
             p, f"The grip wants {xp} XP — your bar holds "
                f"{p['xp']}.")
@@ -3914,7 +4004,7 @@ def _school_carry(p: dict, oid: str) -> Scene:
         return _school_refuse(
             p, f"The grip's fee is ◈ {gold} — you carry "
                f"◈ {p['gold']:,}.")
-    p["xp"] -= xp
+    state.spend_xp(p, xp)
     p["gold"] -= gold
     p["slots"] = slots + 1
     combat._ledger(p, "train", gold=-gold, xp=-xp,

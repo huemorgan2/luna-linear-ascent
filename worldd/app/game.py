@@ -9,6 +9,8 @@ frontier is shared across tenants.
 from __future__ import annotations
 
 import json
+import hashlib
+from copy import deepcopy
 
 from .gamepath import ensure_game_importable
 
@@ -45,7 +47,14 @@ async def _load_doc(conn, tenant: str, player: str,
         "SELECT doc FROM ascent_players WHERE tenant=$1 AND player=$2 "
         "FOR UPDATE", tenant, player)
     if row:
-        return json.loads(row["doc"])
+        doc = json.loads(row["doc"])
+        from plugin_linear_ascent.engine import collection
+        if collection.enrollment_open() and not collection.enabled(doc) and not doc.get("encounter"):
+            receipts = await conn.fetch(
+                "SELECT kind, note, gold, xp FROM ascent_ledger WHERE tenant=$1 AND player=$2 "
+                "AND kind='train' AND note IN ('carry 2','carry 3') ORDER BY id", tenant, player)
+            doc["school_slot_receipts"] = [dict(r) for r in receipts]
+        return doc
     doc = pstate.new_player(f"{tenant}:{player}")
     if display_name:
         # 005 web play: the door already carved this name at signup
@@ -154,6 +163,8 @@ async def run_scene(tenant: str, player: str,
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
+            await conn.execute("SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+                               json.dumps(["ascent-action", tenant, player]))
             doc = await _load_doc(conn, tenant, player, display_name)
             await social.inject_world(conn, tenant, player, doc)
             _sync_frontier_into_doc(doc, doc["_world"]["frontier"])
@@ -172,16 +183,29 @@ _REFRESH_KINDS = {"collect_letter_gold"}
 
 
 async def run_act(tenant: str, player: str, option: str, text: str,
-                  idem: str, display_name: str = "") -> dict:
+                  idem: str, display_name: str = "", expected_scene: str = "") -> dict:
     pool = await db.get_pool()
     async with pool.acquire() as conn:
         async with conn.transaction():
+            # Serialize even a first-ever document and all retry checks.
+            # Row locks alone cannot lock a row which does not exist yet.
+            await conn.execute("SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+                               json.dumps(["ascent-action", tenant, player]))
+            if idem:
+                idem = "player-v2:" + hashlib.sha256(
+                    json.dumps([player, idem]).encode()).hexdigest()
             if idem:
                 prior = await conn.fetchrow(
                     "SELECT response FROM ascent_idempotency "
                     "WHERE tenant=$1 AND idem=$2", tenant, idem)
                 if prior:
                     return json.loads(prior["response"])
+            doc = await _load_doc(conn, tenant, player, display_name)
+            if expected_scene and expected_scene != f"s{doc.get('act_seq', 0)}":
+                scene = (Scene.from_dict(doc["scene"]) if doc.get("scene")
+                         else core.current_scene(deepcopy(doc)))
+                scene.refusal = "That choice belongs to an earlier scene. Choose from the current scene."
+                return scene.to_dict()
             from . import factions, social
             # 010: any act marks today attended; the player's faction
             # resolves its previous week lazily on the first act of a
@@ -191,7 +215,6 @@ async def run_act(tenant: str, player: str, option: str, text: str,
             mine = await factions.member_row(conn, tenant, player)
             if mine:
                 await factions.maybe_resolve(conn, mine["faction"])
-            doc = await _load_doc(conn, tenant, player, display_name)
             if first_today and doc.get("stage") == "playing":
                 await social.add_happening(
                     conn, kind="climb",
