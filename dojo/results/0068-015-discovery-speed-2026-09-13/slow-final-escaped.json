@@ -1,0 +1,175 @@
+{
+  "name": "phase4slow003",
+  "race": "human",
+  "stage": "playing",
+  "ruleset": "collection-v1",
+  "location": "gate_town",
+  "floor": 1,
+  "unlocked_floor": 4,
+  "level": 3,
+  "xp": 0,
+  "gold": 2000,
+  "hp": 106,
+  "energy_val": 24.0,
+  "energy_ts": "2026-09-13T11:09:15.531613+00:00",
+  "deck": [
+    "5a0a4da1a38be76ac687fc5b2d6092ef",
+    "baf8df3165bba4bab9fbf633d239d4fb",
+    "7f8d72a18b83757edf48c0fc544ca621"
+  ],
+  "active_weapon": "7f8d72a18b83757edf48c0fc544ca621",
+  "training": {
+    "bow": 0,
+    "blade": 0,
+    "staff": 0
+  },
+  "collection": {
+    "284942b05bd43a978d8a87796ca45446": {
+      "id": "284942b05bd43a978d8a87796ca45446",
+      "grade": "Common",
+      "level": 0,
+      "family": "breach",
+      "source": "starter",
+      "maximum": 1170,
+      "location": "carried",
+      "durability": 1170,
+      "provenance": {
+        "owner": "web:phase4slow003",
+        "receipt": "migration:held:rusted_shiv:0"
+      }
+    },
+    "3c53d702f17d6dda7da51af2855273ca": {
+      "id": "3c53d702f17d6dda7da51af2855273ca",
+      "grade": "Common",
+      "level": 0,
+      "family": "ember",
+      "source": "starter",
+      "maximum": 1300,
+      "location": "carried",
+      "durability": 1300,
+      "provenance": {
+        "owner": "web:phase4slow003",
+        "receipt": "starter:staff"
+      }
+    },
+    "5a0a4da1a38be76ac687fc5b2d6092ef": {
+      "id": "5a0a4da1a38be76ac687fc5b2d6092ef",
+      "grade": "Common",
+      "level": 0,
+      "family": "breach",
+      "source": "craft",
+      "maximum": 1170,
+      "location": "carried",
+      "durability": 1170,
+      "provenance": {
+        "owner": "web:phase4slow003",
+        "receipt": "declared:phase4slow003:breach"
+      }
+    },
+    "7f8d72a18b83757edf48c0fc544ca621": {
+      "id": "7f8d72a18b83757edf48c0fc544ca621",
+      "grade": "Common",
+      "level": 0,
+      "family": "frostbind",
+      "source": "craft",
+      "maximum": 1495,
+      "location": "carried",
+      "durability": 1493,
+      "provenance": {
+        "owner": "web:phase4slow003",
+        "receipt": "declared:phase4slow003:frostbind"
+      }
+    },
+    "b715aa18e2c3332b7384f393d392bf84": {
+      "id": "b715aa18e2c3332b7384f393d392bf84",
+      "grade": "Common",
+      "level": 0,
+      "family": "hawkeye",
+      "source": "starter",
+      "maximum": 1300,
+      "location": "carried",
+      "durability": 1300,
+      "provenance": {
+        "owner": "web:phase4slow003",
+        "receipt": "starter:bow"
+      }
+    },
+    "baf8df3165bba4bab9fbf633d239d4fb": {
+      "id": "baf8df3165bba4bab9fbf633d239d4fb",
+      "grade": "Common",
+      "level": 0,
+      "family": "pinning",
+      "source": "craft",
+      "maximum": 1300,
+      "location": "carried",
+      "durability": 1300,
+      "provenance": {
+        "owner": "web:phase4slow003",
+        "receipt": "declared:phase4slow003:pinning"
+      }
+    }
+  },
+  "quiver": {
+    "Common": {
+      "fire": 0,
+      "arcane": 0,
+      "poison": 0,
+      "pinning": 10,
+      "ordinary": 20,
+      "concussive": 0
+    }
+  },
+  "arrow_choice": {},
+  "materials": {},
+  "utility_tools": {},
+  "act_seq": 7,
+  "rng_counter": 1015,
+  "group": null,
+  "group_result": {
+    "id": "group:1",
+    "xp": 0,
+    "won": false,
+    "haul": {
+      "gold": 0,
+      "weapons": [],
+      "materials": {}
+    },
+    "count": 2,
+    "floor": 1,
+    "kills": 0,
+    "energy": 1,
+    "events": [],
+    "escaped": true,
+    "exhausted": 0
+  },
+  "groups_cleared": 1,
+  "hunt_offers": {},
+  "tenant": "web",
+  "player": "phase4slow003",
+  "energy_now": 24,
+  "observed_at": "2026-09-13T11:10:32.067905+00:00",
+  "scene_summary": {
+    "scene_id": "s7",
+    "headline": "You escaped",
+    "enemy": null,
+    "member_speeds": []
+  },
+  "collection_view": null,
+  "collection_arrows": null,
+  "ledger": [
+    {
+      "id": 144,
+      "kind": "group_escape",
+      "gold": 0,
+      "xp": 0,
+      "note": "group:1"
+    },
+    {
+      "id": 143,
+      "kind": "enemy_start",
+      "gold": 0,
+      "xp": 0,
+      "note": "group:1:enemy:0:paid"
+    }
+  ]
+}

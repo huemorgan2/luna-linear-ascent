@@ -1,0 +1,103 @@
+Before Slow, player6 and boar6: withdrawal gains one step, pursuit closes it; Contact remains. First enemy starts for one energy.
+
+GAME
+SCORE
+COMMUNITY
+FLOOR 1 · HUNT
+Feral boar · enemy 1 of 2i
+XP after each kill. S
+1 Feral boar
+2 Grey wolf
+ Common
+ Ground
+ 6 speed
+
+Traits: sturdy, fierce
+
+8 ATK · 1 DEF · Power ×1.25 · Magic ×1.25
+
+Drop chances for this enemy
+ 42 / 42 HP
+Contact
+Near
+Far
+Cover
+
+ENERGY PAID · normal strength
+
+0 XP kept · 0 gold pending
+Breach Cleaver +0
+Blade · 9 ATK
+1170/1170
+Pinning Bow +0
+Bow · 7 ATK
+1300/1300
+Frostbind Staff +0
+Staff · 6 ATK
+1495/1495
+1 Breach Cleaver
+Blade strike
+2 Pinning Bow
+Ordinary · Power · 20 left
+3 Slow · Pinning Bow
+Pinning shot removes three speed for two phases.
+4 Frostbind Staff
+Staff strike
+5 Slow · Frostbind Staff
+Frostbind removes three speed for two phases.
+6 Close in
+Contact
+7 Pull back
+Speed decides the opening
+8 Guard
+Stronger shield absorption; some damage gets through
+9 Try to escape
+Keep earned XP
+16 Weapon collection
+your three battle slots
+Common Pinning Bow
+
+Choose arrows · selection is free
+
+10 Ordinary
+20 left · Power
+11 Arcane
+0 left · Magic
+12 Poison
+0 left · Power
+13 Fire
+0 left · Power
+14 Pinning
+10 left · Power
+15 Concussive
+0 left · Power
+
+2 HP lost; shield absorbed 3
+
+phase4slow003
+HUMAN STAFF
+LEVEL 3
+COINS  2,000
+HP 116/116
+██████████
+ 25/25
+██████████
+XP 0/125
+░░░░░░░░░░
+ATK 11
+DEF 15
+SPD 6
+PACK 3/6
+JOIN A FACTION
+no faction flies yet — be the first
+found your own
+level 4
+CONNECT GMAIL TO RECOVER THIS PLAYER.
+SOUND ON
+MUSIC ON
+▶
+PLAYING
+2
+FEEDBACK
+LABS
+ADMIN

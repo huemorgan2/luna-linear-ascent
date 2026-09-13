@@ -1,0 +1,470 @@
+{
+  "name": "phase4slow003",
+  "race": "human",
+  "stage": "playing",
+  "ruleset": "collection-v1",
+  "location": "group",
+  "floor": 1,
+  "unlocked_floor": 4,
+  "level": 3,
+  "xp": 0,
+  "gold": 2000,
+  "hp": 116,
+  "energy_val": 25.0,
+  "energy_ts": "2026-09-13T11:08:37.347223+00:00",
+  "deck": [
+    "5a0a4da1a38be76ac687fc5b2d6092ef",
+    "baf8df3165bba4bab9fbf633d239d4fb",
+    "7f8d72a18b83757edf48c0fc544ca621"
+  ],
+  "active_weapon": "7f8d72a18b83757edf48c0fc544ca621",
+  "training": {
+    "bow": 0,
+    "blade": 0,
+    "staff": 0
+  },
+  "collection": {
+    "284942b05bd43a978d8a87796ca45446": {
+      "id": "284942b05bd43a978d8a87796ca45446",
+      "grade": "Common",
+      "level": 0,
+      "family": "breach",
+      "source": "starter",
+      "maximum": 1170,
+      "location": "carried",
+      "durability": 1170,
+      "provenance": {
+        "owner": "web:phase4slow003",
+        "receipt": "migration:held:rusted_shiv:0"
+      }
+    },
+    "3c53d702f17d6dda7da51af2855273ca": {
+      "id": "3c53d702f17d6dda7da51af2855273ca",
+      "grade": "Common",
+      "level": 0,
+      "family": "ember",
+      "source": "starter",
+      "maximum": 1300,
+      "location": "carried",
+      "durability": 1300,
+      "provenance": {
+        "owner": "web:phase4slow003",
+        "receipt": "starter:staff"
+      }
+    },
+    "5a0a4da1a38be76ac687fc5b2d6092ef": {
+      "id": "5a0a4da1a38be76ac687fc5b2d6092ef",
+      "grade": "Common",
+      "level": 0,
+      "family": "breach",
+      "source": "craft",
+      "maximum": 1170,
+      "location": "carried",
+      "durability": 1170,
+      "provenance": {
+        "owner": "web:phase4slow003",
+        "receipt": "declared:phase4slow003:breach"
+      }
+    },
+    "7f8d72a18b83757edf48c0fc544ca621": {
+      "id": "7f8d72a18b83757edf48c0fc544ca621",
+      "grade": "Common",
+      "level": 0,
+      "family": "frostbind",
+      "source": "craft",
+      "maximum": 1495,
+      "location": "carried",
+      "durability": 1495,
+      "provenance": {
+        "owner": "web:phase4slow003",
+        "receipt": "declared:phase4slow003:frostbind"
+      }
+    },
+    "b715aa18e2c3332b7384f393d392bf84": {
+      "id": "b715aa18e2c3332b7384f393d392bf84",
+      "grade": "Common",
+      "level": 0,
+      "family": "hawkeye",
+      "source": "starter",
+      "maximum": 1300,
+      "location": "carried",
+      "durability": 1300,
+      "provenance": {
+        "owner": "web:phase4slow003",
+        "receipt": "starter:bow"
+      }
+    },
+    "baf8df3165bba4bab9fbf633d239d4fb": {
+      "id": "baf8df3165bba4bab9fbf633d239d4fb",
+      "grade": "Common",
+      "level": 0,
+      "family": "pinning",
+      "source": "craft",
+      "maximum": 1300,
+      "location": "carried",
+      "durability": 1300,
+      "provenance": {
+        "owner": "web:phase4slow003",
+        "receipt": "declared:phase4slow003:pinning"
+      }
+    }
+  },
+  "quiver": {
+    "Common": {
+      "fire": 0,
+      "arcane": 0,
+      "poison": 0,
+      "pinning": 10,
+      "ordinary": 20,
+      "concussive": 0
+    }
+  },
+  "arrow_choice": {},
+  "materials": {},
+  "utility_tools": {},
+  "act_seq": null,
+  "rng_counter": 1005,
+  "group": {
+    "id": "group:1",
+    "xp": 0,
+    "deck": [],
+    "deep": false,
+    "haul": {
+      "gold": 0,
+      "weapons": [],
+      "materials": {}
+    },
+    "site": "",
+    "turn": 0,
+    "floor": 1,
+    "index": 0,
+    "offer": "1:trail:",
+    "energy": 0,
+    "events": [],
+    "members": [
+      {
+        "hp": 42,
+        "id": "feral_boar",
+        "air": false,
+        "atk": 8,
+        "gap": 0,
+        "lore": "Sty stock gone wild in two generations. It charges first and decides why later.",
+        "name": "Feral boar",
+        "note": "Soft defenses. Every reachable weapon works.",
+        "paid": false,
+        "type": "ground-common",
+        "floor": 1,
+        "image": "creatures/feral_boar_320x112.png",
+        "magic": 1.25,
+        "power": 1.25,
+        "rates": {
+          "weapon": {
+            "Epic": 6.21e-05,
+            "Rare": 0.00621,
+            "Common": 0.9315,
+            "Legendary": 0
+          },
+          "material": {
+            "Epic": 0.003105,
+            "Rare": 0.15525,
+            "Common": 6.21,
+            "Legendary": 0
+          }
+        },
+        "speed": 6,
+        "hp_max": 42,
+        "killed": false,
+        "traits": [
+          "sturdy",
+          "fierce"
+        ],
+        "weight": 3,
+        "bundles": {
+          "Epic": {
+            "Meteorite": 2,
+            "Starforged Steel": 2
+          },
+          "Rare": {
+            "Steel": 2,
+            "Hardwood": 2
+          },
+          "Common": {
+            "Wood": 2,
+            "Raw Metal": 2
+          },
+          "Legendary": {
+            "Shard Matter": 2,
+            "Mythic Threads": 2
+          }
+        },
+        "defense": 1,
+        "effects": [],
+        "rewards": {
+          "xp": 3,
+          "gold": 26,
+          "weapon": null,
+          "materials": {}
+        },
+        "started": false,
+        "affinity": "Common",
+        "instance": "group:1:enemy:0",
+        "specimen": "alpha",
+        "exhausted": false,
+        "arrival_gap": 0,
+        "stun_recovery": 0,
+        "reward_revision": "bundles-1"
+      },
+      {
+        "hp": 10,
+        "id": "grey_wolf",
+        "air": false,
+        "atk": 6,
+        "gap": 3,
+        "lore": "Farm dogs once kept them past the fences. The dogs are gone; the wolves remember the gap in the third hedge.",
+        "name": "Grey wolf",
+        "note": "Soft defenses. Every reachable weapon works.",
+        "paid": false,
+        "type": "ground-common",
+        "floor": 1,
+        "image": "creatures/grey_wolf_320x112.png",
+        "magic": 1.25,
+        "power": 1.25,
+        "rates": {
+          "weapon": {
+            "Epic": 1e-05,
+            "Rare": 0.001,
+            "Common": 0.15,
+            "Legendary": 0
+          },
+          "material": {
+            "Epic": 0.0005,
+            "Rare": 0.025,
+            "Common": 1.0,
+            "Legendary": 0
+          }
+        },
+        "speed": 5,
+        "hp_max": 10,
+        "killed": false,
+        "traits": [],
+        "weight": 3,
+        "bundles": {
+          "Epic": {
+            "Meteorite": 2,
+            "Starforged Steel": 2
+          },
+          "Rare": {
+            "Steel": 2,
+            "Hardwood": 2
+          },
+          "Common": {
+            "Wood": 2,
+            "Raw Metal": 2
+          },
+          "Legendary": {
+            "Shard Matter": 2,
+            "Mythic Threads": 2
+          }
+        },
+        "defense": 1,
+        "effects": [],
+        "rewards": {
+          "xp": 1,
+          "gold": 11,
+          "weapon": null,
+          "materials": {}
+        },
+        "started": false,
+        "affinity": "Common",
+        "instance": "group:1:enemy:1",
+        "specimen": "runt",
+        "exhausted": false,
+        "arrival_gap": 3,
+        "stun_recovery": 0,
+        "reward_revision": "bundles-1"
+      }
+    ],
+    "revision": "collection-v1",
+    "committed": false,
+    "cooldowns": {},
+    "life_used": false,
+    "event_sequence": 0,
+    "combat_revision": 2
+  },
+  "group_result": null,
+  "groups_cleared": 1,
+  "hunt_offers": {
+    "1:trail:": {
+      "id": "group:1",
+      "xp": 0,
+      "deck": [],
+      "deep": false,
+      "haul": {
+        "gold": 0,
+        "weapons": [],
+        "materials": {}
+      },
+      "site": "",
+      "turn": 0,
+      "floor": 1,
+      "index": 0,
+      "offer": "1:trail:",
+      "energy": 0,
+      "events": [],
+      "members": [
+        {
+          "hp": 42,
+          "id": "feral_boar",
+          "air": false,
+          "atk": 8,
+          "gap": 0,
+          "lore": "Sty stock gone wild in two generations. It charges first and decides why later.",
+          "name": "Feral boar",
+          "note": "Soft defenses. Every reachable weapon works.",
+          "paid": false,
+          "type": "ground-common",
+          "floor": 1,
+          "image": "creatures/feral_boar_320x112.png",
+          "magic": 1.25,
+          "power": 1.25,
+          "rates": {
+            "weapon": {
+              "Epic": 6.21e-05,
+              "Rare": 0.00621,
+              "Common": 0.9315,
+              "Legendary": 0
+            },
+            "material": {
+              "Epic": 0.003105,
+              "Rare": 0.15525,
+              "Common": 6.21,
+              "Legendary": 0
+            }
+          },
+          "speed": 6,
+          "hp_max": 42,
+          "killed": false,
+          "traits": [
+            "sturdy",
+            "fierce"
+          ],
+          "weight": 3,
+          "bundles": {
+            "Epic": {
+              "Meteorite": 2,
+              "Starforged Steel": 2
+            },
+            "Rare": {
+              "Steel": 2,
+              "Hardwood": 2
+            },
+            "Common": {
+              "Wood": 2,
+              "Raw Metal": 2
+            },
+            "Legendary": {
+              "Shard Matter": 2,
+              "Mythic Threads": 2
+            }
+          },
+          "defense": 1,
+          "effects": [],
+          "rewards": {
+            "xp": 3,
+            "gold": 26,
+            "weapon": null,
+            "materials": {}
+          },
+          "started": false,
+          "affinity": "Common",
+          "instance": "group:1:enemy:0",
+          "specimen": "alpha",
+          "exhausted": false,
+          "arrival_gap": 0,
+          "stun_recovery": 0,
+          "reward_revision": "bundles-1"
+        },
+        {
+          "hp": 10,
+          "id": "grey_wolf",
+          "air": false,
+          "atk": 6,
+          "gap": 3,
+          "lore": "Farm dogs once kept them past the fences. The dogs are gone; the wolves remember the gap in the third hedge.",
+          "name": "Grey wolf",
+          "note": "Soft defenses. Every reachable weapon works.",
+          "paid": false,
+          "type": "ground-common",
+          "floor": 1,
+          "image": "creatures/grey_wolf_320x112.png",
+          "magic": 1.25,
+          "power": 1.25,
+          "rates": {
+            "weapon": {
+              "Epic": 1e-05,
+              "Rare": 0.001,
+              "Common": 0.15,
+              "Legendary": 0
+            },
+            "material": {
+              "Epic": 0.0005,
+              "Rare": 0.025,
+              "Common": 1.0,
+              "Legendary": 0
+            }
+          },
+          "speed": 5,
+          "hp_max": 10,
+          "killed": false,
+          "traits": [],
+          "weight": 3,
+          "bundles": {
+            "Epic": {
+              "Meteorite": 2,
+              "Starforged Steel": 2
+            },
+            "Rare": {
+              "Steel": 2,
+              "Hardwood": 2
+            },
+            "Common": {
+              "Wood": 2,
+              "Raw Metal": 2
+            },
+            "Legendary": {
+              "Shard Matter": 2,
+              "Mythic Threads": 2
+            }
+          },
+          "defense": 1,
+          "effects": [],
+          "rewards": {
+            "xp": 1,
+            "gold": 11,
+            "weapon": null,
+            "materials": {}
+          },
+          "started": false,
+          "affinity": "Common",
+          "instance": "group:1:enemy:1",
+          "specimen": "runt",
+          "exhausted": false,
+          "arrival_gap": 3,
+          "stun_recovery": 0,
+          "reward_revision": "bundles-1"
+        }
+      ],
+      "revision": "collection-v1",
+      "committed": false,
+      "cooldowns": {},
+      "life_used": false,
+      "event_sequence": 0,
+      "combat_revision": 2
+    }
+  },
+  "tenant": "web",
+  "player": "phase4slow003",
+  "energy_now": 25,
+  "observed_at": "2026-09-13T11:09:00.639078+00:00",
+  "ledger": []
+}

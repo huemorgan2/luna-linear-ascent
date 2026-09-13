@@ -1,0 +1,99 @@
+GAME
+SCORE
+COMMUNITY
+FLOOR 1 · HUNT
+Grey wolf · enemy 1 of 2i
+XP after each kill. Secure the gold and items by defeating the whole group.
+1 Grey wolf
+2 Hedgerow rat
+ Common
+ Ground
+ 6 speed
+
+Traits: none
+
+7 ATK · 1 DEF · Power ×1.25 · Magic ×1.25
+
+Drop chances for this enemy
+ 36 / 36 HP
+Contact
+Near
+Far
+Cover
+
+WAITING · 1 energy when this enemy begins
+
+0 XP kept · 0 gold pending
+Breach Cleaver +0
+Blade · 9 ATK
+1170/1170
+Hawkeye Longbow +1
+Bow · 11 ATK
+1299/1332
+Ember Staff +0
+Staff · 7 ATK
+1293/1300
+1 Breach Cleaver
+Move to contact first
+2 Hawkeye Longbow
+Arcane · Magic · 20 left
+3 Cover shot · Hawkeye Longbow
+Adds 20% at Far (2) or Cover (3). No bonus at this distance.
+4 Ember Staff
+Staff strike
+5 Burn · Ember Staff
+Ignition adds 12% source attack for two phases as Magic.
+6 Close in
+Near
+7 Pull back
+Speed decides the opening
+8 Guard
+Stronger shield absorption; some damage gets through
+9 Leave and lose the pending haul
+Keep earned XP
+16 Weapon collection
+your three battle slots
+Common Hawkeye Longbow
+
+Choose arrows · selection is free
+
+10 Ordinary
+100 left · Power
+11 Arcane
+20 left · Magic
+12 Poison
+0 left · Power
+13 Fire
+0 left · Power
+14 Pinning
+0 left · Power
+15 Concussive
+0 left · Power
+Phase3Luna
+HUMAN BOW
+LEVEL 1
+COINS  33
+HP 58/80
+▓▓▓▓▓▓▓░░░
+ 3/25
+▓░░░░░░░░░
+XP 17/24
+▓▓▓▓▓▓▓░░░
+LEVEL UP — XP 17/24 + ◈ 60 — the Guildhall levels you up
+✕
+ATK 14
+DEF 14
+SPD 5
+PACK 0/6
+JOIN A FACTION
+no faction flies yet — be the first
+found your own
+level 4
+SOUND ON
+MUSIC ON
+▶
+PLAYING
+2
+FEEDBACK
+LABS
+ADMIN

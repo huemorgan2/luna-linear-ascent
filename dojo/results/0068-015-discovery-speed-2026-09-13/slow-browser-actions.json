@@ -1,0 +1,121 @@
+[
+  {
+    "kind": "request",
+    "time": "2026-09-13T11:09:15.455Z",
+    "body": {
+      "option": "withdraw",
+      "scene_id": "s0",
+      "mode": "pane"
+    }
+  },
+  {
+    "kind": "response",
+    "time": "2026-09-13T11:09:15.646Z",
+    "status": 200,
+    "scene_id": "s1",
+    "headline": "Feral boar · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "kind": "request",
+    "time": "2026-09-13T11:09:28.502Z",
+    "body": {
+      "option": "skill:7f8d72a18b83757edf48c0fc544ca621",
+      "scene_id": "s1",
+      "mode": "pane"
+    }
+  },
+  {
+    "kind": "response",
+    "time": "2026-09-13T11:09:28.721Z",
+    "status": 200,
+    "scene_id": "s2",
+    "headline": "Feral boar · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "kind": "request",
+    "time": "2026-09-13T11:09:55.423Z",
+    "body": {
+      "option": "withdraw",
+      "scene_id": "s2",
+      "mode": "pane"
+    }
+  },
+  {
+    "kind": "response",
+    "time": "2026-09-13T11:09:55.683Z",
+    "status": 200,
+    "scene_id": "s3",
+    "headline": "Feral boar · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "kind": "request",
+    "time": "2026-09-13T11:10:14.396Z",
+    "body": {
+      "option": "guard",
+      "scene_id": "s3",
+      "mode": "pane"
+    }
+  },
+  {
+    "kind": "response",
+    "time": "2026-09-13T11:10:14.554Z",
+    "status": 200,
+    "scene_id": "s4",
+    "headline": "Feral boar · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "kind": "request",
+    "time": "2026-09-13T11:10:15.206Z",
+    "body": {
+      "option": "guard",
+      "scene_id": "s4",
+      "mode": "pane"
+    }
+  },
+  {
+    "kind": "response",
+    "time": "2026-09-13T11:10:15.321Z",
+    "status": 200,
+    "scene_id": "s5",
+    "headline": "Feral boar · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "kind": "request",
+    "time": "2026-09-13T11:10:15.946Z",
+    "body": {
+      "option": "skill:7f8d72a18b83757edf48c0fc544ca621",
+      "scene_id": "s5",
+      "mode": "pane"
+    }
+  },
+  {
+    "kind": "response",
+    "time": "2026-09-13T11:10:16.057Z",
+    "status": 200,
+    "scene_id": "s6",
+    "headline": "Feral boar · enemy 1 of 2",
+    "refusal": ""
+  },
+  {
+    "kind": "request",
+    "time": "2026-09-13T11:10:30.539Z",
+    "body": {
+      "option": "flee",
+      "scene_id": "s6",
+      "mode": "pane"
+    }
+  },
+  {
+    "kind": "response",
+    "time": "2026-09-13T11:10:31.041Z",
+    "status": 200,
+    "scene_id": "s7",
+    "headline": "You escaped",
+    "refusal": ""
+  }
+]

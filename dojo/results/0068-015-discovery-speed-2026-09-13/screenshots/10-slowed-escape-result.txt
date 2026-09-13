@@ -1,0 +1,61 @@
+Real escape after reapplying Slow. Initial stream was declared before INSERT; no forced outcome. Expect escaped,0kills,1totalenergy and no extra damage on success.
+
+GAME
+SCORE
+COMMUNITY
+FLOOR 1 · GROUP RESULT
+You escaped
+0/2 defeated ·  0 XP kept · 1 energy spent
+WEAPON COLLECTION
+
+Pack 3 / 6 · town storage stays in Roothollow
+
+1
+Breach Cleaver +0
+2
+Pinning Bow +0
+3
+Frostbind Staff +0
+Upgrade materials
+Arrows · 30 / 400
+0 gold left behind
+No 
+1
+Return to camp
+2
+Weapon collection
+your three battle slots
+PLAYERS ON FLOOR 1
+Phase3Energy2
+L1
+Phase3Energy5
+L1
+Phase3Luna
+L1
+phase4slow003
+HUMAN STAFF
+LEVEL 3
+COINS  2,000
+HP 106/116
+▓▓▓▓▓▓▓▓▓░
+ 24/25
+▓▓▓▓▓▓▓▓▓▓
+XP 0/125
+░░░░░░░░░░
+ATK 11
+DEF 15
+SPD 6
+PACK 3/6
+JOIN A FACTION
+no faction flies yet — be the first
+found your own
+level 4
+CONNECT GMAIL TO RECOVER THIS PLAYER.
+SOUND ON
+MUSIC ON
+▶
+PLAYING
+2
+FEEDBACK
+LABS
+ADMIN

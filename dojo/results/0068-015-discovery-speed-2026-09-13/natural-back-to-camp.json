@@ -1,0 +1,352 @@
+{
+  "name": "Phase3Luna",
+  "race": "human",
+  "stage": "playing",
+  "ruleset": "collection-v1",
+  "location": "gate_town",
+  "floor": 1,
+  "unlocked_floor": 3,
+  "level": 1,
+  "xp": 17,
+  "gold": 33,
+  "hp": 58,
+  "energy_val": 3.5411333262962996,
+  "energy_ts": "2026-09-13T10:50:06.518049+00:00",
+  "deck": [
+    "2b196ea3c3ee0fc7d4d3a6085c4ea1f5",
+    "ca244e21392326f61e3672473bf2b992",
+    "d7611c55513bb8cdbbccb3c88f65e7ae"
+  ],
+  "active_weapon": "ca244e21392326f61e3672473bf2b992",
+  "training": {
+    "bow": 1,
+    "blade": 2,
+    "staff": 0
+  },
+  "collection": {
+    "2b196ea3c3ee0fc7d4d3a6085c4ea1f5": {
+      "id": "2b196ea3c3ee0fc7d4d3a6085c4ea1f5",
+      "grade": "Common",
+      "level": 0,
+      "family": "breach",
+      "source": "starter",
+      "maximum": 1170,
+      "location": "carried",
+      "durability": 1170,
+      "provenance": {
+        "owner": "ascent-change-phase3:owner",
+        "receipt": "migration:held:rusted_sword:0"
+      }
+    },
+    "ca244e21392326f61e3672473bf2b992": {
+      "id": "ca244e21392326f61e3672473bf2b992",
+      "grade": "Common",
+      "level": 1,
+      "family": "hawkeye",
+      "source": "starter",
+      "maximum": 1332,
+      "location": "carried",
+      "durability": 1299,
+      "provenance": {
+        "owner": "ascent-change-phase3:owner",
+        "receipt": "starter:bow"
+      }
+    },
+    "d7611c55513bb8cdbbccb3c88f65e7ae": {
+      "id": "d7611c55513bb8cdbbccb3c88f65e7ae",
+      "grade": "Common",
+      "level": 0,
+      "family": "ember",
+      "source": "starter",
+      "maximum": 1300,
+      "location": "carried",
+      "durability": 1293,
+      "provenance": {
+        "owner": "ascent-change-phase3:owner",
+        "receipt": "starter:staff"
+      }
+    }
+  },
+  "quiver": {
+    "Common": {
+      "arcane": 20,
+      "ordinary": 100
+    }
+  },
+  "arrow_choice": {},
+  "materials": {
+    "Wood": 0,
+    "Raw Metal": 0
+  },
+  "utility_tools": {
+    "pickaxe": {
+      "condition": 119
+    },
+    "wood-axe": {
+      "condition": 91
+    }
+  },
+  "act_seq": 143,
+  "rng_counter": 249,
+  "group": null,
+  "group_result": null,
+  "groups_cleared": 8,
+  "hunt_offers": {
+    "3:trail:": {
+      "id": "group:9",
+      "xp": 0,
+      "deck": [],
+      "deep": false,
+      "haul": {
+        "gold": 0,
+        "weapons": [],
+        "materials": {}
+      },
+      "site": "",
+      "floor": 3,
+      "index": 0,
+      "offer": "3:trail:",
+      "energy": 0,
+      "events": [],
+      "members": [
+        {
+          "hp": 11,
+          "id": "reed_adder",
+          "air": false,
+          "atk": 7,
+          "gap": 2,
+          "lore": "Fever-bold now, striking from the reed at anything warm.",
+          "name": "Marsh adder",
+          "note": "Soft defenses. Every reachable weapon works.",
+          "paid": false,
+          "type": "ground-common",
+          "floor": 3,
+          "image": "creatures/reed_adder_320x112.png",
+          "magic": 1.25,
+          "power": 1.25,
+          "rates": {
+            "weapon": {
+              "Epic": 7.980555555555557e-06,
+              "Rare": 0.0026758333333333334,
+              "Common": 0.105625,
+              "Legendary": 0
+            },
+            "material": {
+              "Epic": 0.0006337500000000001,
+              "Rare": 0.0316875,
+              "Common": 5.281250000000001,
+              "Legendary": 0
+            }
+          },
+          "speed": 5,
+          "hp_max": 11,
+          "killed": false,
+          "traits": [
+            "frail",
+            "feeble"
+          ],
+          "weight": 3,
+          "bundles": {
+            "Epic": {
+              "Meteorite": 2,
+              "Starforged Steel": 2
+            },
+            "Rare": {
+              "Steel": 2,
+              "Hardwood": 2
+            },
+            "Common": {
+              "Wood": 2,
+              "Raw Metal": 2
+            },
+            "Legendary": {
+              "Shard Matter": 2,
+              "Mythic Threads": 2
+            }
+          },
+          "defense": 1,
+          "effects": [],
+          "rewards": {
+            "xp": 5,
+            "gold": 15,
+            "weapon": null,
+            "materials": {}
+          },
+          "started": false,
+          "affinity": "Common",
+          "instance": "group:9:enemy:0",
+          "specimen": "runt",
+          "exhausted": false,
+          "stun_recovery": 0,
+          "reward_revision": "bundles-1"
+        },
+        {
+          "hp": 11,
+          "id": "reed_adder",
+          "air": false,
+          "atk": 7,
+          "gap": 1,
+          "lore": "Fever-bold now, striking from the reed at anything warm.",
+          "name": "Marsh adder",
+          "note": "Soft defenses. Every reachable weapon works.",
+          "paid": false,
+          "type": "ground-common",
+          "floor": 3,
+          "image": "creatures/reed_adder_320x112.png",
+          "magic": 1.25,
+          "power": 1.25,
+          "rates": {
+            "weapon": {
+              "Epic": 7.980555555555557e-06,
+              "Rare": 0.0026758333333333334,
+              "Common": 0.105625,
+              "Legendary": 0
+            },
+            "material": {
+              "Epic": 0.0006337500000000001,
+              "Rare": 0.0316875,
+              "Common": 5.281250000000001,
+              "Legendary": 0
+            }
+          },
+          "speed": 5,
+          "hp_max": 11,
+          "killed": false,
+          "traits": [
+            "frail",
+            "feeble"
+          ],
+          "weight": 3,
+          "bundles": {
+            "Epic": {
+              "Meteorite": 2,
+              "Starforged Steel": 2
+            },
+            "Rare": {
+              "Steel": 2,
+              "Hardwood": 2
+            },
+            "Common": {
+              "Wood": 2,
+              "Raw Metal": 2
+            },
+            "Legendary": {
+              "Shard Matter": 2,
+              "Mythic Threads": 2
+            }
+          },
+          "defense": 1,
+          "effects": [],
+          "rewards": {
+            "xp": 5,
+            "gold": 15,
+            "weapon": null,
+            "materials": {}
+          },
+          "started": false,
+          "affinity": "Common",
+          "instance": "group:9:enemy:1",
+          "specimen": "runt",
+          "exhausted": false,
+          "stun_recovery": 0,
+          "reward_revision": "bundles-1"
+        }
+      ],
+      "revision": "collection-v1",
+      "committed": false,
+      "cooldowns": {},
+      "life_used": false,
+      "event_sequence": 0
+    }
+  },
+  "tenant": "ascent-change-phase3",
+  "player": "owner",
+  "energy_now": 3,
+  "observed_at": "2026-09-13T11:08:58.167948+00:00",
+  "ledger": [
+    {
+      "id": 139,
+      "kind": "arrows",
+      "gold": -10,
+      "xp": 0,
+      "note": "Common:arcane:20"
+    },
+    {
+      "id": 135,
+      "kind": "group_clear",
+      "gold": 35,
+      "xp": 0,
+      "note": "group:7"
+    },
+    {
+      "id": 134,
+      "kind": "kill",
+      "gold": 0,
+      "xp": 2,
+      "note": "group:7:enemy:1"
+    },
+    {
+      "id": 133,
+      "kind": "enemy_start",
+      "gold": 0,
+      "xp": 0,
+      "note": "group:7:enemy:1:paid"
+    },
+    {
+      "id": 132,
+      "kind": "kill",
+      "gold": 0,
+      "xp": 2,
+      "note": "group:7:enemy:0"
+    },
+    {
+      "id": 131,
+      "kind": "enemy_start",
+      "gold": 0,
+      "xp": 0,
+      "note": "group:7:enemy:0:paid"
+    },
+    {
+      "id": 98,
+      "kind": "quiver_enroll",
+      "gold": 0,
+      "xp": 0,
+      "note": "quiver-v1:100:Common:ordinary"
+    },
+    {
+      "id": 97,
+      "kind": "upgrade",
+      "gold": -171,
+      "xp": 0,
+      "note": "ca244e21392326f61e3672473bf2b992:+1"
+    },
+    {
+      "id": 96,
+      "kind": "gather_extract",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:2"
+    },
+    {
+      "id": 95,
+      "kind": "gather",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:2:1:yield"
+    },
+    {
+      "id": 94,
+      "kind": "gather_tool",
+      "gold": -45,
+      "xp": 0,
+      "note": "pickaxe"
+    },
+    {
+      "id": 93,
+      "kind": "gather_extract",
+      "gold": 0,
+      "xp": 0,
+      "note": "expedition:1"
+    }
+  ]
+}
