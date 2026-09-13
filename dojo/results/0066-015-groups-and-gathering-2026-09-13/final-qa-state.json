@@ -1,0 +1,543 @@
+{
+  "captured_at": "2026-09-13T07:36:01.911803+00:00",
+  "players": [
+    {
+      "tenant": "web",
+      "player": "phase3shield",
+      "state": {
+        "name": "Phase3Shield",
+        "gold": 50,
+        "bank": 0,
+        "xp": 0,
+        "xp_reserve": 0,
+        "hp": 27,
+        "energy_val": 4.1762531962962965,
+        "energy_ts": "2026-09-13T07:08:22.453182+00:00",
+        "materials": {},
+        "utility_tools": {},
+        "floor": 1,
+        "location": "group",
+        "act_seq": 2,
+        "deck": [
+          "6e7377bd420683bcc64be549320a9b45",
+          "00addbf579b21fe2bb8aa4437d32f8f5",
+          "7dd4e57171d3f42b0cafe0d5125c797f"
+        ]
+      },
+      "weapons": [
+        {
+          "id": "00addbf579b21fe2bb8aa4437d32f8f5",
+          "family": "hawkeye",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1300,
+          "maximum": 1300,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "6e7377bd420683bcc64be549320a9b45",
+          "family": "breach",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1170,
+          "maximum": 1170,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "7dd4e57171d3f42b0cafe0d5125c797f",
+          "family": "ember",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1299,
+          "maximum": 1300,
+          "source": "starter",
+          "location": "carried"
+        }
+      ]
+    },
+    {
+      "tenant": "web",
+      "player": "phase3gather",
+      "state": {
+        "name": "Phase3Gather",
+        "gold": 610,
+        "bank": 0,
+        "xp": 12,
+        "xp_reserve": 0,
+        "hp": 80,
+        "energy_val": 0.21932772444444426,
+        "energy_ts": "2026-09-13T07:10:18.854137+00:00",
+        "materials": {
+          "Wood": 15,
+          "Raw Metal": 7
+        },
+        "utility_tools": {
+          "wood-axe": {
+            "condition": 99
+          }
+        },
+        "floor": 0,
+        "location": "forge",
+        "act_seq": 18,
+        "deck": [
+          "6022aa009cf25fc5db6a49c45e5846c9",
+          "3639243de9efe6579872445751b0da83",
+          "b2ee64198751c9619f74563c96339668"
+        ]
+      },
+      "weapons": [
+        {
+          "id": "043cd78be46950c22910261b96953a19",
+          "family": "viper",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1300,
+          "maximum": 1300,
+          "source": "shop",
+          "location": "carried"
+        },
+        {
+          "id": "3639243de9efe6579872445751b0da83",
+          "family": "hawkeye",
+          "grade": "Common",
+          "level": 1,
+          "durability": 1331,
+          "maximum": 1332,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "6022aa009cf25fc5db6a49c45e5846c9",
+          "family": "breach",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1170,
+          "maximum": 1170,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "b2ee64198751c9619f74563c96339668",
+          "family": "ember",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1298,
+          "maximum": 1300,
+          "source": "starter",
+          "location": "carried"
+        }
+      ]
+    },
+    {
+      "tenant": "web",
+      "player": "qacollectionfixture",
+      "state": {
+        "name": "QACollectionFixture",
+        "gold": 550,
+        "bank": 550,
+        "xp": 0,
+        "xp_reserve": 0,
+        "hp": 80,
+        "energy_val": 24.0,
+        "energy_ts": "2026-09-13T05:46:05.842974+00:00",
+        "materials": {},
+        "utility_tools": {},
+        "floor": 0,
+        "location": "vault",
+        "act_seq": 17,
+        "deck": [
+          "8eddb4bf7a538e6414998dc6b9369d3f",
+          "f2fdb8a9c4dd892457d248bd5f908ac7",
+          null
+        ]
+      },
+      "weapons": [
+        {
+          "id": "021d6ef117352e44f95d6dfa973bb507",
+          "family": "viper",
+          "grade": "Legendary",
+          "level": 6,
+          "durability": 3998,
+          "maximum": 3998,
+          "source": "shop",
+          "location": null
+        },
+        {
+          "id": "63d61b269246dead8ea3a368986195f2",
+          "family": "viper",
+          "grade": "Rare",
+          "level": 2,
+          "durability": 2178,
+          "maximum": 2178,
+          "source": "shop",
+          "location": null
+        },
+        {
+          "id": "8eddb4bf7a538e6414998dc6b9369d3f",
+          "family": "viper",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1300,
+          "maximum": 1300,
+          "source": "shop",
+          "location": null
+        },
+        {
+          "id": "f0d1d16de75b7837d562dc9079354cfd",
+          "family": "viper",
+          "grade": "Epic",
+          "level": 4,
+          "durability": 3120,
+          "maximum": 3120,
+          "source": "shop",
+          "location": null
+        },
+        {
+          "id": "f2fdb8a9c4dd892457d248bd5f908ac7",
+          "family": "viper",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1300,
+          "maximum": 1300,
+          "source": "shop",
+          "location": null
+        }
+      ]
+    },
+    {
+      "tenant": "ascent-change-phase3",
+      "player": "owner",
+      "state": {
+        "name": "Phase3Luna",
+        "gold": 8,
+        "bank": 0,
+        "xp": 13,
+        "xp_reserve": 0,
+        "hp": 58,
+        "energy_val": 1.146876300740744,
+        "energy_ts": "2026-09-13T07:32:22.024080+00:00",
+        "materials": {
+          "Wood": 0,
+          "Raw Metal": 0
+        },
+        "utility_tools": {
+          "pickaxe": {
+            "condition": 119
+          },
+          "wood-axe": {
+            "condition": 91
+          }
+        },
+        "floor": 0,
+        "location": "forge",
+        "act_seq": 122,
+        "deck": [
+          "2b196ea3c3ee0fc7d4d3a6085c4ea1f5",
+          "ca244e21392326f61e3672473bf2b992",
+          "d7611c55513bb8cdbbccb3c88f65e7ae"
+        ]
+      },
+      "weapons": [
+        {
+          "id": "2b196ea3c3ee0fc7d4d3a6085c4ea1f5",
+          "family": "breach",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1170,
+          "maximum": 1170,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "ca244e21392326f61e3672473bf2b992",
+          "family": "hawkeye",
+          "grade": "Common",
+          "level": 1,
+          "durability": 1304,
+          "maximum": 1332,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "d7611c55513bb8cdbbccb3c88f65e7ae",
+          "family": "ember",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1293,
+          "maximum": 1300,
+          "source": "starter",
+          "location": "carried"
+        }
+      ]
+    },
+    {
+      "tenant": "web",
+      "player": "phase3energy2",
+      "state": {
+        "name": "Phase3Energy2",
+        "gold": 100,
+        "bank": 0,
+        "xp": 24,
+        "xp_reserve": 126,
+        "hp": 80,
+        "energy_val": 0.03191716000000011,
+        "energy_ts": "2026-09-13T07:01:52.504529+00:00",
+        "materials": {
+          "Wood": 14
+        },
+        "utility_tools": {},
+        "floor": 1,
+        "location": "gate_town",
+        "act_seq": 7,
+        "deck": [
+          "2ce0c1315bee7293b1e62d70e9420442",
+          "e25cf684f332a8ec7903ec939afb28dd",
+          "a355d7e8ad8246d27f0601ab15fe69c4"
+        ]
+      },
+      "weapons": [
+        {
+          "id": "2ce0c1315bee7293b1e62d70e9420442",
+          "family": "breach",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1170,
+          "maximum": 1170,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "a355d7e8ad8246d27f0601ab15fe69c4",
+          "family": "ember",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1300,
+          "maximum": 1300,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "e25cf684f332a8ec7903ec939afb28dd",
+          "family": "hawkeye",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1295,
+          "maximum": 1300,
+          "source": "starter",
+          "location": "carried"
+        }
+      ]
+    },
+    {
+      "tenant": "web",
+      "player": "phase3energy5",
+      "state": {
+        "name": "Phase3Energy5",
+        "gold": 50,
+        "bank": 0,
+        "xp": 24,
+        "xp_reserve": 36,
+        "hp": 80,
+        "energy_val": 3.074488256666667,
+        "energy_ts": "2026-09-13T07:03:47.573869+00:00",
+        "materials": {
+          "Wood": 9
+        },
+        "utility_tools": {},
+        "floor": 1,
+        "location": "gate_town",
+        "act_seq": 3,
+        "deck": [
+          "a3bdaf8494549d918238a23c1d44a479",
+          "b68559891276af87e8eb597b5e53b807",
+          "2e96510909f9d3777687cc58bf4ead6f"
+        ]
+      },
+      "weapons": [
+        {
+          "id": "2e96510909f9d3777687cc58bf4ead6f",
+          "family": "ember",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1300,
+          "maximum": 1300,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "a3bdaf8494549d918238a23c1d44a479",
+          "family": "breach",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1170,
+          "maximum": 1170,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "b68559891276af87e8eb597b5e53b807",
+          "family": "hawkeye",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1298,
+          "maximum": 1300,
+          "source": "starter",
+          "location": "carried"
+        }
+      ]
+    },
+    {
+      "tenant": "web",
+      "player": "phase3mobile",
+      "state": {
+        "name": "Phase3Mobile",
+        "gold": 300,
+        "bank": 0,
+        "xp": 0,
+        "xp_reserve": 0,
+        "hp": 80,
+        "energy_val": 10,
+        "energy_ts": "2026-09-13T07:07:19.082545+00:00",
+        "materials": {
+          "Wood": 10,
+          "Raw Metal": 10
+        },
+        "utility_tools": {},
+        "floor": 3,
+        "location": "gate_town",
+        "act_seq": 19,
+        "deck": [
+          "044bb1d433864b55bcf7c2c3e931ea3e",
+          "541aec876480883e94ac7b2c8c8953c3",
+          "d6795198a69a2511f0cabf332528f30c"
+        ]
+      },
+      "weapons": [
+        {
+          "id": "044bb1d433864b55bcf7c2c3e931ea3e",
+          "family": "breach",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1170,
+          "maximum": 1170,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "541aec876480883e94ac7b2c8c8953c3",
+          "family": "hawkeye",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1300,
+          "maximum": 1300,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "d6795198a69a2511f0cabf332528f30c",
+          "family": "ember",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1300,
+          "maximum": 1300,
+          "source": "starter",
+          "location": "carried"
+        }
+      ]
+    },
+    {
+      "tenant": "ascent-change-baseline",
+      "player": "owner",
+      "state": {
+        "name": "BaselineAsh",
+        "gold": 45,
+        "bank": 25,
+        "xp": 2,
+        "xp_reserve": 0,
+        "hp": 80,
+        "energy_val": 23.0,
+        "energy_ts": "2026-09-13T05:19:06.956474+00:00",
+        "materials": {},
+        "utility_tools": {},
+        "floor": 0,
+        "location": "school",
+        "act_seq": 38,
+        "deck": [
+          "bf947a8284b2fa38d42e2a8723e13351",
+          null,
+          null
+        ]
+      },
+      "weapons": [
+        {
+          "id": "bf947a8284b2fa38d42e2a8723e13351",
+          "family": "breach",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1295,
+          "maximum": 1300,
+          "source": "legacy",
+          "location": null
+        }
+      ]
+    },
+    {
+      "tenant": "web",
+      "player": "phase3sprout",
+      "state": {
+        "name": "Phase3Sprout",
+        "gold": 82,
+        "bank": 0,
+        "xp": 4,
+        "xp_reserve": 0,
+        "hp": 78,
+        "energy_val": 22.10866064925926,
+        "energy_ts": "2026-09-13T06:47:18.837042+00:00",
+        "materials": {},
+        "utility_tools": {},
+        "floor": 0,
+        "location": "forge",
+        "act_seq": 34,
+        "deck": [
+          "a74ca0ab81434109a312fd647cf11e0d",
+          "d810a489eeffa19018b89a4fb091d63d",
+          "d73439bdab6f21e3720c5b57ec37cf07"
+        ]
+      },
+      "weapons": [
+        {
+          "id": "a74ca0ab81434109a312fd647cf11e0d",
+          "family": "breach",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1169,
+          "maximum": 1170,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "d73439bdab6f21e3720c5b57ec37cf07",
+          "family": "ember",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1298,
+          "maximum": 1300,
+          "source": "starter",
+          "location": "carried"
+        },
+        {
+          "id": "d810a489eeffa19018b89a4fb091d63d",
+          "family": "hawkeye",
+          "grade": "Common",
+          "level": 0,
+          "durability": 1296,
+          "maximum": 1300,
+          "source": "starter",
+          "location": "carried"
+        }
+      ]
+    }
+  ]
+}

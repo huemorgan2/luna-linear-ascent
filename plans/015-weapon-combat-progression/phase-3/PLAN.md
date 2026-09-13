@@ -32,7 +32,7 @@ Follow the [parent plan](../PLAN.md) and its ownership map. No new production ru
 
 ## Execution status
 
-In progress. Rewritten for the three-weapon/group design on12 September2026; authorized for implementation by the subsequent user request. The checkpoints below record completed verification; browser completion and the next phase remain pending.
+Essential opening/group/Forge/gathering gate verified on0.114.5. Rewritten for the three-weapon/group design on12 September2026; authorized for implementation by the subsequent user request. Broader content and integration findings remain assigned to their later gates; this is not a complete release claim.
 
 ### Execution start —13 September2026
 
@@ -47,3 +47,13 @@ Verification so far:39 focused engine/style checks passed;8 HTTP action checks p
 The real browser/Luna gate is in progress under `/private/tmp/ascent-phase3-browser/001-phase3`; its first query is `hunt a monster group`. It has no final verdict yet. See `MEASUREMENTS.md` for provisional runs; no100-floor balance or shared-warden claim follows from this checkpoint.
 
 Rollback: before any candidate writes, `git -C plugin-linear-ascent revert 18a3956` reverses the plugin implementation. **Candidate QA writes now exist**, so do not run that inverse against the progressed database. Stop only the two owned QA processes listed in `/private/tmp/ascent-change-qa/pids.json`, keep their databases and current collection/group/expedition readers, and fix forward or implement a receipt-preserving compensation first. No restored snapshot may overwrite earned state. The concrete launcher/PID procedure and its pre-execution rollback are in `/private/tmp/ascent-change-qa/ROLLBACK.md`.
+
+### Browser and natural upgrade gate —0.114.5
+
+Main reviewed the actual browser evidence and390px mobile pass in `dojo/results/0066-015-groups-and-gathering-2026-09-13`. The natural Luna character earned its money, paid35gold for an axe and45 for a pick, secured6Wood/2RawMetal and spent171gold on Hawkeye+1. Final8gold/13XP/58HP,1304/1332bow condition and the same owned instance survived reconnect and authoritative read. Nine Wood attempts and one Metal attempt were paid individually. No personal grants/time advance; the shared QA frontier was separately staged to3. Group energy/partial XP/pending haul, partial shields, resistance, fixtures' ambush/extract/retry, and selected weapon/Forge cards passed their recorded checks.
+
+The main390px Chromium pass confirms332px generic row content/scroll width and151px combat button content/scroll width, wrapping tool requirements and all3cards/four grade choices. Current natural account and the original BaselineAsh were preserved. The browser runner's final report follows separately; its underlying completed screenshots and safe snapshots already substantiate this scope gate.
+
+Open findings are retained: P3-008 Luna exceeded a narrower two-gather request with three gathers before extraction (four total actions), although each was correctly charged. Phase7 must address assistant action-bound behavior. Existing trait labels omitted from scene_text produced a casual “no special traits” reply; phase4 supplies canonical trait descriptions. These are not hidden by the passed engine/transaction gate. The broad death/migration/all-content/wardens matrix remains later work.
+
+Coded verification:70focused,6CPU/replay,1512full-plugin passes with8known legacy failures,62simulator and8HTTP passes. Current full worldd231pass/1stale-wiki-stamp failure; after generating current data,4wiki tests passed. Two current actual-game traces replayed exactly1055/2313actions. Further100-floor policy/economy tuning remains necessary: the corrected ten-day run reachedfloor10 with3/8players and still has a steep early delay. Proceed to the committed phase4 implementation decisions; do not deploy this partial candidate.
