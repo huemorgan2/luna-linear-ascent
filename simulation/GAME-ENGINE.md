@@ -21,7 +21,7 @@ The imported checkout initially reports **0.111.0**, loaded from `worldd/vendor/
 
 ## Current versus proposed mechanics
 
-The current imported engine starts at one weapon slot and sells additional slots through the School. Its ordinary/deep hunts are individual encounters; current deep-hunt energy and capped XP rules remain in force. The proposal's fixed three-weapon decks, group reward escrow, overflow XP, four upgrade grades and replacement warden healing law are **not injected**. To simulate those rules accurately, implement them once in the actual game library, then have both the live service and this runner import that library. Existing adapter tests should be updated as intentional game contracts change.
+Runs explicitly select `ruleset: "legacy"` (default, for historical comparisons) or `ruleset: "collection-v1"`. The latter creates a candidate character through the real engine's enrollment/migration path and runs fixed three-weapon decks, complete sequential groups, per-enemy energy/exhaustion, delayed haul, XP reserve, material-funded Forge work and the implemented gathering sites. The resolver lives only in the game package. A probe succeeds only after a full group clear, never after its first kill. Candidate enrollment is recorded in replay traces. Legacy runs keep their historical contracts. Shared wardens are still outside this personal-state host until the service harness phase.
 
 ## World access and calendar days
 

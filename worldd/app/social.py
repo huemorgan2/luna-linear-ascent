@@ -98,6 +98,8 @@ _FIGHT_OPTIONS = frozenset({
 
 
 def _is_fight_round(doc: dict, option: str) -> bool:
+    if doc.get("group"):
+        return option in ("approach", "withdraw", "guard", "flee", "drink_tonic") or option.startswith(("strike:", "skill:"))
     if not doc.get("encounter"):
         return False
     return option in _FIGHT_OPTIONS or option.startswith("attack")
@@ -381,7 +383,7 @@ _presence_cache: dict = {"at": None, "data": None}
 # Python truthiness for doc["encounter"]: a finished fight leaves
 # `"encounter": null` (or {}) in the doc — neither puts a body on a floor.
 _ENCOUNTER_SQL = ("(doc->'encounter' IS NOT NULL "
-                  "AND doc->'encounter' NOT IN ('null'::jsonb, '{}'::jsonb))")
+                  "AND doc->'encounter' NOT IN ('null'::jsonb, '{}'::jsonb) OR doc->>'location' IN ('group','gathering'))")
 
 
 def _torch_status(d: dict) -> str:
@@ -395,8 +397,10 @@ def _torch_status(d: dict) -> str:
     if d.get("location") in ("warden_keep", "boss_keep") or \
             (d.get("encounter") or {}).get("kind") == "warden":
         return "at the keep"
-    if d.get("encounter"):
+    if d.get("encounter") or d.get("location") == "group":
         return "hunting"
+    if d.get("location") == "gathering":
+        return "gathering"
     return "at the fire"
 
 

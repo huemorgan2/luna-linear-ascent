@@ -32,8 +32,18 @@ Follow the [parent plan](../PLAN.md) and its ownership map. No new production ru
 
 ## Execution status
 
-Not started. Rewritten for the three-weapon/group design on12 September2026; authorized for implementation by the subsequent user request. This document is not evidence that runtime changes or tests have run.
+In progress. Rewritten for the three-weapon/group design on12 September2026; authorized for implementation by the subsequent user request. The checkpoints below record completed verification; browser completion and the next phase remain pending.
 
 ### Execution start —13 September2026
 
 Phase2's essential state/collection browser gate passed on0.113.5. Implementation now follows `ENGINE-CONTRACT.md`, committed before runtime edits. Preserve the baseline legacy failure list and source-pin new group tests separately; phase3 must supply actual-engine group progression evidence, not reinterpret prior single-enemy runs.
+
+### Candidate checkpoint —0.114.0 / plugin18a3956
+
+The actual engine now resolves sequential groups and per-enemy energy, XP/pending haul, owned-weapon Forge work, paid repairs/practice recovery, Drowned Copse/Bog-Iron Field expeditions, and shared pixel battle/collection/catalog cards. Candidate source and vendor match. QA was restarted with its existing databases and earned players preserved; `/health` reports0.114.0. Production is unchanged.
+
+Verification so far:39 focused engine/style checks passed;8 HTTP action checks passed;4 local PostgreSQL checks passed. The server-wide suite passed232 tests in409.89s. The plugin follow-up passed1480 tests with8 previously recorded legacy failures,4 skips and1 expected failure in114.69s. No newly attributed engine regression remains in that suite. The simulator initially passed60 tests; additional full-group accounting and automatic-CPU/replay tests passed (12 focused accounting/swarm and6 candidate checks); its final full follow-up is running.
+
+The real browser/Luna gate is in progress under `/private/tmp/ascent-phase3-browser/001-phase3`; its first query is `hunt a monster group`. It has no final verdict yet. See `MEASUREMENTS.md` for provisional runs; no100-floor balance or shared-warden claim follows from this checkpoint.
+
+Rollback: before any candidate writes, `git -C plugin-linear-ascent revert 18a3956` reverses the plugin implementation. **Candidate QA writes now exist**, so do not run that inverse against the progressed database. Stop only the two owned QA processes listed in `/private/tmp/ascent-change-qa/pids.json`, keep their databases and current collection/group/expedition readers, and fix forward or implement a receipt-preserving compensation first. No restored snapshot may overwrite earned state. The concrete launcher/PID procedure and its pre-execution rollback are in `/private/tmp/ascent-change-qa/ROLLBACK.md`.

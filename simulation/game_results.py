@@ -85,7 +85,7 @@ def simulate(config,progress=None):
             probes='Disposable copies; owned gear/condition/training, restored HP/energy, test-floor access. No player rewards. Mode: '+cfg.probe_mode,
             recovery='Actual sleep between planner visits; social/PvP ambushes are absent from this personal-state experiment.',
             multiplayer='Worldd database services, social interactions and shared warden victory are not run. Required-party counts remain null.',
-            mechanics='The imported game revision decides mechanics. Proposed groups, fixed three slots and material grades are not injected.',
+            mechanics=('Actual collection-v1 engine: three weapons, sequential groups, per-enemy energy, delayed haul, Forge upgrades and named gathering sites. Shared warden redesign not yet measured.' if cfg.ruleset=='collection-v1' else 'Actual legacy engine: individual hunts and School slot purchases. No candidate mechanics injected.'),
             activity='Heuristic choices and scheduled attendance are experimental inputs, not real player demographics.',
             trace='Complete action/time/world-fixture inputs saved for the first trace_players players. Other players retain final state, summary and recent actions.'))
 

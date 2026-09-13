@@ -64,12 +64,19 @@ def engine_source():
 
 class GameSession:
     """Synthetic persistence + clock. All player choices go through core."""
-    def __init__(self, key, *, seconds=0, document=None, capture=True):
+    def __init__(self, key, *, seconds=0, document=None, capture=True, ruleset=None):
         self.key,self.seconds,self.capture = key,float(seconds),capture
         self.trace=[]
         self.events=[]
         with at_time(self.seconds):
             self.doc=deepcopy(document) if document is not None else state.new_player(key)
+        if document is None and ruleset == 'collection-v1':
+            from plugin_linear_ascent.engine import collection
+            self.doc['born_ruleset'] = collection.RULESET
+            with at_time(self.seconds):collection.migrate(self.doc)
+            if self.capture:self.trace.append([self.seconds,'@ruleset',ruleset])
+        elif ruleset == 'legacy' and self.doc.get('born_ruleset'):
+            raise ValueError('Legacy simulation cannot run with candidate enrollment enabled')
         self.scene=None
         self.look()
 
@@ -120,7 +127,12 @@ def replay(key, trace, *, expected_source=None, expected_state=None):
     # new_player so replay does not introduce an extra engine read.
     with at_time(0):s.doc=state.new_player(key)
     for seconds,option,text in trace:
-        if option=='@world_frontier':s.advance(seconds);s.world_frontier(int(text))
+        if option=='@ruleset':
+            if text!='collection-v1':raise ValueError('Unknown recorded ruleset')
+            from plugin_linear_ascent.engine import collection
+            s.doc['born_ruleset']=text
+            with at_time(seconds):collection.migrate(s.doc)
+        elif option=='@world_frontier':s.advance(seconds);s.world_frontier(int(text))
         elif option is None:s.look(seconds)
         else:s.act(option,text,seconds=seconds)
     match=expected_state is None or s.state_hash()==expected_state

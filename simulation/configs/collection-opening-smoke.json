@@ -1,0 +1,1 @@
+{"ruleset":"collection-v1","players":8,"days":10,"workers":4,"max_floor":10,"seed":31001,"readiness_trials":4,"trace_players":2,"policies":["learner","tactician","saver","planner"]}

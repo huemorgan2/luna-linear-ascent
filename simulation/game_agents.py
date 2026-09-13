@@ -21,6 +21,7 @@ POLICIES = {
 
 @dataclass
 class GameConfig:
+    ruleset:str="legacy"
     players:int=24
     days:int=30
     seed:int=1601
@@ -51,6 +52,7 @@ class GameConfig:
         unknown=set(values)-set(cls.__dataclass_fields__)
         if unknown:raise ValueError('Not an engine-run setting: '+', '.join(sorted(unknown)))
         c=cls(**values)
+        if c.ruleset not in ('legacy','collection-v1'):raise ValueError('Unknown game ruleset')
         if c.probe_mode not in ('session','improvements'):raise ValueError('probe_mode must be session or improvements')
         if c.planner_path not in ('blade','bow','staff'):raise ValueError('planner_path must be blade, bow or staff')
         if c.planner_growth not in ('levels','training'):raise ValueError('planner_growth must be levels or training')
@@ -66,14 +68,21 @@ class GameConfig:
         c.policies=tuple(c.policies);return c
 
 
-def create_character(key,capture=True):
-    s=GameSession(key,capture=capture)
+def create_character(key,capture=True,ruleset="legacy"):
+    s=GameSession(key,capture=capture,ruleset=ruleset)
     while s.doc['stage']=='intro':s.act(s.legal()[0].id)
     s.act('human');s.act('', 'Simclimber')
     return s
 
 
+def in_battle(p):
+    return p.get('group') or p.get('encounter')
+
+
 def fight_choice(session, policy, *, probe=False):
+    if session.doc.get('group'):
+        from .game_collection import fight
+        return fight(session,policy,probe=probe)
     opts={o.id:o for o in session.legal()};p=session.doc
     if not probe and p['hp']<state.max_hp(p)*POLICIES[policy]['retreat'] and 'run' in opts:return 'run'
     if policy=='archer' and 'treeline_shot' in opts:return 'treeline_shot'
@@ -95,24 +104,27 @@ def assess(document,seconds,floor,cfg):
         p=deepcopy(document)
         p.update(luna_user=f'probe:{cfg.seed}:{floor}:{trial}',encounter=None,location='gate_town',floor=floor,
             unlocked_floor=max(floor,p['unlocked_floor']),rng_counter=0,pending_events=[])
-        for k in ('movie_floor','movie_beat','sleeping','kill_receipt','profile_view','foe_sheet'):p.pop(k,None)
+        for k in ('movie_floor','movie_beat','sleeping','kill_receipt','profile_view','foe_sheet','group','group_result','expedition','collection_view','workshop_view','hunt_offers'):p.pop(k,None)
         with at_time(seconds):
             p['hp']=state.max_hp(p);p['energy_val']=float(state.energy_cap_of(p));p['energy_ts']=state.now().isoformat()
         s=GameSession(p['luna_user'],seconds=seconds,document=p,capture=False);s.act('hunt')
         if s.scene.refusal:raise RuntimeError('Probe hunt refused: '+s.scene.refusal)
-        enemy=deepcopy(s.doc['encounter']);won=False;outcome='action_limit'
+        enemy=deepcopy(in_battle(s.doc));won=False;outcome='action_limit'
         for action in range(cfg.max_combat_actions):
-            if cfg.probe_mode=='improvements':
+            if s.doc.get('group'):
+                option=fight_choice(s,'tactician',probe=True)
+            elif cfg.probe_mode=='improvements':
                 from .game_planner import fight
                 option=fight(s)[0]
             else:option=fight_choice(s,'tactician',probe=True)
             s.act(option)
             if s.scene.refusal:raise RuntimeError('Probe action refused: '+option+': '+s.scene.refusal)
-            if any(e['kind']=='kill' for e in s.events):won=True;outcome='win';break
-            if not s.doc.get('encounter'):
+            success='group_clear' if p.get('ruleset')=='collection-v1' else 'kill'
+            if any(e['kind']==success for e in s.events):won=True;outcome='win';break
+            if not in_battle(s.doc):
                 outcome='death_or_retreat';break
         wins+=won;failures[outcome]+=1
-        samples.append(dict(monster=enemy['name'],type=enemy.get('profile',{}).get('type'),outcome=outcome,actions=action+1))
+        samples.append(dict(monster=' / '.join(m['name'] for m in enemy['members']) if enemy.get('members') else enemy['name'],type='group' if enemy.get('members') else enemy.get('profile',{}).get('type'),outcome=outcome,actions=action+1))
     return dict(win_rate=wins/cfg.readiness_trials,wins=wins,trials=cfg.readiness_trials,failures=dict(failures),samples=samples)
 
 
@@ -120,7 +132,7 @@ class Agent:
     def __init__(self,cfg,ident,policy):
         self.cfg,self.id,self.policy=cfg,ident,policy
         self.rng=random.Random(f'agent:{cfg.seed}:{ident}')
-        self.s=create_character(f'simulation:{cfg.seed}:{ident}',ident<cfg.trace_players)
+        self.s=create_character(f'simulation:{cfg.seed}:{ident}',ident<cfg.trace_players,cfg.ruleset)
         self.ready=0;self.milestones=[];self.floors={};self.counters=Counter();self.ledger=Counter();self.blocked=Counter()
         self.timeline=[];self.active=0.;self.actions=0;self.goal=None;self.queue=[];self.target=1;self.end=0;self.last_probe=None
         self.recent=[];self.attempt=None;self.probe_key=None;self.last_win=None
@@ -131,7 +143,7 @@ class Agent:
         self.s.world_frontier(min(self.cfg.max_floor,floor))
 
     def act(self,option):
-        before=self.s.doc;enc=deepcopy(before.get('encounter'))
+        before=self.s.doc;enc=deepcopy(in_battle(before))
         self.s.act(option,seconds=self.s.seconds+self.cfg.action_seconds)
         self.active+=self.cfg.action_seconds/60;self.actions+=1
         self.counters['actions']+=1
@@ -140,28 +152,36 @@ class Agent:
         for event in self.s.events:
             kind=event['kind'];self.counters[kind]+=1
             self.ledger[kind]+=event.get('gold',0)
-            if kind=='kill':self.counters['earned_gold']+=max(0,event.get('gold',0));self.counters['earned_xp']+=max(0,event.get('xp',0))
-        current=self.s.doc.get('encounter')
+            if kind in ('kill','group_clear','gather_extract'):
+                self.counters['earned_gold']+=max(0,event.get('gold',0));self.counters['earned_xp']+=max(0,event.get('xp',0))
+        current=in_battle(self.s.doc)
         if not enc and current:
             f=current['floor'];self.attempt=f
             self.floors.setdefault(f,dict(attempts=0,wins=0,kills=0,deaths=0,actions=0,gold=0,xp=0))['attempts']+=1
         if enc:
             f=enc['floor'];row=self.floors[f];row['actions']+=1
-            if any(e['kind']=='kill' for e in self.s.events):
-                row['wins']+=1;row['kills']+=1;self.last_win=True
-                for event in self.s.events:
-                    if event['kind']=='kill':row['gold']+=event.get('gold',0);row['xp']+=event.get('xp',0)
+            row['kills']+=sum(e['kind']=='kill' for e in self.s.events)
+            for event in self.s.events:
+                if event['kind'] in ('kill','group_clear'):
+                    row['gold']+=event.get('gold',0)
+                    row['xp']+=event.get('xp',0)
+            success='group_clear' if enc.get('members') else 'kill'
+            if any(e['kind']==success for e in self.s.events):
+                row['wins']+=1;self.last_win=True
             elif not current:
                 row['deaths']+=int(any(e['kind']=='death' for e in self.s.events));self.last_win=False
             if not current:
                 history=self.route_history.setdefault(f,[]);history.append(self.last_win);del history[:-12]
-        if any(e['kind'] in ('buy','train','levelup','hone','repair') for e in self.s.events):
+        if any(e['kind'] in ('buy','train','levelup','hone','repair','upgrade','craft') for e in self.s.events):
             self.route_history={}
         if self.last_decision_reason:self.planner_notes[self.last_decision_reason]+=1
         self.recent.append(dict(at=self.s.seconds,action=option,headline=self.s.scene.headline,refusal=self.s.scene.refusal))
         self.recent=self.recent[-30:]
 
     def goto(self,room):
+        if self.cfg.ruleset=="collection-v1":
+            from .game_collection import navigate
+            return navigate(self,room)
         s=self.s;p=s.doc;opts={o.id for o in s.legal()}
         if p.get('movie_floor'):return 'skip'
         if p['location']==room:return None
@@ -232,7 +252,10 @@ class Agent:
     def step(self):
         # Read the engine's current state before deciding. A death/receipt
         # scene may describe a room the player has already returned to.
-        if not self.s.doc.get('encounter'):self.s.look()
+        if not in_battle(self.s.doc):self.s.look()
+        if self.cfg.ruleset=='collection-v1':
+            from .game_collection import decide
+            return decide(self)
         if self.policy=='planner':
             from .game_planner import decide
             return decide(self)
@@ -275,11 +298,14 @@ class Agent:
         return self.goto('gate')
 
     def probe(self):
-        if self.ready>=self.cfg.max_floor:return
+        if self.ready>=self.cfg.max_floor or self.s.doc.get('expedition'):return
+        if self.cfg.ruleset=='collection-v1':
+            from plugin_linear_ascent.engine import collection
+            if collection.claims(self.s.doc):return
         # Recheck only on changes relevant to combat; exact condition and
         # quiver retained. A new day also changes the game's RNG day seed.
         p=self.s.doc
-        signature=digest({k:p.get(k) for k in ('level','gear','hone','training','slots','held','durability','durability_pack','quiver','mastery')})
+        signature=digest({k:p.get(k) for k in ('level','gear','hone','training','slots','held','durability','durability_pack','quiver','mastery','collection','deck')})
         key=(int(self.s.seconds//86400),signature,self.ready)
         if key==self.probe_key:return
         self.probe_key=key
@@ -294,8 +320,8 @@ class Agent:
         if self.cfg.probe_mode=='improvements':self.probe_key=(key[0],signature,self.ready)
 
     def improvement_probe(self,option):
-        if self.cfg.probe_mode!='improvements' or self.s.doc.get('encounter'):return
-        if any(e['kind'] in ('buy','train','levelup','hone','repair') for e in self.s.events) or option.startswith(('wear_','unequip_','nock_')):
+        if self.cfg.probe_mode!='improvements' or in_battle(self.s.doc):return
+        if any(e['kind'] in ('buy','train','levelup','hone','repair','upgrade','craft') for e in self.s.events) or option.startswith(('wear_','unequip_','nock_')):
             self.probe()
 
     def run(self):
@@ -305,19 +331,21 @@ class Agent:
                 start=day*86400+visit*(16*3600/max(1,self.cfg.sessions_per_day-1))
                 self.s.look(max(start,self.s.seconds))
                 self.end=self.s.seconds+self.cfg.minutes_per_day*60/self.cfg.sessions_per_day
-                if day%self.cfg.probe_every_days==0 and not self.s.doc.get('encounter'):
+                if day%self.cfg.probe_every_days==0 and not in_battle(self.s.doc):
                     self.probe()
                 self.target=min(self.s.doc['unlocked_floor'],max(1,self.ready+int(self.policy=='rusher')-int(self.policy=='saver')))
+                if self.cfg.ruleset=='collection-v1' and self.policy not in ('rusher','learner'):
+                    self.target=max(1,self.target-1)
                 guard=0;repeat=None;repeated=0
                 while self.s.seconds+self.cfg.action_seconds<=self.end:
                     # Reserve actual action time for the planner's between-visit
                     # rest. The game still charges every navigation/sleep action.
-                    if self.policy=='planner' and not self.s.doc.get('encounter') and self.end-self.s.seconds<=6*self.cfg.action_seconds:break
+                    if self.policy=='planner' and not in_battle(self.s.doc) and self.end-self.s.seconds<=6*self.cfg.action_seconds:break
                     with at_time(self.s.seconds):option=self.step()
                     if option is None:break
                     before=(self.s.doc['location'],option)
                     repeated=repeated+1 if before==repeat else 0;repeat=before
-                    if repeated>self.cfg.max_combat_actions and not self.s.doc.get('encounter'):
+                    if repeated>self.cfg.max_combat_actions and not in_battle(self.s.doc):
                         self.blocked['decision_loop']+=1;break
                     self.act(option);guard+=1
                     self.improvement_probe(option)
@@ -326,7 +354,7 @@ class Agent:
                         if repeated>2:self.blocked['refusal_loop']+=1;break
                 # No fabricated end-of-session heal. Sleep and bank use
                 # ordinary game choices within the remaining activity budget.
-                if (visit==self.cfg.sessions_per_day-1 or self.policy=='planner') and not self.s.doc.get('encounter'):
+                if (visit==self.cfg.sessions_per_day-1 or self.policy=='planner') and not in_battle(self.s.doc):
                     self.s.look()
                     sequence=['vault','deposit_all'] if self.policy=='saver' else []
                     sequence+=['sleep_menu','sleep_fields']
@@ -340,7 +368,7 @@ class Agent:
                             else:break
             self.timeline.append(dict(day=day+1,ready_floor=self.ready,level=self.s.doc['level'],gold=self.s.doc['gold'],bank=self.s.doc['bank'],active_minutes=self.active,actions=self.actions))
         self.s.look(max(self.s.seconds,self.cfg.days*86400))
-        if not self.s.doc.get('encounter'):self.probe()
+        if not in_battle(self.s.doc):self.probe()
         p=self.s.doc
         # Ledger transfers are kept signed for inspection. Wealth is recorded
         # separately because depositing gold does not destroy it.
