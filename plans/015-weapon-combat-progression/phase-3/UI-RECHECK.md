@@ -33,3 +33,11 @@ Verification: shared tool payload/scene tests and focused group rendering checks
 Rollback: revert the recorded guidance-only plugin commit, vendor and restart the same owned QA processes; preserve all progressed state. Restart procedure remains the QA ROLLBACK.md. This note is committed before the code change.
 
 P3-005 implementation: plugin3f8d2b2/version0.114.3,32 focused checks passed; full1482passed/8 established legacy failures/4skipped/1xfail in38.62s. QA health confirms0.114.3. Matching eight-player ten-day run20260913T070656Z-cd6a13b3 has the identical semantic digest fef26f696cf2b69be63d64210ff8fac4bffd3bc2f2bf5bbe2b3168132e6536fc; the guidance patch changes no progression outcome. Browser explanatory recheck pending. Guidance rollback: `git -C plugin-linear-ascent revert 3f8d2b2`, re-vendor and restart only owned QA processes.
+
+## P3-006 —390px generic option hints (pre-execution)
+
+Main opened the real QA /play page with cached Chromium at390×844, separate declared `web:phase3mobile` fixture. Screenshot /private/tmp/ascent-phase3-mobile/01-camp.png shows Drowned Copse and Bog-Iron Field tool requirements clipped to the right; .opt .hint is forced to white-space:nowrap and its row cannot fit the new descriptive hints. The group-specific buttons already wrap without overflow (312px action grid,151px button content/scroll width). This is a separate presentation defect; the native Safari functional pass continues on0.114.3.
+
+Fix only candidate collection-scene generic option rows at narrow widths: key/label first line, wrapping hint below; remove the dot leader for these rows. Preserve labels, action IDs, number selection, keyboard handling and old-player row behavior. Give native group button content a consistent top alignment. Verify actual390px camp/gather/selected collection, Forge grade/catalog and battle screenshots with no clipped text; rerun existing rendering tests and full plugin gate before freezing. No new economic grants to natural players.
+
+Rollback: revert the recorded CSS/marker plugin commit, vendor and restart ownedQA; preserve all player state and fixtures. Browser fixture setup/cleanup is documented before writes in /private/tmp/ascent-change-qa/MOBILE-CHECK.md. Temporary session cookies are excluded from repository/evidence.
