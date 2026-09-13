@@ -1,0 +1,27 @@
+# Phase5 implementation decisions — before execution
+
+13 September2026, rootfa3e16c, plugine44998d/0.115.2. User authorized all phases and autonomous tuning. Start implementation after phase4 discovery/browser gate closes.
+
+## Problem and evidence
+
+Actual opening run008 takes fastest8days tofloor10, versus the reviewed illustrative1.59day guide. Only1/8arrive; median unavailable. Candidate policies all stop training at3, never hone/repair defensive equipment, never upgrade to a new-grade weapon, store all weapon drops without comparing them, and prioritize maintaining every weapon equally. Saver deposits but the candidate decision path never collects interest or withdraws it. Candidate planner ignores prior configured growth/path settings. Several late prepared site failures improve drastically when initial defenses are honed: floor80gatherdeaths20/32→1/32. This is a policy coverage gap before it is proof of a broken game coefficient. The headless adapter already imports the real core and checks source/replay/CPU parity; preserve it.
+
+## Execution order
+
+1. Complete policy coverage, no game coefficient changes. Preserve Learner and Tactician as ordinary comparisons. Add deterministic seeded random legal choices and a strategic investor. Candidate planner settings must actually select main family/path, growth priorities, gathering preference and Vault allocation. Record reasons and all action receipts. Policies see public stats, inventory, prices, stock and history, never future RNG or hidden loot. Compare expected choices using shared public formulae without rolling alternate futures.
+2. Implement legal preparation: matchups/status-aware combat and reachable counters; compare owned weapons by useful current contribution, repair when worthwhile, allocate upgrades asymmetrically, craft/buy new grades using actual gates, buy/hone/repair armor/shield, train/mastery and character levels with real XP/gold. Reserve recovery/ammo money. Store obsolete items through collection options; never grant items or edit a progressing player document. Handle collection screens as a pending legal decision rather than closing them endlessly.
+3. Measure Vault policy via actual collect_interest/deposit_half/withdraw_all choices. Keep some capital invested, harvest stubs, and withdraw for concrete profitable progression rather than repeatedly depositing/withdrawing. Reserve final visit action time for deposit/sleep; actual engine recovery only. Add no-Vault/no-gathering comparison settings. Never alter engine clocks/returns just to reward a named strategy.
+4. Fix observability where needed: group killXP and haul, recovery/arrow/defense/material costs, action reasons, invalid loops, exhausted starts, wealth and bank return. Probe actual full groups with owned stock/condition, record sample outcomes. Add paid sustained routes and per-player next-floor intervals; preserve unreached denominators.
+5. Run 1-day canary,10-day screen,30/90-day bottleneck review; freeze candidate settings, validate disjoint seeds, then extend to365days and100floors. Start with4–16players and availableCPUs; increase only after runtime/outcomes are useful. Compare serial/auto semantic hashes and exact replays. Save every failed/slow experiment. No silent removal of weaker but legal policies.
+6. Only after traces identify an actual economic wall, write a small pre-execution tuning amendment naming affected coefficients, old/new values, mathematical intent and expected falsifiable result. Preserve the1.3power,1.25income,1.04relative growth references unless the evidence justifies an explicit documented revision. Investigate adjacent-floor delay cliffs; do not interpolate fabricated observations.
+7. Dashboard: label cumulative days and additional days in plain words, fastest observed identity/strategy and cohortmedian with counts. Add measured strategy/investment/gathering comparisons and costs. Show strong-policy guide separately from measured results; the fastest envelope is not a guaranteed optimum. Browser/Luna ordinary earning test closes the phase.
+
+## Verification
+
+Exact tests: no forward RNG inspection; inventory/energy/XP/wealth conservation through core actions; interest collected once; investment can later fund a recorded purchase; only3slots; group completion, sleep, grade transitions, depleted arrows, empty cash/broken starters; no refusal/collection navigation loops. `ASCENT_GAME_PATH="$PWD/plugin-linear-ascent" <project-python> -m unittest discover -s simulation/tests -q`. Runs use `simulation/run.py`; extend `game_search.py` with explicit collection-v1 selection and settings, retain legacy entry point. Parallel child runs use workers1 to avoid nested oversubscription. Validate against recorded source/host hashes; source changes never overwrite older outputs.
+
+Dojo S13: navigate actual saved-run dashboard, hover first/late/missing floors, read median+fastest and per-player intervals, inspect cost/reach tables. Real Luna: smart preparation using actual earned resources; one-action prompts until phase7 action-cap guard lands. No direct player grants used to claim days-to-progress.
+
+## Rollback
+
+Revert phase5 policy/display commits in reverse order and rerun recorded seeds againstfa3e16c/e44998d. Keep all run files and source hashes; no production change, no earned document reset. Gameplay tuning separately reversible with persisted quote/group compatibility specified before edits. This plan is not proof of completed policy coverage or pacing.
