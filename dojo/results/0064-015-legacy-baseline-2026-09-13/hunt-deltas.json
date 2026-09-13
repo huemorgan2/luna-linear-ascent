@@ -1,0 +1,34 @@
+[
+  {
+    "captured_at": "2026-09-13T05:19:31.159698+00:00",
+    "hp": 80,
+    "gold": 25,
+    "bank": 25,
+    "xp": 0,
+    "energy_val": 23.0,
+    "energy_ts": "2026-09-13T05:19:06.956474+00:00",
+    "act_seq": 22,
+    "rng_counter": 2,
+    "slots": 1,
+    "held": [
+      "rusted_sword"
+    ],
+    "encounter": "lane_wolf"
+  },
+  {
+    "captured_at": "2026-09-13T05:20:21.068144+00:00",
+    "hp": 75,
+    "gold": 45,
+    "bank": 25,
+    "xp": 2,
+    "energy_val": 23.0,
+    "energy_ts": "2026-09-13T05:19:06.956474+00:00",
+    "act_seq": 28,
+    "rng_counter": 15,
+    "slots": 1,
+    "held": [
+      "rusted_sword"
+    ],
+    "encounter": null
+  }
+]

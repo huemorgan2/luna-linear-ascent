@@ -31,4 +31,4 @@ Follow the [parent plan](../PLAN.md) and its ownership map. No new production ru
 
 ## Execution status
 
-Not started. Rewritten for the three-weapon/group design on12 September2026; authorized for implementation by the subsequent user request. This document is not evidence that runtime changes or tests have run.
+Baseline captured and contracts committed on13 September2026; proceed to phase2 candidate implementation. See BASELINE.md and dojo/results/0064-015-legacy-baseline-2026-09-13 in the parent repository. Server224 tests and simulator56 tests pass; source alignment retains the same10 pre-existing plugin failures. Exact replay, Vault timing, finite-energy probes and real Luna creation/School/Vault/normal-hunt are recorded. The bounded baseline did not exercise every older S01 browser case; those unrun cases are explicitly listed and must be covered on the candidate before release. No new gameplay or production conversion has occurred. Baseline/alignment commits: root4e51eb6 and213062a, plugin06134b0 and1f1b661. Rollback alignment with git revert1f1b661 (with normal spaces); root integration with git revert -m1 1f45fb1.
