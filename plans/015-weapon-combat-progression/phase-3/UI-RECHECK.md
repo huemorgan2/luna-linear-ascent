@@ -21,3 +21,13 @@ Plugin d49adf1 (0.114.1) implemented the six presentation/text changes above. It
 QA has been restarted with0.114.2, same progressed databases, and tenant `ascent-change-phase3` for the separate natural Luna character. BaselineAsh remains under `ascent-change-baseline`. Current owned process IDs are recorded in the local `pids.json`; do not assume an older recorded PID still identifies a QA process. Browser resumes from the pending first Luna enemy and the web camp, not from reset characters.
 
 Exact presentation rollback: `git -C plugin-linear-ascent revert 7a00177 d49adf1`, then `bash worldd/tools/vendor_game.sh` and restart the same owned QA launchers. It retains0.114.0 group/collection readers and all earned state. This rollback is distinct from reversing the original group-engine migration.
+
+## P3-005 — stale standing combat advice (pre-execution)
+
+Browser evidence09 records Luna saying a Cover shot doubles damage and a blade can reach from Cover. Source review on13 September found `_GUIDE_RULES` in plugin.py explicitly instructing the obsolete cover-shot double, old single-weapon start, flat fight energy and outdated fixed prices/death loss; `_SHARED_RULES` also hardcodes the old first training fee. Group technique hints currently repeat only their names, omitting the real20% bonus. This is a guidance contract defect, not evidence to change the resolver.
+
+Correct the standing instructions to obtain facts from the current scene/character data rather than a second rules table. Explain independent reach/affinity for collection battles and preserve old-player behavior by reading the scene. Put each family technique's exact description in its current action hint and include current gap/reach requirements in the scene text. A request to explain combat may receive the requested short explanation rather than being suppressed by the one-line flavor rule.
+
+Verification: shared tool payload/scene tests and focused group rendering checks, full plugin suite (separately identify established legacy failures), frozen-source simulator outcome comparison. Restart owned QA Luna as tool registration changes, preserve accounts/fixtures, then repeat the actual explanatory question in the existing conversation and finish the ongoing walkthrough. No gold, damage, energy, prices, loot or RNG changes.
+
+Rollback: revert the recorded guidance-only plugin commit, vendor and restart the same owned QA processes; preserve all progressed state. Restart procedure remains the QA ROLLBACK.md. This note is committed before the code change.
