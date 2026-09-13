@@ -33,3 +33,7 @@ Follow the [parent plan](../PLAN.md) and its ownership map. No new production ru
 ## Execution status
 
 Not started. Rewritten for the three-weapon/group design on12 September2026; authorized for implementation by the subsequent user request. This document is not evidence that runtime changes or tests have run.
+
+### Execution start —13 September2026
+
+Phase2's essential state/collection browser gate passed on0.113.5. Implementation now follows `ENGINE-CONTRACT.md`, committed before runtime edits. Preserve the baseline legacy failure list and source-pin new group tests separately; phase3 must supply actual-engine group progression evidence, not reinterpret prior single-enemy runs.

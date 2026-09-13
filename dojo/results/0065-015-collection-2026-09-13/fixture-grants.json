@@ -1,0 +1,273 @@
+{
+  "fixture": {
+    "purpose": "Phase2 browser collection grades/copy identity and deposit retry",
+    "grants": [
+      "1000 gold",
+      "floor 100 unlock for grade visibility",
+      "two Common, one Rare, one Epic, one Legendary Viper via collection.mint shop source"
+    ],
+    "at": "2026-09-13T05:46:05.845430+00:00"
+  },
+  "items": [
+    {
+      "id": "f2fdb8a9c4dd892457d248bd5f908ac7",
+      "family": "viper",
+      "grade": "Common",
+      "level": 0,
+      "source": "shop",
+      "provenance": {
+        "receipt": "qa-phase2-0",
+        "owner": "web:qacollectionfixture"
+      },
+      "durability": 1300,
+      "maximum": 1300
+    },
+    {
+      "id": "8eddb4bf7a538e6414998dc6b9369d3f",
+      "family": "viper",
+      "grade": "Common",
+      "level": 0,
+      "source": "shop",
+      "provenance": {
+        "receipt": "qa-phase2-1",
+        "owner": "web:qacollectionfixture"
+      },
+      "durability": 1300,
+      "maximum": 1300
+    },
+    {
+      "id": "63d61b269246dead8ea3a368986195f2",
+      "family": "viper",
+      "grade": "Rare",
+      "level": 2,
+      "source": "shop",
+      "provenance": {
+        "receipt": "qa-phase2-2",
+        "owner": "web:qacollectionfixture"
+      },
+      "durability": 2178,
+      "maximum": 2178
+    },
+    {
+      "id": "f0d1d16de75b7837d562dc9079354cfd",
+      "family": "viper",
+      "grade": "Epic",
+      "level": 4,
+      "source": "shop",
+      "provenance": {
+        "receipt": "qa-phase2-3",
+        "owner": "web:qacollectionfixture"
+      },
+      "durability": 3120,
+      "maximum": 3120
+    },
+    {
+      "id": "021d6ef117352e44f95d6dfa973bb507",
+      "family": "viper",
+      "grade": "Legendary",
+      "level": 6,
+      "source": "shop",
+      "provenance": {
+        "receipt": "qa-phase2-4",
+        "owner": "web:qacollectionfixture"
+      },
+      "durability": 3998,
+      "maximum": 3998
+    }
+  ],
+  "doc": {
+    "version": 11,
+    "luna_user": "web:qacollectionfixture",
+    "stage": "playing",
+    "name": "QACollectionFixture",
+    "race": "Elf",
+    "level": 1,
+    "xp": 0,
+    "hp": 80,
+    "gold": 1000,
+    "bank": 0,
+    "bank_day": 254,
+    "floor": 0,
+    "location": "town",
+    "gear": {
+      "weapon": null,
+      "shield": "gate_buckler",
+      "armor": "gate_jerkin",
+      "shoes": null,
+      "charm": null
+    },
+    "hone": {
+      "shield": 0,
+      "armor": 0
+    },
+    "charm_slot": false,
+    "quiver": {},
+    "oil": {},
+    "charm_dur": 0,
+    "durability": {},
+    "durability_pack": {},
+    "inventory": {},
+    "energy_ts": "2026-09-13T05:46:05.842974+00:00",
+    "energy_val": 24.0,
+    "lodged_until_day": -1,
+    "last_seen": "2026-09-13T05:46:05.842974+00:00",
+    "news_day": 254,
+    "rng_counter": 0,
+    "scene": null,
+    "encounter": null,
+    "unlocked_floor": 100,
+    "flags": {},
+    "daily": {
+      "day": 254,
+      "pvp_used": 0,
+      "energy_cell": false,
+      "death_save": false
+    },
+    "sidekick": {
+      "insight": 1,
+      "carried": null
+    },
+    "telemetry_day": 254,
+    "training": {
+      "blade": 0,
+      "bow": 0,
+      "staff": 0
+    },
+    "slots": 3,
+    "held": [],
+    "labs": {},
+    "collection": {
+      "f2fdb8a9c4dd892457d248bd5f908ac7": {
+        "id": "f2fdb8a9c4dd892457d248bd5f908ac7",
+        "family": "viper",
+        "grade": "Common",
+        "level": 0,
+        "source": "shop",
+        "provenance": {
+          "receipt": "qa-phase2-0",
+          "owner": "web:qacollectionfixture"
+        },
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "8eddb4bf7a538e6414998dc6b9369d3f": {
+        "id": "8eddb4bf7a538e6414998dc6b9369d3f",
+        "family": "viper",
+        "grade": "Common",
+        "level": 0,
+        "source": "shop",
+        "provenance": {
+          "receipt": "qa-phase2-1",
+          "owner": "web:qacollectionfixture"
+        },
+        "durability": 1300,
+        "maximum": 1300
+      },
+      "63d61b269246dead8ea3a368986195f2": {
+        "id": "63d61b269246dead8ea3a368986195f2",
+        "family": "viper",
+        "grade": "Rare",
+        "level": 2,
+        "source": "shop",
+        "provenance": {
+          "receipt": "qa-phase2-2",
+          "owner": "web:qacollectionfixture"
+        },
+        "durability": 2178,
+        "maximum": 2178
+      },
+      "f0d1d16de75b7837d562dc9079354cfd": {
+        "id": "f0d1d16de75b7837d562dc9079354cfd",
+        "family": "viper",
+        "grade": "Epic",
+        "level": 4,
+        "source": "shop",
+        "provenance": {
+          "receipt": "qa-phase2-3",
+          "owner": "web:qacollectionfixture"
+        },
+        "durability": 3120,
+        "maximum": 3120
+      },
+      "021d6ef117352e44f95d6dfa973bb507": {
+        "id": "021d6ef117352e44f95d6dfa973bb507",
+        "family": "viper",
+        "grade": "Legendary",
+        "level": 6,
+        "source": "shop",
+        "provenance": {
+          "receipt": "qa-phase2-4",
+          "owner": "web:qacollectionfixture"
+        },
+        "durability": 3998,
+        "maximum": 3998
+      }
+    },
+    "deck": [
+      null,
+      null,
+      null
+    ],
+    "active_weapon": null,
+    "item_sequence": 5,
+    "item_receipts": {
+      "qa-phase2-0": "f2fdb8a9c4dd892457d248bd5f908ac7",
+      "qa-phase2-1": "8eddb4bf7a538e6414998dc6b9369d3f",
+      "qa-phase2-2": "63d61b269246dead8ea3a368986195f2",
+      "qa-phase2-3": "f0d1d16de75b7837d562dc9079354cfd",
+      "qa-phase2-4": "021d6ef117352e44f95d6dfa973bb507"
+    },
+    "group": null,
+    "expedition": null,
+    "xp_reserve": 0,
+    "materials": {},
+    "utility_tools": {},
+    "ruleset": "collection-v1",
+    "collection_migration": {
+      "id": "collection-v1",
+      "status": "applied",
+      "legacy": {
+        "held": [],
+        "gear": {
+          "weapon": null,
+          "shield": "gate_buckler",
+          "armor": "gate_jerkin",
+          "shoes": null,
+          "charm": null
+        },
+        "inventory": {},
+        "durability": {},
+        "durability_pack": {},
+        "hone": {
+          "shield": 0,
+          "armor": 0
+        },
+        "oil": {},
+        "slots": 1
+      },
+      "refund": {
+        "gold": 0,
+        "xp": 0,
+        "basis": "recorded receipts"
+      },
+      "count": 0
+    },
+    "_ledger": [
+      {
+        "kind": "slot_refund",
+        "gold": 0,
+        "xp": 0,
+        "note": "collection-v1"
+      }
+    ],
+    "qa_fixture": {
+      "purpose": "Phase2 browser collection grades/copy identity and deposit retry",
+      "grants": [
+        "1000 gold",
+        "floor 100 unlock for grade visibility",
+        "two Common, one Rare, one Epic, one Legendary Viper via collection.mint shop source"
+      ],
+      "at": "2026-09-13T05:46:05.845430+00:00"
+    }
+  }
+}
